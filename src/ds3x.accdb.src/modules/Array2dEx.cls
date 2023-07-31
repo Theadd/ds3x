@@ -143,7 +143,8 @@ Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
     End If
     
     Set CreateFromRecordset = New Array2dEx
-    CreateFromRecordset.Instance = CollectionsLib.GetArrayByRef(k)
+'    CreateFromRecordset.Instance = CollectionsLib.GetArrayByRef(k)
+    CreateFromRecordset.Instance = k
 End Function
 
 Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
@@ -160,7 +161,8 @@ Private Function CreateFromRecordsetFields(ByVal AllFields As ADODB.Fields) As A
     Next i
     
     Set CreateFromRecordsetFields = New Array2dEx
-    CreateFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
+'    CreateFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromRecordsetFields.Instance = t
 End Function
 
 Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dEx
@@ -183,7 +185,8 @@ Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dE
     Next i
 
     Set CreateFromArrayList = New Array2dEx
-    CreateFromArrayList.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromArrayList.Instance = t
+'    CreateFromArrayList.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
 
@@ -217,7 +220,8 @@ Private Function CreateFromJaggedArray(ByVal TargetArray As Variant) As Array2dE
         i = i + 1
     Next Entry
     
-    CreateFromJaggedArray.Instance = CollectionsLib.GetArrayByRef(t)
+'    CreateFromJaggedArray.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromJaggedArray.Instance = t
 End Function
 
 ' Concatenate all elements of TargetArray as additional columns into a new Array2dEx
@@ -247,7 +251,8 @@ Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     Next i
     
     Set Join = New Array2dEx
-    Join.Instance = CollectionsLib.GetArrayByRef(t)
+'    Join.Instance = CollectionsLib.GetArrayByRef(t)
+    Join.Instance = t
 End Function
 
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
@@ -279,12 +284,15 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     Next i
     
     Set GetRange = New Array2dEx
-    GetRange.Instance = CollectionsLib.GetArrayByRef(t)
+'    GetRange.Instance = CollectionsLib.GetArrayByRef(t)
+    GetRange.Instance = t
 End Function
 
-'Public Function Resize(Optional ByVal NumRows As Variant, Optional ByVal NumColumns As Variant, Optional ByVal DefaultValue As Variant) As Array2dEx
-'    Dim t As New Array2dEx
-'End Function
+Public Function Clone() As Array2dEx
+    Dim t() As Variant
+    t = Instance
+    Set Clone = Array2dEx.Create(t)
+End Function
 
 Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
     Dim t() As String, s() As String, i As Long, c As Long, uc As Long
@@ -318,11 +326,21 @@ End Function
 ' --- OTHER ---
 
 Private Sub Class_Initialize()
+    OBJ_COUNTER_ARRAY2DEX = OBJ_COUNTER_ARRAY2DEX + 1
     Instance = Empty
 End Sub
 
 Private Sub Class_Terminate()
-    Instance = Empty
+    OBJ_COUNTER_ARRAY2DEX = OBJ_COUNTER_ARRAY2DEX - 1
+    Debug.Print "# Array2dEx.Terminate(), Remaining: " & CStr(OBJ_COUNTER_ARRAY2DEX)
+    ' EDIT: DISPOSE
+    ' Instance = Empty
+End Sub
+
+Public Sub Dispose()
+    ' EDIT: DISPOSE
+    'Stop
+    'Instance = Empty
 End Sub
 
 
@@ -352,7 +370,8 @@ Public Function Transpose() As Array2dEx
     Next
     
     Set Transpose = New Array2dEx
-    Transpose.Instance = CollectionsLib.GetArrayByRef(t)
+'    Transpose.Instance = CollectionsLib.GetArrayByRef(t)
+    Transpose.Instance = t
 End Function
 
 
@@ -385,7 +404,7 @@ Private Function C2Object(ByRef Value As Variant) As Object
     Set C2Object = Value
 End Function
 
-Private Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
+Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Finally
     Dim t As Long
     
@@ -397,7 +416,7 @@ Private Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
 Finally:
 End Function
 
-Private Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
+Public Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Fallback
 
     Is1dArray = Not (UBound(ArrayLike, 2) >= 0)

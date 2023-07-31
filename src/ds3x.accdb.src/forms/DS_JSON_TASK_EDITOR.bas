@@ -24,10 +24,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =18165
-    Top =3180
-    Right =27975
-    Bottom =10395
+    Left =4065
+    Top =2775
+    Right =28545
+    Bottom =15345
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -559,6 +559,7 @@ Private Sub DS_BUTTON_TOGGLE_EXPAND_GotFocus()
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+    On Error Resume Next
     If KeyCode = vbKeyReturn And Shift = 0 Then
         Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.KeyDown(vbKeyReturn, 0)"
         KeyCode = 0

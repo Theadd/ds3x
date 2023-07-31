@@ -31,7 +31,7 @@ Public Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, 
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
-Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal y As Long, ByVal CX As Long, ByVal CY As Long, ByVal wFlags As Long) As Long
+Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal y As Long, ByVal cX As Long, ByVal CY As Long, ByVal wFlags As Long) As Long
 Private Declare PtrSafe Function GetDesktopWindow Lib "user32" () As LongPtr
 
 Private Declare PtrSafe Function CalculatePopupWindowPosition Lib "user32" (anchorPoint As POINTAPI, windowSize As SIZE, ByVal flags As Long, excludeRect As RECT, outPosition As RECT) As Boolean  ' https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-calculatepopupwindowposition
@@ -81,7 +81,7 @@ Private Const HWND_BOTTOM As Long = 1        ' Places the window at the bottom o
 ' --- TYPE DEFINITIONS ---
 
 Private Type SIZE
-        CX As Long
+        cX As Long
         CY As Long
 End Type
 
@@ -183,7 +183,7 @@ End Property
 
 ' --- PRIVATE FUNCTIONS ---
 
-Private Function PointToSize(p As POINTAPI) As SIZE: PointToSize.CX = p.X: PointToSize.CY = p.y: End Function
+Private Function PointToSize(p As POINTAPI) As SIZE: PointToSize.cX = p.X: PointToSize.CY = p.y: End Function
 
 ' --- PUBLIC FUNCTIONS ---
 

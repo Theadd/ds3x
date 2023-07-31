@@ -182,6 +182,36 @@ Finally:
     TryGetMemoryUsage = False
 End Function
 
+Public Sub ShowAvailableVirtualMemory()
+    On Error GoTo Finally
+    Dim Mem As MEMORYSTATUS
+
+    Mem.dwLength = LenB(Mem)
+#If Win64 Then
+    GlobalMemoryStatusEx Mem
+#Else
+    GlobalMemoryStatus Mem
+#End If
+
+    Debug.Print CStr(BytesToMB(Mem.dwAvailVirtual)) & " MB / " & CStr(BytesToMB(Mem.dwTotalVirtual)) & " MB"
+Finally:
+End Sub
+
+Public Function GetAvailableVirtualMemory() As Long
+    On Error GoTo Finally
+    Dim Mem As MEMORYSTATUS
+
+    Mem.dwLength = LenB(Mem)
+#If Win64 Then
+    GlobalMemoryStatusEx Mem
+#Else
+    GlobalMemoryStatus Mem
+#End If
+
+    GetAvailableVirtualMemory = BytesToMB(Mem.dwAvailVirtual)
+Finally:
+End Function
+
 'Convert raw byte count to a more human readable format
 #If Win64 Then
 Private Function BytesToXB(RawValue As LARGE_INTEGER) As String

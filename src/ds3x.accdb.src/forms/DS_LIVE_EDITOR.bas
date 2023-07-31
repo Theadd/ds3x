@@ -507,6 +507,8 @@ Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Propert
 
 Private Sub Form_Load()
     Debug.Print "  # Form_Load()"
+    OBJ_COUNTER_ARRAYLISTEX = 0
+    OBJ_COUNTER_ARRAY2DEX = 0
     'App.Initialize
     ScreenLib_Resync
     
@@ -561,6 +563,7 @@ Private Sub Form_Timer()
         Set d = New dsLiveEd
         Bind d
         Set d.LiveEditor = Me
+        d.DisposeOnClose = True
         ' TODO: REMOVE 3 LINES BELOW
 '        pController.LoadADifferentSetOfSampleValues
 '        pController.MockAddTasks

@@ -17,6 +17,7 @@ Private pHeaderArray As Array2dEx
 Private pRecordList As ArrayListEx
 Private pRecordArray As Array2dEx
 Private pTableSource As Variant
+Private Const dsChunkSize As Long = 4000
 
 
 
@@ -32,7 +33,11 @@ End Property
 Public Property Get ColumnCount() As Long
     On Error Resume Next
     If pHeaderArray Is Nothing Then
-        ColumnCount = 1 + UBound(Me.HeaderList.Item(0)) - LBound(Me.HeaderList.Item(0))
+        If pHeaderList Is Nothing Then
+            ColumnCount = Me.Records.ColumnCount
+        Else
+            ColumnCount = 1 + UBound(Me.HeaderList.Item(0)) - LBound(Me.HeaderList.Item(0))
+        End If
     Else
         ColumnCount = Me.HeaderArray.ColumnCount
     End If
@@ -74,35 +79,64 @@ Public Property Get Records() As Variant
     End If
 End Property
 
-Public Property Get IndexRecordset() As ADODB.Recordset: Set IndexRecordset = CreateIndexRecordset: End Property
+Public Property Get IndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset: Set IndexRecordset = CreateIndexRecordset(PageSize, PageIndex): End Property
 Public Property Get NamedRecordset() As ADODB.Recordset: Set NamedRecordset = CreateNamedRecordset: End Property
 Public Property Get RowNumbers() As Boolean: On Error Resume Next: RowNumbers = (GetHeaderNames()(0) = "${#}"): End Property
 
 
 
-Public Function Create(Optional ByRef TableLike As Variant) As dsTable
+Public Function Create(Optional ByRef TableLike As Variant, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Set Create = New dsTable
-    If Not IsMissing(TableLike) Then Create.Bind TableLike
+    If Not IsMissing(TableLike) Then Create.Bind TableLike, AutoHeaders
 End Function
 
-Public Function Bind(Optional ByRef TableLike As Variant) As dsTable
+Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Set Bind = Unbind
     
     If Not IsMissing(TableLike) Then
         If Not IsObject(TableLike) Then
-            Err.Raise 13
+            If IsArray(TableLike) Then
+                If Array2dEx.Is2dArray(TableLike) Then
+                    Bind Array2dEx.Create(TableLike), AutoHeaders
+                ElseIf Array2dEx.Is1dArray(TableLike) Then
+                    Bind ArrayListEx.Create(TableLike), AutoHeaders
+                Else
+                    Err.Raise 13
+                End If
+            ElseIf VarType(TableLike) = vbString Then
+                If Left(LTrim(TableLike), 1) = "[" Then
+                    Bind JSON.Parse(TableLike, True, True)
+                Else
+                    Err.Raise 13
+                End If
+            Else
+                Err.Raise 13
+            End If
         Else
             If TypeOf TableLike Is RecordsetEx Then
                 Set pTableSource = TableLike    '.Clone
+                If AutoHeaders Then Me.SetHeaders pTableSource
+            ElseIf TypeOf TableLike Is ADODB.Recordset Then
+                Set pTableSource = RecordsetEx.Create(C2Recordset(TableLike))
+                If AutoHeaders Then Me.SetHeaders pTableSource
             ElseIf TypeOf TableLike Is ArrayListEx Then
                 Set pRecordList = TableLike
             ElseIf TypeOf TableLike Is Array2dEx Then
                 Set pRecordArray = TableLike
             Else
-                Err.Raise 13
+                If TypeOf TableLike Is xlSheetsEx Then
+                    Set Bind = CreateFromExcelRange(C2xlSheetsEx(TableLike).UsedRange, AutoHeaders)
+                ElseIf TypeOf TableLike Is Excel.Worksheet Then
+                    Set Bind = CreateFromExcelRange(C2ExcelWorksheet(TableLike).UsedRange, AutoHeaders)
+                ElseIf TypeOf TableLike Is Excel.Range Then
+                    Set Bind = CreateFromExcelRange(C2ExcelRange(TableLike), AutoHeaders)
+                Else
+                    Err.Raise 13
+                End If
             End If
         End If
     End If
+    
 End Function
 
 Public Function Unbind() As dsTable
@@ -118,7 +152,7 @@ Public Function Unbind() As dsTable
 End Function
 
 Public Sub Dispose()
-    ' TODO
+    Unbind
 End Sub
 
 Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
@@ -193,14 +227,61 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
     ToCSV = GetHeaderNames.ToCSV(Delimiter) & Me.Records.ToCSV(Delimiter)
 End Function
 
-Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As dsTable
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
+    Dim aX As ArrayListEx, cRow As Long, cRange As Excel.Range, i As Long, iMax As Long, rCount As Long, bX As ArrayListEx, a2dX As Array2dEx, iNumRows As Long
+    
+    If WriteHeaders Then
+        Set aX = ArrayListEx.Create(Array(GetHeaderNames))
+        Array2dEx.Create(aX).CopyToRange RangeObject, False
+        aX.Dispose
+        Set aX = Nothing
+        cRow = cRow + 1
+    End If
+    If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
+    If pRecordArray Is Nothing Then
+        On Error GoTo ErrorHandler
+        rCount = pRecordList.Count
+        
+        iNumRows = rCount - (i * dsChunkSize)
+        If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
+
+        While (iNumRows > 0)
+            ' TODO: To ~one-liner
+            Set bX = pRecordList.GetRange(i * dsChunkSize, iNumRows)
+            Set a2dX = Array2dEx.Create(bX)
+            a2dX.CopyToRange RangeObject.Range("A" & CStr(1 + cRow)), ApplyUserLocale
+            a2dX.Dispose
+            bX.Dispose
+            i = i + 1
+            cRow = cRow + iNumRows
+            iNumRows = rCount - (i * dsChunkSize)
+            If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
+        Wend
+
+    Else
+        pRecordArray.CopyToRange RangeObject.Range("A" & CStr(1 + cRow)), ApplyUserLocale
+    End If
+    
+    ' Me.RecordArray.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
+    
+ExitFunc:
+    Set CopyToRange = Me
+    Exit Function
+ErrorHandler:
+    On Error GoTo ExitFunc
+    Debug.Print CStr(Err.Number) & " - " & Err.Description
+    Stop
+    Resume Next
+End Function
+
+Friend Function CopyToRangeNonChunked(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As dsTable
     Dim hList As New ArrayListEx
     
     hList.Add GetHeaderNames
     Array2dEx.Create(hList).CopyToRange RangeObject, False
     Me.RecordArray.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
     
-    Set CopyToRange = Me
+    Set CopyToRangeNonChunked = Me
 End Function
 
 
@@ -254,10 +335,6 @@ End Function
 
 
 ' --- OTHER ---
-
-Private Sub Class_Initialize()
-    
-End Sub
 
 Private Sub Class_Terminate()
     On Error Resume Next
@@ -315,14 +392,21 @@ Private Sub RebuildRecordsFromTableSource()
     End If
 End Sub
 
+Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByVal AutoHeaders As Boolean = False) As dsTable
+    With xlRange
+        If AutoHeaders Then
+            Set pRecordList = ArrayListEx.Create(.Range(.Cells(2, 1), .Cells(.Rows.Count, .Columns.Count)))
+            Me.SetHeaders ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0)
+        Else
+            Set pRecordList = ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(.Rows.Count, .Columns.Count)))
+        End If
+    End With
+    
+    Set CreateFromExcelRange = Me
+End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
     Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx
-    
-'    If Me.Count = 0 Then
-'        Set CreateNamedRecordset = rs
-'        Exit Function
-'    End If
     
     iRow = GetHeaderNames
     cMax = UBound(iRow)
@@ -342,17 +426,15 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
         
         If Me.Count > 0 Then .MoveFirst
     End With
+    
     Set CreateNamedRecordset = rs
 End Function
 
-Private Function CreateIndexRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx
+Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx, iMax As Long
     
-    If Me.Count = 0 Then
-        Set CreateIndexRecordset = rs
-        Exit Function
-    End If
-    
+    If IsMissing(PageSize) Then PageSize = Me.Count
+    If IsMissing(PageIndex) Then PageIndex = 0
     iRow = CreateIndexHeaders
     cMax = UBound(iRow)
     cMin = LBound(iRow)
@@ -364,13 +446,15 @@ Private Function CreateIndexRecordset() As ADODB.Recordset
         Next c
         
         .Open
-        
-        For i = 0 To Me.Count - 1
+        iMax = (PageSize * (PageIndex + 1)) - 1
+        If iMax > Me.Count - 1 Then iMax = Me.Count - 1
+        For i = (PageSize * PageIndex) To iMax
             .AddNew FieldList:=iRow, Values:=allValues(i)
         Next i
         
-        .MoveFirst
+        If Me.Count > 0 Then .MoveFirst
     End With
+    
     Set CreateIndexRecordset = rs
 End Function
 
@@ -399,6 +483,14 @@ Public Function GetHeaderNames() As Variant
     
     GetHeaderNames = t
 End Function
+
+
+' --- TYPE CASTING ---
+
+Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2Recordset = Value: End Function
+Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
+Private Function C2ExcelWorksheet(ByVal Value As Variant) As Excel.Worksheet: Set C2ExcelWorksheet = Value: End Function
+Private Function C2xlSheetsEx(ByVal Value As Variant) As xlSheetsEx: Set C2xlSheetsEx = Value: End Function
 
 
 

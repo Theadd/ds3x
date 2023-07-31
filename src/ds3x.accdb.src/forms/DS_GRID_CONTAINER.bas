@@ -18,13 +18,13 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =3435
+    Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1558
     Left =4065
-    Top =-13170
+    Top =3030
     Right =22230
-    Bottom =-975
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -322,7 +322,7 @@ Begin Form
                     OverlapFlags =93
                     OldBorderStyle =0
                     Top =30
-                    Width =3435
+                    Width =3433
                     Height =2835
                     TabIndex =2
                     BorderColor =10921638
@@ -337,7 +337,7 @@ Begin Form
                     VerticalAnchor =2
 
                     LayoutCachedTop =30
-                    LayoutCachedWidth =3435
+                    LayoutCachedWidth =3433
                     LayoutCachedHeight =2865
                     LayoutGroup =1
                     GroupTable =2
@@ -413,16 +413,16 @@ Begin Form
                     OldBorderStyle =0
                     OverlapFlags =85
                     Top =2865
-                    Width =3435
+                    Width =3433
                     Height =270
                     AutoActivate =1
                     TabIndex =3
                     BorderColor =10921638
                     Name ="SCROLLBAR_X"
                     OleData = Begin
-                        0x00120000d0cf11e0a1b11ae1000000000000000000000000000000003e000300 ,
-                        0xfeff090006000000000000000000000001000000000000000000000000100000 ,
-                        0x0600000001000000feffffff0000000001000000ffffffffffffffffffffffff ,
+                        0x000e0000d0cf11e0a1b11ae1000000000000000000000000000000003e000300 ,
+                        0xfeff090006000000000000000000000001000000020000000000000000100000 ,
+                        0x0400000001000000feffffff0000000003000000ffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
@@ -439,19 +439,19 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d00000000000000000000000000b2830049c3d9010700000040010000 ,
-                        0x0000000063006f006e00740065006e0074007300000000000000000000000000 ,
+                        0x004a803d000000000000000000000000f004e27208c3d9010700000080000000 ,
+                        0x0000000003004f006c0065004f0062006a006500630074004400610074006100 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x00000000120002010200000003000000ffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000400000020000000 ,
-                        0x00000000010043006f006d0070004f0062006a00000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000012000200ffffffffffffffffffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000100000088000000 ,
+                        0x000000001e000201ffffffff02000000ffffffff000000000000000000000000 ,
+                        0x000000000000000000000000000000000000000000000000010000002c000000 ,
                         0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
                         0x4400610074006100000000000000000000000000000000000000000000000000 ,
                         0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000038000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x00000000fefffffffdfffffffffffffffffffffffffffffffffffffffeffffff ,
                         0xfeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
@@ -471,15 +471,15 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000402fa6d548c3d9010500000000010000 ,
-                        0x0000000063006f006e00740065006e0074007300000000000000000000000000 ,
+                        0x004a803d000000000000000000000000b09c1d5916c3d9010500000080000000 ,
+                        0x0000000003004f006c0065004f0062006a006500630074004400610074006100 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x000000001200020102000000ffffffffffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000300000020000000 ,
-                        0x00000000010043006f006d0070004f0062006a00000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000012000200ffffffffffffffffffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000088000000 ,
+                        0x000000001e000201ffffffff02000000ffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000100000030000000 ,
+                        0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
+                        0x4400610074006100000000000000000000000000000000000000000000000000 ,
+                        0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000038000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000ffffffffffffffffffffffff000000000000000000000000 ,
@@ -500,39 +500,7 @@ Begin Form
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffff0100000002000000fefffffffeffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffff0100feff030a0000ffffffffe081d1df2f5ece11a44900aa004a803d ,
-                        0x2e000000426172726120646520646573706c617a616d69656e746f206465204d ,
-                        0x6963726f736f667420466f726d7320322e0010000000456d626564646564204f ,
-                        0x626a6563740012000000466f726d732e5363726f6c6c4261722e3100f439b271 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000021c0048700000e02e0000b00400000100000000000000a5170000 ,
-                        0xda01000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x00000000feffffff0200000003000000fefffffffeffffffffffffffffffffff ,
+                        0xfffffffffefffffffeffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
@@ -549,15 +517,15 @@ Begin Form
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffff38000000000000000100000000000000000000000000000000000000 ,
-                        0x000000003800000000000000000000000000000000000000000000006465204d ,
-                        0x6963726f0100feff030a0000ffffffffe081d1df2f5ece11a44900aa004a803d ,
-                        0x2e000000426172726120646520646573706c617a616d69656e746f206465204d ,
-                        0x6963726f736f667420466f726d7320322e0010000000456d626564646564204f ,
-                        0x626a6563740012000000466f726d732e5363726f6c6c4261722e3100f439b271 ,
-                        0x000000000000000000000000e02e0000b00400000100000000000000a5170000 ,
-                        0xda01000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000021c0048700000e02e0000b00400000100000000000000a7170000 ,
-                        0xdc01000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000038000000000000000000000000000000000000000000000000000000 ,
+                        0x00000000e081d1df2f5ece11a44900aa004a803d00021c0048700000e02e0000 ,
+                        0xb00400000100000000000000a5170000da010000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
@@ -576,7 +544,7 @@ Begin Form
                     GridlineColor =10921638
 
                     LayoutCachedTop =2865
-                    LayoutCachedWidth =3435
+                    LayoutCachedWidth =3433
                     LayoutCachedHeight =3135
                     RowStart =1
                     RowEnd =1
@@ -599,6 +567,7 @@ Option Explicit
 Private WithEvents pController As dsGridController
 Attribute pController.VB_VarHelpID = -1
 Private pScrollModX As Double
+Private pCurrentPageIndex As Long
 
 
 
@@ -628,6 +597,10 @@ End Property
 
 Public Property Get ScrollModX() As Double: ScrollModX = pScrollModX: End Property
 Public Property Let ScrollModX(ByVal Value As Double): pScrollModX = Value: End Property
+Public Property Get CurrentPageIndex() As Long: CurrentPageIndex = pCurrentPageIndex: End Property
+Public Property Let CurrentPageIndex(ByVal Value As Long): pCurrentPageIndex = Value: End Property
+
+Public Property Get MaxRowsInViewport() As Long: MaxRowsInViewport = CLng(Int((Me.DS_GRID.Form.InsideHeight - Me.DS_GRID.Form.EncabezadoDelFormulario.Height) / Me.DS_GRID.Form.Detalle.Height) + 1): End Property
 
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
@@ -641,7 +614,8 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Form_Resize()
-    'LogMe "[DEBUG] @DS_GRID_CONTAINER.Resize()", True
+    LogMe Printf("[DEBUG] @DS_GRID_CONTAINER.Resize(), Me.InsideHeight: %1, Me.Parent.InsideHeight: %2, Me.DS_GRID.Height: %3", Me.InsideHeight, Me.Parent.InsideHeight, Me.DS_GRID.Height), True
+'    Stop
     On Error Resume Next
     With Me.SCROLLBAR_X
         If Not .Visible Then Exit Sub
@@ -698,8 +672,10 @@ Public Sub ViewportGridRebuild()
     Dim rs As ADODB.Recordset
     '''''''Set Me.DS_GRID.Form.Recordset = Nothing
     ' gShow = Not (Controller.Table Is Nothing)
+    On Error GoTo ExitSub
     If Controller.TaskController.IsValidTable Then
-        Set rs = Controller.Table.IndexRecordset
+        ' TODO: FIXME: .IndexRecordset() throws "Subíndice fuera del intervalo" while executing "MoveColumnsToStart" on columns at the right end of the current table.
+        Set rs = Controller.Table.IndexRecordset(MaxRowsInViewport, CurrentPageIndex)
         If Not Me.DS_GRID.Visible Then
             Me.DS_GRID.Visible = True
             Me.DS_GRID_FIXED.Visible = True
@@ -710,6 +686,7 @@ Public Sub ViewportGridRebuild()
         Me.DS_GRID_FIXED.Form.RebuildActiveColumns
         Set Me.DS_GRID_FIXED.Form.Recordset = rs.Clone
     Else
+        On Error GoTo HandleHideFocusedControlError
         If Me.DS_GRID.Visible Then
             Me.DS_GRID.Visible = False
             Me.DS_GRID_FIXED.Visible = False
@@ -717,6 +694,13 @@ Public Sub ViewportGridRebuild()
             Set Me.DS_GRID.Form.Recordset = Nothing
         End If
     End If
+    
+ExitSub:
+    Exit Sub
+HandleHideFocusedControlError:
+    On Error GoTo ExitSub
+    Me.HiddenControl.SetFocus
+    Resume Next
 End Sub
 
 Public Sub ViewportSizeUpdate()

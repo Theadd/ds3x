@@ -15,16 +15,14 @@ Public Event OnDataSourceChange()
 Public Event OnSave()
 Public Event OnClose()
 
-Private pTaskController As New dsTaskController
+Private pTaskController As dsTaskController
 Private pGridController As dsGridController
-
-'Private pSourceRecordsetEx As New RecordsetEx
-'Private pTargetExcelSheetEx As xlSheetsEx
-
 Private pLiveEditor As Access.Form
 
 Private pPresetObject As Scripting.Dictionary
 Private pPresetFile As String
+
+Private pDisposeOnClose As Boolean
 
 
 
@@ -37,6 +35,9 @@ Public Property Set LiveEditor(ByRef Value As Access.Form): Set pLiveEditor = Va
 Public Property Get PresetObject() As Scripting.Dictionary: Set PresetObject = pPresetObject: End Property
 Public Property Get PresetFile() As String: PresetFile = pPresetFile: End Property
 Public Property Let PresetFile(ByVal Value As String): pPresetFile = Value: End Property
+
+Public Property Get DisposeOnClose() As Boolean: DisposeOnClose = pDisposeOnClose: End Property
+Public Property Let DisposeOnClose(ByVal Value As Boolean): pDisposeOnClose = Value: End Property
 
 
 Public Property Get Visible() As Boolean
@@ -60,22 +61,8 @@ Public Property Let Visible(ByVal Value As Boolean)
     End If
 End Property
 
-'Public Property Set SourceRecordset(ByRef rs As ADODB.Recordset)
-''    pSourceRecordsetEx.Bind rs
-'    Set TaskController.DataSource("DS1") = dsTable.Create(pSourceRecordsetEx).SetHeaders(pSourceRecordsetEx)
-'    RaiseEvent OnDataSourceChange
-'End Property
 
 
-
-'Public Property Set SourceExcelRange(ByRef xlRange As Excel.Range)
-'    With xlRange
-'        Set TaskController.DataSource("DS1") = dsTable _
-'            .Create(ArrayListEx.Create(.Range(.Cells(2, 1), .Cells(.Rows.Count, .Columns.Count)))) _
-'            .SetHeaders(ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0))
-'    End With
-'    RaiseEvent OnDataSourceChange
-'End Property
 
 Public Sub AddSource(ByRef SourceObject As Object, Optional ByVal TaskId As Variant)
     Dim rX As RecordsetEx, dsT As dsTable, xlS As xlSheetsEx
@@ -147,11 +134,11 @@ Public Function TryGenerateAsExcel(Optional ByRef xlSheet As xlSheetsEx = Nothin
                         Else
                             Set xlSX = vGenerated
                             xlSX.Instance.Select
-                            xlR = xlSX.UsedRange
+                            Set xlR = xlSX.UsedRange
                             xlR.Copy
                             xlSheet.Instance.Select
                             If xlRange Is Nothing Then
-                                xlRange = xlSheet.Range("A1")
+                                Set xlRange = xlSheet.Range("A1")
                             End If
                             xlRange.Select
                             xlSheet.Instance.Paste
@@ -175,36 +162,126 @@ Public Function TryRebuildAll() As Boolean
 Finally:
 End Function
 
+Public Function TryApplyPresetOn(ByVal Preset As Variant, ByRef SourceInput As Variant, ByRef GeneratedOutput As Variant, Optional ByVal AutoHeaders As Boolean = True) As Boolean
+    On Error GoTo Fallback
+    
+    ImportPreset Preset
+    TryApplyPresetOn = TryApplyOn(SourceInput, GeneratedOutput, AutoHeaders)
+    
+Finally:
+    Exit Function
+Fallback:
+    Debug.Print "[ERROR] @dsLiveEd.TryApplyPresetOn() - " & Err.Description
+    Resume Finally
+End Function
+
+Public Function TryApplyOn(ByRef SourceInput As Variant, ByRef GeneratedOutput As Variant, Optional ByVal AutoHeaders As Boolean = True) As Boolean
+    Dim srcType As String, inType As String, ds1Idx As Long, xs1Idx As Long, xlSheet As xlSheetsEx
+    On Error GoTo Fallback
+    
+    srcType = TypeName(SourceInput)
+    If Not TaskController.TryGetIndexOfTaskId("DS1", ds1Idx) Then ds1Idx = 999
+    If Not TaskController.TryGetIndexOfTaskId("XS1", xs1Idx) Then xs1Idx = 999
+    inType = IIf(xs1Idx < ds1Idx, "Worksheet", "Table")
+    
+    Select Case inType
+        Case "Table"
+            If srcType Like "*Recordset*" Then
+                AddSource C2Object(SourceInput)
+            ElseIf srcType Like "*Table*" Then
+                AddSource C2Object(SourceInput)
+            Else
+                AddSource dsTable.Create(SourceInput, AutoHeaders)
+            End If
+        Case "Worksheet"
+            If IsObject(SourceInput) Then
+                AddSource C2Object(SourceInput)
+            Else
+                If VarType(SourceInput) = vbString Then
+                    If TryWaitFileExists(SourceInput, 10) Then
+                        Set xlSheet = xlSheetsEx.Create(, SourceInput)
+                        AddSource xlSheet
+                    Else
+                        Err.Raise 17
+                    End If
+                Else
+                    Err.Raise 17
+                End If
+            End If
+        Case Else
+            Err.Raise 17
+    End Select
+    
+    TryApplyOn = TryApply(GeneratedOutput)
+    
+Finally:
+    Exit Function
+Fallback:
+    Debug.Print "[ERROR] @dsLiveEd.TryApplyOn() - " & Err.Description
+    Resume Finally
+End Function
+
+' Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated.
+Public Function TryApply(ByRef GeneratedOutput As Variant) As Boolean
+Attribute TryApply.VB_Description = "Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated."
+    On Error GoTo Fallback
+    
+    If TryRebuildAll Then
+        Assign GeneratedOutput, TaskController.GeneratedValue
+        If IsObject(GeneratedOutput) Then
+            If Not GeneratedOutput Is Nothing Then
+                TryApply = True
+            End If
+        End If
+    End If
+    
+Finally:
+    Exit Function
+Fallback:
+    Debug.Print "[ERROR] @dsLiveEd.TryApply() - " & Err.Description
+    Resume Finally
+End Function
 
 
-Public Sub Dispose()
-    Destroy
-End Sub
+
+Public Sub Dispose(): Destroy: End Sub
+Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
 
 Private Sub Class_Initialize()
 '    Set pSourceRecordsetEx = Nothing
     Set pGridController = Nothing
-    Set pTaskController = Nothing
+    Set pTaskController = New dsTaskController
     ' Set GridController.TaskController = TaskController
 End Sub
 
 Private Sub Class_Terminate()
-    Debug.Print "[INFO] dsLiveEd.Terminate()"
-    Destroy
+    On Error Resume Next
+    If Not pTaskController Is Nothing Then
+        Destroy
+    End If
 End Sub
 
-Private Function Destroy()
-    On Error Resume Next
+Private Sub Destroy()
+    'Static wasDestroyed As Boolean
+    On Error GoTo ErrorHandler
+    'If wasDestroyed Then Exit Function
+    'wasDestroyed = True
     Visible = False
     Set pPresetObject = Nothing
     pPresetFile = ""
 '    pSourceRecordsetEx.Unbind
+    Set pLiveEditor = Nothing
     If Not pGridController Is Nothing Then Set pGridController.TaskController = Nothing
     Set pGridController = Nothing
-    pTaskController.Dispose
+    Set pTaskController.AvailableTasks.TaskController = Nothing
+    'pTaskController.Dispose
     Set pTaskController = Nothing
-    Set pLiveEditor = Nothing
-End Function
+    
+    Exit Sub
+ErrorHandler:
+    Debug.Print "[ERROR] - " & CStr(Err.Description)
+    Resume Next
+End Sub
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     If Not IsMissing(Value) Then
@@ -226,6 +303,13 @@ End Function
 
 
 ' --- PRESETS ---
+
+Public Function GetBlankPreset() As Scripting.Dictionary
+    Dim dX As DictionaryEx
+    Set dX = DictionaryEx.Create()
+    Set dX("dsLiveEd") = GetDefaultDsLiveEdPreset()
+    Set GetBlankPreset = dX.Instance
+End Function
 
 ' Updates PresetObject dictionary with the current state in the editor, if that state derives from
 ' a previously imported preset by providing a dictionary object while importing it, that dictionary
@@ -399,7 +483,7 @@ Private Function SetNamedEntryToEntries(ByRef dX As DictionaryEx, ByRef Entry As
 Finally:
 End Function
 
-Public Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean = False)
+Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean = False)
     On Error Resume Next
     
     If Not SkipAutoClose Then
@@ -408,6 +492,9 @@ Public Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean 
     End If
     
     RaiseEvent OnClose
+    If Not SkipAutoClose Then
+        If pDisposeOnClose Then Dispose
+    End If
 End Sub
 
 
@@ -415,7 +502,7 @@ End Sub
 ' --- SAMPLE MOCKS FOR DEVELOPMENT ---
 
 
-Public Sub LoadSampleValues()
+Friend Sub LoadSampleValues()
     ' SELECT U.UR, E.DEMANDA, E.CONTRATO, E.TAREA_PROCESO, E.FECHA_ENTRADA, E.FECHA_ULTIMO_HITO, E.INFORME_FISCAL, U.DIRECCION, U.CODIGO_POSTAL, U.PROVINCIA, U.TIPO_INMUEBLE, U.VALOR_TASACION, U.PRINCIPAL, U.TOTAL_DEUDA, U.VALOR_SUBASTA, U.PORCENTAJE_PROPIEDAD, U.FECHA_PETICION_CALCULOS, U.TIPO, E.OBSERVACIONES
     AddSource _
         dbQuery.Create( _
@@ -425,11 +512,11 @@ Public Sub LoadSampleValues()
         )
 End Sub
 
-Public Sub LoadADifferentSetOfSampleValues()
+Friend Sub LoadADifferentSetOfSampleValues()
     AddSource dbQuery.Create("EXEC [dbo].[P_ATM_ISCS_APP_USER_MONTHLY_TIME]")
 End Sub
 
-Public Sub MockAddTasks()
+Friend Sub MockAddTasks()
     Dim aX As ArrayListEx
     
     Set aX = ArrayListEx.Create(TaskController.RebuildSequence)

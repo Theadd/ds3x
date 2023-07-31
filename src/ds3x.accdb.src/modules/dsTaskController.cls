@@ -40,7 +40,7 @@ Public Event OnRebuildSequenceChange()
 Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
 Public Event OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
 
-Private pRebuildSequence As New ArrayListEx
+Private pRebuildSequence As ArrayListEx
 Private pSequenceIndex As Long
 ' The lowest index within the RebuildSequence array that needs rebuilding.
 Private pDirtyRebuildIndex As Long
@@ -197,6 +197,8 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Else
         Err.Raise 13
     End If
+    
+    VMemAnalysis "@" & dX("Id") & " " & TaskName
 End Sub
 
 
@@ -204,6 +206,7 @@ End Sub
 
 Private Sub Class_Initialize()
     pDirtyRebuildIndex = 0
+    Set pRebuildSequence = New ArrayListEx
     Set pTaskResults = DictionaryEx.Create()
     Set pGarbageCollector = DictionaryEx.Create()
     Set pDataSources = DictionaryEx.Create()
@@ -215,30 +218,73 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
+    On Error GoTo ErrorHandler
+    Debug.Print "[INFO] @dsTaskController.Terminate()"
     Dispose
+    
+    Exit Sub
+ErrorHandler:
+    Debug.Print "[ERROR] @dsTaskController.Terminate() - " & CStr(Err.Description)
+    Resume Next
 End Sub
 
-Public Sub Dispose()
-    On Error Resume Next
+Private Sub Dispose()
+    On Error GoTo ErrorHandler
+'    Dim t As Scripting.Dictionary, t2 As Scripting.Dictionary
+'    Set t = New Scripting.Dictionary
+'    Set t2 = New Scripting.Dictionary
+    
     Debug.Print "[INFO] @dsTaskController.Dispose()"
     Set pTable = Nothing
-    pTaskResults.RemoveAll
-    pDataSources.RemoveAll
-    ' Run GarbageCollector
-    FreeUnlinkedResources
-    pDataSources.Unbind
+'    pDataSources.Unbind().Bind t
+'    pTaskResults.Unbind().Bind t
+'    pDataSources.Bind t
+'    pTaskResults.Bind t
     Set pTaskResults = Nothing
     Set pDataSources = Nothing
+'    pTaskResults.RemoveAll
+'    pDataSources.RemoveAll
+    ' Run GarbageCollector
+    ''''''''''FreeUnlinkedResources True
+'    pDataSources.Unbind
+'    Set pTaskResults = Nothing
+'    Set pDataSources = Nothing
     Set pGarbageCollector = Nothing
     Set pAvailableTasks.TaskController = Nothing
     Set pAvailableTasks = Nothing
+    Set pRebuildSequence = Nothing
+    
+    Exit Sub
+ErrorHandler:
+    Debug.Print "[ERROR] @dsTaskController.Dispose() - " & CStr(Err.Description)
+    Resume Next
 End Sub
 
 
 
 
 Private Sub SetRebuildSequence(ByRef Value As ArrayListEx)
-    Dim ds1 As dsTable, rs1 As xlSheetsEx
+    Dim ds1 As dsTable, rs1 As xlSheetsEx, t0 As String, tr0 As Object
+    
+    If Not Value Is Nothing Then
+        If Value.Count > 0 Then
+            t0 = Value(0)("Id")
+            If Trim(CStr(t0)) <> "" Then
+                If pTaskResults.Exists(t0) Then
+                    If IsObject(pTaskResults(t0)) Then
+                        Set tr0 = pTaskResults(t0)
+                        If tr0 Is Nothing Then t0 = ""
+                    Else
+                        t0 = ""
+                    End If
+                Else
+                    t0 = ""
+                End If
+            Else
+                t0 = ""
+            End If
+        End If
+    End If
     
     If pDataSources.Exists("DS1") Then
         Set ds1 = pDataSources("DS1")
@@ -258,6 +304,10 @@ Private Sub SetRebuildSequence(ByRef Value As ArrayListEx)
     End If
     If Not rs1 Is Nothing Then
         Set pDataSources("XS1") = rs1
+    End If
+    If t0 <> "" Then
+        Set pTaskResults(t0) = tr0
+        ' TODO: Set as DataSource when task type is a ds type
     End If
     Set pRebuildSequence = Value
     RaiseEvent OnRebuildSequenceChange
@@ -315,13 +365,14 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
     RaiseEvent OnDataSourceChange(TaskId)
 End Sub
 
-Private Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Long) As Boolean
+Friend Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Long) As Boolean
     Dim i As Long
     On Error GoTo Finally
     
     For i = 0 To pRebuildSequence.Count - 1
         If pRebuildSequence(i)("Id") = TaskId Then
             OutIndex = i
+            TryGetIndexOfTaskId = True
             Exit Function
         End If
     Next i
@@ -548,13 +599,18 @@ Public Function AddResource(ByRef TargetResource As Object) As Object
 End Function
 
 ' Run GarbageCollector
-Public Sub FreeUnlinkedResources()
+Public Sub FreeUnlinkedResources(Optional ByVal ForceFreeAllResources As Boolean = False)
     Dim i As Long, gcKeys As Variant, iMax As Long, cKey As LongPtr, isMatch As Boolean
     Dim iTR As Long, iDS As Long, trKeys As Variant, dsKeys As Variant
     
     gcKeys = pGarbageCollector.Keys()
-    trKeys = pTaskResults.Keys()
-    dsKeys = pDataSources.Keys()
+    If ForceFreeAllResources Then
+        trKeys = Array()
+        dsKeys = Array()
+    Else
+        trKeys = pTaskResults.Keys()
+        dsKeys = pDataSources.Keys()
+    End If
     iMax = UBound(gcKeys)
     
     On Error GoTo StopOnError
@@ -584,6 +640,8 @@ Public Sub FreeUnlinkedResources()
         End If
         
         If Not isMatch Then
+            ' EDIT: DISPOSE
+            Debug.Print "!!! Calling SafeDisposeResource for ObjPtr " & CStr(gcKeys(i))
             SafeDisposeResource pGarbageCollector(gcKeys(i))
             On Error Resume Next
             Set pGarbageCollector(gcKeys(i)) = Nothing
@@ -601,11 +659,28 @@ End Sub
 
 Private Sub SafeDisposeResource(ByRef TargetResource As Object)
     On Error GoTo DisposeFailed
-    
+    ' EDIT: DISPOSE
+    Debug.Print "    ... Disposing object of type: " & TypeName(TargetResource)
     TargetResource.Dispose
     Exit Sub
 DisposeFailed:
     On Error Resume Next
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
 End Sub
+
+Private Sub VMemAnalysis(Optional ByVal Message As Variant)
+    Static LastVMemFree As Long, sVMemCallCount As Long
+    Dim cVMemFree As Long
+    
+    cVMemFree = GetAvailableVirtualMemory()
+    sVMemCallCount = sVMemCallCount + 1
+    If LastVMemFree <> 0 Then
+        If Abs(LastVMemFree - cVMemFree) >= 5 Then
+            Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
+        End If
+    End If
+    LastVMemFree = cVMemFree
+End Sub
+
+
 

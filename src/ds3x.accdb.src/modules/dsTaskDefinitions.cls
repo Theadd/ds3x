@@ -48,11 +48,11 @@ Public Function SetColumnName(ByRef TargetTable As Variant, ByVal ColumnIndex As
             Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", ColumnName).Instance
         Else
             Set d = cH(i)
-            Set t(0, i) = d
+            Set t(0, i) = DictionaryEx.Bind(d).Clone().Instance
         End If
     Next i
     
-    Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
+    Set SetColumnName = pTaskController.AddResource(dsTable.Create(Target.Records.Clone).SetHeaders(Array2dEx.Create(t)))
 End Function
 
 'RecordsetEx.Filter("REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'")
@@ -62,7 +62,7 @@ Public Function Filter(ByRef TargetTable As Variant, Optional ByVal QueryFilter 
     QueryFilter = GetParam(QueryFilter, "")
 
     Set rX = RecordsetEx.Create(Target.NamedRecordset).Filter(QueryFilter)
-    Set Filter = dsTable.Create(rX).SetHeaders(Target.Headers)
+    Set Filter = pTaskController.AddResource(dsTable.Create(rX).SetHeaders(Target.Headers.Clone))
 End Function
 
 Public Function GetRange(ByRef TargetTable As Variant, Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
@@ -143,7 +143,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
         End With
     End If
     
-    Set ReplaceValues = pTaskController.AddResource(dsTable.Create(Array2dEx.Create(t)).SetHeaders(Target.Headers))
+    Set ReplaceValues = pTaskController.AddResource(dsTable.Create(Array2dEx.Create(t)).SetHeaders(Target.Headers.Clone))
 End Function
 
 Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer As Variant) As dsTable
@@ -174,7 +174,7 @@ Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer 
         Next i
     End If
     
-    Set ReplaceColumnNames = pTaskController.AddResource(dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t)))
+    Set ReplaceColumnNames = pTaskController.AddResource(dsTable.Create(Target.Records.Clone).SetHeaders(Array2dEx.Create(t)))
 End Function
 
 Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
@@ -191,7 +191,7 @@ Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes 
 End Function
 
 Public Function MoveColumnsToTheEnd(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
-    Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant, CX As ArrayListEx
+    Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant, cX As ArrayListEx
     Dim TableA As dsTable, TableB As dsTable
     
     Set Target = TargetTable
@@ -263,6 +263,9 @@ LoadTableFromFileFallback:
         Set xlX = GetWorksheet(xlX, WorksheetNameOrIndex)
     End If
     Set dsT = LoadFromRange(xlX, xlX.UsedRange, FirstRowHasHeaders)
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
 Finally:
     On Error Resume Next
     xlX.DiscardChangesAndExit
@@ -303,13 +306,11 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
 
     With xlRange
         If FirstRowHasHeaders Then
-            Set LoadFromRange = dsTable _
-                .Create(ArrayListEx.Create(.Range(.Cells(2, 1), .Cells(.Rows.Count, .Columns.Count)))) _
-                .SetHeaders(ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0))
+            Set LoadFromRange = pTaskController.AddResource(dsTable.Create(xlRange, True))
         Else
-            Set LoadFromRange = dsTable _
+            Set LoadFromRange = pTaskController.AddResource(dsTable _
                 .Create(ArrayListEx.Create(xlRange)) _
-                .SetHeaders(ArrayRange(1, .Columns.Count))
+                .SetHeaders(ArrayRange(1, .Columns.Count)))
         End If
     End With
 End Function
@@ -637,7 +638,7 @@ End Function
 
 Private Function GetParam(Optional ByVal Value As Variant, Optional ByVal DefaultValue As Variant) As Variant
     If Not IsMissing(Value) Then
-        If Not (IsError(Value) Or IsNull(Value)) Then
+        If Not (IsError(Value) Or IsNull(Value) Or IsEmpty(Value)) Then
             If IsObject(Value) Then
                 Set GetParam = Value
             Else

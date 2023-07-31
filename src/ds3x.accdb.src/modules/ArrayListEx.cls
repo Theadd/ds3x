@@ -22,10 +22,17 @@ Implements IList
 
 Public Instance As ArrayList
 
+Private Const dsChunkSize As Long = 1000
+
 
 'Gets the key count of the underlying Scripting.Dictionary.
 Public Property Get Count() As Variant
     Count = Instance.Count
+End Property
+
+Public Property Get ColumnCount() As Long
+    On Error Resume Next
+    ColumnCount = CountElementsIn(Instance(0))
 End Property
 
 'Sets or returns an item for a specified key.
@@ -64,12 +71,13 @@ Public Function Create(Optional ByRef ArrayLike As Variant) As ArrayListEx
     If Not IsMissing(ArrayLike) Then Create.AddRange ArrayLike
 End Function
 
-Public Function Bind(Optional ByRef TargetArrayList As Variant) As ArrayListEx
+Friend Function Bind(Optional ByRef TargetArrayList As Variant) As ArrayListEx
     Set Bind = Me
     Set Instance = Nothing
     If IsMissing(TargetArrayList) Then Exit Function
     If TargetArrayList Is Nothing Then Exit Function
     If TypeOf TargetArrayList Is ArrayListEx Then
+        Stop ' An ArrayListEx instance should NEVER bind to another ArrayListEx instance! @SEE: .Dispose()
         Set Instance = TargetArrayList.Instance
     ElseIf TypeOf TargetArrayList Is ArrayList Then
         Set Instance = TargetArrayList
@@ -105,10 +113,10 @@ Public Function AddRange(Optional ByRef ArrayLike As Variant) As ArrayListEx
             If TypeOf ArrayLike Is ArrayListEx Then
                 Instance.AddRange ArrayLike.Instance
             Else
-                Instance.AddRange ArrayLike
+                Instance.AddRange C2ArrayList(ArrayLike)
             End If
         ElseIf TypeOf ArrayLike Is Excel.Range Then
-            AddFromExcelRange ArrayLike
+            AddFromExcelRange C2ExcelRange(ArrayLike)
         ElseIf TypeOf C2Object(ArrayLike) Is Array2dEx Then
             AddFrom2dArray ArrayLike.Instance
         Else
@@ -128,24 +136,51 @@ Public Function AddRange(Optional ByRef ArrayLike As Variant) As ArrayListEx
     End If
 End Function
 
-
-Private Function AddFromExcelRange(ByVal r As Excel.Range) As ArrayListEx
+Private Sub AddFromExcelRange(ByRef r As Excel.Range)
     Dim Items As Variant, i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
+    Dim g As Long, gNumRows As Long, rCount As Long, rng2 As Excel.Range, rBase As Long
+
+    rCount = r.Rows.Count
+    gNumRows = rCount - (g * dsChunkSize)
+    If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
+    If Not (gNumRows > 0) Then Exit Sub
+    rBase = GetBaseRowIndexOfRange(r)
     
-    Items = r.Value
-    lc = LBound(Items, 2)
-    uc = UBound(Items, 2)
-    ui = UBound(Items, 1)
-    ReDim vRow(0 To (uc - lc))
+    Do While (gNumRows > 0)
+        Set rng2 = r.Range(r.Cells(rBase + (g * dsChunkSize), 1), r.Cells((rBase + (g * dsChunkSize)) + (gNumRows - 1), r.Columns.Count))
+        Items = Empty
+        Items = rng2.Value
+        lc = LBound(Items, 2)
+        uc = UBound(Items, 2)
+        ui = UBound(Items, 1)
+        ReDim vRow(0 To (uc - lc))
+
+        For i = LBound(Items, 1) To ui
+            For c = lc To uc - 1
+                vRow(c - lc) = Items(i, c)
+            Next c
+            If VarType(Items(i, uc)) = vbString Then
+                vRow(uc - lc) = Trim(Items(i, uc))
+            Else
+                vRow(uc - lc) = Items(i, uc)
+            End If
+            Instance.Add vRow
+        Next i
+
+        g = g + 1
+        gNumRows = rCount - (g * dsChunkSize)
+        If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
+    Loop
+    Items = Empty
+End Sub
+
+Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
+    On Error GoTo Fallback
     
-    For i = LBound(Items, 1) To ui
-        For c = lc To uc
-            vRow(c - lc) = Items(i, c)
-        Next c
-        Instance.Add vRow
-    Next i
-    
-    Set AddFromExcelRange = Me
+    GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
+    Exit Function
+Fallback:
+    GetBaseRowIndexOfRange = 1
 End Function
 
 Private Function AddFrom2dArray(ByRef Items As Variant) As ArrayListEx
@@ -289,19 +324,21 @@ End Function
 ' @param [GetCount] - The number of rows or elements in the range.
 ' @param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, no columns are excluded.
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ArrayListEx
-    Dim Aux As New ArrayList, xRange As New ArrayListEx, Entry As Variant, i As Long
+    Dim Aux As ArrayList, xRange As ArrayListEx, Entry As Variant, i As Long
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If IsMissing(GetCount) Or IsEmpty(GetCount) Then GetCount = Instance.Count
     
     If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then
-        Set GetRange = New ArrayListEx
-        GetRange.Bind Instance.GetRange(Index, GetCount)
+        Set GetRange = ArrayListEx.Create(Instance.GetRange(Index, GetCount))
+        'GetRange.Bind Instance.GetRange(Index, GetCount)
     Else
         If Not IsArray(ColumnIndexes) Then
             Err.Raise 5
         Else
             Set GetRange = New ArrayListEx
+            Set Aux = New ArrayList
+            Set xRange = New ArrayListEx
             xRange.Bind Instance.GetRange(Index, GetCount)
             For Each Entry In xRange.Instance
                 Aux.Clear
@@ -341,6 +378,10 @@ End Function
 Public Function Reverse() As ArrayListEx
     Instance.Reverse
     Set Reverse = Me
+End Function
+
+Public Function Clone() As ArrayListEx
+    Set Clone = ArrayListEx.Create(Me)
 End Function
 
 
@@ -399,13 +440,36 @@ Private Function C2Object(ByRef Value As Variant) As Object
     Set C2Object = Value
 End Function
 
+Private Function C2ArrayList(ByRef Value As Variant) As ArrayList
+    Set C2ArrayList = Value
+End Function
+
+Private Function C2ExcelRange(ByRef Value As Variant) As Excel.Range
+    Set C2ExcelRange = Value
+End Function
+
 
 Private Sub Class_Initialize()
+'    Debug.Print "#+ ArrayListEx.Initialize(), Index: " & CStr(OBJ_COUNTER_ARRAYLISTEX)
+    OBJ_COUNTER_ARRAYLISTEX = OBJ_COUNTER_ARRAYLISTEX + 1
     Set Instance = New ArrayList
 End Sub
 
 Private Sub Class_Terminate()
+    OBJ_COUNTER_ARRAYLISTEX = OBJ_COUNTER_ARRAYLISTEX - 1
+    Debug.Print "# ArrayListEx.Terminate(), Remaining: " & CStr(OBJ_COUNTER_ARRAYLISTEX)
+    ' EDIT: DISPOSE
+    ' Dispose
+'    -- EDIT: DISPOSE (COMMENT REMOVED)
     Set Instance = Nothing
+End Sub
+
+Public Sub Dispose()
+    On Error Resume Next
+    ' EDIT: DISPOSE
+'    Stop
+'    Instance.Clear
+'    Set Instance = Nothing
 End Sub
 
 Private Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
