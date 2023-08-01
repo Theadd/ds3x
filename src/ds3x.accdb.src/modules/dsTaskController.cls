@@ -468,11 +468,14 @@ Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As 
             Exit For
         End If
         If IsObject(TaskValues(i)) Then
-            Set vItem = TaskValues(i)
+            Set vItem = dsAppGlobals.ApplyCustomVarsOn(TaskValues(i))
         Else
-            vItem = TaskValues(i)
+            If Not IsError(TaskValues(i)) Then
+                vItem = dsAppGlobals.ApplyCustomVarsOn(TaskValues(i))
+            Else
+                vItem = TaskValues(i)
+            End If
         End If
-        'Assign vItem, TaskValues(i)
 
         If Not IsError(vItem) Then
             If IsArray(vItem) Then

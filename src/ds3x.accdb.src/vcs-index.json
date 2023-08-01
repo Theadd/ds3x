@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": null,
-    "ExportDate": "01/08/2023 4:09:24",
+    "ExportDate": "01/08/2023 12:56:17",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -32,6 +32,13 @@
         }
       },
       "Forms": {
+        "DS_ASYNC_RUNNER.bas": {
+          "FileHash": "31fea2e",
+          "OtherHash": "7b8e78c",
+          "ExportDate": "01/08/2023 12:56:17",
+          "SourceModified": "01/08/2023 12:56:17",
+          "FilePropertiesHash": "8a2c266"
+        },
         "DS_CREATE_TASK.bas": {
           "FileHash": "1b02fa6",
           "OtherHash": "b14cbd5",
@@ -178,6 +185,13 @@
           "SourceModified": "01/08/2023 4:09:23",
           "FilePropertiesHash": "3e6ef4c"
         },
+        "dsAppGlobals.bas": {
+          "FileHash": "60fb444",
+          "OtherHash": "a1e6178",
+          "ExportDate": "01/08/2023 12:56:17",
+          "SourceModified": "01/08/2023 12:56:17",
+          "FilePropertiesHash": "21ae868"
+        },
         "dsGridController.cls": {
           "FileHash": "92a2775",
           "OtherHash": "8cca896",
@@ -201,17 +215,17 @@
         },
         "dsTaskController.cls": {
           "FileHash": "155af79",
-          "OtherHash": "41a16c0",
-          "ExportDate": "01/08/2023 4:09:23",
-          "SourceModified": "01/08/2023 4:09:23",
-          "FilePropertiesHash": "d3eb86a"
+          "OtherHash": "b5a834b",
+          "ExportDate": "01/08/2023 12:54:31",
+          "SourceModified": "01/08/2023 4:18:13",
+          "FilePropertiesHash": "db5ed68"
         },
         "dsTaskDefinitions.cls": {
           "FileHash": "cee9745",
-          "OtherHash": "20eac5c",
-          "ExportDate": "01/08/2023 4:09:24",
-          "SourceModified": "01/08/2023 4:09:24",
-          "FilePropertiesHash": "2dfd0f6"
+          "OtherHash": "f0821ca",
+          "ExportDate": "01/08/2023 12:54:31",
+          "SourceModified": "01/08/2023 4:18:13",
+          "FilePropertiesHash": "a5170b4"
         },
         "EventsLib.bas": {
           "FileHash": "8adf323",
@@ -263,11 +277,11 @@
           "FilePropertiesHash": "f2f25bf"
         },
         "xlSheetsEx.cls": {
-          "FileHash": "0ff9a3f",
-          "OtherHash": "53888d5",
-          "ExportDate": "31/07/2023 23:15:04",
-          "SourceModified": "31/07/2023 23:15:04",
-          "FilePropertiesHash": "dcf5811"
+          "FileHash": "647601a",
+          "OtherHash": "5efdf03",
+          "ExportDate": "01/08/2023 12:56:17",
+          "SourceModified": "01/08/2023 12:56:17",
+          "FilePropertiesHash": "c3877a0"
         }
       },
       "Nav Pane Groups": {
@@ -301,10 +315,10 @@
       },
       "VB Project": {
         "vbe-project.json": {
-          "FileHash": "a5d87e7",
-          "ExportDate": "31/07/2023 23:15:01",
-          "SourceModified": "31/07/2023 23:15:01",
-          "FilePropertiesHash": "a78692a"
+          "FileHash": "48ef1f6",
+          "ExportDate": "01/08/2023 12:56:17",
+          "SourceModified": "01/08/2023 12:56:17",
+          "FilePropertiesHash": "77578a5"
         }
       },
       "VBE References": {

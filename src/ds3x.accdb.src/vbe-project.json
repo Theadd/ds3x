@@ -9,7 +9,7 @@
     "FileName": "ds3x.accdb",
     "HelpFile": "",
     "HelpContextId": 0,
-    "ConditionalCompilationArguments": "",
+    "ConditionalCompilationArguments": "AutomationSupport = 1",
     "Mode": 0,
     "Protection": 0,
     "Type": 100

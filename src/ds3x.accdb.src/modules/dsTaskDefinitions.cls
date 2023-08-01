@@ -402,6 +402,13 @@ Public Function GetWorksheet(ByRef SourceSheet As Variant, ByVal WorksheetNameOr
     Set GetWorksheet = pTaskController.AddResource(xlSheet.GetSheet(WorksheetNameOrIndex))
 End Function
 
+Public Function SaveWorkbook(ByRef SourceSheet As Variant, ByVal FilePath As Variant) As xlSheetsEx
+    Dim xlSheet As xlSheetsEx
+    
+    Set xlSheet = SourceSheet
+    Set SaveWorkbook = pTaskController.AddResource(xlSheet.SaveWorkbook(CStr(FilePath)))
+End Function
+
 
 
 ' --- XL FORMATTING TASKS ---
@@ -570,6 +577,8 @@ Private Sub AddAllTasks()
     AddTask "AddWorksheet", "[Source]: Worksheet, [WorksheetName = 'Sheet%1']: String", TaskType:="XLG"
     
     AddTask "GetWorksheet", "[Source]: Worksheet, WorksheetNameOrIndex: String|Long", TaskType:="XLG"
+    
+    AddTask "SaveWorkbook", "[Source]: Worksheet, FilePath: String", TaskType:="XLG"
     
     ' --- XL FORMATTING TASKS ---
     
