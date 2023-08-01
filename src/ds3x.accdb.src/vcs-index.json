@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": null,
-    "ExportDate": "01/08/2023 18:12:15",
+    "ExportDate": "01/08/2023 18:31:11",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -17,10 +17,10 @@
       },
       "DB Properties": {
         "dbs-properties.json": {
-          "FileHash": "a99e751",
-          "ExportDate": "31/07/2023 23:15:02",
-          "SourceModified": "31/07/2023 23:15:02",
-          "FilePropertiesHash": "b48ed64"
+          "FileHash": "3d77c7b",
+          "ExportDate": "01/08/2023 18:31:11",
+          "SourceModified": "01/08/2023 18:31:11",
+          "FilePropertiesHash": "fcc996c"
         }
       },
       "Doc Properties": {

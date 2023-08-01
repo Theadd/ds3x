@@ -13,7 +13,7 @@
       "Type": 1
     },
     "AllowDatasheetSchema": {
-      "Value": true,
+      "Value": false,
       "Type": 1
     },
     "AllowFullMenus": {
@@ -166,6 +166,10 @@
     },
     "Themed Form Controls": {
       "Value": 1,
+      "Type": 4
+    },
+    "Track Name AutoCorrect Info": {
+      "Value": 0,
       "Type": 4
     },
     "Transactions": {
