@@ -40,7 +40,7 @@ Public Event OnRebuildSequenceChange()
 Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
 Public Event OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
 
-Private pRebuildSequence As ArrayListEx
+Private pRebuildSequence As New ArrayListEx
 Private pSequenceIndex As Long
 ' The lowest index within the RebuildSequence array that needs rebuilding.
 Private pDirtyRebuildIndex As Long
@@ -206,7 +206,6 @@ End Sub
 
 Private Sub Class_Initialize()
     pDirtyRebuildIndex = 0
-    Set pRebuildSequence = New ArrayListEx
     Set pTaskResults = DictionaryEx.Create()
     Set pGarbageCollector = DictionaryEx.Create()
     Set pDataSources = DictionaryEx.Create()
@@ -218,73 +217,30 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
-    On Error GoTo ErrorHandler
-    Debug.Print "[INFO] @dsTaskController.Terminate()"
     Dispose
-    
-    Exit Sub
-ErrorHandler:
-    Debug.Print "[ERROR] @dsTaskController.Terminate() - " & CStr(Err.Description)
-    Resume Next
 End Sub
 
-Private Sub Dispose()
-    On Error GoTo ErrorHandler
-'    Dim t As Scripting.Dictionary, t2 As Scripting.Dictionary
-'    Set t = New Scripting.Dictionary
-'    Set t2 = New Scripting.Dictionary
-    
+Public Sub Dispose()
+    On Error Resume Next
     Debug.Print "[INFO] @dsTaskController.Dispose()"
     Set pTable = Nothing
-'    pDataSources.Unbind().Bind t
-'    pTaskResults.Unbind().Bind t
-'    pDataSources.Bind t
-'    pTaskResults.Bind t
+    pTaskResults.RemoveAll
+    pDataSources.RemoveAll
+    ' Run GarbageCollector
+    FreeUnlinkedResources
+    pDataSources.Unbind
     Set pTaskResults = Nothing
     Set pDataSources = Nothing
-'    pTaskResults.RemoveAll
-'    pDataSources.RemoveAll
-    ' Run GarbageCollector
-    ''''''''''FreeUnlinkedResources True
-'    pDataSources.Unbind
-'    Set pTaskResults = Nothing
-'    Set pDataSources = Nothing
     Set pGarbageCollector = Nothing
     Set pAvailableTasks.TaskController = Nothing
     Set pAvailableTasks = Nothing
-    Set pRebuildSequence = Nothing
-    
-    Exit Sub
-ErrorHandler:
-    Debug.Print "[ERROR] @dsTaskController.Dispose() - " & CStr(Err.Description)
-    Resume Next
 End Sub
 
 
 
 
 Private Sub SetRebuildSequence(ByRef Value As ArrayListEx)
-    Dim ds1 As dsTable, rs1 As xlSheetsEx, t0 As String, tr0 As Object
-    
-    If Not Value Is Nothing Then
-        If Value.Count > 0 Then
-            t0 = Value(0)("Id")
-            If Trim(CStr(t0)) <> "" Then
-                If pTaskResults.Exists(t0) Then
-                    If IsObject(pTaskResults(t0)) Then
-                        Set tr0 = pTaskResults(t0)
-                        If tr0 Is Nothing Then t0 = ""
-                    Else
-                        t0 = ""
-                    End If
-                Else
-                    t0 = ""
-                End If
-            Else
-                t0 = ""
-            End If
-        End If
-    End If
+    Dim ds1 As dsTable, rs1 As xlSheetsEx
     
     If pDataSources.Exists("DS1") Then
         Set ds1 = pDataSources("DS1")
@@ -304,10 +260,6 @@ Private Sub SetRebuildSequence(ByRef Value As ArrayListEx)
     End If
     If Not rs1 Is Nothing Then
         Set pDataSources("XS1") = rs1
-    End If
-    If t0 <> "" Then
-        Set pTaskResults(t0) = tr0
-        ' TODO: Set as DataSource when task type is a ds type
     End If
     Set pRebuildSequence = Value
     RaiseEvent OnRebuildSequenceChange
@@ -599,21 +551,21 @@ Public Function AddResource(ByRef TargetResource As Object) As Object
 End Function
 
 ' Run GarbageCollector
-Public Sub FreeUnlinkedResources(Optional ByVal ForceFreeAllResources As Boolean = False)
+Public Sub FreeUnlinkedResources()
     Dim i As Long, gcKeys As Variant, iMax As Long, cKey As LongPtr, isMatch As Boolean
     Dim iTR As Long, iDS As Long, trKeys As Variant, dsKeys As Variant
     
     gcKeys = pGarbageCollector.Keys()
-    If ForceFreeAllResources Then
-        trKeys = Array()
-        dsKeys = Array()
-    Else
-        trKeys = pTaskResults.Keys()
-        dsKeys = pDataSources.Keys()
-    End If
+    trKeys = pTaskResults.Keys()
+    dsKeys = pDataSources.Keys()
     iMax = UBound(gcKeys)
     
     On Error GoTo StopOnError
+    
+    Debug.Print "[DEBUG] Running GarbageCollector:"
+    Debug.Print "    TaskResults.Keys: " & JSON.Stringify(trKeys)
+    Debug.Print "    DataSources.Keys: " & JSON.Stringify(dsKeys)
+    Debug.Print "    GarbageCollector.Keys: " & JSON.Stringify(gcKeys)
     
     For i = iMax To 0 Step -1
         cKey = gcKeys(i)
@@ -640,8 +592,6 @@ Public Sub FreeUnlinkedResources(Optional ByVal ForceFreeAllResources As Boolean
         End If
         
         If Not isMatch Then
-            ' EDIT: DISPOSE
-            Debug.Print "!!! Calling SafeDisposeResource for ObjPtr " & CStr(gcKeys(i))
             SafeDisposeResource pGarbageCollector(gcKeys(i))
             On Error Resume Next
             Set pGarbageCollector(gcKeys(i)) = Nothing
@@ -659,8 +609,7 @@ End Sub
 
 Private Sub SafeDisposeResource(ByRef TargetResource As Object)
     On Error GoTo DisposeFailed
-    ' EDIT: DISPOSE
-    Debug.Print "    ... Disposing object of type: " & TypeName(TargetResource)
+    
     TargetResource.Dispose
     Exit Sub
 DisposeFailed:

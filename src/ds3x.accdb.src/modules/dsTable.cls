@@ -152,7 +152,8 @@ Public Function Unbind() As dsTable
 End Function
 
 Public Sub Dispose()
-    Unbind
+    ' EDIT: DISPOSE
+    ' Unbind
 End Sub
 
 Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
@@ -491,6 +492,8 @@ Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2R
 Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
 Private Function C2ExcelWorksheet(ByVal Value As Variant) As Excel.Worksheet: Set C2ExcelWorksheet = Value: End Function
 Private Function C2xlSheetsEx(ByVal Value As Variant) As xlSheetsEx: Set C2xlSheetsEx = Value: End Function
+
+
 
 
 

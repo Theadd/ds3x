@@ -450,17 +450,10 @@ End Function
 
 
 Private Sub Class_Initialize()
-'    Debug.Print "#+ ArrayListEx.Initialize(), Index: " & CStr(OBJ_COUNTER_ARRAYLISTEX)
-    OBJ_COUNTER_ARRAYLISTEX = OBJ_COUNTER_ARRAYLISTEX + 1
     Set Instance = New ArrayList
 End Sub
 
 Private Sub Class_Terminate()
-    OBJ_COUNTER_ARRAYLISTEX = OBJ_COUNTER_ARRAYLISTEX - 1
-    Debug.Print "# ArrayListEx.Terminate(), Remaining: " & CStr(OBJ_COUNTER_ARRAYLISTEX)
-    ' EDIT: DISPOSE
-    ' Dispose
-'    -- EDIT: DISPOSE (COMMENT REMOVED)
     Set Instance = Nothing
 End Sub
 

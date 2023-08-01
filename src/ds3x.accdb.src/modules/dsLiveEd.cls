@@ -15,8 +15,12 @@ Public Event OnDataSourceChange()
 Public Event OnSave()
 Public Event OnClose()
 
-Private pTaskController As dsTaskController
+Private pTaskController As New dsTaskController
 Private pGridController As dsGridController
+
+'Private pSourceRecordsetEx As New RecordsetEx
+'Private pTargetExcelSheetEx As xlSheetsEx
+
 Private pLiveEditor As Access.Form
 
 Private pPresetObject As Scripting.Dictionary
@@ -223,7 +227,6 @@ End Function
 
 ' Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated.
 Public Function TryApply(ByRef GeneratedOutput As Variant) As Boolean
-Attribute TryApply.VB_Description = "Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated."
     On Error GoTo Fallback
     
     If TryRebuildAll Then
@@ -244,44 +247,41 @@ End Function
 
 
 
-Public Sub Dispose(): Destroy: End Sub
+Public Sub Dispose()
+    Destroy
+End Sub
+
 Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
+
 
 Private Sub Class_Initialize()
 '    Set pSourceRecordsetEx = Nothing
     Set pGridController = Nothing
-    Set pTaskController = New dsTaskController
+    Set pTaskController = Nothing
     ' Set GridController.TaskController = TaskController
 End Sub
 
 Private Sub Class_Terminate()
-    On Error Resume Next
-    If Not pTaskController Is Nothing Then
-        Destroy
-    End If
+    Debug.Print "[INFO] dsLiveEd.Terminate()"
+'    On Error Resume Next
+'    If Not pTaskController Is Nothing Then
+'        Destroy
+'    End If
+    Destroy
 End Sub
 
-Private Sub Destroy()
-    'Static wasDestroyed As Boolean
-    On Error GoTo ErrorHandler
-    'If wasDestroyed Then Exit Function
-    'wasDestroyed = True
+Private Function Destroy()
+    On Error Resume Next
     Visible = False
     Set pPresetObject = Nothing
     pPresetFile = ""
 '    pSourceRecordsetEx.Unbind
-    Set pLiveEditor = Nothing
     If Not pGridController Is Nothing Then Set pGridController.TaskController = Nothing
     Set pGridController = Nothing
-    Set pTaskController.AvailableTasks.TaskController = Nothing
-    'pTaskController.Dispose
+    pTaskController.Dispose
     Set pTaskController = Nothing
-    
-    Exit Sub
-ErrorHandler:
-    Debug.Print "[ERROR] - " & CStr(Err.Description)
-    Resume Next
-End Sub
+    Set pLiveEditor = Nothing
+End Function
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     If Not IsMissing(Value) Then
@@ -483,6 +483,9 @@ Private Function SetNamedEntryToEntries(ByRef dX As DictionaryEx, ByRef Entry As
 Finally:
 End Function
 
+' ---
+
+
 Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean = False)
     On Error Resume Next
     
@@ -492,9 +495,6 @@ Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean 
     End If
     
     RaiseEvent OnClose
-    If Not SkipAutoClose Then
-        If pDisposeOnClose Then Dispose
-    End If
 End Sub
 
 

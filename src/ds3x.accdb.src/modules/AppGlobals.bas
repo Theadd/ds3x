@@ -10,15 +10,15 @@ Public Const PATH_AppDeployDirectory As String = "\\Sanficifspvsk\pvskpcifsp01\M
 Public Const TRACE_CALLS As Boolean = False
 
 'DEVTOOLS - DEBUG MODE FOR FASTER TESTING
-Public Const DEBUG_MODE_ENABLED As Boolean = True
-Public Const STOP_ON_MISSING_CODE As Boolean = True
+Public Const DEBUG_MODE_ENABLED As Boolean = False
+Public Const STOP_ON_MISSING_CODE As Boolean = False
 Public Const INCLUDE_ENV_STRINGS_IN_REPORTS As Boolean = True
 
-Public Const DBG_THROW_ERRORS As Boolean = True
+Public Const DBG_THROW_ERRORS As Boolean = False
 
 
-Public OBJ_COUNTER_ARRAYLISTEX As Long
-Public OBJ_COUNTER_ARRAY2DEX As Long
+
+
 
 
 

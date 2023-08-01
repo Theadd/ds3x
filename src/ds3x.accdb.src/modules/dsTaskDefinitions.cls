@@ -48,11 +48,11 @@ Public Function SetColumnName(ByRef TargetTable As Variant, ByVal ColumnIndex As
             Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", ColumnName).Instance
         Else
             Set d = cH(i)
-            Set t(0, i) = DictionaryEx.Bind(d).Clone().Instance
+            Set t(0, i) = d
         End If
     Next i
     
-    Set SetColumnName = pTaskController.AddResource(dsTable.Create(Target.Records.Clone).SetHeaders(Array2dEx.Create(t)))
+    Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
 End Function
 
 'RecordsetEx.Filter("REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'")
@@ -62,7 +62,7 @@ Public Function Filter(ByRef TargetTable As Variant, Optional ByVal QueryFilter 
     QueryFilter = GetParam(QueryFilter, "")
 
     Set rX = RecordsetEx.Create(Target.NamedRecordset).Filter(QueryFilter)
-    Set Filter = pTaskController.AddResource(dsTable.Create(rX).SetHeaders(Target.Headers.Clone))
+    Set Filter = dsTable.Create(rX).SetHeaders(Target.Headers)
 End Function
 
 Public Function GetRange(ByRef TargetTable As Variant, Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
@@ -143,7 +143,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
         End With
     End If
     
-    Set ReplaceValues = pTaskController.AddResource(dsTable.Create(Array2dEx.Create(t)).SetHeaders(Target.Headers.Clone))
+    Set ReplaceValues = pTaskController.AddResource(dsTable.Create(Array2dEx.Create(t)).SetHeaders(Target.Headers))
 End Function
 
 Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer As Variant) As dsTable
@@ -174,7 +174,7 @@ Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer 
         Next i
     End If
     
-    Set ReplaceColumnNames = pTaskController.AddResource(dsTable.Create(Target.Records.Clone).SetHeaders(Array2dEx.Create(t)))
+    Set ReplaceColumnNames = pTaskController.AddResource(dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t)))
 End Function
 
 Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable

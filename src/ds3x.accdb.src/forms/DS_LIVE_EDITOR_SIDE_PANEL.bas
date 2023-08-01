@@ -24,10 +24,10 @@ Begin Form
     Width =3734
     DatasheetFontHeight =11
     ItemSuffix =1594
-    Left =24855
-    Top =1260
-    Right =28605
-    Bottom =8835
+    Left =4065
+    Top =2775
+    Right =28545
+    Bottom =15345
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -939,10 +939,6 @@ End Sub
 Private Sub DS_EDIT_BUTTON_Click()
     ' Set Controller.TaskController.DataSource("DS1") = dsTable.Create(ArrayListEx.Create().Add(Array(1, 2, 3)).Add(Array(4, 5, 6))).SetHeaders(Array("ColA", "ColB", "ColC"))
     'Stop
-    Dim TC As dsTaskController, aX As ArrayListEx, gX As Array2dEx, nX As dsTable
-    Set TC = Controller.TaskController
-    
-    Stop
 End Sub
 
 Private Sub DS_GENERATE_BUTTON_Click()
