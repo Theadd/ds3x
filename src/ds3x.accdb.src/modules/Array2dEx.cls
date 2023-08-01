@@ -66,7 +66,6 @@ Private Function CreateFromObject(ByVal ArrayLike As Object) As Array2dEx
     ElseIf TypeOf ArrayLike Is ArrayList Then
         Set CreateFromObject = CreateFromArrayList(C2ArrayList(ArrayLike))
     Else
-        If DEBUG_MODE_ENABLED Then Stop
         Err.Raise 13
     End If
 End Function

@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =4065
-    Top =3030
-    Right =22230
-    Bottom =15225
+    Left =18480
+    Top =3045
+    Right =28530
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -614,7 +614,7 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Form_Resize()
-    LogMe Printf("[DEBUG] @DS_GRID_CONTAINER.Resize(), Me.InsideHeight: %1, Me.Parent.InsideHeight: %2, Me.DS_GRID.Height: %3", Me.InsideHeight, Me.Parent.InsideHeight, Me.DS_GRID.Height), True
+'    Debug.Print Printf("[DEBUG] @DS_GRID_CONTAINER.Resize(), Me.InsideHeight: %1, Me.Parent.InsideHeight: %2, Me.DS_GRID.Height: %3", Me.InsideHeight, Me.Parent.InsideHeight, Me.DS_GRID.Height)
 '    Stop
     On Error Resume Next
     With Me.SCROLLBAR_X

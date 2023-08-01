@@ -609,15 +609,15 @@ Friend Sub MockAddTasks()
                             .Add("TaskName", "ReplaceColumnNames") _
                             .Add("Values", Array( _
                                 , _
-                                "XDaysAgo2ColumnName"))
+                                "XDaysAgo"))
 
-        ' XDaysAgo2ColumnName
+        ' XDaysAgo
 '        .Add DictionaryEx.Create() _
 '                            .Add("Id", "T6") _
 '                            .Add("TaskName", "ReplaceColumnNames") _
 '                            .Add("Values", Array( _
 '                                Array("CURRENT", "Table"), _
-'                                Array("CALLABLE", "XDaysAgo2ColumnName")))
+'                                Array("CALLABLE", "XDaysAgo")))
 
 '        .Add DictionaryEx.Create() _
 '                            .Add("Id", "T7") _
