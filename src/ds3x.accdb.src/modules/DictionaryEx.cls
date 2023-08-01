@@ -225,6 +225,7 @@ Private Function ShallowCopyDictionary(ByVal d As Scripting.Dictionary) As Scrip
 End Function
 
 Private Sub Class_Terminate()
+    On Error Resume Next
     Set Instance = Nothing
 End Sub
 

@@ -197,6 +197,8 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Else
         Err.Raise 13
     End If
+    
+    VMemAnalysis "@" & dX("Id") & " " & TaskName
 End Sub
 
 
@@ -315,13 +317,14 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
     RaiseEvent OnDataSourceChange(TaskId)
 End Sub
 
-Private Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Long) As Boolean
+Friend Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Long) As Boolean
     Dim i As Long
     On Error GoTo Finally
     
     For i = 0 To pRebuildSequence.Count - 1
         If pRebuildSequence(i)("Id") = TaskId Then
             OutIndex = i
+            TryGetIndexOfTaskId = True
             Exit Function
         End If
     Next i
@@ -559,6 +562,11 @@ Public Sub FreeUnlinkedResources()
     
     On Error GoTo StopOnError
     
+    Debug.Print "[DEBUG] Running GarbageCollector:"
+    Debug.Print "    TaskResults.Keys: " & JSON.Stringify(trKeys)
+    Debug.Print "    DataSources.Keys: " & JSON.Stringify(dsKeys)
+    Debug.Print "    GarbageCollector.Keys: " & JSON.Stringify(gcKeys)
+    
     For i = iMax To 0 Step -1
         cKey = gcKeys(i)
         isMatch = False
@@ -608,4 +616,20 @@ DisposeFailed:
     On Error Resume Next
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
 End Sub
+
+Private Sub VMemAnalysis(Optional ByVal Message As Variant)
+    Static LastVMemFree As Long, sVMemCallCount As Long
+    Dim cVMemFree As Long
+    
+    cVMemFree = GetAvailableVirtualMemory()
+    sVMemCallCount = sVMemCallCount + 1
+    If LastVMemFree <> 0 Then
+        If Abs(LastVMemFree - cVMemFree) >= 5 Then
+            Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
+        End If
+    End If
+    LastVMemFree = cVMemFree
+End Sub
+
+
 

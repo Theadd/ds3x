@@ -21,10 +21,10 @@ Begin Form
     Width =14542
     DatasheetFontHeight =11
     ItemSuffix =1572
-    Left =4065
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =18480
+    Top =-13155
+    Right =28530
+    Bottom =-8730
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -561,6 +561,7 @@ Private Sub Form_Timer()
         Set d = New dsLiveEd
         Bind d
         Set d.LiveEditor = Me
+        d.DisposeOnClose = True
         ' TODO: REMOVE 3 LINES BELOW
 '        pController.LoadADifferentSetOfSampleValues
 '        pController.MockAddTasks

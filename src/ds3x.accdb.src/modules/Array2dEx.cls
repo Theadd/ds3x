@@ -282,9 +282,11 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     GetRange.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
-'Public Function Resize(Optional ByVal NumRows As Variant, Optional ByVal NumColumns As Variant, Optional ByVal DefaultValue As Variant) As Array2dEx
-'    Dim t As New Array2dEx
-'End Function
+Public Function Clone() As Array2dEx
+    Dim t() As Variant
+    t = Instance
+    Set Clone = Array2dEx.Create(t)
+End Function
 
 Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
     Dim t() As String, s() As String, i As Long, c As Long, uc As Long
@@ -325,7 +327,10 @@ Private Sub Class_Terminate()
     Instance = Empty
 End Sub
 
-
+Public Sub Dispose()
+    ' EDIT: DISPOSE
+    ' Instance = Empty
+End Sub
 
 
 
@@ -385,7 +390,7 @@ Private Function C2Object(ByRef Value As Variant) As Object
     Set C2Object = Value
 End Function
 
-Private Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
+Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Finally
     Dim t As Long
     
@@ -397,7 +402,7 @@ Private Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
 Finally:
 End Function
 
-Private Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
+Public Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Fallback
 
     Is1dArray = Not (UBound(ArrayLike, 2) >= 0)

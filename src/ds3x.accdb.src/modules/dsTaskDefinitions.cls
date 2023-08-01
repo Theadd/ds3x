@@ -191,7 +191,7 @@ Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes 
 End Function
 
 Public Function MoveColumnsToTheEnd(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
-    Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant, CX As ArrayListEx
+    Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant, cX As ArrayListEx
     Dim TableA As dsTable, TableB As dsTable
     
     Set Target = TargetTable
@@ -263,6 +263,9 @@ LoadTableFromFileFallback:
         Set xlX = GetWorksheet(xlX, WorksheetNameOrIndex)
     End If
     Set dsT = LoadFromRange(xlX, xlX.UsedRange, FirstRowHasHeaders)
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
 Finally:
     On Error Resume Next
     xlX.DiscardChangesAndExit
@@ -303,13 +306,11 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
 
     With xlRange
         If FirstRowHasHeaders Then
-            Set LoadFromRange = dsTable _
-                .Create(ArrayListEx.Create(.Range(.Cells(2, 1), .Cells(.Rows.Count, .Columns.Count)))) _
-                .SetHeaders(ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0))
+            Set LoadFromRange = pTaskController.AddResource(dsTable.Create(xlRange, True))
         Else
-            Set LoadFromRange = dsTable _
+            Set LoadFromRange = pTaskController.AddResource(dsTable _
                 .Create(ArrayListEx.Create(xlRange)) _
-                .SetHeaders(ArrayRange(1, .Columns.Count))
+                .SetHeaders(ArrayRange(1, .Columns.Count)))
         End If
     End With
 End Function
@@ -637,7 +638,7 @@ End Function
 
 Private Function GetParam(Optional ByVal Value As Variant, Optional ByVal DefaultValue As Variant) As Variant
     If Not IsMissing(Value) Then
-        If Not (IsError(Value) Or IsNull(Value)) Then
+        If Not (IsError(Value) Or IsNull(Value) Or IsEmpty(Value)) Then
             If IsObject(Value) Then
                 Set GetParam = Value
             Else
