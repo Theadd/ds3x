@@ -24,10 +24,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =18480
-    Top =-13155
-    Right =28530
-    Bottom =-8730
+    Left =4080
+    Top =3045
+    Right =14130
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -641,4 +641,10 @@ Private Function Decode(ByVal RenderedString As String) As String
     s = RenderedString
     
     Decode = s
+End Function
+
+Private Function GetControlText(ByRef TargetControl As Access.Control) As String
+    On Error Resume Next
+    GetControlText = TargetControl.Value
+    GetControlText = TargetControl.Text
 End Function

@@ -187,6 +187,15 @@ Public Function AddSheet(Optional ByVal WorksheetName As String = "Sheet%1") As 
     End With
 End Function
 
+Public Function SaveWorkbook(ByVal TargetPath As String, Optional ByVal EnableMacros As Boolean = False) As xlSheetsEx
+    If EnableMacros Then
+        Me.Workbook.SaveAs TargetPath, FileFormat:=xlOpenXMLWorkbookMacroEnabled, Local:=True
+    Else
+        Me.Workbook.SaveAs TargetPath, FileFormat:=xlOpenXMLWorkbook, Local:=True
+    End If
+    Set SaveWorkbook = Me
+End Function
+
 Friend Function Bind(ByVal Other As xlSheetsEx) As xlSheetsEx
     Unbind
     Set pAllSheets = Other.AllSheets

@@ -22,9 +22,9 @@ Begin Form
     DatasheetFontHeight =11
     ItemSuffix =1572
     Left =18480
-    Top =-13155
+    Top =3045
     Right =28530
-    Bottom =-8730
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -506,15 +506,10 @@ Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Propert
 
 
 Private Sub Form_Load()
-    Debug.Print "  # Form_Load()"
-    'App.Initialize
     ScreenLib_Resync
     
     WindowSizeTo Me, 22000, 11000
     WindowCenterTo Me, ScreenLib.PrimaryScreen
-    
-'    Me.DS_SIDE_PANEL.HorizontalAnchor = acHorizontalAnchorRight
-'    Me.DS_VERTICAL_SPLITTER.HorizontalAnchor = acHorizontalAnchorRight
 
     Me.TimerInterval = 1
 End Sub
@@ -548,9 +543,7 @@ Private Sub Bind(ByVal TargetController As dsLiveEd)
 End Sub
 
 Private Sub Form_Resize()
-    LogMe "[DEBUG] @DS_LIVE_EDITOR.Resize() (START)", True
     ResizeToFitAllControls
-    LogMe "    [DEBUG] @DS_LIVE_EDITOR.Resize() (END)", True
 End Sub
 
 Private Sub Form_Timer()
@@ -571,7 +564,6 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
-    Debug.Print "  # Form_Unload()"
     pController.TriggerLiveEditorWindowClose True
     Set pController = Nothing
 End Sub
@@ -598,4 +590,10 @@ End Sub
 
 Private Sub pController_OnDataSourceChange()
     If Not Me.DS_MAIN_PANEL.Visible Then Me.DS_MAIN_PANEL.Visible = True
+End Sub
+
+Private Sub Focus(ByRef frm As Access.Form)
+    On Error Resume Next
+    frm.Controls("HiddenControl").SetFocus
+    DoEvents
 End Sub

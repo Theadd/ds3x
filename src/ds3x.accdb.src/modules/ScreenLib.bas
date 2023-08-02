@@ -328,7 +328,7 @@ Public Function HideAppWindow(frm As Access.Form)
     ShowWindow frm.hWnd, SW_SHOW
  End Function
 
-Public Sub RestoreTaskbarIconForAllOpenWindows()
+Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWindow As Boolean = True)
     Dim f As Access.Form, i As Long
     On Error Resume Next
     
@@ -342,7 +342,7 @@ Public Sub RestoreTaskbarIconForAllOpenWindows()
         End If
     Next i
     
-    If Not DEBUG_MODE_ENABLED Then ShowWindow Application.hWndAccessApp, SW_HIDE
+    If HideMainAccessWindow Then ShowWindow Application.hWndAccessApp, SW_HIDE
     
     For i = Forms.Count - 1 To 0 Step -1
         If i < Forms.Count Then
@@ -668,4 +668,5 @@ Private Function GetMonitorDirectionOfPoint(p As POINTAPI) As DirectionType
     End Select
 End Function
 
-
+Private Function Max(X As Variant, y As Variant) As Variant: Max = IIf(X > y, X, y): End Function
+Private Function Min(X As Variant, y As Variant) As Variant: Min = IIf(X < y, X, y): End Function

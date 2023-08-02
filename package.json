@@ -1,0 +1,32 @@
+{
+  "name": "ds3x",
+  "version": "1.0.0",
+  "description": "A lightweight MSAccess (VBA) shared library providing a dead simple abstraction in working with different sources/types of data collections to query, iterate, filter, fix/reformat, transform... Even converting to other collection types (CSV/Excel sheets, ArrayLists, 2D Arrays, Dictionaries, Recordsets, JSON, etc). ",
+  "main": "./src/ds3x.accdb",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Theadd/ds3x.git"
+  },
+  "keywords": [
+    "VBA",
+    "MSAccess",
+    "ArrayList",
+    "Recordset",
+    "Excel",
+    "CSV",
+    "JSON",
+    "Dictionary"
+  ],
+  "author": "R. Beltran",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Theadd/ds3x/issues"
+  },
+  "homepage": "https://github.com/Theadd/ds3x#readme",
+  "ds3x": {
+    "dbQuery.ConnectionString": ""
+  }
+}

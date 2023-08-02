@@ -298,7 +298,6 @@ End Function
 Public Function CopyToRange(ByRef RangeObject As Range) As ArrayListEx
     ' TODO: On Error Resume Next
     Dim Entry As Variant, i As Long, c As Long
-    LogMe "IN CopyToRange()", True
 
     For i = 0 To Instance.Count - 1
         Assign Entry, Instance(i)

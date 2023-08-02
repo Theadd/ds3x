@@ -234,12 +234,13 @@ End Sub
 
 ' Convert Variant To Varaint()
 Private Function CArray(ByVal xs) As Variant()
-    On Error GoTo StopInDebugModeOnly
+    On Error GoTo ErrorHandler
     CArray = xs
-    
+ExitFunc:
     Exit Function
-StopInDebugModeOnly:
-    If DEBUG_MODE_ENABLED Then Stop
+ErrorHandler:
+    Debug.Print "[ERROR] " & CStr(Err.Number) & " - " & CStr(Err.Description)
+    Resume ExitFunc
 End Function
 
 

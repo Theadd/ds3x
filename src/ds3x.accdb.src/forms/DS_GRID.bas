@@ -20,10 +20,10 @@ Begin Form
     Width =27774
     DatasheetFontHeight =11
     ItemSuffix =2052
-    Left =13395
-    Top =3165
-    Right =23280
-    Bottom =11835
+    Left =18480
+    Top =3045
+    Right =28530
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -3155,7 +3155,7 @@ Public Function OnColumnHeaderClick()
             ShiftKey = GetAsyncKeyState(vbKeyShift)
             CtrlKey = GetAsyncKeyState(vbKeyControl)
             
-            LogMe Printf("Click: %1, ColumnIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, colIndex, ShiftKey, CtrlKey), True
+            Debug.Print Printf("Click: %1, ColumnIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, colIndex, ShiftKey, CtrlKey)
             Controller.HandleClickOnColumnHeader colIndex, ShiftKey, CtrlKey
         End If
     End If
@@ -3171,7 +3171,7 @@ Public Function OnRowHeaderClick()
             ShiftKey = GetAsyncKeyState(vbKeyShift)
             CtrlKey = GetAsyncKeyState(vbKeyControl)
             
-            LogMe Printf("Click: %1, RowIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, RowIndex, ShiftKey, CtrlKey), True
+            Debug.Print Printf("Click: %1, RowIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, RowIndex, ShiftKey, CtrlKey)
             Controller.HandleClickOnRowHeader RowIndex, ShiftKey, CtrlKey
         'End If
     End If
@@ -3308,4 +3308,10 @@ Finally:
     Exit Function
 ErrorHandler:
     Resume Finally
+End Function
+
+Private Function GetControlText(ByRef TargetControl As Access.Control) As String
+    On Error Resume Next
+    GetControlText = TargetControl.Value
+    GetControlText = TargetControl.Text
 End Function
