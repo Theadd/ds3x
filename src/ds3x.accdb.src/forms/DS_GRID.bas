@@ -20,10 +20,10 @@ Begin Form
     Width =27774
     DatasheetFontHeight =11
     ItemSuffix =2052
-    Left =18480
-    Top =3045
-    Right =28530
-    Bottom =15210
+    Left =8310
+    Top =-10425
+    Right =11490
+    Bottom =-7845
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -3009,7 +3009,6 @@ Private pIsViewportDirty As Boolean
 Private pCurrentFirstColumn As Long
 
 
-
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
@@ -3277,7 +3276,7 @@ Public Sub ViewportSizeUpdate(Optional ByVal ViewportWidth As Long = 0, Optional
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Debug.Print "[INFO] @DS_GRID.Unload()"
+    ' Debug.Print "[INFO] @DS_GRID.Unload()"
 End Sub
 
 Public Sub SetScrollPositionX(ByVal ScrollPosX As Long)

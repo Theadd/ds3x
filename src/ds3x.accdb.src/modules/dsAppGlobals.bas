@@ -3,6 +3,7 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
+
 ' --- dsAppGlobals Module ---
 
 #If AutomationSupport = 1 Then

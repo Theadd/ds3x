@@ -346,13 +346,33 @@ Public Function TryGetFileWithoutExtension(ByVal targetDirectory As String, ByVa
     
 End Function
 
-Public Function GetFileExtension(ByRef FilePath As String) As String
+Public Function GetFileExtension(ByVal FilePath As String) As String
     GetFileExtension = FSO.GetExtensionName(FilePath)
 End Function
 
-Public Function GetFileName(ByRef FilePath As String) As String
+Public Function GetFileName(ByVal FilePath As String) As String
     GetFileName = FSO.GetFileName(FilePath)
 End Function
+
+Public Function TryGetFileInAncestors(ByRef TargetFile As String, Optional ByVal BackwardMovesLimit As Long = -1) As Boolean
+    Dim sName As String, sPath As String
+    sName = GetFileName(TargetFile)
+    sPath = TargetFile
+    
+    Do
+        sPath = FSO.GetParentFolderName(sPath)
+        If sPath = vbNullString Then Exit Do
+        
+        If TryWaitFileExists(PathCombine(sPath, sName), 0) Then
+            TargetFile = PathCombine(sPath, sName)
+            TryGetFileInAncestors = True
+            Exit Do
+        End If
+        
+        BackwardMovesLimit = BackwardMovesLimit - 1
+    Loop Until (BackwardMovesLimit = -1)
+End Function
+
 
 Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal overwriteIfAlreadyExists As Boolean = True, Optional ByVal asUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler

@@ -23,11 +23,11 @@ Begin Form
     GridY =10
     Width =8145
     DatasheetFontHeight =11
-    ItemSuffix =1577
-    Left =18645
-    Top =3165
-    Right =28455
-    Bottom =10380
+    ItemSuffix =1578
+    Left =4065
+    Top =3030
+    Right =22230
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1063,6 +1063,55 @@ Begin Form
                         End
                     End
                 End
+                Begin CommandButton
+                    OverlapFlags =215
+                    TextFontCharSet =177
+                    Left =165
+                    Top =4755
+                    Width =1755
+                    Height =360
+                    FontSize =10
+                    TabIndex =10
+                    Name ="DS_ENABLE_ALL_TASKS_BUTTON"
+                    Caption ="ENABLE ALL TASKS"
+                    OnClick ="[Event Procedure]"
+                    GroupTable =13
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =15
+                    BottomPadding =15
+                    GridlineColor =10921638
+                    VerticalAnchor =1
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =165
+                    LayoutCachedTop =4755
+                    LayoutCachedWidth =1920
+                    LayoutCachedHeight =5115
+                    LayoutGroup =12
+                    ForeThemeColorIndex =1
+                    ForeTint =100.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =8
+                    BackTint =100.0
+                    BorderWidth =1
+                    BorderThemeColorIndex =8
+                    BorderTint =100.0
+                    ThemeFontIndex =-1
+                    HoverThemeColorIndex =8
+                    HoverTint =80.0
+                    PressedThemeColorIndex =8
+                    PressedShade =80.0
+                    HoverForeThemeColorIndex =1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =1
+                    PressedForeTint =100.0
+                    GroupTable =13
+                    QuickStyle =13
+                    QuickStyleMask =-1
+                    Overlaps =1
+                End
             End
         End
     End
@@ -1087,6 +1136,7 @@ Private pTaskGroups As DictionaryEx
 Private pActiveTaskName As String
 Private pActiveTaskIndex As Long
 Private pEditMode As Boolean
+Private pEnableAllTasks As Boolean
 
 '    {
 '      "AddRowNumbers": [
@@ -1178,7 +1228,7 @@ Public Sub RebuildTasksList()
         If Not pTaskGroups.Exists(TaskType) Then
             pTaskGroups.Add TaskType, ArrayListEx.Create()
         End If
-        ValidRequiredType = pEditMode Or (ActiveTaskType Like RequiresPattern)
+        ValidRequiredType = pEnableAllTasks Or pEditMode Or (ActiveTaskType Like RequiresPattern)
         pTaskGroups(TaskType).Add Array(i, TaskName, IIf(ValidRequiredType, 1, 4))
     Next i
     
@@ -1220,6 +1270,11 @@ Private Function CreateListItemTextHeader(ByVal Title As String) As String
         "<div align=center><font face=""72 Black"" size=1 color=""#A5A5A5"">" & Title & "</font><font color=white>&nbsp;&nbsp;.<br>" & _
         "</font><font style=""BACKGROUND-COLOR:#808080"">______ _______ _________ ________ ________ _______ ____ ______ _____</font></div>"
 End Function
+
+Private Sub DS_ENABLE_ALL_TASKS_BUTTON_Click()
+    pEnableAllTasks = Not pEnableAllTasks
+    RebuildTasksList
+End Sub
 
 Private Sub Form_Load()
     Debug.Print RectToString(GetWindowRect(Me))

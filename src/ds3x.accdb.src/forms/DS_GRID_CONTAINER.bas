@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =18480
-    Top =3045
-    Right =28530
-    Bottom =15210
+    Left =7965
+    Top =-11085
+    Right =25005
+    Bottom =-3210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -32,6 +32,7 @@ Begin Form
     Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
     OnKeyDown ="[Event Procedure]"
+    OnTimer ="[Event Procedure]"
     OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
@@ -439,11 +440,11 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000f004e27208c3d9010700000080000000 ,
+                        0x004a803d000000000000000000000000a0b897a498c4d9010700000080000000 ,
                         0x0000000003004f006c0065004f0062006a006500630074004400610074006100 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x000000001e000201ffffffff02000000ffffffff000000000000000000000000 ,
-                        0x000000000000000000000000000000000000000000000000010000002c000000 ,
+                        0x0000000000000000000000000000000000000000000000000100000030000000 ,
                         0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
                         0x4400610074006100000000000000000000000000000000000000000000000000 ,
                         0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
@@ -471,11 +472,11 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000b09c1d5916c3d9010500000080000000 ,
+                        0x004a803d000000000000000000000000306010159bc4d9010500000080000000 ,
                         0x0000000003004f006c0065004f0062006a006500630074004400610074006100 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x000000001e000201ffffffff02000000ffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000100000030000000 ,
+                        0x000000000000000000000000000000000000000000000000010000002c000000 ,
                         0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
                         0x4400610074006100000000000000000000000000000000000000000000000000 ,
                         0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
@@ -518,8 +519,8 @@ Begin Form
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffff38000000000000000100000000000000000000000000000000000000 ,
                         0x0000000038000000000000000000000000000000000000000000000000000000 ,
-                        0x00000000e081d1df2f5ece11a44900aa004a803d00021c0048700000e02e0000 ,
-                        0xb00400000100000000000000a5170000da010000000000000000000000000000 ,
+                        0x00000000e081d1df2f5ece11a44900aa004a803d0002180048300000e02e0000 ,
+                        0xb004000001000000a5170000da010000da010000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
@@ -534,6 +535,7 @@ Begin Form
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000
                     End
+                    OnLostFocus ="[Event Procedure]"
                     OLEClass ="Microsoft Forms 2.0"
                     Class ="Forms.ScrollBar.1"
                     GroupTable =2
@@ -568,6 +570,9 @@ Private WithEvents pController As dsGridController
 Attribute pController.VB_VarHelpID = -1
 Private pScrollModX As Double
 Private pCurrentPageIndex As Long
+
+Private pRowsInViewport As Long
+Private pIsMaxRowsDirty As Boolean
 
 
 
@@ -614,19 +619,63 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Form_Resize()
-'    Debug.Print Printf("[DEBUG] @DS_GRID_CONTAINER.Resize(), Me.InsideHeight: %1, Me.Parent.InsideHeight: %2, Me.DS_GRID.Height: %3", Me.InsideHeight, Me.Parent.InsideHeight, Me.DS_GRID.Height)
-'    Stop
-    On Error Resume Next
+    On Error GoTo Finally
+
+    ResizeControlsToFillParent
+    If Me.SCROLLBAR_X.Visible Then
+        VerifyThatRowsFillViewport
+    End If
+Finally:
+End Sub
+
+Private Sub ResizeControlsToFillParent()
+    Dim pSize As Long
+    
+    pSize = Me.Parent.InsideWidth
+    
     With Me.SCROLLBAR_X
-        If Not .Visible Then Exit Sub
-        .Visible = False
-        .Visible = True
-        .HorizontalAnchor = acHorizontalAnchorBoth
+        .Left = 0
+        .Height = 270
+        .Width = pSize
     End With
+    Me.DS_GRID.Width = pSize
+End Sub
+
+Private Sub VerifyThatRowsFillViewport()
+    Dim t As Long, c As Long
+    On Error GoTo Finally
+        
+    c = Controller.Table.Count
+    t = MaxRowsInViewport
+    ' TODO: Apply CurrentPageIndex
+    If t > c Then t = c
+    If t > pRowsInViewport Then
+        If pIsMaxRowsDirty Then
+            Debug.Print "[DEBUG] VerifyThatRowsFillViewport failed but MaxRows is already dirty."
+        Else
+            Debug.Print "[DEBUG] VerifyThatRowsFillViewport failed, delay a call to ViewportGridRebuild."
+            pIsMaxRowsDirty = True
+            Me.TimerInterval = 100
+        End If
+    End If
+Finally:
+End Sub
+
+Private Sub Form_Timer()
+    Me.TimerInterval = 0
+    
+    If pIsMaxRowsDirty Then
+        ViewportGridRebuild
+    Else
+        Debug.Print "[INFO] Unexpected code path, ViewportGridRebuild was called within the few milliseconds gap that took Form_Timer to execute."
+        'Stop
+    End If
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Debug.Print "[INFO] @DS_GRID_CONTAINER.Unload()"
+    On Error Resume Next
+    ' Debug.Print "[INFO] @DS_GRID_CONTAINER.Unload()"
+    Me.TimerInterval = 0
 End Sub
 
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
@@ -635,12 +684,27 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     With Me.SCROLLBAR_X
         If Not .Visible Then Exit Function
         xVal = CLng(.Value + (Count * pScrollModX))
-        .Value = IIf(xVal > .Max, .Max, xVal)
+        If xVal > .Max Then
+            .Value = .Max
+            ApplyScrollbarX
+        Else
+            If xVal < 0 Then
+                .Value = 0
+                ApplyScrollbarX
+            Else
+                .Value = xVal
+            End If
+        End If
     End With
 End Function
 
 Private Sub SCROLLBAR_X_Change()
     ApplyScrollbarX
+End Sub
+
+Private Sub SCROLLBAR_X_LostFocus()
+    Me.TimerInterval = 1000
+    DoEvents
 End Sub
 
 Private Sub SCROLLBAR_X_Scroll()
@@ -670,12 +734,20 @@ End Sub
 
 Public Sub ViewportGridRebuild()
     Dim rs As ADODB.Recordset
-    '''''''Set Me.DS_GRID.Form.Recordset = Nothing
-    ' gShow = Not (Controller.Table Is Nothing)
-    On Error GoTo ExitSub
+
     If Controller.TaskController.IsValidTable Then
+        On Error Resume Next
+        Err.Clear
         ' TODO: FIXME: .IndexRecordset() throws "Subíndice fuera del intervalo" while executing "MoveColumnsToStart" on columns at the right end of the current table.
-        Set rs = Controller.Table.IndexRecordset(MaxRowsInViewport, CurrentPageIndex)
+        pRowsInViewport = MaxRowsInViewport
+        Set rs = Controller.Table.IndexRecordset(pRowsInViewport, CurrentPageIndex)
+        If Err.Number > 0 Then
+            ' TODO: Remove
+            Stop
+        End If
+        pIsMaxRowsDirty = False
+        
+        On Error GoTo ExitSub
         If Not Me.DS_GRID.Visible Then
             Me.DS_GRID.Visible = True
             Me.DS_GRID_FIXED.Visible = True
@@ -706,10 +778,8 @@ End Sub
 Public Sub ViewportSizeUpdate()
     Dim vCols As Long, xMax As Long
     
-    If Not Me.DS_GRID.Visible Then
-        Debug.Print "IN DS_GRID_CONTAINER.ViewportSizeUpdate() WITH TaskController.IsValidTable = False, SKIPPING"
-        Exit Sub
-    End If
+    If Not Me.DS_GRID.Visible Then Exit Sub
+
     vCols = Me.DS_GRID.Form.MaxViewportColumns * pController.ScrollIncrement
     xMax = (pController.NumColumnsInTable * pController.ScrollIncrement) - vCols
     If xMax <= 0 Then
@@ -719,7 +789,7 @@ Public Sub ViewportSizeUpdate()
 
     With Me.SCROLLBAR_X
         .Value = pController.ViewportScrollX
-        .LargeChange = vCols
+        .LargeChange = IIf(vCols > xMax, xMax, vCols)
         .Max = xMax
     End With
     Me.DS_GRID_FIXED.Form.ViewportSizeUpdate Me.DS_GRID.Form.InsideWidth, pController.FixedColumnsOnTheLeft

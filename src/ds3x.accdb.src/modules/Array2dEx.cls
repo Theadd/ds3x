@@ -17,10 +17,6 @@ Option Base 0
 Public Instance As Variant
 
 
-'Public Property Get ResolvedInstance() As Variant
-'    Set ResolvedInstance = CollectionsLib.GetArrayByRef(Instance)
-'End Property
-
 Public Property Get Count() As Long
     On Error Resume Next
     Count = 1 + (UBound(Instance, 1) - LBound(Instance, 1))

@@ -24,10 +24,10 @@ Begin Form
     Width =3248
     DatasheetFontHeight =11
     ItemSuffix =1590
-    Left =18645
-    Top =3165
-    Right =23280
-    Bottom =10380
+    Left =4065
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -329,46 +329,6 @@ Begin Form
             AlternateBackTint =40.0
             BackThemeColorIndex =3
             Begin
-                Begin Label
-                    Vertical = NotDefault
-                    BackStyle =1
-                    OldBorderStyle =1
-                    OverlapFlags =93
-                    TextFontCharSet =177
-                    TextFontFamily =0
-                    Left =30
-                    Top =30
-                    Width =330
-                    Height =2123
-                    FontSize =10
-                    FontWeight =100
-                    LeftMargin =58
-                    ForeColor =-2147483600
-                    Name ="Etiqueta1782"
-                    Caption ="  R E B U I L D   S E Q U E N C E"
-                    FontName ="Calibri Light"
-                    GroupTable =1
-                    LeftPadding =15
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleLeft =1
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-                    LayoutCachedLeft =30
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =360
-                    LayoutCachedHeight =2153
-                    LayoutGroup =1
-                    ThemeFontIndex =-1
-                    BorderThemeColorIndex =1
-                    BorderTint =100.0
-                    ForeThemeColorIndex =-1
-                    ForeTint =100.0
-                    GridlineShade =50.0
-                    GroupTable =1
-                End
                 Begin Subform
                     OverlapFlags =87
                     Left =360
@@ -399,6 +359,48 @@ Begin Form
                     GridlineShade =50.0
                     BorderShade =100.0
                     GroupTable =1
+                    Begin
+                        Begin Label
+                            Vertical = NotDefault
+                            BackStyle =1
+                            OldBorderStyle =1
+                            OverlapFlags =93
+                            TextFontCharSet =177
+                            TextFontFamily =0
+                            Left =30
+                            Top =30
+                            Width =330
+                            Height =2123
+                            FontSize =10
+                            FontWeight =100
+                            LeftMargin =58
+                            ForeColor =-2147483600
+                            Name ="Etiqueta1782"
+                            Caption ="  R E B U I L D   S E Q U E N C E"
+                            FontName ="Calibri Light"
+                            GroupTable =1
+                            LeftPadding =15
+                            TopPadding =15
+                            RightPadding =0
+                            BottomPadding =0
+                            GridlineStyleLeft =1
+                            GridlineStyleTop =1
+                            GridlineColor =8355711
+                            VerticalAnchor =2
+                            LayoutCachedLeft =30
+                            LayoutCachedTop =30
+                            LayoutCachedWidth =360
+                            LayoutCachedHeight =2153
+                            LayoutGroup =1
+                            ThemeFontIndex =-1
+                            BorderThemeColorIndex =1
+                            BorderTint =100.0
+                            ForeThemeColorIndex =-1
+                            ForeTint =100.0
+                            GridlineShade =50.0
+                            GroupTable =1
+                        End
+                    End
                 End
             End
         End
@@ -1285,7 +1287,7 @@ Private Sub Form_Resize()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Debug.Print "[INFO] @DS_REBUILD_SEQUENCE.Unload()"
+    ' Debug.Print "[INFO] @DS_REBUILD_SEQUENCE.Unload()"
 End Sub
 
 Private Sub pContinuousList_OnActiveIndexChange(ByVal ActiveIndex As Long)

@@ -986,7 +986,7 @@ Private Sub Form_Resize()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Debug.Print "[INFO] @DS_LIVE_EDITOR_SIDE_PANEL.Unload()"
+    ' Debug.Print "[INFO] @DS_LIVE_EDITOR_SIDE_PANEL.Unload()"
 End Sub
 
 Private Sub pController_OnDataSourceChange()
