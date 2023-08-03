@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": null,
-    "ExportDate": "03/08/2023 19:59:31",
+    "ExportDate": "03/08/2023 20:34:31",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -144,18 +144,18 @@
           "FilePropertiesHash": "4a47e5c"
         },
         "dbQuery.cls": {
-          "FileHash": "364729b",
-          "OtherHash": "18918b5",
-          "ExportDate": "03/08/2023 19:59:31",
-          "SourceModified": "03/08/2023 19:59:31",
-          "FilePropertiesHash": "f89d9f2"
+          "FileHash": "864cb68",
+          "OtherHash": "daa2e61",
+          "ExportDate": "03/08/2023 20:34:31",
+          "SourceModified": "03/08/2023 20:34:31",
+          "FilePropertiesHash": "d4ca060"
         },
         "DictionaryEx.cls": {
-          "FileHash": "35f0764",
-          "OtherHash": "b0c1db9",
-          "ExportDate": "03/08/2023 19:59:02",
-          "SourceModified": "01/08/2023 4:18:13",
-          "FilePropertiesHash": "fd507a6"
+          "FileHash": "2f8b905",
+          "OtherHash": "91ed1f8",
+          "ExportDate": "03/08/2023 20:34:31",
+          "SourceModified": "03/08/2023 20:34:31",
+          "FilePropertiesHash": "99959d3"
         },
         "dsAppGlobals.bas": {
           "FileHash": "961fab5",
@@ -165,11 +165,11 @@
           "FilePropertiesHash": "fa56dc5"
         },
         "dsCodeSandbox.bas": {
-          "FileHash": "597f951",
-          "OtherHash": "a5ba6e1",
-          "ExportDate": "03/08/2023 19:59:31",
-          "SourceModified": "03/08/2023 19:59:31",
-          "FilePropertiesHash": "5be5354"
+          "FileHash": "49476e8",
+          "OtherHash": "7f7f3e0",
+          "ExportDate": "03/08/2023 20:34:31",
+          "SourceModified": "03/08/2023 20:34:31",
+          "FilePropertiesHash": "c8b4d50"
         },
         "dsCommonLib.bas": {
           "FileHash": "6d8a2da",
