@@ -67,9 +67,18 @@ Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
     Set Create = New DictionaryEx
     
     If Not IsMissing(DictionaryLike) Then
-        If Not DictionaryLike Is Nothing Then
-            Create.Bind DictionaryLike
-            Exit Function
+        If IsObject(DictionaryLike) Then
+            If Not DictionaryLike Is Nothing Then
+                Create.Bind DictionaryLike
+                Exit Function
+            End If
+        Else
+            If VarType(DictionaryLike) = vbString Then
+                If VBA.Left(LTrim(DictionaryLike), 1) = "{" Then
+                    Create.Bind JSON.Parse(DictionaryLike, True, True)
+                    Exit Function
+                End If
+            End If
         End If
     End If
     
