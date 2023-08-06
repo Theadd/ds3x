@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =15780
-    Top =-11835
-    Right =27630
-    Bottom =-5310
+    Left =16125
+    Top =-12825
+    Right =27975
+    Bottom =-6300
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -550,6 +550,9 @@ Option Explicit
 ' The amount of overflowing scroll to the right after the last table column
 Private pOutOfBoundsScrollX As Long
 Private pCurrentPageIndex As Long
+Private pScrollPageSizeX As Long
+Private pInitialized As Boolean
+Private pKeepScrollPositionOnTableChange As Boolean
 
 'Private pRowsInViewport As Long
 'Private pIsMaxRowsDirty As Boolean
@@ -569,6 +572,11 @@ Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: En
 Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = Value: End Property
 
 Public Property Get Table() As dsTable: Set Table = pTable: End Property
+Public Property Set Table(ByRef Value As dsTable): SetTable Value: End Property
+
+Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
+Public Property Get KeepScrollPositionOnTableChange() As Boolean: KeepScrollPositionOnTableChange = pKeepScrollPositionOnTableChange: End Property
+Public Property Let KeepScrollPositionOnTableChange(ByVal Value As Boolean): pKeepScrollPositionOnTableChange = Value: End Property
 
 Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 
@@ -586,6 +594,8 @@ Public Property Get OutOfBoundsScrollX() As Long: OutOfBoundsScrollX = pOutOfBou
 Public Property Let OutOfBoundsScrollX(ByVal Value As Long): pOutOfBoundsScrollX = Value: End Property
 
 Public Property Get AvailableVMemOnLoad() As Long: AvailableVMemOnLoad = pAvailableVMemOnLoad: End Property
+
+Public Property Get ScrollPageSizeX() As Long: ScrollPageSizeX = pScrollPageSizeX: End Property
 
 Public Property Get MaxRowsInViewport() As Long
 '    MaxRowsInViewport = CLng( _
@@ -607,20 +617,22 @@ Private Sub Form_Load()
     Monitor "VMem", "0 MB"
     ScreenLib_Resync
     Setup
-    ' TODO: Remove
-    SetupDevelopmentEnvironment
     
     If Not IsSubform Then
         WindowSizeTo Me, 12000, 8000
         WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
+        ' TODO: Remove
+        SetupDevelopmentEnvironment
     End If
     Monitor "VMem", CStr(pAvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
 End Sub
 
 Private Sub Form_Resize()
     ResizeFormContent
-    UpdateScrollbarX
-    HandleLargeStepResize
+    If pInitialized Then
+        UpdateScrollbarX
+        HandleLargeStepResize
+    End If
 End Sub
 
 Private Sub Form_Timer()
@@ -648,6 +660,14 @@ Private Sub Setup()
     Set Viewport.ScrollView = Me
     Viewport.Setup
     Set Worksheet = Viewport.Worksheet
+End Sub
+
+Private Sub SetTable(ByRef Value As dsTable)
+    Set pTable = Value
+    pInitialized = Not (pTable Is Nothing)
+    
+    UpdateScrollbarX
+    Viewport.OnSourceTableChange
 End Sub
 
 
@@ -678,7 +698,7 @@ Private Sub HandleLargeStepResize()
         rStepX = Me.InsideWidth
         rStepY = Me.InsideHeight
         
-        Viewport.RecalculateViewportSizes
+        ' Viewport.RecalculateViewportSizes
     End If
 End Sub
 
@@ -704,14 +724,14 @@ End Sub
 
 Private Sub ApplyScrollbarX()
     ' TODO: On Error GoTo Finally
-    If Not Me.SCROLLBAR_X.Visible Then Exit Sub
+    If (Not Me.SCROLLBAR_X.Visible) Or (Not pInitialized) Then Exit Sub
     
     ' TODO
     With Me.SCROLLBAR_X
         'Debug.Print Printf("[IN] ApplyScrollbarX's .Max: %1, .LargeChange: %2, .Value: %3", .Max, .LargeChange, .Value)
         
         ' Scroll X to (0 - .Value)
-        Viewport.ScrollTo .Value
+        Viewport.ScrollTo .Value, 0
         
     End With
     
@@ -726,19 +746,21 @@ End Sub
 Private Sub UpdateScrollbarX()
     If Not Me.SCROLLBAR_X.Visible Then Exit Sub
     
-    ' ____________* ScrollView.InsideWidth     _______* ScrollView.OutOfBoundsScrollX
+    ' ____________* ScrollView.ScrollPageSizeX _______* ScrollView.OutOfBoundsScrollX
     '|____________|___________________________|_______|
     '|________________________________________|
     '                                         * Viewport.ViewportContentFullWidth
     
-    Dim xMax As Long
+    Dim xMax As Long, cellSizeX As Long, fullViewportContentSizeX As Long
     
-    xMax = (Viewport.ViewportContentFullWidth + OutOfBoundsScrollX) - Me.InsideWidth
+    cellSizeX = Worksheet.GridCellSizeX
+    pScrollPageSizeX = CLng(Int(Me.InsideWidth / cellSizeX)) * cellSizeX
+    fullViewportContentSizeX = pTable.ColumnCount * cellSizeX
+    xMax = (fullViewportContentSizeX + OutOfBoundsScrollX) - pScrollPageSizeX
     With Me.SCROLLBAR_X
         .Max = xMax
-        .LargeChange = IIf(Me.InsideWidth > xMax, xMax, Me.InsideWidth)
-        .SmallChange = 200
-        ' Debug.Print Printf("ScrollbarX's .Max: %1, .LargeChange: %2, .Value: %3;    ViewportContentFullWidth: %4", xMax, .LargeChange, .Value, Viewport.ViewportContentFullWidth)
+        .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
+        .SmallChange = CLng(cellSizeX / 5)
     End With
 End Sub
 
@@ -746,13 +768,7 @@ End Sub
 ' --- TESTING / DEVELOPMENT ---
 
 Private Sub SetupDevelopmentEnvironment()
-    Set pTable = CreateSampleTable
-    
-    Viewport.OnSourceTableChange
-    'Set Worksheet.Recordset = pTable.CreateIndexRecordset(10, pCurrentPageIndex, 10, 0, , True)
-    
-    ' pRowsInViewport = MaxRowsInViewport
-    
+    Set Table = CreateSampleTable
 End Sub
 
 Public Function Monitor(ByVal Key As String, ByVal Value As Variant) As Variant

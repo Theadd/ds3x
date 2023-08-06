@@ -31,7 +31,7 @@ Public Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, 
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
-Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal y As Long, ByVal cX As Long, ByVal CY As Long, ByVal wFlags As Long) As Long
+Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal CY As Long, ByVal wFlags As Long) As Long
 Private Declare PtrSafe Function GetDesktopWindow Lib "user32" () As LongPtr
 
 Private Declare PtrSafe Function CalculatePopupWindowPosition Lib "user32" (anchorPoint As POINTAPI, windowSize As SIZE, ByVal flags As Long, excludeRect As RECT, outPosition As RECT) As Boolean  ' https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-calculatepopupwindowposition
@@ -87,7 +87,7 @@ End Type
 
 Public Type POINTAPI
     X As Long
-    y As Long
+    Y As Long
 End Type
 
 Public Type RECT
@@ -99,7 +99,7 @@ End Type
 
 Public Type BOUNDS
     X As Long
-    y As Long
+    Y As Long
     W As Long
     h As Long
 End Type
@@ -183,14 +183,14 @@ End Property
 
 ' --- PRIVATE FUNCTIONS ---
 
-Private Function PointToSize(p As POINTAPI) As SIZE: PointToSize.cX = p.X: PointToSize.CY = p.y: End Function
+Private Function PointToSize(p As POINTAPI) As SIZE: PointToSize.cX = p.X: PointToSize.CY = p.Y: End Function
 
 ' --- PUBLIC FUNCTIONS ---
 
 Public Function TwipsInPixelsX(PixelsX As Long) As Long: TwipsInPixelsX = PixelsX * TwipsPerPixelX: End Function
 Public Function TwipsInPixelsY(PixelsY As Long) As Long: TwipsInPixelsY = PixelsY * TwipsPerPixelY: End Function
 
-Public Function PointToString(p As POINTAPI) As String: PointToString = Printf("(%1, %2)", p.X, p.y): End Function
+Public Function PointToString(p As POINTAPI) As String: PointToString = Printf("(%1, %2)", p.X, p.Y): End Function
 Public Function RectToString(r As RECT) As String: RectToString = Printf("(%1, %2) -> (%3, %4)", r.Left, r.Top, r.Right, r.Bottom): End Function
 Public Function SerializeRect(r As RECT) As String: SerializeRect = Printf("%1,%2,%3,%4", r.Left, r.Top, r.Right, r.Bottom): End Function
 
@@ -210,33 +210,33 @@ Public Function UnserializeRect(ByVal s As String) As RECT
     End With
 End Function
 
-Public Function GetPoint(Optional ByVal X As Long = 0, Optional ByVal y As Long = 0) As POINTAPI: GetPoint.X = X: GetPoint.y = y: End Function
-Public Function GetRect(ByVal X As Long, ByVal y As Long, ByVal X2 As Long, ByVal Y2 As Long) As RECT: GetRect.Left = X: GetRect.Top = y: GetRect.Right = X2: GetRect.Bottom = Y2: End Function
-Public Function GetBounds(ByVal X As Long, ByVal y As Long, ByVal W As Long, ByVal h As Long) As BOUNDS: GetBounds.X = X: GetBounds.y = y: GetBounds.W = W: GetBounds.h = h: End Function
-Public Function RectToBounds(r As RECT) As BOUNDS: RectToBounds.X = r.Left: RectToBounds.y = r.Top: RectToBounds.W = (r.Right - r.Left): RectToBounds.h = (r.Bottom - r.Top): End Function
-Public Function BoundsToRect(b As BOUNDS) As RECT: BoundsToRect.Left = b.X: BoundsToRect.Top = b.y: BoundsToRect.Right = (b.X + b.W): BoundsToRect.Bottom = (b.y + b.h): End Function
+Public Function GetPoint(Optional ByVal X As Long = 0, Optional ByVal Y As Long = 0) As POINTAPI: GetPoint.X = X: GetPoint.Y = Y: End Function
+Public Function GetRect(ByVal X As Long, ByVal Y As Long, ByVal X2 As Long, ByVal Y2 As Long) As RECT: GetRect.Left = X: GetRect.Top = Y: GetRect.Right = X2: GetRect.Bottom = Y2: End Function
+Public Function GetBounds(ByVal X As Long, ByVal Y As Long, ByVal W As Long, ByVal h As Long) As BOUNDS: GetBounds.X = X: GetBounds.Y = Y: GetBounds.W = W: GetBounds.h = h: End Function
+Public Function RectToBounds(r As RECT) As BOUNDS: RectToBounds.X = r.Left: RectToBounds.Y = r.Top: RectToBounds.W = (r.Right - r.Left): RectToBounds.h = (r.Bottom - r.Top): End Function
+Public Function BoundsToRect(b As BOUNDS) As RECT: BoundsToRect.Left = b.X: BoundsToRect.Top = b.Y: BoundsToRect.Right = (b.X + b.W): BoundsToRect.Bottom = (b.Y + b.h): End Function
 
-Public Function RectAsBounds(r As RECT) As BOUNDS: RectAsBounds.X = r.Left: RectAsBounds.y = r.Top: RectAsBounds.W = r.Right: RectAsBounds.h = r.Bottom: End Function
-Public Function BoundsAsRect(b As BOUNDS) As RECT: BoundsAsRect.Left = b.X: BoundsAsRect.Top = b.y: BoundsAsRect.Right = b.W: BoundsAsRect.Bottom = b.h: End Function
+Public Function RectAsBounds(r As RECT) As BOUNDS: RectAsBounds.X = r.Left: RectAsBounds.Y = r.Top: RectAsBounds.W = r.Right: RectAsBounds.h = r.Bottom: End Function
+Public Function BoundsAsRect(b As BOUNDS) As RECT: BoundsAsRect.Left = b.X: BoundsAsRect.Top = b.Y: BoundsAsRect.Right = b.W: BoundsAsRect.Bottom = b.h: End Function
 
-Public Function InvertPoint(p As POINTAPI) As POINTAPI: InvertPoint.X = 0 - p.X: InvertPoint.y = 0 - p.y: End Function
-Public Function DirectionPoint(d As DirectionType) As POINTAPI: DirectionPoint.X = Clamp101((d And East) - (d And West)): DirectionPoint.y = Clamp101((d And South) - (d And North)): End Function
+Public Function InvertPoint(p As POINTAPI) As POINTAPI: InvertPoint.X = 0 - p.X: InvertPoint.Y = 0 - p.Y: End Function
+Public Function DirectionPoint(d As DirectionType) As POINTAPI: DirectionPoint.X = Clamp101((d And East) - (d And West)): DirectionPoint.Y = Clamp101((d And South) - (d And North)): End Function
 
 Public Function PointInRect(r As RECT, d As DirectionType) As POINTAPI
     With DirectionPoint(d)
         PointInRect.X = Switch(.X = -1, r.Left, .X = 0, r.Left + ((r.Right - r.Left) / 2), .X = 1, r.Right)
-        PointInRect.y = Switch(.y = -1, r.Top, .y = 0, r.Top + ((r.Bottom - r.Top) / 2), .y = 1, r.Bottom)
+        PointInRect.Y = Switch(.Y = -1, r.Top, .Y = 0, r.Top + ((r.Bottom - r.Top) / 2), .Y = 1, r.Bottom)
     End With
 End Function
 
-Public Function AddOffsetToRect(r As RECT, p As POINTAPI) As RECT: With AddOffsetToRect: .Left = r.Left + p.X: .Top = r.Top + p.y: .Right = r.Right + p.X: .Bottom = r.Bottom + p.y: End With: End Function
+Public Function AddOffsetToRect(r As RECT, p As POINTAPI) As RECT: With AddOffsetToRect: .Left = r.Left + p.X: .Top = r.Top + p.Y: .Right = r.Right + p.X: .Bottom = r.Bottom + p.Y: End With: End Function
 Public Function RemoveOffsetFromRect(r As RECT, p As POINTAPI) As RECT: RemoveOffsetFromRect = AddOffsetToRect(r, InvertPoint(p)): End Function
 
-Public Function AddOffsetToPoint(t As POINTAPI, p As POINTAPI) As POINTAPI: AddOffsetToPoint.X = t.X + p.X: AddOffsetToPoint.y = t.y + p.y: End Function
+Public Function AddOffsetToPoint(t As POINTAPI, p As POINTAPI) As POINTAPI: AddOffsetToPoint.X = t.X + p.X: AddOffsetToPoint.Y = t.Y + p.Y: End Function
 Public Function RemoveOffsetFromPoint(t As POINTAPI, p As POINTAPI) As POINTAPI: RemoveOffsetFromPoint = AddOffsetToPoint(t, InvertPoint(p)): End Function
 
 Public Function RectInTwips(r As RECT) As RECT: With RectInTwips: .Left = r.Left * TwipsPerPixelX: .Top = r.Top * TwipsPerPixelY: .Right = r.Right * TwipsPerPixelX: .Bottom = r.Bottom * TwipsPerPixelY: End With: End Function
-Public Function PointInTwips(p As POINTAPI) As POINTAPI: PointInTwips.X = p.X * TwipsPerPixelX: PointInTwips.y = p.y * TwipsPerPixelY: End Function
+Public Function PointInTwips(p As POINTAPI) As POINTAPI: PointInTwips.X = p.X * TwipsPerPixelX: PointInTwips.Y = p.Y * TwipsPerPixelY: End Function
 
 Public Function RectInPixels(r As RECT) As RECT
     With RectInPixels
@@ -250,7 +250,7 @@ End Function
 Public Function PointInPixels(p As POINTAPI) As POINTAPI
     With PointInPixels
         .X = CLng(p.X / TwipsPerPixelX)
-        .y = CLng(p.y / TwipsPerPixelY)
+        .Y = CLng(p.Y / TwipsPerPixelY)
     End With
 End Function
 
@@ -400,16 +400,16 @@ End Function
 
 ' --- SET WINDOW SIZE / POSITION ---
 
-Public Sub WindowMoveTo(f As Access.Form, X As Long, y As Long)
-    SetWindowPos f.hWnd, HWND_TOP, CLng(X / TwipsPerPixelX), CLng(y / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
+Public Sub WindowMoveTo(f As Access.Form, X As Long, Y As Long)
+    SetWindowPos f.hWnd, HWND_TOP, CLng(X / TwipsPerPixelX), CLng(Y / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
 End Sub
 
 Public Sub WindowSizeTo(f As Access.Form, W As Long, h As Long)
     SetWindowPos f.hWnd, HWND_TOP, 0, 0, CLng(W / TwipsPerPixelX), CLng(h / TwipsPerPixelY), (SWP_NOMOVE Or SWP_NOZORDER Or SWP_NOACTIVATE)
 End Sub
 
-Public Sub WindowMoveSize(f As Access.Form, X As Long, y As Long, W As Long, h As Long)
-    SetWindowPos f.hWnd, HWND_TOP, CLng(X / TwipsPerPixelX), CLng(y / TwipsPerPixelY), CLng(W / TwipsPerPixelX), CLng(h / TwipsPerPixelY), (SWP_NOZORDER Or SWP_NOACTIVATE)
+Public Sub WindowMoveSize(f As Access.Form, X As Long, Y As Long, W As Long, h As Long)
+    SetWindowPos f.hWnd, HWND_TOP, CLng(X / TwipsPerPixelX), CLng(Y / TwipsPerPixelY), CLng(W / TwipsPerPixelX), CLng(h / TwipsPerPixelY), (SWP_NOZORDER Or SWP_NOACTIVATE)
 End Sub
 
 Public Sub WindowBringToTop(f As Access.Form)
@@ -430,7 +430,7 @@ Public Sub WindowCenterTo(f As Access.Form, r As RECT)
     c = PointInRect(r, DirectionType.Center)
     b = RectToBounds(GetWindowRect(f))
 
-    SetWindowPos f.hWnd, HWND_TOP, CLng((c.X - (b.W / 2)) / TwipsPerPixelX), CLng((c.y - (b.h / 2)) / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
+    SetWindowPos f.hWnd, HWND_TOP, CLng((c.X - (b.W / 2)) / TwipsPerPixelX), CLng((c.Y - (b.h / 2)) / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
 End Sub
 
 Public Sub WindowMaximize(f As Access.Form): ShowWindow f.hWnd, SW_SHOWMAXIMIZED: End Sub
@@ -533,7 +533,7 @@ Private Function GetFormSectionAsOffset(f As Access.Form, t As AcSection) As POI
     
     GetFormSectionAsOffset = GetPoint
     With f.Section(t)
-        If .Visible Then GetFormSectionAsOffset.y = .Height
+        If .Visible Then GetFormSectionAsOffset.Y = .Height
     End With
     
 Finally:
@@ -662,11 +662,11 @@ Private Function GetMonitorDirectionOfPoint(p As POINTAPI) As DirectionType
         Case Is > PrimaryScreenRect.Right: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.East
     End Select
     
-    Select Case p.y
+    Select Case p.Y
         Case Is < PrimaryScreenRect.Top: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.North
         Case Is > PrimaryScreenRect.Bottom: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.South
     End Select
 End Function
 
-Private Function Max(X As Variant, y As Variant) As Variant: Max = IIf(X > y, X, y): End Function
-Private Function Min(X As Variant, y As Variant) As Variant: Min = IIf(X < y, X, y): End Function
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function

@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1559
-    Left =14625
-    Top =-12780
-    Right =26325
-    Bottom =-5715
+    Left =16125
+    Top =-12825
+    Right =27975
+    Bottom =-6300
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -398,7 +398,7 @@ Option Explicit
 '             /* WindowMoveTo Worksheet, (pScrollModX - pScrollX), (pScrollModY - pScrollY) */
 '
 '                                         (18000)
-'              ____________ * ScrollView.InsideWidth    _______ * ScrollView.OutOfBoundsScrollX
+'              ____________ * ScrollView.ScrollPageSizeX_______ * ScrollView.OutOfBoundsScrollX
 '             |____________|___________________________|_______|
 '             |________________________________________|
 '             |_____________________|                   * Viewport.ViewportContentFullWidth      -> All dsTable Columns Width
@@ -444,8 +444,32 @@ Private pCurrentTrackIndex As Long
 ' Maximum distance between calls to ScrollTo()
 Private pMaxScrollStepX As Long
 
-' TODO: Event actions for changes on source dsTable to rebuild Right and Left RecordsetEx's
+' --- V2 ---
+Private pCachedTracks As ArrayListEx
+' The current ColumnsToLargeChangeTrack value used in CachedTracks, CachedTracks resets when this value changes
+Private pTrackColumnSizesInCache As Long
 
+Private Type TViewportState
+    ScrollPosX As Long
+    ScrollPosY As Long
+    ' Index of current visible track in Viewport
+    TrackIndex As Long
+    ' Index of current visible page in Viewport
+    PageIndex As Long
+    ' Index of the first visible column in **Table**
+    FirstVisibleColumn As Long
+    ' The distance between the start of the first visible column to the viewport left edge (must be less than GridCellSizeX)
+    FirstVisibleColumnPositionModX As Long
+    ' Index of the first visible column relative to current visible **Track**
+    FirstVisibleColumnInTrack As Long
+    ' Number of columns as the distance between track switching
+    ColumnsToLargeChangeTrack As Long
+    ' The distance from the current track left edge to the viewport left edge
+    TrackPositionModX As Long
+End Type
+Private this As TViewportState
+
+' ---
 
 Private pScrollX As Long
 Private pScrollY As Long
@@ -463,15 +487,6 @@ Public Property Get CurrentTrackIndex() As Long: CurrentTrackIndex = pCurrentTra
 Public Property Let CurrentTrackIndex(ByVal Value As Long): pCurrentTrackIndex = Value: End Property
 
 Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
-
-' --- VIEWPORT CONTENT PROPERTIES ---
-
-' ViewportContentFullWidth = (Total Columns in dsTable * Grid Cell Width)
-Public Property Get ViewportContentFullWidth() As Long
-    On Error Resume Next
-    ViewportContentFullWidth = pScrollView.Table.ColumnCount * Worksheet.DS_HC_2_2.Left
-End Property
-
 
 
 ' --- FORM EVENTS ---
@@ -494,8 +509,6 @@ Public Sub Setup()
     r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
     b = ScreenLib.RectToBounds(r)
     
-    Debug.Print Printf("Bounds.Width: %1, Worksheet.InsideWidth: %2", b.W, Worksheet.InsideWidth)
-    
     t = Worksheet.MaxContentWidthLimit
 
     Me.Width = t
@@ -516,254 +529,98 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     pScrollView.PropagateMouseWheel Page, Count
 End Function
 
-' Private Function SeamlessTrackShift(ByRef TargetWorksheet As Form_DS_WORKSHEET, ByRef rX As RecordsetEx) As Long
-Private Function SeamlessTrackShift(ByVal TrackStopIndex As Long) As Long
-    ' Dim rX As RecordsetEx
-    ' 2 -> 2: RS1 = RS2, RS2 = RSN,                 RSN = Dirty
-    ' 2 -> 1: RS1 = RS1, RS2 = RS2,                 RSN = Dirty
-    ' 1 -> 2: RS1 = RS1, RS2 = RS2,                 RSN = Dirty
-    ' 1 -> 1: RS2 = RS1, RS1 = RSN,                 RSN = Dirty
-    Debug.Print "SHIFTING"
-    Select Case TrackStopIndex
-        Case 1
-            pCurrentTrackIndex = pCurrentTrackIndex - 1
-            If pCurrentTrackStopOrigin = 1 Then
-                ' Set rX = pTrackStopRS1
-                Set pTrackStopRS2 = pTrackStopRS1
-                Set pTrackStopRS1 = pTrackStopRSN
-            End If
-            Set Worksheet.Recordset = pTrackStopRS1.Instance
-            
-        Case 2
-            pCurrentTrackIndex = pCurrentTrackIndex + 1
-            If pCurrentTrackStopOrigin = 2 Then
-                ' Set rX = pTrackStopRS2
-                Set pTrackStopRS1 = pTrackStopRS2
-                Set pTrackStopRS2 = pTrackStopRSN
-            End If
-            Set Worksheet.Recordset = pTrackStopRS2.Instance
-            
-    End Select
-    If pCurrentTrackIndex > 0 Then pIsDirtyRSN = True
-    pCurrentTrackStopOrigin = TrackStopIndex
-    ' TODO: REMOVE BELOW
-    ScrollView.Monitor "TrackIndex", pCurrentTrackIndex
-End Function
-
-Private Sub JumpToTrackStop(ByVal TrackStopIndex As Long, ByVal sX As Long, ByVal sY As Long)
-    Dim sMod As Long
+Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
+    Dim sView As TViewportState
     
-    ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
-    SeamlessTrackShift TrackStopIndex
+    sView = GetViewportStateAt(X, Y)
     
-    Select Case TrackStopIndex
-        Case 1
-            ' TODO: DoEvents after implementing Event pooling
-            sMod = (pTrackStops(3) - pTrackStops(1))
-            ' WindowMoveTo Worksheet, (0 - sX) - sMod + (pTrackStops(3) - sX), 0 - sY
-            'WindowMoveTo Worksheet, (0 - sX) - sMod + pScrollModX + (pTrackStops(3) - sX), 0 - sY
-            Debug.Print Printf("(3 -> 1) = pScrollModX + (pTrackStops(3) - pTrackStops(1)) - (pTrackStops(3) - sX): %1 + (%2 - %3) - (%2 - %4) = %1 + (%5) - (%6) = %7", _
-                pScrollModX, pTrackStops(3), pTrackStops(1), sX, pTrackStops(3) - pTrackStops(1), pTrackStops(3) - sX, pScrollModX + sMod - (pTrackStops(3) - sX))
-'            pScrollModX = pScrollModX + sMod - (pTrackStops(3) - sX)
-            pScrollModX = pScrollModX + sMod + (pTrackStops(3) - sX)
-        Case 2
-            ' TODO: DoEvents
-            If (pTrackStops(0) - sX) > 0 Then
-                ' TODO: Remove (assert: should be negative)
-                Stop
-            End If
-            sMod = (pTrackStops(0) - pTrackStops(2))
-            ' WindowMoveTo Worksheet, (0 - sX) - sMod + (pTrackStops(0) - sX), 0 - sY
-            Debug.Print Printf("(0 -> 2) = pScrollModX + (pTrackStops(0) - pTrackStops(2)) + (pTrackStops(0) - sX): %1 + (%2 - %3) + (%2 - %4) = %1 + (%5) + (%6) = %7", _
-                pScrollModX, pTrackStops(0), pTrackStops(2), sX, pTrackStops(0) - pTrackStops(2), pTrackStops(0) - sX, pScrollModX + sMod + (pTrackStops(0) - sX))
-            pScrollModX = pScrollModX + sMod + (pTrackStops(0) - sX)
-'            pScrollModX = pScrollModX + sMod - (pTrackStops(0) - sX)
-        Case Else
-            Err.Raise 17, , "Nonsense."
-    End Select
-    ScrollView.Monitor "LastJumpTo", TrackStopIndex
-    ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
-End Sub
-
-Public Sub ScrollTo(Optional ByVal ScrollPosX As Variant, Optional ByVal ScrollPosY As Variant)
-    Dim sValue As Long
-    If IsMissing(ScrollPosX) Then ScrollPosX = pScrollX
-    If IsMissing(ScrollPosY) Then ScrollPosY = pScrollY
+    If pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then RestartTrackCache
+    WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
     
-    If Abs(pScrollX - ScrollPosX) > pMaxScrollStepX Then
-        sValue = pScrollX
-        If pScrollX < ScrollPosX Then
-            Do
-                sValue = sValue + pMaxScrollStepX
-                If sValue >= ScrollPosX Then sValue = ScrollPosX
-                ScrollWorksheetTo sValue, ScrollPosY
-            Loop Until (sValue = ScrollPosX)
-        Else
-            Do
-                sValue = sValue - pMaxScrollStepX
-                If sValue <= ScrollPosX Then sValue = ScrollPosX
-                ScrollWorksheetTo sValue, ScrollPosY
-            Loop Until (sValue = ScrollPosX)
-        End If
-    Else
-        ScrollWorksheetTo ScrollPosX, ScrollPosY
-    End If
-End Sub
-
-Private Sub ScrollWorksheetTo(ByVal ScrollPosX As Variant, ByVal ScrollPosY As Variant)
-    Static pCallCount As Long
-    ' TODO: Remove
-    Dim iAux As Long
-    On Error GoTo 0
-    
-    pCallCount = pCallCount + 1
-    If pCallCount > 1 Then Debug.Print "[WARNING] @Viewport.ScrollTo() - pCallCount: " & CStr(pCallCount)
-    If pIsDirtyRSN Then UpdateTrackStopRSN
-    ' TODO: Event pooling
-    Dim sX As Long, sY As Long, prevX As Long, prevY As Long
-'    If IsMissing(ScrollPosX) Then ScrollPosX = pScrollX
-'    If IsMissing(ScrollPosY) Then ScrollPosY = pScrollY
-    
-    '                 if X < (3) jumps to (1)
-    '                  <------------<
-    ' pTrackStops: [0, 1,        2, 3]
-    '               >------------>     ... if X > (0) jumps to (2)
-    
-    ' sX = (0 - ScrollPosX) + pScrollModX     ' Ik
-    sX = ScrollPosX - pScrollModX
-    sY = ScrollPosY - pScrollModY
-    prevX = pScrollX - pScrollModX
-    prevY = pScrollY - pScrollModY
-    
-    If pScrollX > ScrollPosX Then
-        ' Scrolls to the left (to the begginning of the table)
-        If prevX > pTrackStops(3) And sX < pTrackStops(3) Then
-            ' JUMP! (3) -> (1)
-            If ScrollPosX > pTrackStops(3) Then
-                iAux = pScrollModX
-                JumpToTrackStop 1, sX, sY
-                
-                sX = ScrollPosX - pScrollModX
-                Debug.Print Printf("---> sX FROM %1 (%2 - %3) TO %4 (%5 - %6)", ScrollPosX - iAux, ScrollPosX, iAux, ScrollPosX - pScrollModX, ScrollPosX, pScrollModX)
-                WindowMoveTo Worksheet, pTrackStops(3) - sX, 0 - sY
-                GoTo Finally
-            End If
-        End If
-    ElseIf pScrollX < ScrollPosX Then
-        ' Scrolls RIGHT
-        If prevX < pTrackStops(0) And sX > pTrackStops(0) Then
-            ' JUMP! (0) -> (2)
-            iAux = pScrollModX
-            JumpToTrackStop 2, sX, sY
-            
-            sX = ScrollPosX - pScrollModX
-            Debug.Print Printf("---> sX FROM %1 (%2 - %3) TO %4 (%5 - %6)", ScrollPosX - iAux, ScrollPosX, iAux, ScrollPosX - pScrollModX, ScrollPosX, pScrollModX)
-            WindowMoveTo Worksheet, pTrackStops(3) - sX, 0 - sY
-            GoTo Finally
-        End If
-    Else
-        ' Vertical scrolling not implemented yet, can't reach here, or shouldn't
-        Debug.Print "[NOTICE] @Viewport.ScrollTo() - Vertical scrolling not implemented yet, can't reach here, or shouldn't"
-    End If
-    
-    WindowMoveTo Worksheet, pTrackStops(3) - sX, 0 - sY
-Finally:
-    pScrollX = ScrollPosX
-    pScrollY = ScrollPosY
-    ' TODO: Remove
-'    ScrollView.Monitor "sX", sX
-'    ScrollView.Monitor "pScrollX", pScrollX
-'    ScrollView.Monitor "pScrollModX", pScrollModX
-    pCallCount = pCallCount - 1
-End Sub
-
-
-' --- VIEWPORT CONTENT ---
-
-Public Function OnSourceTableChange()
-    Static isFirstRun As Boolean
-    RecalculateViewportSizes
-
-    Set Worksheet.Recordset = pTrackStopRS1.Instance
-    
-    If Not isFirstRun Then
-        pCurrentTrackStopOrigin = 1
-        pScrollModX = 0 - pTrackStops(3)
-        ScrollTo 0, 0
-        isFirstRun = True
-    End If
-End Function
-
-Public Sub RecalculateViewportSizes()
-    Dim dsT As dsTable
-    
-    Set dsT = ScrollView.Table
-    ' ws => Worksheet
-    ' vw => Viewport
-    Dim wsMaxContentWidth As Long, scViewInsideWidth As Long, MaxFlexSpaceX As Long, pCurrentPageIndex As Long
-    Dim cellSizeX As Long, cellScrollSafeMoves As Long
-    ', outerTrackStopSizeModX As Long
-    ' TODO: CurrentPageIndex as a ScrollView property?
-    pCurrentPageIndex = ScrollView.CurrentPageIndex
-'    wsMaxContentWidth = Worksheet.MaxContentWidthLimit
-'    scViewInsideWidth = ScrollView.InsideWidth
-
-    MaxFlexSpaceX = Worksheet.MaxContentWidthLimit - ScrollView.InsideWidth
-    cellSizeX = Worksheet.GridCellSizeX
-    ' outerTrackStopSizeModX = CLng(cellSizeX * 0.4)
-    
-    cellScrollSafeMoves = Int(MaxFlexSpaceX / cellSizeX) - 1
-    pAllowedTrackMoves = IIf(cellScrollSafeMoves <= 0, 1, cellScrollSafeMoves)
-    pMaxScrollStepX = cellSizeX * Int((pAllowedTrackMoves + 1) / 2)
-    
-'    pTrackStops = Array(cellSizeX * pAllowedTrackMoves, (cellSizeX * pAllowedTrackMoves) - outerTrackStopSizeModX, cellSizeX, outerTrackStopSizeModX)
-    pTrackStops = Array(cellSizeX * (pAllowedTrackMoves + 1), cellSizeX * pAllowedTrackMoves, cellSizeX * 2, cellSizeX)
-
-    Set pTrackStopRS1 = RecordsetEx.Create(dsT.CreateIndexRecordset(10, pCurrentPageIndex, 10, 0, , True))
-    Set pTrackStopRS2 = RecordsetEx.Create(dsT.CreateIndexRecordset(10, pCurrentPageIndex, 10, pAllowedTrackMoves - 1, , True))
- 
-    Debug.Print Printf("ScrollView.InsideWidth: %1, Worksheet.MaxContentWidthLimit: %2, MaxFlexSpaceX: %3, pTrackStops: %4", _
-        ScrollView.InsideWidth, Worksheet.MaxContentWidthLimit, MaxFlexSpaceX, JSON.Stringify(pTrackStops))
-        
-    'ScrollView.Monitor "TrackStops", pTrackStops
-
-    
-End Sub
-
-Private Sub UpdateTrackStopRSN()
-    Dim ColumnStartIndex As Long, dsT As dsTable
-    ' TODO: ColumnsCount
-    Debug.Print "IN UpdateTrackStopRSN"
-    pIsDirtyRSN = False
-    ' TODO: Remove
-    On Error GoTo StopOnError
-    Set dsT = ScrollView.Table
-    
-    If pCurrentTrackIndex = 9 Then
+    If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Then
+        Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
+        ScrollView.Monitor "Track", sView.TrackIndex
         ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
-        'Stop
     End If
-    Select Case pCurrentTrackStopOrigin
-        Case 1
-            ColumnStartIndex = ((pCurrentTrackIndex - 1) * pAllowedTrackMoves) - 1
-            If ColumnStartIndex < 0 Then ColumnStartIndex = 0
-        Case 2
-            ColumnStartIndex = ((pCurrentTrackIndex + 1) * pAllowedTrackMoves) - 1
-    End Select
     
-    If ColumnStartIndex >= dsT.ColumnCount Then
-        Set pTrackStopRSN = RecordsetEx.Create(CreateBlankRecordset(100, 0, Worksheet.MaxAvailColumns))
-    Else
-        Set pTrackStopRSN = RecordsetEx.Create(dsT.CreateIndexRecordset(10, ScrollView.CurrentPageIndex, 10, ColumnStartIndex, , True))
-    End If
-    ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
-ExitSub:
-    Exit Sub
-StopOnError:
-    Debug.Print Err.Description
-    Stop
-    Resume Next
+    this = sView
 End Sub
+
+
+' --- STATE MANAGEMENT ---
+
+Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewportState
+    Dim t As TViewportState, maxTrackWidth As Long, cellWidth As Long, viewWidth As Long
+    
+    t.ScrollPosX = X
+    t.ScrollPosY = Y
+    
+    maxTrackWidth = Worksheet.MaxContentWidthLimit
+    cellWidth = Worksheet.GridCellSizeX
+    viewWidth = ScrollView.ScrollPageSizeX
+    
+    t.ColumnsToLargeChangeTrack = Max(CLng((maxTrackWidth - viewWidth) / cellWidth) - 1, 1)
+    
+    t.FirstVisibleColumn = CLng(Int(X / cellWidth))
+    t.FirstVisibleColumnPositionModX = X Mod cellWidth
+    t.TrackIndex = CLng(Int(X / (cellWidth * t.ColumnsToLargeChangeTrack)))
+    t.PageIndex = 0 ' TODO
+    t.FirstVisibleColumnInTrack = t.FirstVisibleColumn - (t.ColumnsToLargeChangeTrack * t.TrackIndex)
+    t.TrackPositionModX = (t.FirstVisibleColumnInTrack * cellWidth) + t.FirstVisibleColumnPositionModX
+    
+    GetViewportStateAt = t
+End Function
+
+Public Sub OnSourceTableChange()
+    Static isFirstRun As Boolean
+    
+    RestartTrackCache
+    this.TrackIndex = -1
+    If ScrollView.KeepScrollPositionOnTableChange Then
+        ScrollTo this.ScrollPosX, this.ScrollPosY
+    Else
+        ScrollTo 0, 0
+    End If
+End Sub
+
+Private Function GetColumnsToLargeChangeTrack() As Long
+    GetColumnsToLargeChangeTrack = Max(CLng((Worksheet.MaxContentWidthLimit - (ScrollView.ScrollPageSizeX)) / Worksheet.GridCellSizeX) - 1, 1)
+End Function
+
+
+' --- TRACK CACHE ---
+
+Private Sub RestartTrackCache()
+    ' TODO: Free cached tracks
+    Set pCachedTracks = Nothing
+    Set pCachedTracks = ArrayListEx.Create()
+    pTrackColumnSizesInCache = GetColumnsToLargeChangeTrack
+    ScrollView.Monitor "lgChange", pTrackColumnSizesInCache
+    ScrollView.Monitor "ViewArea", Printf("[(%1)..%2]", pTrackColumnSizesInCache, Worksheet.MaxAvailColumns)
+End Sub
+
+Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
+    Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long
+
+    Set dsT = ScrollView.Table
+    ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
+
+    If ColumnStartIndex >= dsT.ColumnCount Then
+        Set rX = RecordsetEx.Create(CreateBlankRecordset(100, 0, Worksheet.MaxAvailColumns))
+    Else
+        ' TODO: PageIndex * 10
+        If dsT.ColumnCount - ColumnStartIndex > Worksheet.MaxAvailColumns Then
+            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(10, PageIndex, 10, ColumnStartIndex, Worksheet.MaxAvailColumns, True))
+        Else
+            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(10, PageIndex, 10, ColumnStartIndex, , True))
+        End If
+    End If
+    
+    Set GetTrack = rX
+End Function
+
+
+' --- HELPERS ---
 
 Private Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
     Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
@@ -786,3 +643,6 @@ Private Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStart
     
     Set CreateBlankRecordset = rs
 End Function
+
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function

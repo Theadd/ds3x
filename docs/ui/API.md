@@ -32,6 +32,31 @@
 ```vb
 ' ViewportContentFullWidth = (Total Columns in dsTable * Grid Cell Width)
 Property Get ViewportContentFullWidth() As Long
+
+Private pCachedTracks As ArrayListEx
+' The current ColumnsToLargeChangeTrack value used in CachedTracks, CachedTracks resets when this value changes
+Private pTrackColumnSizesInCache As Long
+
+Private Type TViewportState
+    ScrollPosX As Long
+    ScrollPosY As Long
+    ' Index of current visible track in Viewport
+    TrackIndex As Long
+    ' Index of current visible page in Viewport
+    PageIndex As Long
+    ' Index of the first visible column in **Table**
+    FirstVisibleColumn As Long
+    ' The distance between the start of the first visible column to the viewport left edge (must be less than GridCellSizeX)
+    FirstVisibleColumnPositionModX As Long
+    ' Index of the first visible column relative to current visible **Track**
+    FirstVisibleColumnInTrack As Long
+    ' Number of columns as the distance between track switching
+    ColumnsToLargeChangeTrack As Long
+    ' The distance from the current track left edge to the viewport left edge
+    TrackPositionModX As Long
+End Type
+
+Private this As TViewportState
 ```
 ````vb
 Public Sub ScrollTo(X, Y)

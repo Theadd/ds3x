@@ -38,22 +38,24 @@ End Property
 'Sets or returns an item for a specified key.
 Public Property Get Item(ByVal Index As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
-        Index = CLng(Index)
-        Select Case Index
-                Case Is < 0
-                        Index = Instance.Count + Index
-                        If Index < 0 Then Exit Property
-                        Assign Item, Instance(Index)
-                Case Is < Instance.Count
-                        Assign Item, Instance(Index)
-        End Select
+    Index = CLng(Index)
+    Select Case Index
+        Case Is < 0
+            Index = Instance.Count + Index
+            If Index < 0 Then Exit Property
+            Assign Item, Instance(Index)
+        Case Is < Instance.Count
+            Assign Item, Instance(Index)
+    End Select
 End Property
 
 Public Property Let Item(ByVal Index As Variant, Value As Variant)
+    If Index >= Instance.Count Then Allocate Index
     Instance(CLng(Index)) = Value
 End Property
 
 Public Property Set Item(ByVal Index As Variant, Value As Variant)
+    If Index >= Instance.Count Then Allocate Index
     Set Instance(CLng(Index)) = Value
 End Property
 
@@ -424,6 +426,14 @@ Private Function ValueToCSV(ByVal Value As Variant) As String
 End Function
 
 ' --- PRIVATE METHODS ---
+
+Private Sub Allocate(ByVal Index As Variant)
+    Dim i As Long
+    
+    For i = Instance.Count To Index
+        Instance.Add Empty
+    Next i
+End Sub
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     If Not IsMissing(Value) Then
