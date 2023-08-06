@@ -74,6 +74,7 @@ Public Property Get VirtualScrollX() As Long
     b = a * pScrollIncrement
     c = pViewportScrollX - b
     VirtualScrollX = CLng((GetColumnWidth(a + 1) / pScrollIncrement) * c)
+    Debug.Print Printf("a: %1, b: %2, c: %3, (%4 / %5) * %3: %6", a, b, c, GetColumnWidth(a + 1), pScrollIncrement, (GetColumnWidth(a + 1) / pScrollIncrement) * c)
 End Property
 
 

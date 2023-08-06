@@ -407,12 +407,12 @@ Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByV
 End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx
     
     iRow = GetHeaderNames
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    Set allValues = Me.RecordList
+    Set AllValues = Me.RecordList
     
     With rs
         For c = cMin To cMax
@@ -422,7 +422,7 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
         .Open
         
         For i = 0 To Me.Count - 1
-            .AddNew FieldList:=iRow, Values:=allValues(i)
+            .AddNew FieldList:=iRow, Values:=AllValues(i)
         Next i
         
         If Me.Count > 0 Then .MoveFirst
@@ -431,15 +431,31 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
     Set CreateNamedRecordset = rs
 End Function
 
-Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx, iMax As Long
+
+Public Function CreateIndexRecordset( _
+        Optional ByVal PageSize As Variant, _
+        Optional ByVal PageIndex As Variant, _
+        Optional ByVal PageCount As Long = 1, _
+        Optional ByVal ColumnStartIndex As Variant, _
+        Optional ByVal ColumnsCount As Variant, _
+        Optional ByVal ColumnIndexStartsOnZero As Boolean = False _
+        ) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, iMax As Long
     
     If IsMissing(PageSize) Then PageSize = Me.Count
     If IsMissing(PageIndex) Then PageIndex = 0
-    iRow = CreateIndexHeaders
+    If IsMissing(ColumnStartIndex) Then ColumnStartIndex = 0
+    If IsMissing(ColumnsCount) Then ColumnsCount = Me.ColumnCount - ColumnStartIndex
+    
+    iRow = CreateIndexHeaders(ColumnStartIndex, ColumnsCount, ColumnIndexStartsOnZero)
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    Set allValues = Me.RecordList
+    
+    If ColumnStartIndex <> 0 Or ColumnsCount <> Me.ColumnCount Then
+        Set AllValues = Me.RecordList.GetRange(, , CreateIndexHeaders(ColumnStartIndex, ColumnsCount, False))
+    Else
+        Set AllValues = Me.RecordList
+    End If
     
     With rs
         For c = cMin To cMax
@@ -447,10 +463,10 @@ Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Option
         Next c
         
         .Open
-        iMax = (PageSize * (PageIndex + 1)) - 1
+        iMax = ((PageSize * (PageIndex + 1)) - 1) + ((PageCount - 1) * PageSize)
         If iMax > Me.Count - 1 Then iMax = Me.Count - 1
         For i = (PageSize * PageIndex) To iMax
-            .AddNew FieldList:=iRow, Values:=allValues(i)
+            .AddNew FieldList:=iRow, Values:=AllValues(i)
         Next i
         
         If Me.Count > 0 Then .MoveFirst
@@ -459,13 +475,18 @@ Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Option
     Set CreateIndexRecordset = rs
 End Function
 
-Private Function CreateIndexHeaders() As Variant
-    Dim t As Variant, c As Long, cMax As Long
-    cMax = Me.ColumnCount - 1
+Private Function CreateIndexHeaders(ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long, ByVal ColumnIndexStartsOnZero As Boolean) As Variant
+    Dim t As Variant, c As Long, cMax As Long, cMin As Long
+    cMax = (ColumnsCount - 1) ' + ColumnStartIndex
+    
+    If Not ColumnIndexStartsOnZero Then
+        cMin = ColumnStartIndex
+    End If
+    
     ReDim t(0 To cMax)
     
     For c = 0 To cMax
-        t(c) = CStr(c)
+        t(c) = CStr(c + cMin)
     Next c
     
     CreateIndexHeaders = t

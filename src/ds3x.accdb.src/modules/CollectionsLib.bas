@@ -86,10 +86,6 @@ End Function
 
 ' ---
 
-Public Function CreateDSLiveEd() As dsLiveEd
-    Set CreateDSLiveEd = New dsLiveEd
-End Function
-
 
 ' Devuelve un array estructurado en formato SearchDefinition como el descrito en los comentarios de la parte superior
 ' de este módulo, partiendo de una SearchString que puede estar compuesta por múltiples criterios de búsqueda y en

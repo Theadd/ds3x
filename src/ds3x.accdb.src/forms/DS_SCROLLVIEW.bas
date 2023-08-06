@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =10440
-    Top =3945
-    Right =27480
-    Bottom =11820
+    Left =15780
+    Top =-11835
+    Right =27630
+    Bottom =-5310
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -313,35 +313,37 @@ Begin Form
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =3135
+            Height =3120
             Name ="Detalle"
             AlternateBackThemeColorIndex =4
             AlternateBackTint =40.0
             BackThemeColorIndex =3
             Begin
                 Begin Subform
-                    OverlapFlags =93
+                    CanGrow = NotDefault
+                    TabStop = NotDefault
+                    OverlapFlags =85
                     OldBorderStyle =0
-                    Top =30
+                    Top =15
                     Width =3433
                     Height =2835
-                    TabIndex =2
+                    TabIndex =1
                     BorderColor =10921638
-                    Name ="DS_GRID"
-                    SourceObject ="Form.DS_GRID"
+                    Name ="DS_VIEWPORT"
+                    SourceObject ="Form.DS_VIEWPORT"
                     GroupTable =2
                     LeftPadding =0
                     TopPadding =15
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    VerticalAnchor =2
 
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =3433
-                    LayoutCachedHeight =2865
+                    LayoutCachedHeight =2850
                     LayoutGroup =1
                     GroupTable =2
+                    ShowPageHeaderAndPageFooter =0
                 End
                 Begin CommandButton
                     OverlapFlags =85
@@ -385,39 +387,17 @@ Begin Form
                     QuickStyleMask =-1009
                     Overlaps =1
                 End
-                Begin Subform
-                    OverlapFlags =215
-                    OldBorderStyle =0
-                    Top =30
-                    Width =15
-                    Height =2835
-                    TabIndex =1
-                    BorderColor =10921638
-                    Name ="DS_GRID_FIXED"
-                    SourceObject ="Form.DS_GRID"
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    VerticalAnchor =2
-
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =15
-                    LayoutCachedHeight =2865
-                    ColumnEnd =3
-                End
                 Begin CustomControl
                     Enabled = NotDefault
                     TabStop = NotDefault
                     SizeMode =1
                     OldBorderStyle =0
                     OverlapFlags =85
-                    Top =2865
+                    Top =2850
                     Width =3433
                     Height =270
                     AutoActivate =1
-                    TabIndex =3
+                    TabIndex =2
                     BorderColor =10921638
                     Name ="SCROLLBAR_X"
                     OleData = Begin
@@ -545,9 +525,9 @@ Begin Form
                     BottomPadding =0
                     GridlineColor =10921638
 
-                    LayoutCachedTop =2865
+                    LayoutCachedTop =2850
                     LayoutCachedWidth =3433
-                    LayoutCachedHeight =3135
+                    LayoutCachedHeight =3120
                     RowStart =1
                     RowEnd =1
                     LayoutGroup =1
@@ -565,138 +545,148 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
+'Private pScrollModX As Double
 
-Private WithEvents pController As dsGridController
-Attribute pController.VB_VarHelpID = -1
-Private pScrollModX As Double
+' The amount of overflowing scroll to the right after the last table column
+Private pOutOfBoundsScrollX As Long
 Private pCurrentPageIndex As Long
 
-Private pRowsInViewport As Long
-Private pIsMaxRowsDirty As Boolean
+'Private pRowsInViewport As Long
+'Private pIsMaxRowsDirty As Boolean
+
+' TODO: Remove, for development purposes only
+Private pTable As dsTable
+Private pAvailableVMemOnLoad As Long
+
+Private pViewport As Form_DS_VIEWPORT
+Private pWorksheet As Form_DS_WORKSHEET
 
 
+Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
+Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
 
+Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
+Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = Value: End Property
+
+Public Property Get Table() As dsTable: Set Table = pTable: End Property
 
 Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 
-Public Property Get Controller() As dsGridController
-    Set Controller = pController
-End Property
-
-Public Property Set Controller(ByRef Value As dsGridController)
-    Dim mSelf As Access.Form
-    Set pController = Value
-    If Not pController Is Nothing Then
-        Set mSelf = Me
-        Set pController.GridContainer = mSelf
-        Set pController.GridForm = Me.DS_GRID.Form
-    End If
-    Set Me.DS_GRID.Form.Controller = Value
-    Set Me.DS_GRID_FIXED.Form.Controller = Value
-    SetFixedGridColumns
-End Property
 
 Public Property Get ScrollbarX() As Long
     ScrollbarX = Nz(Me.SCROLLBAR_X, 0)
 End Property
 
-Public Property Get ScrollModX() As Double: ScrollModX = pScrollModX: End Property
-Public Property Let ScrollModX(ByVal Value As Double): pScrollModX = Value: End Property
+'Public Property Get ScrollModX() As Double: ScrollModX = pScrollModX: End Property
+'Public Property Let ScrollModX(ByVal Value As Double): pScrollModX = Value: End Property
 Public Property Get CurrentPageIndex() As Long: CurrentPageIndex = pCurrentPageIndex: End Property
 Public Property Let CurrentPageIndex(ByVal Value As Long): pCurrentPageIndex = Value: End Property
 
-Public Property Get MaxRowsInViewport() As Long: MaxRowsInViewport = CLng(Int((Me.DS_GRID.Form.InsideHeight - Me.DS_GRID.Form.EncabezadoDelFormulario.Height) / Me.DS_GRID.Form.Detalle.Height) + 1): End Property
+Public Property Get OutOfBoundsScrollX() As Long: OutOfBoundsScrollX = pOutOfBoundsScrollX: End Property
+Public Property Let OutOfBoundsScrollX(ByVal Value As Long): pOutOfBoundsScrollX = Value: End Property
 
+Public Property Get AvailableVMemOnLoad() As Long: AvailableVMemOnLoad = pAvailableVMemOnLoad: End Property
+
+Public Property Get MaxRowsInViewport() As Long
+'    MaxRowsInViewport = CLng( _
+'        Int((Me.DS_GRID.Form.InsideHeight - Me.DS_GRID.Form.EncabezadoDelFormulario.Height) _
+'            / Me.DS_GRID.Form.Detalle.Height _
+'        ) + 1)
+End Property
+
+
+
+' --- FORM EVENTS ---
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
 '    If KeyCode = vbKeySpace Then Stop
 End Sub
 
 Private Sub Form_Load()
-    pScrollModX = 15
-    SetFixedGridColumns
-    Debug.Print "IN DS_GRID_CONTAINER.Load()"
+    pAvailableVMemOnLoad = GetAvailableVirtualMemory
+    Monitor "VMem", "0 MB"
+    ScreenLib_Resync
+    Setup
+    ' TODO: Remove
+    SetupDevelopmentEnvironment
+    
+    If Not IsSubform Then
+        WindowSizeTo Me, 12000, 8000
+        WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
+    End If
+    Monitor "VMem", CStr(pAvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
 End Sub
 
 Private Sub Form_Resize()
-    On Error GoTo Finally
-
-    ResizeControlsToFillParent
-    If Me.SCROLLBAR_X.Visible Then
-        VerifyThatRowsFillViewport
-    End If
-Finally:
-End Sub
-
-Private Sub ResizeControlsToFillParent()
-    Dim pSize As Long
-    
-    pSize = Me.Parent.InsideWidth
-    
-    With Me.SCROLLBAR_X
-        .Left = 0
-        .Height = 270
-        .Width = pSize
-    End With
-    Me.DS_GRID.Width = pSize
-End Sub
-
-Private Sub VerifyThatRowsFillViewport()
-    Dim t As Long, c As Long
-    On Error GoTo Finally
-        
-    c = Controller.Table.Count
-    t = MaxRowsInViewport
-    ' TODO: Apply CurrentPageIndex
-    If t > c Then t = c
-    If t > pRowsInViewport Then
-        If pIsMaxRowsDirty Then
-            Debug.Print "[DEBUG] VerifyThatRowsFillViewport failed but MaxRows is already dirty."
-        Else
-            Debug.Print "[DEBUG] VerifyThatRowsFillViewport failed, delay a call to ViewportGridRebuild."
-            pIsMaxRowsDirty = True
-            Me.TimerInterval = 100
-        End If
-    End If
-Finally:
+    ResizeFormContent
+    UpdateScrollbarX
+    HandleLargeStepResize
 End Sub
 
 Private Sub Form_Timer()
     Me.TimerInterval = 0
+    DoEvents
     
-    If pIsMaxRowsDirty Then
-        ViewportGridRebuild
-    Else
-        Debug.Print "[INFO] Unexpected code path, ViewportGridRebuild was called within the few milliseconds gap that took Form_Timer to execute."
-        'Stop
-    End If
+    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS
+
+    r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
+    b = ScreenLib.RectToBounds(r)
+    
+    Stop
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
-    ' Debug.Print "[INFO] @DS_GRID_CONTAINER.Unload()"
     Me.TimerInterval = 0
 End Sub
 
-Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
-    Dim xVal As Long
+
+' --- SETUP / BINDING ---
+
+Private Sub Setup()
+    Set Viewport = Me.DS_VIEWPORT.Form
+    Set Viewport.ScrollView = Me
+    Viewport.Setup
+    Set Worksheet = Viewport.Worksheet
+End Sub
+
+
+' --- CONTENT RESIZING ---
+
+Private Sub ResizeFormContent()
+    Dim mW As Long, mH As Long
+    
+    mW = Me.InsideWidth
+    mH = Me.InsideHeight
     
     With Me.SCROLLBAR_X
-        If Not .Visible Then Exit Function
-        xVal = CLng(.Value + (Count * pScrollModX))
-        If xVal > .Max Then
-            Debug.Print Printf("PropagateMouseWheel CASE 1 - xVal: %1, .Max: %2", xVal, .Max)
-            .Value = .Max
-            ApplyScrollbarX
-        Else
-            If xVal < 0 Then
-                .Value = 0
-                ApplyScrollbarX
-            Else
-                .Value = xVal
-            End If
-        End If
+        .Height = 270
+        .Left = 0
+        .Width = mW
     End With
+    With Me.DS_VIEWPORT
+        .Height = mH - (270 + .Top)
+        .Width = mW
+        Me.SCROLLBAR_X.Top = .Height + .Top
+    End With
+End Sub
+
+Private Sub HandleLargeStepResize()
+    Static rStepX As Long, rStepY As Long
+    
+    If VBA.Abs(rStepX - Me.InsideWidth) > 1000 Or VBA.Abs(rStepY - Me.InsideHeight) > 1000 Then
+        rStepX = Me.InsideWidth
+        rStepY = Me.InsideHeight
+        
+        Viewport.RecalculateViewportSizes
+    End If
+End Sub
+
+
+' --- SCROLLING ---
+
+Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
+    ' Debug.Print "[TODO] @DS_SCROLLVIEW.PropagateMouseWheel()"
 End Function
 
 Private Sub SCROLLBAR_X_Change()
@@ -713,94 +703,65 @@ Private Sub SCROLLBAR_X_Scroll()
 End Sub
 
 Private Sub ApplyScrollbarX()
+    ' TODO: On Error GoTo Finally
     If Not Me.SCROLLBAR_X.Visible Then Exit Sub
     
-    Controller.ViewportScrollX = Me.ScrollbarX
-    If Controller.FirstColumnInViewport = Me.DS_GRID.Form.CurrentFirstColumn Then
-        Me.DS_GRID.Form.SetScrollPositionX Controller.VirtualScrollX
-        Exit Sub
-    End If
-    
-    On Error GoTo Finally
-    'Application.Echo False
-    Me.DS_GRID.Form.RebuildActiveColumns
-    Me.DS_GRID.Form.SetScrollPositionX Controller.VirtualScrollX
-Finally:
-    'Application.Echo True
-End Sub
-
-Private Sub pController_OnChange()
-    ViewportGridRebuild
-End Sub
-
-Public Sub ViewportGridRebuild()
-    Dim rs As ADODB.Recordset
-
-    If Controller.TaskController.IsValidTable Then
-        On Error Resume Next
-        Err.Clear
-        ' TODO: FIXME: .IndexRecordset() throws "Subíndice fuera del intervalo" while executing "MoveColumnsToStart" on columns at the right end of the current table.
-        pRowsInViewport = MaxRowsInViewport
-        Set rs = Controller.Table.IndexRecordset(pRowsInViewport, CurrentPageIndex)
-        If Err.Number > 0 Then
-            ' TODO: Remove
-            Stop
-        End If
-        pIsMaxRowsDirty = False
+    ' TODO
+    With Me.SCROLLBAR_X
+        'Debug.Print Printf("[IN] ApplyScrollbarX's .Max: %1, .LargeChange: %2, .Value: %3", .Max, .LargeChange, .Value)
         
-        On Error GoTo ExitSub
-        If Not Me.DS_GRID.Visible Then
-            Me.DS_GRID.Visible = True
-            Me.DS_GRID_FIXED.Visible = True
-            Me.SCROLLBAR_X.Visible = True
-        End If
-        Me.DS_GRID.Form.RebuildActiveColumns
-        Set Me.DS_GRID.Form.Recordset = rs
-        Me.DS_GRID_FIXED.Form.RebuildActiveColumns
-        Set Me.DS_GRID_FIXED.Form.Recordset = rs.Clone
-    Else
-        On Error GoTo HandleHideFocusedControlError
-        If Me.DS_GRID.Visible Then
-            Me.DS_GRID.Visible = False
-            Me.DS_GRID_FIXED.Visible = False
-            Me.SCROLLBAR_X.Visible = False
-            Set Me.DS_GRID.Form.Recordset = Nothing
-        End If
-    End If
+        ' Scroll X to (0 - .Value)
+        Viewport.ScrollTo .Value
+        
+    End With
     
 ExitSub:
     Exit Sub
-HandleHideFocusedControlError:
-    On Error GoTo ExitSub
-    Me.HiddenControl.SetFocus
-    Resume Next
+Finally:
+    On Error Resume Next
+    Debug.Print "[ERROR] @DS_SCROLLVIEW.ApplyScrollbarX() - " & CStr(Err.Description)
+    Resume ExitSub
 End Sub
 
-Public Sub ViewportSizeUpdate()
-    Dim vCols As Long, xMax As Long
+Private Sub UpdateScrollbarX()
+    If Not Me.SCROLLBAR_X.Visible Then Exit Sub
     
-    If Not Me.DS_GRID.Visible Then Exit Sub
-
-    vCols = Me.DS_GRID.Form.MaxViewportColumns * pController.ScrollIncrement
-    ' xMax = (pController.NumColumnsInTable * pController.ScrollIncrement) - vCols
-    ' EDIT: BUG
-    xMax = ((pController.NumColumnsInTable + 1) * pController.ScrollIncrement) - vCols
-    If xMax <= 0 Then
-        xMax = 0
-        pController.ViewportScrollX = 0
-    End If
-
+    ' ____________* ScrollView.InsideWidth     _______* ScrollView.OutOfBoundsScrollX
+    '|____________|___________________________|_______|
+    '|________________________________________|
+    '                                         * Viewport.ViewportContentFullWidth
+    
+    Dim xMax As Long
+    
+    xMax = (Viewport.ViewportContentFullWidth + OutOfBoundsScrollX) - Me.InsideWidth
     With Me.SCROLLBAR_X
-        .Value = pController.ViewportScrollX
-        .LargeChange = IIf(vCols > xMax, xMax, vCols)
         .Max = xMax
+        .LargeChange = IIf(Me.InsideWidth > xMax, xMax, Me.InsideWidth)
+        .SmallChange = 200
+        ' Debug.Print Printf("ScrollbarX's .Max: %1, .LargeChange: %2, .Value: %3;    ViewportContentFullWidth: %4", xMax, .LargeChange, .Value, Viewport.ViewportContentFullWidth)
     End With
-    Me.DS_GRID_FIXED.Form.ViewportSizeUpdate Me.DS_GRID.Form.InsideWidth, pController.FixedColumnsOnTheLeft
 End Sub
 
-Public Sub SetFixedGridColumns()
-    Debug.Print "Me.DS_GRID.Left: " & CStr(Me.DS_GRID.Left)
-    Me.DS_GRID_FIXED.Width = 660
-    Me.DS_GRID.Left = 0
+
+' --- TESTING / DEVELOPMENT ---
+
+Private Sub SetupDevelopmentEnvironment()
+    Set pTable = CreateSampleTable
+    
+    Viewport.OnSourceTableChange
+    'Set Worksheet.Recordset = pTable.CreateIndexRecordset(10, pCurrentPageIndex, 10, 0, , True)
+    
+    ' pRowsInViewport = MaxRowsInViewport
     
 End Sub
+
+Public Function Monitor(ByVal Key As String, ByVal Value As Variant) As Variant
+    Static dX As DictionaryEx
+    
+    If dX Is Nothing Then Set dX = DictionaryEx.Create()
+    
+    dX.Add Key, Value
+    Me.Caption = JSON.Stringify(dX)
+    
+    Monitor = Value
+End Function

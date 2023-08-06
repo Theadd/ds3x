@@ -135,6 +135,10 @@ End Property
 #End If
 
 
+Public Function CreateDSLiveEd() As dsLiveEd
+    Set CreateDSLiveEd = New dsLiveEd
+End Function
+
 
 
 ' --- CustomVars ---
