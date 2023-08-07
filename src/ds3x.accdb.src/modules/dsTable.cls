@@ -492,6 +492,7 @@ Private Function CreateIndexHeaders(ByVal ColumnStartIndex As Long, ByVal Column
     CreateIndexHeaders = t
 End Function
 
+' DEPRECATED, use GetColumnNames() instead.
 Public Function GetHeaderNames() As Variant
     Dim t As Variant, c As Long, d As Scripting.Dictionary, hItems As Variant
     ReDim t(0 To Me.ColumnCount - 1)
@@ -506,6 +507,24 @@ Public Function GetHeaderNames() As Variant
     GetHeaderNames = t
 End Function
 
+Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Optional ByVal GetCount As Variant) As Variant
+    Dim t As Variant, c As Long, hItems As Variant, sLimit As Long
+    
+    If IsMissing(GetCount) Then GetCount = Me.ColumnCount - FirstColumnIndex
+    ReDim t(0 To GetCount - 1)
+    hItems = Me.HeaderList(0)
+    sLimit = IIf(Me.ColumnCount - FirstColumnIndex < GetCount, Me.ColumnCount - FirstColumnIndex, GetCount)
+    
+    For c = 0 To sLimit - 1
+        t(c) = CStr(hItems(c + FirstColumnIndex)("ColumnName"))
+    Next c
+    If sLimit < 0 Then sLimit = 0
+    For c = sLimit To GetCount - 1
+        t(c) = vbNullString
+    Next c
+    
+    GetColumnNames = t
+End Function
 
 ' --- TYPE CASTING ---
 

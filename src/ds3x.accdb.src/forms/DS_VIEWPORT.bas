@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1559
-    Left =16125
-    Top =-12825
-    Right =27975
-    Bottom =-6300
+    Left =15720
+    Top =-12075
+    Right =27570
+    Bottom =-5550
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -530,17 +530,18 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
 End Function
 
 Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
-    Dim sView As TViewportState
+    Dim sView As TViewportState, lgChanged As Boolean
     
     sView = GetViewportStateAt(X, Y)
-    
-    If pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then RestartTrackCache
     WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
     
-    If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Then
+    If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
+        pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
         Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
-        ScrollView.Monitor "Track", sView.TrackIndex
-        ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
+        Worksheet.SetupColumns sView.TrackIndex * sView.ColumnsToLargeChangeTrack, ScrollView.Table
+'        ScrollView.Monitor "ViewArea", Printf("[(%1)..%2]", pTrackColumnSizesInCache, Worksheet.MaxAvailColumns)
+'        ScrollView.Monitor "Track", sView.TrackIndex
+'        ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
     End If
     
     this = sView
@@ -572,31 +573,12 @@ Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewpo
 End Function
 
 Public Sub OnSourceTableChange()
-    Static isFirstRun As Boolean
-    
-    RestartTrackCache
     this.TrackIndex = -1
     If ScrollView.KeepScrollPositionOnTableChange Then
         ScrollTo this.ScrollPosX, this.ScrollPosY
     Else
         ScrollTo 0, 0
     End If
-End Sub
-
-Private Function GetColumnsToLargeChangeTrack() As Long
-    GetColumnsToLargeChangeTrack = Max(CLng((Worksheet.MaxContentWidthLimit - (ScrollView.ScrollPageSizeX)) / Worksheet.GridCellSizeX) - 1, 1)
-End Function
-
-
-' --- TRACK CACHE ---
-
-Private Sub RestartTrackCache()
-    ' TODO: Free cached tracks
-    Set pCachedTracks = Nothing
-    Set pCachedTracks = ArrayListEx.Create()
-    pTrackColumnSizesInCache = GetColumnsToLargeChangeTrack
-    ScrollView.Monitor "lgChange", pTrackColumnSizesInCache
-    ScrollView.Monitor "ViewArea", Printf("[(%1)..%2]", pTrackColumnSizesInCache, Worksheet.MaxAvailColumns)
 End Sub
 
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx

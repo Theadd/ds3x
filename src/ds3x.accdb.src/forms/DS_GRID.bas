@@ -3049,13 +3049,13 @@ Fallback:
 End Sub
 
 Private Function GetH1Text(ByVal ColumnIndex As Long) As String
-    Dim firstColumnIndex As Long
+    Dim FirstColumnIndex As Long
     
-    firstColumnIndex = Int(ColumnIndex / 26)
-    If firstColumnIndex = 0 Then
+    FirstColumnIndex = Int(ColumnIndex / 26)
+    If FirstColumnIndex = 0 Then
         GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1 + ColumnIndex, 1)
     Else
-        GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", firstColumnIndex, 1) & _
+        GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", FirstColumnIndex, 1) & _
                     VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1 + (ColumnIndex Mod 26), 1)
     End If
 End Function

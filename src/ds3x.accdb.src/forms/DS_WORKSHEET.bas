@@ -26,10 +26,10 @@ Begin Form
     Width =31680
     DatasheetFontHeight =11
     ItemSuffix =2080
-    Left =16125
-    Top =-12825
-    Right =27975
-    Bottom =-6300
+    Left =15720
+    Top =-12075
+    Right =27570
+    Bottom =-5550
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -351,7 +351,7 @@ Begin Form
             ForeTint =75.0
         End
         Begin FormHeader
-            Height =630
+            Height =615
             Name ="EncabezadoDelFormulario"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
@@ -414,11 +414,11 @@ Begin Form
                 End
                 Begin CommandButton
                     TabStop = NotDefault
-                    OverlapFlags =215
+                    OverlapFlags =223
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -439,9 +439,9 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =1966
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     LayoutGroup =1
                     ForeTint =65.0
@@ -472,7 +472,7 @@ Begin Form
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =87
                     TextFontCharSet =177
                     TextFontFamily =0
                     IMESentenceMode =3
@@ -507,7 +507,7 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -531,9 +531,9 @@ Begin Form
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =1966
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     LayoutGroup =1
@@ -556,7 +556,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =1965
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -580,9 +580,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =1965
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =3931
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =1
@@ -602,7 +602,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =1965
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -624,9 +624,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =1965
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =3931
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =1
                     ColumnEnd =1
@@ -661,7 +661,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =3930
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -683,9 +683,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =3930
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =5896
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =2
                     ColumnEnd =2
@@ -724,7 +724,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =3930
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -748,9 +748,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =3930
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =5896
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =2
@@ -770,7 +770,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =5895
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -792,9 +792,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =5895
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =7861
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =3
                     ColumnEnd =3
@@ -833,7 +833,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =5895
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -857,9 +857,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =5895
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =7861
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =3
@@ -883,7 +883,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =7860
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -907,9 +907,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =7860
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =9826
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =4
@@ -929,7 +929,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =7860
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -951,9 +951,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =7860
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =9826
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =4
                     ColumnEnd =4
@@ -988,7 +988,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =9825
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1010,9 +1010,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =9825
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =11791
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =5
                     ColumnEnd =5
@@ -1047,7 +1047,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =11790
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1069,9 +1069,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =11790
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =13756
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =6
                     ColumnEnd =6
@@ -1110,7 +1110,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =9825
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1134,9 +1134,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =9825
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =11791
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =5
@@ -1160,7 +1160,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =11790
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1184,9 +1184,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =11790
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =13756
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =6
@@ -1206,7 +1206,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =13755
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1228,9 +1228,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =13755
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =15721
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =7
                     ColumnEnd =7
@@ -1265,7 +1265,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =15720
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1287,9 +1287,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =15720
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =17686
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =8
                     ColumnEnd =8
@@ -1324,7 +1324,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =17685
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1346,9 +1346,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =17685
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =19651
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =9
                     ColumnEnd =9
@@ -1383,7 +1383,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =19650
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1405,9 +1405,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =19650
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =21616
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =10
                     ColumnEnd =10
@@ -1442,7 +1442,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =21615
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1464,9 +1464,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =21615
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =23581
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =11
                     ColumnEnd =11
@@ -1501,7 +1501,7 @@ Begin Form
                     TextFontFamily =0
                     PictureType =2
                     Left =23580
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1523,9 +1523,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =23580
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =25546
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =12
                     ColumnEnd =12
@@ -1564,7 +1564,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =13755
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1588,9 +1588,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =13755
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =15721
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =7
@@ -1614,7 +1614,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =15720
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1638,9 +1638,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =15720
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =17686
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =8
@@ -1664,7 +1664,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =17685
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1688,9 +1688,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =17685
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =19651
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =9
@@ -1714,7 +1714,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =19650
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1738,9 +1738,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =19650
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =21616
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =10
@@ -1764,7 +1764,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =21615
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1788,9 +1788,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =21615
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =23581
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =11
@@ -1814,7 +1814,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =23580
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1838,9 +1838,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =23580
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =25546
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =12
@@ -1862,7 +1862,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =25545
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -1886,9 +1886,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =25545
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =27511
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =13
@@ -1907,7 +1907,7 @@ Begin Form
                     TextFontCharSet =177
                     PictureType =2
                     Left =25545
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1929,9 +1929,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =25545
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =27511
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =13
                     ColumnEnd =13
@@ -1965,7 +1965,7 @@ Begin Form
                     TextFontCharSet =177
                     PictureType =2
                     Left =27510
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -1987,9 +1987,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =27510
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =29476
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =14
                     ColumnEnd =14
@@ -2023,7 +2023,7 @@ Begin Form
                     TextFontCharSet =177
                     PictureType =2
                     Left =29475
-                    Top =30
+                    Top =15
                     Width =1966
                     Height =240
                     FontSize =10
@@ -2045,9 +2045,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =29475
-                    LayoutCachedTop =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =31441
-                    LayoutCachedHeight =270
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =15
                     ColumnEnd =15
@@ -2084,7 +2084,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =27510
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -2108,9 +2108,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =27510
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =29476
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =14
@@ -2132,7 +2132,7 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =29475
-                    Top =270
+                    Top =255
                     Width =1966
                     Height =360
                     FontSize =10
@@ -2156,9 +2156,9 @@ Begin Form
                     ShowDatePicker =0
 
                     LayoutCachedLeft =29475
-                    LayoutCachedTop =270
+                    LayoutCachedTop =255
                     LayoutCachedWidth =31441
-                    LayoutCachedHeight =630
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =15
@@ -2176,7 +2176,7 @@ Begin Form
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =390
+            Height =375
             Name ="Detalle"
             AlternateBackColor =-2147483607
             BackThemeColorIndex =1
@@ -2212,13 +2212,12 @@ Begin Form
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =87
+                    OverlapFlags =215
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2241,13 +2240,11 @@ Begin Form
                     GridlineStyleLeft =1
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedTop =15
                     LayoutCachedWidth =1966
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     LayoutGroup =1
@@ -2270,7 +2267,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =1965
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2292,14 +2288,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =1965
-                    LayoutCachedTop =15
                     LayoutCachedWidth =3931
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =1
@@ -2323,7 +2317,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =3930
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2345,14 +2338,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =3930
-                    LayoutCachedTop =15
                     LayoutCachedWidth =5896
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =2
@@ -2376,7 +2367,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =5895
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2398,14 +2388,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =5895
-                    LayoutCachedTop =15
                     LayoutCachedWidth =7861
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =3
@@ -2429,7 +2417,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =7860
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2451,14 +2438,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =7860
-                    LayoutCachedTop =15
                     LayoutCachedWidth =9826
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =4
@@ -2482,7 +2467,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =9825
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2504,14 +2488,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =9825
-                    LayoutCachedTop =15
                     LayoutCachedWidth =11791
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =5
@@ -2535,7 +2517,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =11790
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2557,14 +2538,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =11790
-                    LayoutCachedTop =15
                     LayoutCachedWidth =13756
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =6
@@ -2588,7 +2567,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =13755
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2610,14 +2588,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =13755
-                    LayoutCachedTop =15
                     LayoutCachedWidth =15721
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =7
@@ -2641,7 +2617,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =15720
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2663,14 +2638,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =15720
-                    LayoutCachedTop =15
                     LayoutCachedWidth =17686
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =8
@@ -2694,7 +2667,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =17685
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2716,14 +2688,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =17685
-                    LayoutCachedTop =15
                     LayoutCachedWidth =19651
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =9
@@ -2747,7 +2717,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =19650
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2769,14 +2738,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =19650
-                    LayoutCachedTop =15
                     LayoutCachedWidth =21616
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =10
@@ -2800,7 +2767,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =21615
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2822,14 +2788,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =21615
-                    LayoutCachedTop =15
                     LayoutCachedWidth =23581
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =11
@@ -2853,7 +2817,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =23580
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2875,14 +2838,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =23580
-                    LayoutCachedTop =15
                     LayoutCachedWidth =25546
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =12
@@ -2904,7 +2865,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =25545
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2926,14 +2886,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =25545
-                    LayoutCachedTop =15
                     LayoutCachedWidth =27511
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =13
@@ -2955,7 +2913,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =27510
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -2977,14 +2934,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =27510
-                    LayoutCachedTop =15
                     LayoutCachedWidth =29476
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =14
@@ -3006,7 +2961,6 @@ Begin Form
                     BackStyle =0
                     IMESentenceMode =3
                     Left =29475
-                    Top =15
                     Width =1966
                     Height =375
                     FontSize =10
@@ -3028,14 +2982,12 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
                     LayoutCachedLeft =29475
-                    LayoutCachedTop =15
                     LayoutCachedWidth =31441
-                    LayoutCachedHeight =390
+                    LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
                     ColumnStart =15
@@ -3071,8 +3023,6 @@ Option Base 0
 Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
 Private pViewport As Form_DS_VIEWPORT
-
-Private Const pABC As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 Private Const pMaxAvailColumns As Long = 16
 Private Const pGridCellSizeX As Long = 1965
@@ -3121,6 +3071,16 @@ Private Sub SetupGridSizes()
     Me.Width = pGridCellSizeX * pMaxAvailColumns
 End Sub
 
+Public Sub SetupColumns(ByVal FirstColumnIndex As Long, ByRef dsT As dsTable)
+    Dim i As Long, sNames As Variant
+    
+    sNames = dsT.GetColumnNames(FirstColumnIndex, pMaxAvailColumns)
+    For i = 1 To pMaxAvailColumns
+        Me.Controls("DS_HC_1_" & CStr(i)).Caption = ColumnLetter(FirstColumnIndex + i - 1)
+        Me.Controls("DS_HC_2_" & CStr(i)) = sNames(i - 1)
+    Next i
+End Sub
+
 ' --- UI EVENT HANDLERS ---
 
 Public Function OnColumnHeaderClick()
@@ -3162,15 +3122,14 @@ End Function
 
 ' --- MISC ---
 
-Private Function GetH1Text(ByVal ColumnIndex As Long) As String
-    Dim firstColumnIndex As Long
-    
-    firstColumnIndex = Int(ColumnIndex / 26)
-    If firstColumnIndex = 0 Then
-        GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1 + ColumnIndex, 1)
+Private Function ColumnLetter(ByVal ColumnIndex As Long) As String
+    Const sChars As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    If Int(ColumnIndex / 26) = 0 Then
+        ColumnLetter = VBA.Mid$(sChars, 1 + ColumnIndex, 1)
     Else
-        GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", firstColumnIndex, 1) & _
-                    VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1 + (ColumnIndex Mod 26), 1)
+        ColumnLetter = VBA.Mid$(sChars, Int(ColumnIndex / 26), 1) & _
+                       VBA.Mid$(sChars, 1 + (ColumnIndex Mod 26), 1)
     End If
 End Function
 

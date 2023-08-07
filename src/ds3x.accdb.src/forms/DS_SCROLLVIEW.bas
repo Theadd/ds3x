@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =16125
-    Top =-12825
-    Right =27975
-    Bottom =-6300
+    Left =15720
+    Top =-12075
+    Right =27570
+    Bottom =-5550
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -32,7 +32,6 @@ Begin Form
     Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
     OnKeyDown ="[Event Procedure]"
-    OnTimer ="[Event Procedure]"
     OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
@@ -515,7 +514,6 @@ Begin Form
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000
                     End
-                    OnLostFocus ="[Event Procedure]"
                     OLEClass ="Microsoft Forms 2.0"
                     Class ="Forms.ScrollBar.1"
                     GroupTable =2
@@ -545,14 +543,17 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-'Private pScrollModX As Double
+Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
 ' The amount of overflowing scroll to the right after the last table column
 Private pOutOfBoundsScrollX As Long
 Private pCurrentPageIndex As Long
 Private pScrollPageSizeX As Long
 Private pInitialized As Boolean
+Private pLastScrollX As Variant
+
 Private pKeepScrollPositionOnTableChange As Boolean
+Private pEnableOutOfRangeScrolling As Boolean
 
 'Private pRowsInViewport As Long
 'Private pIsMaxRowsDirty As Boolean
@@ -575,8 +576,13 @@ Public Property Get Table() As dsTable: Set Table = pTable: End Property
 Public Property Set Table(ByRef Value As dsTable): SetTable Value: End Property
 
 Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
+
+' --- SETTINGS ---
+
 Public Property Get KeepScrollPositionOnTableChange() As Boolean: KeepScrollPositionOnTableChange = pKeepScrollPositionOnTableChange: End Property
 Public Property Let KeepScrollPositionOnTableChange(ByVal Value As Boolean): pKeepScrollPositionOnTableChange = Value: End Property
+Public Property Get EnableOutOfRangeScrolling() As Boolean: EnableOutOfRangeScrolling = pEnableOutOfRangeScrolling: End Property
+Public Property Let EnableOutOfRangeScrolling(ByVal Value As Boolean): pEnableOutOfRangeScrolling = Value: End Property
 
 Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 
@@ -609,13 +615,18 @@ End Property
 ' --- FORM EVENTS ---
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
-'    If KeyCode = vbKeySpace Then Stop
+    If KeyCode = vbKeyP Then
+        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+            Stop
+        End If
+    End If
 End Sub
 
 Private Sub Form_Load()
     pAvailableVMemOnLoad = GetAvailableVirtualMemory
     Monitor "VMem", "0 MB"
     ScreenLib_Resync
+    pLastScrollX = Array(0, 0)
     Setup
     
     If Not IsSubform Then
@@ -631,21 +642,21 @@ Private Sub Form_Resize()
     ResizeFormContent
     If pInitialized Then
         UpdateScrollbarX
-        HandleLargeStepResize
+'        HandleLargeStepResize
     End If
 End Sub
 
-Private Sub Form_Timer()
-    Me.TimerInterval = 0
-    DoEvents
-    
-    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS
-
-    r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
-    b = ScreenLib.RectToBounds(r)
-    
-    Stop
-End Sub
+'Private Sub Form_Timer()
+'    Me.TimerInterval = 0
+'    DoEvents
+'
+'    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS
+'
+'    r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
+'    b = ScreenLib.RectToBounds(r)
+'
+'    Stop
+'End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
@@ -691,48 +702,61 @@ Private Sub ResizeFormContent()
     End With
 End Sub
 
-Private Sub HandleLargeStepResize()
-    Static rStepX As Long, rStepY As Long
-    
-    If VBA.Abs(rStepX - Me.InsideWidth) > 1000 Or VBA.Abs(rStepY - Me.InsideHeight) > 1000 Then
-        rStepX = Me.InsideWidth
-        rStepY = Me.InsideHeight
-        
-        ' Viewport.RecalculateViewportSizes
-    End If
-End Sub
+'Private Sub HandleLargeStepResize()
+'    Static rStepX As Long, rStepY As Long
+'
+'    If VBA.Abs(rStepX - Me.InsideWidth) > 1000 Or VBA.Abs(rStepY - Me.InsideHeight) > 1000 Then
+'        rStepX = Me.InsideWidth
+'        rStepY = Me.InsideHeight
+'
+'        ' Viewport.RecalculateViewportSizes
+'    End If
+'End Sub
 
 
 ' --- SCROLLING ---
 
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
-    ' Debug.Print "[TODO] @DS_SCROLLVIEW.PropagateMouseWheel()"
+    ApplyScrollbarX CLng(Me.SCROLLBAR_X.Value + (Count * Me.SCROLLBAR_X.SmallChange))
 End Function
 
 Private Sub SCROLLBAR_X_Change()
     ApplyScrollbarX
 End Sub
 
-Private Sub SCROLLBAR_X_LostFocus()
-    Me.TimerInterval = 1000
-    DoEvents
-End Sub
-
 Private Sub SCROLLBAR_X_Scroll()
     ApplyScrollbarX
 End Sub
 
-Private Sub ApplyScrollbarX()
+Private Sub ApplyScrollbarX(Optional ByVal xVal As Variant)
     ' TODO: On Error GoTo Finally
     If (Not Me.SCROLLBAR_X.Visible) Or (Not pInitialized) Then Exit Sub
+    Dim rawMax As Long
     
-    ' TODO
     With Me.SCROLLBAR_X
-        'Debug.Print Printf("[IN] ApplyScrollbarX's .Max: %1, .LargeChange: %2, .Value: %3", .Max, .LargeChange, .Value)
-        
-        ' Scroll X to (0 - .Value)
-        Viewport.ScrollTo .Value, 0
-        
+        If IsMissing(xVal) Then xVal = .Value
+        rawMax = .Max - pOutOfBoundsScrollX
+        If xVal > .Max Then
+            If pEnableOutOfRangeScrolling Then
+                pOutOfBoundsScrollX = xVal - rawMax
+                .Max = xVal
+                .Value = xVal
+            Else
+                .Value = .Max
+            End If
+            UpdateScrollbarX
+        Else
+            If pOutOfBoundsScrollX > 0 Then
+                pOutOfBoundsScrollX = IIf(xVal - rawMax > 0, xVal - rawMax, 0)
+                If .Max <> rawMax + pOutOfBoundsScrollX Then .Max = rawMax + pOutOfBoundsScrollX
+                If .Value <> xVal Then .Value = xVal
+                UpdateScrollbarX
+            Else
+                If .Value <> xVal Then .Value = xVal
+                Viewport.ScrollTo xVal, 0
+                pLastScrollX(0) = xVal
+            End If
+        End If
     End With
     
 ExitSub:
@@ -755,12 +779,17 @@ Private Sub UpdateScrollbarX()
     
     cellSizeX = Worksheet.GridCellSizeX
     pScrollPageSizeX = CLng(Int(Me.InsideWidth / cellSizeX)) * cellSizeX
-    fullViewportContentSizeX = pTable.ColumnCount * cellSizeX
-    xMax = (fullViewportContentSizeX + OutOfBoundsScrollX) - pScrollPageSizeX
+    fullViewportContentSizeX = (pTable.ColumnCount - 0) * cellSizeX
+    xMax = (fullViewportContentSizeX + OutOfBoundsScrollX) - Me.InsideWidth
     With Me.SCROLLBAR_X
         .Max = xMax
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
         .SmallChange = CLng(cellSizeX / 5)
+        If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
+            Viewport.ScrollTo .Value, 0
+            pLastScrollX(0) = .Value
+            pLastScrollX(1) = .Max
+        End If
     End With
 End Sub
 
@@ -768,6 +797,7 @@ End Sub
 ' --- TESTING / DEVELOPMENT ---
 
 Private Sub SetupDevelopmentEnvironment()
+    pEnableOutOfRangeScrolling = True
     Set Table = CreateSampleTable
 End Sub
 
