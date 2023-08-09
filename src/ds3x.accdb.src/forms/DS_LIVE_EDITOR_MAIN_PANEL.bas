@@ -24,10 +24,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =16125
-    Top =3720
-    Right =26370
-    Bottom =11205
+    Left =4065
+    Top =-13170
+    Right =22380
+    Bottom =-975
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -346,7 +346,7 @@ Begin Form
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =2835
+            Height =2850
             Name ="Detalle"
             AlternateBackThemeColorIndex =4
             AlternateBackTint =40.0
@@ -385,15 +385,16 @@ Begin Form
                     OverlapFlags =85
                     OldBorderStyle =0
                     Left =30
+                    Top =15
                     Width =3405
                     Height =2835
                     TabIndex =1
                     BorderColor =10921638
-                    Name ="DS_GRID_CONTAINER"
-                    SourceObject ="Form.DS_GRID_CONTAINER"
+                    Name ="DS_SCROLLVIEW"
+                    SourceObject ="Form.DS_SCROLLVIEW"
                     GroupTable =1
                     LeftPadding =0
-                    TopPadding =0
+                    TopPadding =15
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
@@ -401,8 +402,9 @@ Begin Form
                     VerticalAnchor =2
 
                     LayoutCachedLeft =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =3435
-                    LayoutCachedHeight =2835
+                    LayoutCachedHeight =2850
                     LayoutGroup =1
                     GroupTable =1
                 End
@@ -453,17 +455,25 @@ End Sub
 
 Private Sub SetController(ByVal TargetController As dsLiveEd)
     Set pController = TargetController
-    Set Me.DS_GRID_CONTAINER.Form.Controller = pController.GridController
+    Set pController.GridController.Scrollview = Me.DS_SCROLLVIEW.Form
+    ' Set Me.DS_GRID_CONTAINER.Form.Controller = pController.GridController
     Set Me.DS_JSON_TASK_EDITOR.Form.Controller = pController.TaskController
     Me.DS_JSON_TASK_EDITOR.Visible = True
-    Me.DS_GRID_CONTAINER.Visible = True
+    ' Me.DS_GRID_CONTAINER.Visible = True
+    Me.DS_SCROLLVIEW.Visible = True
+    pController.GridController.TriggerOnChangeEvent
     Rebuild
 End Sub
 
 Private Sub Rebuild()
 '    If pController.TaskController.IsValidTable Then
 '        Me.DS_GRID_CONTAINER.Visible = True
-        Me.DS_GRID_CONTAINER.Form.ViewportGridRebuild
+
+        '''' Me.DS_GRID_CONTAINER.Form.ViewportGridRebuild
+    If pController.TaskController.IsValidTable Then
+        Set Me.DS_SCROLLVIEW.Form.Table = pController.TaskController.Table
+    End If
+
 '    Else
 '        Me.DS_GRID_CONTAINER.Visible = False
 '    End If

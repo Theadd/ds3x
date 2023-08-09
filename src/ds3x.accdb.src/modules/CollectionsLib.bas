@@ -349,6 +349,55 @@ Private Function TokenizeArgs(ByRef SearchString As String) As String
    TokenizeArgs = sArgs
 End Function
 
+' EXAMPLE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
+Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
+    Dim t() As Variant, i As Long, aSize As Long
+
+    If IsMissing(RangeEnd) Then RangeEnd = RangeStart
+    aSize = RangeEnd - RangeStart
+    ReDim t(0 To aSize)
+
+    For i = 0 To aSize
+        t(i) = RangeStart + i
+    Next i
+
+    ArrayRange = t
+End Function
+
+Public Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
+    
+    ReDim iRow(0 To ColumnsCount - 1)
+    ReDim rValues(0 To ColumnsCount - 1)
+    
+    With rs
+        For i = LBound(iRow) To UBound(iRow)
+            iRow(i) = CStr(ColumnStartIndex + i)
+            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
+            rValues(i) = ""
+        Next i
+        .Open
+        For i = 0 To RowsCount - 1
+            .AddNew FieldList:=iRow, Values:=rValues
+        Next i
+        .MoveFirst
+    End With
+    
+    Set CreateBlankRecordset = rs
+End Function
+
+Public Function CreateBlankTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
+    Dim t() As Variant, i As Long, k() As Variant
+    
+    ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+    ReDim k(0 To ColumnsCount - 1)
+    
+    For i = 0 To ColumnsCount - 1
+        k(i) = vbNullString
+    Next i
+
+    Set CreateBlankTable = dsTable.Create(Array2dEx.Create(t)).SetHeaders(k)
+End Function
 
 
 

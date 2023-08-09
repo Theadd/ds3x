@@ -36,6 +36,10 @@ Property Get ViewportContentFullWidth() As Long
 Private pCachedTracks As ArrayListEx
 ' The current ColumnsToLargeChangeTrack value used in CachedTracks, CachedTracks resets when this value changes
 Private pTrackColumnSizesInCache As Long
+Const NumPagesInLargeChangeRows As Long = 5
+Const PageSize As Long = 10
+Const PageCount As Long = 10
+
 
 Private Type TViewportState
     ScrollPosX As Long
@@ -46,10 +50,14 @@ Private Type TViewportState
     PageIndex As Long
     ' Index of the first visible column in **Table**
     FirstVisibleColumn As Long
+    ' Index of the first visible row in **Table**
+    FirstVisibleRow As Long
     ' The distance between the start of the first visible column to the viewport left edge (must be less than GridCellSizeX)
     FirstVisibleColumnPositionModX As Long
     ' Index of the first visible column relative to current visible **Track**
     FirstVisibleColumnInTrack As Long
+    ' Index of the first visible row relative to current visible **Page**
+    FirstVisibleRowInPage As Long
     ' Number of columns as the distance between track switching
     ColumnsToLargeChangeTrack As Long
     ' The distance from the current track left edge to the viewport left edge

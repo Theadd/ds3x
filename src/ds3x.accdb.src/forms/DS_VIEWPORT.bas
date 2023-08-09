@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1559
-    Left =15720
-    Top =-12075
-    Right =27570
-    Bottom =-5550
+    Left =22365
+    Top =-11520
+    Right =28470
+    Bottom =-4995
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -395,59 +395,21 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-'             /* WindowMoveTo Worksheet, (pScrollModX - pScrollX), (pScrollModY - pScrollY) */
-'
-'                                         (18000)
-'              ____________ * ScrollView.ScrollPageSizeX_______ * ScrollView.OutOfBoundsScrollX
-'             |____________|___________________________|_______|
-'             |________________________________________|
-'             |_____________________|                   * Viewport.ViewportContentFullWidth      -> All dsTable Columns Width
-'                                    * Worksheet.MaxContentWidthLimit (30000)   -> Worksheet form' max width (~22 inches)
-'                          :--------:
-'                                    * .MaxFlexSpaceX (6000)
-'                          :--::
-'                              * .RSafeMarginX (2000 + 1000)
-'       |_____________________|
-'                              * Viewport.ScrollTo (4000)
-'         ::--:
-'              * .LSafeMarginX (1000 + 2000)
-'          |_____________________|
-'
-'                                [pScrollX] [pScrollModX]
+Private Declare PtrSafe Function SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As LongPtr, ByVal wMsg As Long, ByVal wParam As LongPtr, lParam As Any) As LongPtr
+
+Private Const WM_VSCROLL = &H115
+Private Const SB_LINEUP = 0
+Private Const SB_LINEDOWN = 1
+Private Const SB_TOP = 6
 
 Private pWorksheet As Form_DS_WORKSHEET
-' Private pWorksheetAux As Form_DS_WORKSHEET
-Private pScrollView As Form_DS_SCROLLVIEW
+Private pScrollview As Form_DS_SCROLLVIEW
 
-'                 if X < (3) jumps to (1)
-'                  <------------<
-' pTrackStops: [0, 1,        2, 3]
-'               >------------>     ... if X > (0) jumps to (2)
-
-' 1 (TrackStop1/RS1) is for moving backwards (scrolls left / heads to first column) and the one initially rendered.
-Private pTrackStopRS1 As RecordsetEx
-' 2 (TrackStop2/RS2) is for moving forwards (scrolls right / heads to last column)
-Private pTrackStopRS2 As RecordsetEx
-' N (RSN) preloads the recordset for the next jump of the current TrackStop(1/2) origin (the last jump done)
-Private pTrackStopRSN As RecordsetEx
-' Array(0, 1, 2, 3) of TrackStop's points on the X axis (in absolute values)
-Private pTrackStops As Variant
-' Tells the TrackStop that the current viewport positioning is based on.
-'''''''''''''''''''''''''''''''''''''''''''''''''''''' NOTE: RS1 is initially rendered but since scrolling forward is possible from there, this value is set to 2 (RS2/forwards).
-Private pCurrentTrackStopOrigin As Long
-' The number of Worksheet columns between jumps
-Private pAllowedTrackMoves As Long
-' Dirty flag for TrackStopRSN
-Private pIsDirtyRSN As Boolean
-' The Track index being rendered in the Worksheet (X axis).
-Private pCurrentTrackIndex As Long
-' Maximum distance between calls to ScrollTo()
-Private pMaxScrollStepX As Long
-
-' --- V2 ---
-Private pCachedTracks As ArrayListEx
 ' The current ColumnsToLargeChangeTrack value used in CachedTracks, CachedTracks resets when this value changes
 Private pTrackColumnSizesInCache As Long
+Const NumPagesInLargeChangeRows As Long = 5
+Const PageSize As Long = 10
+Const PageCount As Long = 10
 
 Private Type TViewportState
     ScrollPosX As Long
@@ -458,15 +420,20 @@ Private Type TViewportState
     PageIndex As Long
     ' Index of the first visible column in **Table**
     FirstVisibleColumn As Long
+    ' Index of the first visible row in **Table**
+    FirstVisibleRow As Long
     ' The distance between the start of the first visible column to the viewport left edge (must be less than GridCellSizeX)
     FirstVisibleColumnPositionModX As Long
     ' Index of the first visible column relative to current visible **Track**
     FirstVisibleColumnInTrack As Long
+    ' Index of the first visible row relative to current visible **Page**
+    FirstVisibleRowInPage As Long
     ' Number of columns as the distance between track switching
     ColumnsToLargeChangeTrack As Long
     ' The distance from the current track left edge to the viewport left edge
     TrackPositionModX As Long
 End Type
+
 Private this As TViewportState
 
 ' ---
@@ -480,11 +447,10 @@ Private pScrollModY As Long
 Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
 Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
 
-Public Property Get ScrollView() As Form_DS_SCROLLVIEW: Set ScrollView = pScrollView: End Property
-Public Property Set ScrollView(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollView = Value: End Property
+Public Property Get Scrollview() As Form_DS_SCROLLVIEW: Set Scrollview = pScrollview: End Property
+Public Property Set Scrollview(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollview = Value: End Property
 
-Public Property Get CurrentTrackIndex() As Long: CurrentTrackIndex = pCurrentTrackIndex: End Property
-Public Property Let CurrentTrackIndex(ByVal Value As Long): pCurrentTrackIndex = Value: End Property
+Friend Property Get FirstColumnIndex() As Long: FirstColumnIndex = this.TrackIndex * this.ColumnsToLargeChangeTrack: End Property
 
 Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 
@@ -510,14 +476,13 @@ Public Sub Setup()
     b = ScreenLib.RectToBounds(r)
     
     t = Worksheet.MaxContentWidthLimit
-
     Me.Width = t
-    Me.Detalle.Height = CLng(b.h * 1.5)
+    Me.Detalle.Height = CLng(Min(b.h * 1.95, 31500))
     With Me.DS_WORKSHEET
         .Left = 0
         .Top = 0
         .Width = t
-        .Height = CLng(b.h * 1.5)
+        .Height = CLng(Min(b.h * 1.95, 31500))
     End With
 End Sub
 
@@ -526,7 +491,7 @@ End Sub
 
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
-    pScrollView.PropagateMouseWheel Page, Count
+    pScrollview.PropagateMouseWheel Page, Count
 End Function
 
 Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
@@ -538,35 +503,63 @@ Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
     If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
         Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
-        Worksheet.SetupColumns sView.TrackIndex * sView.ColumnsToLargeChangeTrack, ScrollView.Table
+        Worksheet.SetupColumns sView.TrackIndex * sView.ColumnsToLargeChangeTrack, Scrollview.Table
 '        ScrollView.Monitor "ViewArea", Printf("[(%1)..%2]", pTrackColumnSizesInCache, Worksheet.MaxAvailColumns)
 '        ScrollView.Monitor "Track", sView.TrackIndex
 '        ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
     End If
     
+    AdjustScrollY sView
     this = sView
+End Sub
+
+Private Sub AdjustScrollY(ByRef sView As TViewportState)
+    Dim rowOrigin As Long, hW As LongPtr, i As Long
+    
+    rowOrigin = this.FirstVisibleRowInPage
+    hW = Worksheet.hWnd
+    If this.PageIndex <> sView.PageIndex Then
+        SendMessage hW, WM_VSCROLL, SB_TOP, 0&
+        rowOrigin = 0
+    End If
+    If rowOrigin <> sView.FirstVisibleRowInPage Then
+        Worksheet.Painting = False
+        If rowOrigin < sView.FirstVisibleRowInPage Then
+            For i = rowOrigin To sView.FirstVisibleRowInPage - 1
+                SendMessage hW, WM_VSCROLL, SB_LINEDOWN, 0&
+            Next i
+        ElseIf rowOrigin > sView.FirstVisibleRowInPage Then
+            For i = rowOrigin - 1 To sView.FirstVisibleRowInPage Step -1
+                SendMessage hW, WM_VSCROLL, SB_LINEUP, 0&
+            Next i
+        End If
+        Worksheet.Painting = True
+    End If
 End Sub
 
 
 ' --- STATE MANAGEMENT ---
 
 Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewportState
-    Dim t As TViewportState, maxTrackWidth As Long, cellWidth As Long, viewWidth As Long
+    Dim t As TViewportState, maxTrackWidth As Long, cellWidth As Long, viewWidth As Long, cellHeight As Long
     
     t.ScrollPosX = X
     t.ScrollPosY = Y
     
     maxTrackWidth = Worksheet.MaxContentWidthLimit
     cellWidth = Worksheet.GridCellSizeX
-    viewWidth = ScrollView.ScrollPageSizeX
+    cellHeight = Worksheet.GridCellSizeY
+    viewWidth = Scrollview.ScrollPageSizeX
     
     t.ColumnsToLargeChangeTrack = Max(CLng((maxTrackWidth - viewWidth) / cellWidth) - 1, 1)
     
     t.FirstVisibleColumn = CLng(Int(X / cellWidth))
+    t.FirstVisibleRow = CLng(Int(Y / cellHeight))
     t.FirstVisibleColumnPositionModX = X Mod cellWidth
     t.TrackIndex = CLng(Int(X / (cellWidth * t.ColumnsToLargeChangeTrack)))
-    t.PageIndex = 0 ' TODO
+    t.PageIndex = CLng(Int(t.FirstVisibleRow / (PageSize * NumPagesInLargeChangeRows)))
     t.FirstVisibleColumnInTrack = t.FirstVisibleColumn - (t.ColumnsToLargeChangeTrack * t.TrackIndex)
+    t.FirstVisibleRowInPage = t.FirstVisibleRow - (t.PageIndex * PageSize * NumPagesInLargeChangeRows)
     t.TrackPositionModX = (t.FirstVisibleColumnInTrack * cellWidth) + t.FirstVisibleColumnPositionModX
     
     GetViewportStateAt = t
@@ -574,7 +567,7 @@ End Function
 
 Public Sub OnSourceTableChange()
     this.TrackIndex = -1
-    If ScrollView.KeepScrollPositionOnTableChange Then
+    If Scrollview.KeepScrollPositionOnTableChange Then
         ScrollTo this.ScrollPosX, this.ScrollPosY
     Else
         ScrollTo 0, 0
@@ -582,19 +575,24 @@ Public Sub OnSourceTableChange()
 End Sub
 
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
-    Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long
+    Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long
 
-    Set dsT = ScrollView.Table
+    Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
+    nCols = Worksheet.MaxAvailColumns
 
     If ColumnStartIndex >= dsT.ColumnCount Then
-        Set rX = RecordsetEx.Create(CreateBlankRecordset(100, 0, Worksheet.MaxAvailColumns))
+        Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
     Else
-        ' TODO: PageIndex * 10
-        If dsT.ColumnCount - ColumnStartIndex > Worksheet.MaxAvailColumns Then
-            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(10, PageIndex, 10, ColumnStartIndex, Worksheet.MaxAvailColumns, True))
+        If dsT.ColumnCount - ColumnStartIndex > nCols Then
+            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
         Else
-            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(10, PageIndex, 10, ColumnStartIndex, , True))
+            ' Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(10, PageIndex, 10, ColumnStartIndex, , True))
+            nRows = Min(dsT.Count - (PageSize * PageIndex * NumPagesInLargeChangeRows), PageSize * PageCount)
+            Set dsT2 = dsT.GetRange(PageSize * PageIndex * NumPagesInLargeChangeRows, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
+            Set dsT2 = dsT2.Join(dsT3)
+            Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
         End If
     End If
     
@@ -603,28 +601,6 @@ End Function
 
 
 ' --- HELPERS ---
-
-Private Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
-    
-    ReDim iRow(0 To ColumnsCount - 1)
-    ReDim rValues(0 To ColumnsCount - 1)
-    
-    With rs
-        For i = LBound(iRow) To UBound(iRow)
-            iRow(i) = CStr(ColumnStartIndex + i)
-            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
-            rValues(i) = ""
-        Next i
-        .Open
-        For i = 0 To RowsCount - 1
-            .AddNew FieldList:=iRow, Values:=rValues
-        Next i
-        .MoveFirst
-    End With
-    
-    Set CreateBlankRecordset = rs
-End Function
 
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function

@@ -26,15 +26,16 @@ Begin Form
     Width =31680
     DatasheetFontHeight =11
     ItemSuffix =2080
-    Left =15720
-    Top =-12075
-    Right =27570
-    Bottom =-5550
+    Left =22365
+    Top =-11520
+    Right =28470
+    Bottom =-4995
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
     Caption ="WORKSHEET"
     DatasheetFontName ="Calibri"
+    OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
     OnMouseWheel ="[Event Procedure]"
     FetchDefaults =0
@@ -352,7 +353,7 @@ Begin Form
         End
         Begin FormHeader
             Height =615
-            Name ="EncabezadoDelFormulario"
+            Name ="FormHeaders"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
             BackThemeColorIndex =3
@@ -2177,7 +2178,7 @@ Begin Form
             CanGrow = NotDefault
             CanShrink = NotDefault
             Height =375
-            Name ="Detalle"
+            Name ="FormDetail"
             AlternateBackColor =-2147483607
             BackThemeColorIndex =1
             Begin
@@ -3020,12 +3021,21 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
+
 Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
+Public Event OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+Public Event OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
+
 Private pViewport As Form_DS_VIEWPORT
+Private pSelectedColumns As ArrayListEx
 
 Private Const pMaxAvailColumns As Long = 16
 Private Const pGridCellSizeX As Long = 1965
+Private Const pGridCellSizeY As Long = 375
+
+Private Const pHeaderButtonBackColorSelected As Long = 12644351
+Private Const pHeaderButtonBackColorNormal As Long = 15132391
 
 
 Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
@@ -3036,9 +3046,14 @@ Public Property Get MaxAvailColumns() As Long: MaxAvailColumns = pMaxAvailColumn
 Public Property Get MaxContentWidthLimit() As Long: MaxContentWidthLimit = pGridCellSizeX * pMaxAvailColumns: End Property
 ' Default Cell/Column width
 Public Property Get GridCellSizeX() As Long: GridCellSizeX = pGridCellSizeX: End Property
+Public Property Get GridCellSizeY() As Long: GridCellSizeY = pGridCellSizeY: End Property
 
 
 ' --- FORM EVENTS ---
+
+Private Sub Form_Load()
+    Set pSelectedColumns = ArrayListEx.Create()
+End Sub
 
 Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
@@ -3076,30 +3091,63 @@ Public Sub SetupColumns(ByVal FirstColumnIndex As Long, ByRef dsT As dsTable)
     
     sNames = dsT.GetColumnNames(FirstColumnIndex, pMaxAvailColumns)
     For i = 1 To pMaxAvailColumns
-        Me.Controls("DS_HC_1_" & CStr(i)).Caption = ColumnLetter(FirstColumnIndex + i - 1)
+        With Me.Controls("DS_HC_1_" & CStr(i))
+            .Caption = ColumnLetter(FirstColumnIndex + i - 1)
+            .BackColor = IIf(pSelectedColumns.Contains(FirstColumnIndex + i - 1), pHeaderButtonBackColorSelected, pHeaderButtonBackColorNormal)
+        End With
         Me.Controls("DS_HC_2_" & CStr(i)) = sNames(i - 1)
     Next i
 End Sub
 
+Friend Sub SetSelectedColumns(ByRef aX As ArrayListEx)
+    Dim FirstColumnIndex As Long, i As Long
+    
+    Set pSelectedColumns = aX
+    FirstColumnIndex = pViewport.FirstColumnIndex
+    For i = 1 To pMaxAvailColumns
+        Me.Controls("DS_HC_1_" & CStr(i)).BackColor = IIf(aX.Contains(FirstColumnIndex + i - 1), pHeaderButtonBackColorSelected, pHeaderButtonBackColorNormal)
+    Next i
+End Sub
+
+Public Function HideColumnLetters(ByVal Value As Boolean) As Boolean
+    Const hc1Top As Long = 15, hc1Height As Long = 240, hc2Height As Long = 360, bgHeight As Long = 340
+    Dim i As Long
+    
+    If Viewport.Scrollview.HideColumnLetters <> Value Then
+        For i = 1 To pMaxAvailColumns
+            With Me.Controls("DS_HC_1_" & CStr(i))
+                .Visible = Not Value
+                .GridlineStyleTop = VBA.Abs(Int(Not Value))
+                .GridlineStyleBottom = VBA.Abs(Int(Not Value))
+            End With
+            Me.Controls("DS_HC_2_" & CStr(i)).GridlineStyleTop = VBA.Abs(Int(Value))
+        Next i
+
+        Me.DS_HC_1_1.Top = IIf(Value, 0, hc1Top)
+        Me.DS_HC_1_1.Height = IIf(Value, 0, hc1Height)
+        Me.DS_HC_2_1.Top = IIf(Value, 0, hc1Top + hc1Height)
+        Me.DS_HC_2_1.Height = hc2Height
+        Me.DS_HR_BG.Top = Me.DS_HC_2_1.Top + 15
+        Me.DS_HR_BG.Height = bgHeight
+        Me.FormHeaders.Height = Me.DS_HC_2_1.Top + Me.DS_HC_2_1.Height
+    End If
+    
+    HideColumnLetters = Value
+End Function
+
+
 ' --- UI EVENT HANDLERS ---
 
 Public Function OnColumnHeaderClick()
-    Dim Target As Access.CommandButton, colIndex As Long, ShiftKey As Boolean, CtrlKey As Boolean
-    
-    If TryGetActiveControl(Target) Then
-        Me.HiddenControl.SetFocus
-'        If TryGetColumnIndexOfControl(Target, colIndex) Then
-'            ShiftKey = GetAsyncKeyState(vbKeyShift)
-'            CtrlKey = GetAsyncKeyState(vbKeyControl)
-'
-'            Debug.Print Printf("Click: %1, ColumnIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, colIndex, ShiftKey, CtrlKey)
-'            Controller.HandleClickOnColumnHeader colIndex, ShiftKey, CtrlKey
-'        End If
-    End If
+    RaiseEvent OnColumnLetterClick(pViewport.FirstColumnIndex + (Me.SelLeft - 2), GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
 End Function
 
 Public Function OnColumnNameChange()
-    Debug.Print "[INFO] @DS_WORKSHEET.OnColumnNameChange()"
+    Dim Target As Access.TextBox
+    
+    If TryGetActiveControl(Target) Then
+        RaiseEvent OnColumnNameWillChange(pViewport.FirstColumnIndex + (Me.SelLeft - (pMaxAvailColumns + 0) - 2), GetControlText(Target))
+    End If
 End Function
 
 
@@ -3132,26 +3180,3 @@ Private Function ColumnLetter(ByVal ColumnIndex As Long) As String
                        VBA.Mid$(sChars, 1 + (ColumnIndex Mod 26), 1)
     End If
 End Function
-
-
-' --- TEST / DEBUG ---
-
-Public Sub Debugger()
-    Stop
-End Sub
-
-Private Sub DebuggerStop()
-    Dim pForm As Form_DS_GRID_CONTAINER, pSubForm As Access.SubForm, cForm As Form_DS_GRID, stopLooping As Boolean
-    
-    Set pForm = Me.Parent
-    Set pSubForm = pForm.DS_GRID
-    Set cForm = Me
-    
-    Debug.Print "DEBUGGER STOP START!"
-    Do
-        DoEvents
-        Stop
-        
-    Loop Until stopLooping
-    Debug.Print "DEBUGGER STOP DONE!"
-End Sub

@@ -18,13 +18,13 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =3436
+    Width =3713
     DatasheetFontHeight =11
-    ItemSuffix =1558
-    Left =15720
-    Top =-12075
-    Right =27570
-    Bottom =-5550
+    ItemSuffix =1562
+    Left =22365
+    Top =-11520
+    Right =28470
+    Bottom =-4995
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -325,7 +325,7 @@ Begin Form
                     OldBorderStyle =0
                     Top =15
                     Width =3433
-                    Height =2835
+                    Height =2834
                     TabIndex =1
                     BorderColor =10921638
                     Name ="DS_VIEWPORT"
@@ -339,7 +339,7 @@ Begin Form
 
                     LayoutCachedTop =15
                     LayoutCachedWidth =3433
-                    LayoutCachedHeight =2850
+                    LayoutCachedHeight =2849
                     LayoutGroup =1
                     GroupTable =2
                     ShowPageHeaderAndPageFooter =0
@@ -396,7 +396,7 @@ Begin Form
                     Width =3433
                     Height =270
                     AutoActivate =1
-                    TabIndex =2
+                    TabIndex =3
                     BorderColor =10921638
                     Name ="SCROLLBAR_X"
                     OleData = Begin
@@ -531,6 +531,208 @@ Begin Form
                     LayoutGroup =1
                     GroupTable =2
                 End
+                Begin EmptyCell
+                    Left =3435
+                    Top =2850
+                    Width =270
+                    Height =270
+                    Name ="CeldaVacía1559"
+                    GroupTable =2
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    LayoutCachedLeft =3435
+                    LayoutCachedTop =2850
+                    LayoutCachedWidth =3705
+                    LayoutCachedHeight =3120
+                    RowStart =1
+                    RowEnd =1
+                    ColumnStart =1
+                    ColumnEnd =1
+                    LayoutGroup =1
+                    GroupTable =2
+                End
+                Begin CustomControl
+                    Enabled = NotDefault
+                    TabStop = NotDefault
+                    SizeMode =1
+                    OldBorderStyle =0
+                    OverlapFlags =85
+                    Left =3435
+                    Top =15
+                    Width =270
+                    Height =2834
+                    AutoActivate =1
+                    TabIndex =2
+                    BorderColor =10921638
+                    Name ="SCROLLBAR_Y"
+                    OleData = Begin
+                        0x00120000d0cf11e0a1b11ae1000000000000000000000000000000003e000300 ,
+                        0xfeff090006000000000000000000000001000000000000000000000000100000 ,
+                        0x0600000001000000feffffff0000000001000000ffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
+                        0x004a803d000000000000000000000000d00ed8e922cad9010700000040010000 ,
+                        0x0000000063006f006e00740065006e0074007300000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x00000000120002010200000003000000ffffffff000000000000000000000000 ,
+                        0x000000000000000000000000000000000000000000000000040000001c000000 ,
+                        0x00000000010043006f006d0070004f0062006a00000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000012000200ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000100000088000000 ,
+                        0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
+                        0x4400610074006100000000000000000000000000000000000000000000000000 ,
+                        0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000038000000 ,
+                        0x00000000fefffffffdfffffffffffffffffffffffffffffffffffffffeffffff ,
+                        0xfeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
+                        0x004a803d000000000000000000000000209b9c7b22cad9010500000000010000 ,
+                        0x0000000063006f006e00740065006e0074007300000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x000000001200020102000000ffffffffffffffff000000000000000000000000 ,
+                        0x000000000000000000000000000000000000000000000000030000001c000000 ,
+                        0x00000000010043006f006d0070004f0062006a00000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000012000200ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000088000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x00000000fffffffffffffffffefffffffdfffffffefffffffeffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffff0100000002000000fefffffffeffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffff0100feff030a0000ffffffffe081d1df2f5ece11a44900aa004a803d ,
+                        0x2e000000426172726120646520646573706c617a616d69656e746f206465204d ,
+                        0x6963726f736f667420466f726d7320322e0010000000456d626564646564204f ,
+                        0x626a6563740012000000466f726d732e5363726f6c6c4261722e3100f439b271 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x000000000002180048300000e02e0000b004000001000000a5170000da010000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x00000000feffffff0200000003000000fefffffffeffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
+                        0xffffffff38000000000000000100000000000000000000000000000000000000 ,
+                        0x000000003800000000000000000000000000000000000000000000006465204d ,
+                        0x6963726f0100feff030a0000ffffffffe081d1df2f5ece11a44900aa004a803d ,
+                        0x2e000000426172726120646520646573706c617a616d69656e746f206465204d ,
+                        0x6963726f736f667420466f726d7320322e0010000000456d626564646564204f ,
+                        0x626a6563740012000000466f726d732e5363726f6c6c4261722e3100f439b271 ,
+                        0x000000000000000000000000e02e0000b004000001000000a5170000da010000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x000000000002180048300000e02e0000b004000000000000da01000085130000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000
+                    End
+                    OLEClass ="Microsoft Forms 2.0"
+                    Class ="Forms.ScrollBar.1"
+                    GroupTable =2
+                    LeftPadding =0
+                    TopPadding =15
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+
+                    LayoutCachedLeft =3435
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =3705
+                    LayoutCachedHeight =2849
+                    ColumnStart =1
+                    ColumnEnd =1
+                    LayoutGroup =1
+                    GroupTable =2
+                End
             End
         End
     End
@@ -545,26 +747,58 @@ Option Explicit
 
 Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
-' The amount of overflowing scroll to the right after the last table column
-Private pOutOfBoundsScrollX As Long
-Private pCurrentPageIndex As Long
-Private pScrollPageSizeX As Long
-Private pInitialized As Boolean
-Private pLastScrollX As Variant
+
+' --- EVENTS ---
+
+Public Event OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+Public Event OnColumnNameChange(ByVal ColumnIndex As Long, ByVal FromValue As String, ByVal ToValue As String)
+
+' ---
 
 Private pKeepScrollPositionOnTableChange As Boolean
 Private pEnableOutOfRangeScrolling As Boolean
+Private pHideColumnLetters As Boolean
 
-'Private pRowsInViewport As Long
-'Private pIsMaxRowsDirty As Boolean
-
-' TODO: Remove, for development purposes only
 Private pTable As dsTable
+Private pSelectedColumns As ArrayListEx
+
+
+' --- INTERNAL ---
+
+' The amount of overflowing scroll to the right after the last table column
+Private pOutOfBoundsScrollX As Long
+Private pOutOfBoundsScrollY As Long
+'Private pCurrentPageIndex As Long
+Private pScrollPageSizeX As Long
+Private pScrollPageSizeY As Long
+Private pInitialized As Boolean
+Private pLastScrollX As Variant
+Private pLastScrollY As Variant
+
 Private pAvailableVMemOnLoad As Long
 
 Private pViewport As Form_DS_VIEWPORT
-Private pWorksheet As Form_DS_WORKSHEET
+Private WithEvents pWorksheet As Form_DS_WORKSHEET
+Attribute pWorksheet.VB_VarHelpID = -1
 
+
+' --- PUBLIC PROPERTIES ---
+
+Public Property Get Table() As dsTable: Set Table = pTable: End Property
+Public Property Set Table(ByRef Value As dsTable): SetTable Value: End Property
+
+Public Property Get SelectedColumns() As Variant: SelectedColumns = pSelectedColumns.ToArray(): End Property
+Public Property Let SelectedColumns(ByVal Value As Variant): SetSelectedColumns Value: End Property
+
+Public Property Get KeepScrollPositionOnTableChange() As Boolean: KeepScrollPositionOnTableChange = pKeepScrollPositionOnTableChange: End Property
+Public Property Let KeepScrollPositionOnTableChange(ByVal Value As Boolean): pKeepScrollPositionOnTableChange = Value: End Property
+Public Property Get EnableOutOfRangeScrolling() As Boolean: EnableOutOfRangeScrolling = pEnableOutOfRangeScrolling: End Property
+Public Property Let EnableOutOfRangeScrolling(ByVal Value As Boolean): pEnableOutOfRangeScrolling = Value: End Property
+Public Property Get HideColumnLetters() As Boolean: HideColumnLetters = pHideColumnLetters: End Property
+Public Property Let HideColumnLetters(ByVal Value As Boolean): pHideColumnLetters = Worksheet.HideColumnLetters(Value): End Property
+
+
+' --- INTERNAL PROPERTIES ---
 
 Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
 Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
@@ -572,44 +806,21 @@ Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet 
 Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
 Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = Value: End Property
 
-Public Property Get Table() As dsTable: Set Table = pTable: End Property
-Public Property Set Table(ByRef Value As dsTable): SetTable Value: End Property
-
+Public Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
 
-' --- SETTINGS ---
-
-Public Property Get KeepScrollPositionOnTableChange() As Boolean: KeepScrollPositionOnTableChange = pKeepScrollPositionOnTableChange: End Property
-Public Property Let KeepScrollPositionOnTableChange(ByVal Value As Boolean): pKeepScrollPositionOnTableChange = Value: End Property
-Public Property Get EnableOutOfRangeScrolling() As Boolean: EnableOutOfRangeScrolling = pEnableOutOfRangeScrolling: End Property
-Public Property Let EnableOutOfRangeScrolling(ByVal Value As Boolean): pEnableOutOfRangeScrolling = Value: End Property
-
-Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
-
-
-Public Property Get ScrollbarX() As Long
-    ScrollbarX = Nz(Me.SCROLLBAR_X, 0)
-End Property
-
-'Public Property Get ScrollModX() As Double: ScrollModX = pScrollModX: End Property
-'Public Property Let ScrollModX(ByVal Value As Double): pScrollModX = Value: End Property
-Public Property Get CurrentPageIndex() As Long: CurrentPageIndex = pCurrentPageIndex: End Property
-Public Property Let CurrentPageIndex(ByVal Value As Long): pCurrentPageIndex = Value: End Property
+Public Property Get ScrollbarX() As Long: ScrollbarX = Nz(Me.SCROLLBAR_X, 0): End Property
+Public Property Get ScrollbarY() As Long: ScrollbarY = Nz(Me.SCROLLBAR_Y, 0): End Property
 
 Public Property Get OutOfBoundsScrollX() As Long: OutOfBoundsScrollX = pOutOfBoundsScrollX: End Property
 Public Property Let OutOfBoundsScrollX(ByVal Value As Long): pOutOfBoundsScrollX = Value: End Property
+Public Property Get OutOfBoundsScrollY() As Long: OutOfBoundsScrollY = pOutOfBoundsScrollY: End Property
+Public Property Let OutOfBoundsScrollY(ByVal Value As Long): pOutOfBoundsScrollY = Value: End Property
 
 Public Property Get AvailableVMemOnLoad() As Long: AvailableVMemOnLoad = pAvailableVMemOnLoad: End Property
 
 Public Property Get ScrollPageSizeX() As Long: ScrollPageSizeX = pScrollPageSizeX: End Property
-
-Public Property Get MaxRowsInViewport() As Long
-'    MaxRowsInViewport = CLng( _
-'        Int((Me.DS_GRID.Form.InsideHeight - Me.DS_GRID.Form.EncabezadoDelFormulario.Height) _
-'            / Me.DS_GRID.Form.Detalle.Height _
-'        ) + 1)
-End Property
-
+Public Property Get ScrollPageSizeY() As Long: ScrollPageSizeY = pScrollPageSizeY: End Property
 
 
 ' --- FORM EVENTS ---
@@ -620,6 +831,11 @@ Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
             Stop
         End If
     End If
+    If KeyCode = vbKeyH Then
+        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+            HideColumnLetters = Not HideColumnLetters
+        End If
+    End If
 End Sub
 
 Private Sub Form_Load()
@@ -627,6 +843,8 @@ Private Sub Form_Load()
     Monitor "VMem", "0 MB"
     ScreenLib_Resync
     pLastScrollX = Array(0, 0)
+    pLastScrollY = Array(0, 0)
+    Set pSelectedColumns = ArrayListEx.Create()
     Setup
     
     If Not IsSubform Then
@@ -642,21 +860,9 @@ Private Sub Form_Resize()
     ResizeFormContent
     If pInitialized Then
         UpdateScrollbarX
-'        HandleLargeStepResize
+        UpdateScrollbarY
     End If
 End Sub
-
-'Private Sub Form_Timer()
-'    Me.TimerInterval = 0
-'    DoEvents
-'
-'    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS
-'
-'    r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
-'    b = ScreenLib.RectToBounds(r)
-'
-'    Stop
-'End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
@@ -668,7 +874,7 @@ End Sub
 
 Private Sub Setup()
     Set Viewport = Me.DS_VIEWPORT.Form
-    Set Viewport.ScrollView = Me
+    Set Viewport.Scrollview = Me
     Viewport.Setup
     Set Worksheet = Viewport.Worksheet
 End Sub
@@ -678,7 +884,14 @@ Private Sub SetTable(ByRef Value As dsTable)
     pInitialized = Not (pTable Is Nothing)
     
     UpdateScrollbarX
+    UpdateScrollbarY
     Viewport.OnSourceTableChange
+End Sub
+
+Private Sub SetSelectedColumns(ByVal Value As Variant)
+    pSelectedColumns.Clear
+    pSelectedColumns.AddRange Value
+    pWorksheet.SetSelectedColumns pSelectedColumns
 End Sub
 
 
@@ -693,25 +906,19 @@ Private Sub ResizeFormContent()
     With Me.SCROLLBAR_X
         .Height = 270
         .Left = 0
-        .Width = mW
+        .Width = mW - 270
     End With
     With Me.DS_VIEWPORT
         .Height = mH - (270 + .Top)
-        .Width = mW
+        .Width = mW - 270
         Me.SCROLLBAR_X.Top = .Height + .Top
     End With
+    With Me.SCROLLBAR_Y
+        .Height = mH - (270 + .Top)
+        .Width = 270
+        .Left = mW - 270
+    End With
 End Sub
-
-'Private Sub HandleLargeStepResize()
-'    Static rStepX As Long, rStepY As Long
-'
-'    If VBA.Abs(rStepX - Me.InsideWidth) > 1000 Or VBA.Abs(rStepY - Me.InsideHeight) > 1000 Then
-'        rStepX = Me.InsideWidth
-'        rStepY = Me.InsideHeight
-'
-'        ' Viewport.RecalculateViewportSizes
-'    End If
-'End Sub
 
 
 ' --- SCROLLING ---
@@ -726,6 +933,45 @@ End Sub
 
 Private Sub SCROLLBAR_X_Scroll()
     ApplyScrollbarX
+End Sub
+
+Private Sub SCROLLBAR_Y_Change()
+    ApplyScrollbarY
+End Sub
+
+Private Sub SCROLLBAR_Y_Scroll()
+    ApplyScrollbarY
+End Sub
+
+Private Sub ApplyScrollbarY(Optional ByVal yVal As Variant)
+    If (Not Me.SCROLLBAR_Y.Visible) Or (Not pInitialized) Then Exit Sub
+    Dim rawMax As Long
+    
+    With Me.SCROLLBAR_Y
+        If IsMissing(yVal) Then yVal = .Value
+        rawMax = .Max - pOutOfBoundsScrollY
+        If yVal > .Max Then
+            If pEnableOutOfRangeScrolling Then
+                pOutOfBoundsScrollY = yVal - rawMax
+                .Max = yVal
+                .Value = yVal
+            Else
+                .Value = .Max
+            End If
+            UpdateScrollbarY
+        Else
+            If pOutOfBoundsScrollY > 0 Then
+                pOutOfBoundsScrollY = IIf(yVal - rawMax > 0, yVal - rawMax, 0)
+                If .Max <> rawMax + pOutOfBoundsScrollY Then .Max = rawMax + pOutOfBoundsScrollY
+                If .Value <> yVal Then .Value = yVal
+                UpdateScrollbarY
+            Else
+                If .Value <> yVal Then .Value = yVal
+                Viewport.ScrollTo ScrollbarX, yVal
+                pLastScrollY(0) = yVal
+            End If
+        End If
+    End With
 End Sub
 
 Private Sub ApplyScrollbarX(Optional ByVal xVal As Variant)
@@ -753,7 +999,7 @@ Private Sub ApplyScrollbarX(Optional ByVal xVal As Variant)
                 UpdateScrollbarX
             Else
                 If .Value <> xVal Then .Value = xVal
-                Viewport.ScrollTo xVal, 0
+                Viewport.ScrollTo xVal, ScrollbarY
                 pLastScrollX(0) = xVal
             End If
         End If
@@ -765,6 +1011,27 @@ Finally:
     On Error Resume Next
     Debug.Print "[ERROR] @DS_SCROLLVIEW.ApplyScrollbarX() - " & CStr(Err.Description)
     Resume ExitSub
+End Sub
+
+Private Sub UpdateScrollbarY()
+    If Not Me.SCROLLBAR_Y.Visible Then Exit Sub
+    
+    Dim yMax As Long, cellSizeY As Long, fullViewportContentSizeY As Long
+    
+    cellSizeY = Worksheet.GridCellSizeY
+    pScrollPageSizeY = CLng(Int((Me.InsideHeight - 270) / cellSizeY)) * cellSizeY
+    fullViewportContentSizeY = (pTable.Count - 0) * cellSizeY
+    yMax = (fullViewportContentSizeY + OutOfBoundsScrollY) - (Me.InsideHeight - 270)
+    With Me.SCROLLBAR_Y
+        .Max = yMax
+        .LargeChange = IIf(pScrollPageSizeY > yMax, yMax, pScrollPageSizeY)
+        .SmallChange = cellSizeY
+        If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
+            Viewport.ScrollTo ScrollbarX, .Value
+            pLastScrollY(0) = .Value
+            pLastScrollY(1) = .Max
+        End If
+    End With
 End Sub
 
 Private Sub UpdateScrollbarX()
@@ -786,11 +1053,31 @@ Private Sub UpdateScrollbarX()
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
         .SmallChange = CLng(cellSizeX / 5)
         If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
-            Viewport.ScrollTo .Value, 0
+            Viewport.ScrollTo .Value, ScrollbarY
             pLastScrollX(0) = .Value
             pLastScrollX(1) = .Max
         End If
     End With
+End Sub
+
+
+' --- EVENTS ---
+
+Private Sub pWorksheet_OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    RaiseEvent OnColumnLetterClick(ColumnIndex, CtrlKey, ShiftKey)
+End Sub
+
+Private Sub pWorksheet_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
+    Dim oldValue As String
+    
+    On Error GoTo Finally
+    oldValue = Table().HeaderList(0)(ColumnIndex)("ColumnName")
+    Debug.Print oldValue
+    If StrComp(oldValue, Value, vbBinaryCompare) <> 0 Then
+        On Error GoTo 0
+        RaiseEvent OnColumnNameChange(ColumnIndex, oldValue, Value)
+    End If
+Finally:
 End Sub
 
 

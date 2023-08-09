@@ -602,20 +602,6 @@ End Sub
 
 Public Function ActiveTaskId() As String: ActiveTaskId = TaskController().RebuildSequence(TaskController().SequenceIndex())("Id"): End Function
 
-Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
-    Dim t() As Variant, i As Long, aSize As Long
-    
-    If IsMissing(RangeEnd) Then RangeEnd = RangeStart
-    aSize = RangeEnd - RangeStart
-    ReDim t(0 To aSize)
-    
-    For i = 0 To aSize
-        t(i) = RangeStart + i
-    Next i
-    
-    ArrayRange = t
-End Function
-
 Public Function ColumnCount(ByRef TargetTable As Variant) As Long
     Dim Target As dsTable
     Set Target = TargetTable
