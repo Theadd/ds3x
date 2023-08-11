@@ -22,7 +22,7 @@ Begin Form
     ItemSuffix =2096
     Left =4065
     Top =3030
-    Right =22230
+    Right =28545
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -685,7 +685,6 @@ End Sub
 
 Private Sub DS_LIST_ITEM_OVERLAY_Click()
     On Error GoTo Finally
-    Debug.Print "[EVENT] @DS_LIST_ITEM_OVERLAY.Click()"
 
     If CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_STATE)))) = 4 Then Exit Sub
     SetCurrentAsActiveIndex

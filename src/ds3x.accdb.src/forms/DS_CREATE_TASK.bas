@@ -4,7 +4,6 @@ Begin Form
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
-    MaxButton = NotDefault
     MinButton = NotDefault
     ShortcutMenu = NotDefault
     AutoCenter = NotDefault
@@ -26,7 +25,7 @@ Begin Form
     ItemSuffix =1578
     Left =4065
     Top =3030
-    Right =22230
+    Right =28545
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -391,6 +390,7 @@ Begin Form
                     Name ="DS_TASK_PARAM_0"
                     RowSourceType ="Value List"
                     FontName ="72 Monospace"
+                    OnChange ="[Event Procedure]"
                     GroupTable =3
                     LeftPadding =0
                     TopPadding =0
@@ -1276,6 +1276,18 @@ Private Sub DS_ENABLE_ALL_TASKS_BUTTON_Click()
     RebuildTasksList
 End Sub
 
+Private Sub DS_TASK_PARAM_0_Change()
+    Dim Target As String
+    
+    If GetControlText(Me.DS_TASK_PARAM_0) = "< Select... >" Then
+        If FileSystemLib.TryFileOpenDialog(Target) Then
+            SetControlText Me.DS_TASK_PARAM_0, Target
+        Else
+            SetControlText Me.DS_TASK_PARAM_0, ""
+        End If
+    End If
+End Sub
+
 Private Sub Form_Load()
     Debug.Print RectToString(GetWindowRect(Me))
     WindowSizeTo Me, 11000, 6000
@@ -1378,6 +1390,9 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
             Else
                 .Value = ""
             End If
+        ElseIf TaskParams(ParamIndex)(0) Like "*TargetFile*" Then
+            .AddItem ""
+            .AddItem "< Select... >"
         Else
             Select Case TaskParams(ParamIndex)(1)
                 Case "Table", "Worksheet"
@@ -1385,6 +1400,14 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                     For Each Item In GetListOfPreviousTaskResults(TaskParams(ParamIndex)(1))
                         .AddItem CStr(Item)
                     Next Item
+                Case "String|Dictionary"
+                    Select Case TaskName
+                        Case "LoadFromExcelFile", "OpenWorksheetFromFile"
+                            .AddItem ""
+                            .AddItem "{""UpdateLinks"": false, ""ReadOnly"": true, ""Local"": true, ""UTF8"": false, ""NoTextQualifier"": true}"
+                        Case Else
+                            ' ...
+                    End Select
                 Case Else
                     ' ...
             End Select
@@ -1480,6 +1503,18 @@ Private Sub pController_OnChange()
     If pSelectedTask <> "" Then
         RebuildUIForTask pSelectedTask
     End If
+End Sub
+
+Private Function GetControlText(ByRef TargetControl As Access.Control) As String
+    On Error Resume Next
+    GetControlText = TargetControl.Value
+    GetControlText = TargetControl.Text
+End Function
+
+Private Sub SetControlText(ByRef TargetControl As Access.Control, ByVal Text As String)
+    On Error Resume Next
+    TargetControl.Value = Text
+    TargetControl.Text = Text
 End Sub
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)

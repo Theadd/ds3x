@@ -21,17 +21,16 @@ Begin Form
     Width =3713
     DatasheetFontHeight =11
     ItemSuffix =1562
-    Left =22365
-    Top =-11520
-    Right =28470
-    Bottom =-4995
+    Left =4065
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
     Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
-    OnKeyDown ="[Event Procedure]"
     OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
@@ -775,8 +774,6 @@ Private pInitialized As Boolean
 Private pLastScrollX As Variant
 Private pLastScrollY As Variant
 
-Private pAvailableVMemOnLoad As Long
-
 Private pViewport As Form_DS_VIEWPORT
 Private WithEvents pWorksheet As Form_DS_WORKSHEET
 Attribute pWorksheet.VB_VarHelpID = -1
@@ -817,30 +814,26 @@ Public Property Let OutOfBoundsScrollX(ByVal Value As Long): pOutOfBoundsScrollX
 Public Property Get OutOfBoundsScrollY() As Long: OutOfBoundsScrollY = pOutOfBoundsScrollY: End Property
 Public Property Let OutOfBoundsScrollY(ByVal Value As Long): pOutOfBoundsScrollY = Value: End Property
 
-Public Property Get AvailableVMemOnLoad() As Long: AvailableVMemOnLoad = pAvailableVMemOnLoad: End Property
-
 Public Property Get ScrollPageSizeX() As Long: ScrollPageSizeX = pScrollPageSizeX: End Property
 Public Property Get ScrollPageSizeY() As Long: ScrollPageSizeY = pScrollPageSizeY: End Property
 
 
 ' --- FORM EVENTS ---
 
-Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
-    If KeyCode = vbKeyP Then
-        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-            Stop
-        End If
-    End If
-    If KeyCode = vbKeyH Then
-        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-            HideColumnLetters = Not HideColumnLetters
-        End If
-    End If
-End Sub
+'Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+'    If KeyCode = vbKeyP Then
+'        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+'            Stop
+'        End If
+'    End If
+'    If KeyCode = vbKeyH Then
+'        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+'            HideColumnLetters = Not HideColumnLetters
+'        End If
+'    End If
+'End Sub
 
 Private Sub Form_Load()
-    pAvailableVMemOnLoad = GetAvailableVirtualMemory
-    Monitor "VMem", "0 MB"
     ScreenLib_Resync
     pLastScrollX = Array(0, 0)
     pLastScrollY = Array(0, 0)
@@ -853,7 +846,6 @@ Private Sub Form_Load()
         ' TODO: Remove
         SetupDevelopmentEnvironment
     End If
-    Monitor "VMem", CStr(pAvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
 End Sub
 
 Private Sub Form_Resize()
@@ -883,8 +875,10 @@ Private Sub SetTable(ByRef Value As dsTable)
     Set pTable = Value
     pInitialized = Not (pTable Is Nothing)
     
-    UpdateScrollbarX
-    UpdateScrollbarY
+    If pInitialized Then
+        UpdateScrollbarX
+        UpdateScrollbarY
+    End If
     Viewport.OnSourceTableChange
 End Sub
 
@@ -1087,14 +1081,3 @@ Private Sub SetupDevelopmentEnvironment()
     pEnableOutOfRangeScrolling = True
     Set Table = CreateSampleTable
 End Sub
-
-Public Function Monitor(ByVal Key As String, ByVal Value As Variant) As Variant
-    Static dX As DictionaryEx
-    
-    If dX Is Nothing Then Set dX = DictionaryEx.Create()
-    
-    dX.Add Key, Value
-    Me.Caption = JSON.Stringify(dX)
-    
-    Monitor = Value
-End Function

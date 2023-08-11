@@ -25,9 +25,9 @@ Begin Form
     DatasheetFontHeight =11
     ItemSuffix =1558
     Left =4065
-    Top =-13170
-    Right =22380
-    Bottom =-975
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -456,27 +456,14 @@ End Sub
 Private Sub SetController(ByVal TargetController As dsLiveEd)
     Set pController = TargetController
     Set pController.GridController.Scrollview = Me.DS_SCROLLVIEW.Form
-    ' Set Me.DS_GRID_CONTAINER.Form.Controller = pController.GridController
     Set Me.DS_JSON_TASK_EDITOR.Form.Controller = pController.TaskController
     Me.DS_JSON_TASK_EDITOR.Visible = True
-    ' Me.DS_GRID_CONTAINER.Visible = True
     Me.DS_SCROLLVIEW.Visible = True
-    pController.GridController.TriggerOnChangeEvent
     Rebuild
 End Sub
 
 Private Sub Rebuild()
-'    If pController.TaskController.IsValidTable Then
-'        Me.DS_GRID_CONTAINER.Visible = True
-
-        '''' Me.DS_GRID_CONTAINER.Form.ViewportGridRebuild
-    If pController.TaskController.IsValidTable Then
-        Set Me.DS_SCROLLVIEW.Form.Table = pController.TaskController.Table
-    End If
-
-'    Else
-'        Me.DS_GRID_CONTAINER.Visible = False
-'    End If
+    pController.GridController.TriggerOnChangeEvent
 End Sub
 
 
@@ -484,5 +471,4 @@ Public Sub ResizeFormHeaderToSize(ByVal h As Long)
     Me.DS_JSON_TASK_EDITOR.Height = h
     Me.EncabezadoDelFormulario.Height = h
     Me.DS_JSON_TASK_EDITOR.Height = h
-'    Rebuild
 End Sub

@@ -21,10 +21,10 @@ Begin Form
     Width =3436
     DatasheetFontHeight =11
     ItemSuffix =1559
-    Left =22365
-    Top =-11520
-    Right =28470
-    Bottom =-4995
+    Left =4065
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -504,9 +504,6 @@ Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
         Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
         Worksheet.SetupColumns sView.TrackIndex * sView.ColumnsToLargeChangeTrack, Scrollview.Table
-'        ScrollView.Monitor "ViewArea", Printf("[(%1)..%2]", pTrackColumnSizesInCache, Worksheet.MaxAvailColumns)
-'        ScrollView.Monitor "Track", sView.TrackIndex
-'        ScrollView.Monitor "VMem", CStr(ScrollView.AvailableVMemOnLoad - GetAvailableVirtualMemory) & " MB"
     End If
     
     AdjustScrollY sView
@@ -587,7 +584,6 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
             Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
         Else
-            ' Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(10, PageIndex, 10, ColumnStartIndex, , True))
             nRows = Min(dsT.Count - (PageSize * PageIndex * NumPagesInLargeChangeRows), PageSize * PageCount)
             Set dsT2 = dsT.GetRange(PageSize * PageIndex * NumPagesInLargeChangeRows, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
             Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))

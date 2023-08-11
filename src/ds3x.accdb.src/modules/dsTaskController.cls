@@ -112,6 +112,31 @@ Public Sub AddTask(ByVal TaskName As String, ByVal TaskValues As Variant, Option
     SequenceIndex = sIndex + 1
 End Sub
 
+Public Sub RemoveTask(ByVal TaskId As String)
+    Dim aX As ArrayListEx, TaskIndex As Long, iAux As Long
+    
+    Set aX = ArrayListEx.Create(RebuildSequence)
+    If TryGetIndexOfTaskId(TaskId, TaskIndex) Then
+        aX.RemoveAt TaskIndex
+        Set RebuildSequence = aX
+        
+        If Not TryGetIndexOfTaskId(TaskId, iAux) Then
+            If pTaskResults.Exists(TaskId) Then
+                Set pTaskResults(TaskId) = Nothing
+                pTaskResults.Remove TaskId
+            End If
+            If pDataSources.Exists(TaskId) Then
+                Set pDataSources(TaskId) = Nothing
+                pDataSources.Remove TaskId
+            End If
+            Set pTable = Nothing
+            MakeRebuildSequenceDirtyOn -1
+            Rebuild -1
+        End If
+    End If
+    
+End Sub
+
 ' Used to update an existing task at specified index
 Public Sub SetTask(ByVal Task As Scripting.Dictionary, ByVal Index As Long)
     Set pRebuildSequence(Index) = Task

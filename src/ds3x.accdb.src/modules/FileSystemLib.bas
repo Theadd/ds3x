@@ -259,7 +259,7 @@ MoveFileBack:
         If TryWaitFileExists(TargetPath, retryAttempts) Then
             
             If TryWaitFileWriteAccess(TargetPath, retryAttempts) Then
-                FSO.deletefile TargetPath, True
+                FSO.DeleteFile TargetPath, True
                 TryWaitFileWriteAccess = True
             End If
             
@@ -271,6 +271,18 @@ ExitFunction:
 HandleUnexpectedError:
     TryWaitFileWriteAccess = False
     Debug.Print "Error inesperado al devolver un archivo a su nombre original. " & TargetPath
+End Function
+
+Public Function GetFileMatchingPattern(ByVal Pattern As String) As String
+    Dim sPath As String, sName As String
+    On Error GoTo Finally
+    
+    sPath = FSO.GetParentFolderName(Pattern)
+    sName = VBA.Dir(Pattern)
+    If sName <> "" Then
+        GetFileMatchingPattern = FSO.BuildPath(sPath, sName)
+    End If
+Finally:
 End Function
 
 Public Function TryMoveFile(ByVal sourceFilePath As String, ByVal destinationFilePath As String) As Boolean

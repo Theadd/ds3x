@@ -1216,11 +1216,7 @@ Private Sub CloseFormIfOpen(ByVal FormName As String)
 End Sub
 
 Private Sub DS_LIST_ITEM_REMOVE_Click()
-    Dim aX As ArrayListEx
-    
-    Set aX = ArrayListEx.Create(pController.RebuildSequence)
-    aX.RemoveAt pController.SequenceIndex
-    Set pController.RebuildSequence = aX
+    pController.RemoveTask pController.RebuildSequence(pController.SequenceIndex)("Id")
 End Sub
 
 Private Sub Form_Load()

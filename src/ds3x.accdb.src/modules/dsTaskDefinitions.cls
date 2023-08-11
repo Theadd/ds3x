@@ -239,7 +239,7 @@ Public Function WorksheetSource() As xlSheetsEx
     End With
 End Function
 
-Public Function LoadFromExcelFile(ByVal TargetFile As Variant, Optional ByVal WorksheetNameOrIndex As Variant, Optional ByVal FirstRowHasHeaders As Variant, Optional ByVal UpdateLinks As Variant, Optional ByVal ReadOnly As Variant, Optional ByVal Locale As Variant, Optional ByVal UTF8 As Variant, Optional ByVal NoTextQualifier As Variant, Optional ByVal DisableCache As Variant) As dsTable
+Public Function LoadFromExcelFile(ByVal TargetFile As Variant, Optional ByVal WorksheetNameOrIndex As Variant, Optional ByVal FirstRowHasHeaders As Variant, Optional ByVal Options As Variant, Optional ByVal DisableCache As Variant) As dsTable
     Dim dsT As dsTable, xlX As xlSheetsEx, xlRange As Excel.Range
     DisableCache = GetParam(DisableCache, False)
     
@@ -257,7 +257,7 @@ LoadTableFromFileFallback:
     FirstRowHasHeaders = GetParam(FirstRowHasHeaders, True)
     WorksheetNameOrIndex = GetParam(WorksheetNameOrIndex, 0)
     
-    Set xlX = OpenWorksheetFromFile(TargetFile, UpdateLinks, ReadOnly, Locale, UTF8, NoTextQualifier)
+    Set xlX = OpenWorksheetFromFile(TargetFile, Options)
     On Error GoTo Finally
     If WorksheetNameOrIndex <> 0 Then
         Set xlX = GetWorksheet(xlX, WorksheetNameOrIndex)
@@ -272,25 +272,44 @@ Finally:
     Set LoadFromExcelFile = dsT
 End Function
 
-Public Function OpenWorksheetFromFile(ByVal TargetFile As Variant, Optional ByVal UpdateLinks As Variant, Optional ByVal ReadOnly As Variant, Optional ByVal Locale As Variant, Optional ByVal UTF8 As Variant, Optional ByVal NoTextQualifier As Variant) As xlSheetsEx
+Public Function OpenWorksheetFromFile(ByVal TargetFile As Variant, Optional ByVal Options As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx, dX As DictionaryEx
-    UpdateLinks = GetParam(UpdateLinks, False)
-    ReadOnly = GetParam(ReadOnly, True)
-    Locale = GetParam(Locale, True)
-    UTF8 = GetParam(UTF8, False)
-    NoTextQualifier = GetParam(NoTextQualifier, True)
     
+    Set Options = GetParamAsDictionaryEx(Options)
+    ' {"UpdateLinks": false, "ReadOnly": true, "Local": true, "UTF8": false, "NoTextQualifier": true}
     Set dX = DictionaryEx.Create() _
-                         .Add("UpdateLinks", UpdateLinks) _
-                         .Add("ReadOnly", ReadOnly) _
-                         .Add("Local", Locale) _
-                         .Add("UTF8", UTF8) _
-                         .Add("NoTextQualifier", NoTextQualifier)
+                         .Add("UpdateLinks", Options.GetValue("UpdateLinks", False)) _
+                         .Add("ReadOnly", Options.GetValue("ReadOnly", True)) _
+                         .Add("Local", Options.GetValue("Local", True)) _
+                         .Add("UTF8", Options.GetValue("UTF8", False)) _
+                         .Add("NoTextQualifier", Options.GetValue("NoTextQualifier", True))
                          
     Set xlSheet = xlSheetsEx.Create(, TargetFile, dX)
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
 
     Set OpenWorksheetFromFile = pTaskController.AddResource(xlSheet)
+End Function
+
+Private Function GetParamAsDictionaryEx(Optional ByVal Value As Variant) As DictionaryEx
+    If Not IsMissing(Value) Then
+        If IsObject(Value) Then
+            If TypeName(Value) Like "*Dictionary*" Then
+                Set GetParamAsDictionaryEx = DictionaryEx.Create(JSON.Parse(JSON.Stringify(Value), True, True))
+            Else
+                Err.Raise 13
+            End If
+        Else
+            If IsError(Value) Or IsEmpty(Value) Or IsNull(Value) Then GoTo Fallback
+            If Trim(CStr(Value)) = "" Then GoTo Fallback
+            Set GetParamAsDictionaryEx = DictionaryEx.Create(JSON.Parse(Value, True, True))
+        End If
+    Else
+        GoTo Fallback
+    End If
+    
+    Exit Function
+Fallback:
+    Set GetParamAsDictionaryEx = DictionaryEx.Create()
 End Function
 
 Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal RangeAddress As Variant, Optional ByVal FirstRowHasHeaders As Variant) As dsTable
@@ -559,12 +578,11 @@ Private Sub AddAllTasks()
     AddTask "LoadFromRange", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range, [FirstRowHasHeaders = True]: Boolean", TaskType:="DS", Requires:="X*"
     
     AddTask "LoadFromExcelFile", "TargetFile: String, [WorksheetNameOrIndex]: String|Long, [FirstRowHasHeaders = True]: Boolean, " & _
-                                 "[UpdateLinks = False]: Boolean, [ReadOnly = True]: Boolean, [Local = True]: Boolean, " & _
-                                 "[UTF8 = False]: Boolean, [NoTextQualifier = True]: Boolean, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+                                 "[Options = {}]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
     
     ' --- XL GENERATION TASKS ---
     
-    AddTask "OpenWorksheetFromFile", "TargetFile: String, [UpdateLinks = False]: Boolean, [ReadOnly = True]: Boolean, [Local = True]: Boolean, [UTF8 = False]: Boolean, [NoTextQualifier = True]: Boolean", TaskType:="XLG", Requires:="*"
+    AddTask "OpenWorksheetFromFile", "TargetFile: String, [Options = {}]: String|Dictionary", TaskType:="XLG", Requires:="*"
     
     AddTask "CreateNewExcelApp", "[WorksheetName = 'Sheet%1']: String", TaskType:="XLG", Requires:="*"
     
