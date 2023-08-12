@@ -21,10 +21,10 @@ Begin Form
     Width =14542
     DatasheetFontHeight =11
     ItemSuffix =1572
-    Left =18480
-    Top =3045
-    Right =28530
-    Bottom =15210
+    Left =4065
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -508,7 +508,7 @@ Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Propert
 Private Sub Form_Load()
     ScreenLib_Resync
     
-    WindowSizeTo Me, 22000, 11000
+    WindowSizeTo Me, 22030, 11000
     WindowCenterTo Me, ScreenLib.PrimaryScreen
 
     Me.TimerInterval = 1

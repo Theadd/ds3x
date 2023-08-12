@@ -26,7 +26,7 @@ Begin Form
     ItemSuffix =1558
     Left =4065
     Top =3030
-    Right =22230
+    Right =21105
     Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
@@ -364,15 +364,14 @@ Begin Form
                     Top =120
                     Width =3175
                     Height =345
-                    FontSize =10
                     FontWeight =100
                     LeftMargin =113
-                    TopMargin =58
+                    TopMargin =42
                     RightMargin =57
                     BorderColor =16777215
                     ForeColor =5855577
                     Name ="DS_JSON_EDITOR"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     OnLostFocus ="[Event Procedure]"
                     GroupTable =2
                     LeftPadding =15

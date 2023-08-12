@@ -21,16 +21,17 @@ Begin Form
     Width =3713
     DatasheetFontHeight =11
     ItemSuffix =1562
-    Left =4065
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =4440
+    Top =4500
+    Right =7590
+    Bottom =7080
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
     Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
+    OnKeyDown ="[Event Procedure]"
     OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
@@ -757,6 +758,7 @@ Public Event OnColumnNameChange(ByVal ColumnIndex As Long, ByVal FromValue As St
 Private pKeepScrollPositionOnTableChange As Boolean
 Private pEnableOutOfRangeScrolling As Boolean
 Private pHideColumnLetters As Boolean
+Private pInvertScrollInputAxis As Boolean
 
 Private pTable As dsTable
 Private pSelectedColumns As ArrayListEx
@@ -793,6 +795,8 @@ Public Property Get EnableOutOfRangeScrolling() As Boolean: EnableOutOfRangeScro
 Public Property Let EnableOutOfRangeScrolling(ByVal Value As Boolean): pEnableOutOfRangeScrolling = Value: End Property
 Public Property Get HideColumnLetters() As Boolean: HideColumnLetters = pHideColumnLetters: End Property
 Public Property Let HideColumnLetters(ByVal Value As Boolean): pHideColumnLetters = Worksheet.HideColumnLetters(Value): End Property
+Public Property Get InvertScrollInputAxis() As Boolean: InvertScrollInputAxis = pInvertScrollInputAxis: End Property
+Public Property Let InvertScrollInputAxis(ByVal Value As Boolean): pInvertScrollInputAxis = Value: End Property
 
 
 ' --- INTERNAL PROPERTIES ---
@@ -820,18 +824,18 @@ Public Property Get ScrollPageSizeY() As Long: ScrollPageSizeY = pScrollPageSize
 
 ' --- FORM EVENTS ---
 
-'Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
-'    If KeyCode = vbKeyP Then
-'        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-'            Stop
-'        End If
-'    End If
-'    If KeyCode = vbKeyH Then
-'        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-'            HideColumnLetters = Not HideColumnLetters
-'        End If
-'    End If
-'End Sub
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+    If KeyCode = vbKeyP Then
+        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+            Stop
+        End If
+    End If
+    If KeyCode = vbKeyH Then
+        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+            HideColumnLetters = Not HideColumnLetters
+        End If
+    End If
+End Sub
 
 Private Sub Form_Load()
     ScreenLib_Resync
@@ -918,7 +922,30 @@ End Sub
 ' --- SCROLLING ---
 
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
-    ApplyScrollbarX CLng(Me.SCROLLBAR_X.Value + (Count * Me.SCROLLBAR_X.SmallChange))
+    Dim sAxisX As Boolean, sMod As Double
+    sAxisX = pInvertScrollInputAxis
+    
+    If GetAsyncKeyState(vbKeyShift) Then
+        If GetAsyncKeyState(vbKeyControl) Then
+            sAxisX = Not sAxisX
+            sMod = 3#
+        Else
+            sMod = 3#
+        End If
+    Else
+        If GetAsyncKeyState(vbKeyControl) Then
+            sAxisX = Not sAxisX
+            sMod = 1#
+        Else
+            sMod = 1#
+        End If
+    End If
+    
+    If sAxisX Then
+        ApplyScrollbarX CLng(Me.SCROLLBAR_X.Value + (Count * sMod * Me.SCROLLBAR_X.SmallChange))
+    Else
+        ApplyScrollbarY CLng(Me.SCROLLBAR_Y.Value + (Count * sMod * Me.SCROLLBAR_Y.SmallChange))
+    End If
 End Function
 
 Private Sub SCROLLBAR_X_Change()
@@ -943,6 +970,7 @@ Private Sub ApplyScrollbarY(Optional ByVal yVal As Variant)
     
     With Me.SCROLLBAR_Y
         If IsMissing(yVal) Then yVal = .Value
+        If yVal < 0 Then yVal = 0
         rawMax = .Max - pOutOfBoundsScrollY
         If yVal > .Max Then
             If pEnableOutOfRangeScrolling Then
@@ -975,6 +1003,7 @@ Private Sub ApplyScrollbarX(Optional ByVal xVal As Variant)
     
     With Me.SCROLLBAR_X
         If IsMissing(xVal) Then xVal = .Value
+        If xVal < 0 Then xVal = 0
         rawMax = .Max - pOutOfBoundsScrollX
         If xVal > .Max Then
             If pEnableOutOfRangeScrolling Then
@@ -1015,7 +1044,7 @@ Private Sub UpdateScrollbarY()
     cellSizeY = Worksheet.GridCellSizeY
     pScrollPageSizeY = CLng(Int((Me.InsideHeight - 270) / cellSizeY)) * cellSizeY
     fullViewportContentSizeY = (pTable.Count - 0) * cellSizeY
-    yMax = (fullViewportContentSizeY + OutOfBoundsScrollY) - (Me.InsideHeight - 270)
+    yMax = Max((fullViewportContentSizeY + OutOfBoundsScrollY) - (Me.InsideHeight - 270), 0)
     With Me.SCROLLBAR_Y
         .Max = yMax
         .LargeChange = IIf(pScrollPageSizeY > yMax, yMax, pScrollPageSizeY)
@@ -1041,7 +1070,7 @@ Private Sub UpdateScrollbarX()
     cellSizeX = Worksheet.GridCellSizeX
     pScrollPageSizeX = CLng(Int(Me.InsideWidth / cellSizeX)) * cellSizeX
     fullViewportContentSizeX = (pTable.ColumnCount - 0) * cellSizeX
-    xMax = (fullViewportContentSizeX + OutOfBoundsScrollX) - Me.InsideWidth
+    xMax = Max((fullViewportContentSizeX + OutOfBoundsScrollX) - Me.InsideWidth, 0)
     With Me.SCROLLBAR_X
         .Max = xMax
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
@@ -1073,6 +1102,12 @@ Private Sub pWorksheet_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal V
     End If
 Finally:
 End Sub
+
+
+' --- HELPERS ---
+
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
 
 
 ' --- TESTING / DEVELOPMENT ---

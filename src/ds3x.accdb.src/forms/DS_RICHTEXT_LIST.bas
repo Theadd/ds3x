@@ -22,7 +22,7 @@ Begin Form
     ItemSuffix =2096
     Left =4065
     Top =3030
-    Right =28545
+    Right =21105
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -609,7 +609,7 @@ Begin Form
                     Name ="DS_LIST_ITEM_OVERLAY"
                     OnClick ="[Event Procedure]"
                     OnDblClick ="[Event Procedure]"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0

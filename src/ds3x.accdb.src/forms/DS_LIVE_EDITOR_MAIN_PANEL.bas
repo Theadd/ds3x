@@ -459,6 +459,8 @@ Private Sub SetController(ByVal TargetController As dsLiveEd)
     Set Me.DS_JSON_TASK_EDITOR.Form.Controller = pController.TaskController
     Me.DS_JSON_TASK_EDITOR.Visible = True
     Me.DS_SCROLLVIEW.Visible = True
+    Me.DS_SCROLLVIEW.Form.EnableOutOfRangeScrolling = True
+    Me.DS_SCROLLVIEW.Form.InvertScrollInputAxis = True
     Rebuild
 End Sub
 

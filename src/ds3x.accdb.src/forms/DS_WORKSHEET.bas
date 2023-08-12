@@ -25,11 +25,11 @@ Begin Form
     GridY =10
     Width =31680
     DatasheetFontHeight =11
-    ItemSuffix =2080
-    Left =22365
-    Top =-11520
-    Right =28470
-    Bottom =-4995
+    ItemSuffix =2083
+    Left =4065
+    Top =3030
+    Right =21105
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -358,40 +358,6 @@ Begin Form
             AlternateBackShade =95.0
             BackThemeColorIndex =3
             Begin
-                Begin TextBox
-                    TabStop = NotDefault
-                    OldBorderStyle =0
-                    OverlapFlags =93
-                    TextAlign =1
-                    BackStyle =0
-                    IMESentenceMode =3
-                    Left =284
-                    Top =170
-                    Width =15
-                    Height =15
-                    FontSize =1
-                    TabIndex =33
-                    TopMargin =851
-                    BackColor =-2147483603
-                    BorderColor =-2147483603
-                    Name ="ScrollCursor"
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    ShowDatePicker =0
-
-                    LayoutCachedLeft =284
-                    LayoutCachedTop =170
-                    LayoutCachedWidth =299
-                    LayoutCachedHeight =185
-                    BackThemeColorIndex =-1
-                    BorderThemeColorIndex =-1
-                    BorderShade =100.0
-                    ForeThemeColorIndex =1
-                    ForeTint =100.0
-                End
                 Begin Rectangle
                     SpecialEffect =0
                     BackStyle =1
@@ -399,7 +365,7 @@ Begin Form
                     Left =15
                     Top =270
                     Width =31621
-                    Height =340
+                    Height =326
                     BackColor =-2147483603
                     BorderColor =-2147483603
                     Name ="DS_HR_BG"
@@ -410,12 +376,12 @@ Begin Form
                     LayoutCachedLeft =15
                     LayoutCachedTop =270
                     LayoutCachedWidth =31636
-                    LayoutCachedHeight =610
+                    LayoutCachedHeight =596
                     BorderShade =100.0
                 End
                 Begin CommandButton
                     TabStop = NotDefault
-                    OverlapFlags =223
+                    OverlapFlags =93
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
@@ -529,6 +495,7 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleLeft =1
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -577,6 +544,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -745,6 +713,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -854,6 +823,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -904,6 +874,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1131,6 +1102,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1181,6 +1153,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1585,6 +1558,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1635,6 +1609,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1685,6 +1660,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1735,6 +1711,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1785,6 +1762,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1835,6 +1813,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -1883,6 +1862,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -2105,6 +2085,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -2153,6 +2134,7 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
@@ -2175,8 +2157,6 @@ Begin Form
             End
         End
         Begin Section
-            CanGrow = NotDefault
-            CanShrink = NotDefault
             Height =375
             Name ="FormDetail"
             AlternateBackColor =-2147483607
@@ -2185,8 +2165,83 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
                     OldBorderStyle =0
                     OverlapFlags =93
+                    TextAlign =1
+                    IMESentenceMode =3
+                    Width =31621
+                    Height =375
+                    FontSize =10
+                    TabIndex =17
+                    TopMargin =567
+                    BorderColor =13434879
+                    ForeColor =8355711
+                    Name ="DS_PAGE_ROW_NUM"
+                    ControlSource ="=GetPageRowNum()"
+                    ConditionalFormat = Begin
+                        0x010000009c000000020000000000000002000000000000000200000001000000 ,
+                        0x00000000f7f7f7000100000000000000030000001d0000000100000000000000 ,
+                        0xf2f8ff0000000000000000000000000000000000000000000000000000000000 ,
+                        0x3000000000005b00440053005f0050004100470045005f0052004f0057005f00 ,
+                        0x4e0055004d005d0020004d006f006400200032003d00300000000000
+                    End
+                    GroupTable =19
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =12566463
+                    GridlineWidthLeft =0
+                    GridlineWidthTop =0
+                    GridlineWidthRight =0
+                    GridlineWidthBottom =0
+                    ShowDatePicker =0
+
+                    LayoutCachedWidth =31621
+                    LayoutCachedHeight =375
+                    LayoutGroup =2
+                    BorderThemeColorIndex =-1
+                    BorderShade =100.0
+                    ForeTint =50.0
+                    ConditionalFormat14 = Begin
+                        0x01000200000000000000020000000100000000000000f7f7f700010000003000 ,
+                        0x0000000000000000000000000000000000000000000100000000000000010000 ,
+                        0x0000000000f2f8ff00190000005b00440053005f0050004100470045005f0052 ,
+                        0x004f0057005f004e0055004d005d0020004d006f006400200032003d00300000 ,
+                        0x0000000000000000000000000000000000000000
+                    End
+                    GridlineShade =75.0
+                    GroupTable =19
+                End
+                Begin Rectangle
+                    SpecialEffect =0
+                    BackStyle =1
+                    OldBorderStyle =0
+                    OverlapFlags =255
+                    Left =1701
+                    Top =15
+                    Width =3402
+                    Height =345
+                    BorderColor =-2147483603
+                    Name ="DS_RC_BG_INACTIVE"
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    LayoutCachedLeft =1701
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =5103
+                    LayoutCachedHeight =360
+                    BackThemeColorIndex =1
+                    BackShade =97.0
+                    BorderShade =100.0
+                End
+                Begin TextBox
+                    Locked = NotDefault
+                    TabStop = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =127
                     TextFontCharSet =177
                     TextFontFamily =0
                     IMESentenceMode =3
@@ -2213,7 +2268,7 @@ Begin Form
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =215
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2239,9 +2294,9 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleLeft =1
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedWidth =1966
@@ -2255,16 +2310,15 @@ Begin Form
                     ThemeFontIndex =-1
                     ForeTint =50.0
                     WidthStretch =33
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
-                    TextFontCharSet =177
+                    OverlapFlags =247
                     TextAlign =1
-                    TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
                     Left =1965
@@ -2287,9 +2341,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =1965
@@ -2305,16 +2359,15 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
-                    TextFontCharSet =177
+                    OverlapFlags =247
                     TextAlign =1
-                    TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
                     Left =3930
@@ -2337,9 +2390,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =3930
@@ -2355,13 +2408,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2387,9 +2441,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =5895
@@ -2405,13 +2459,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2437,9 +2492,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =7860
@@ -2455,13 +2510,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2487,9 +2543,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =9825
@@ -2505,13 +2561,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2537,9 +2594,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =11790
@@ -2555,13 +2612,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2587,9 +2645,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =13755
@@ -2605,13 +2663,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2637,9 +2696,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =15720
@@ -2655,13 +2714,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2687,9 +2747,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =17685
@@ -2705,13 +2765,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2737,9 +2798,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =19650
@@ -2755,13 +2816,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2787,9 +2849,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =21615
@@ -2805,13 +2867,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
@@ -2837,9 +2900,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =23580
@@ -2855,13 +2918,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextAlign =1
                     BackStyle =0
                     IMESentenceMode =3
@@ -2885,9 +2949,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =25545
@@ -2903,13 +2967,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextAlign =1
                     BackStyle =0
                     IMESentenceMode =3
@@ -2933,9 +2998,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =27510
@@ -2951,13 +3016,14 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextAlign =1
                     BackStyle =0
                     IMESentenceMode =3
@@ -2981,9 +3047,9 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
-                    GridlineColor =10921638
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
                     LayoutCachedLeft =29475
@@ -2999,6 +3065,7 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
             End
@@ -3021,6 +3088,7 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
+Private pCallCount As Long
 
 Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
@@ -3036,6 +3104,13 @@ Private Const pGridCellSizeY As Long = 375
 
 Private Const pHeaderButtonBackColorSelected As Long = 12644351
 Private Const pHeaderButtonBackColorNormal As Long = 15132391
+Private Const pCellGridlineShadeNormal As Long = 65
+Private Const pCellGridlineShadeInactive As Long = 85
+Private Const pDetailBackColor As Long = 16777215
+Private Const pDetailAlternateBackColor As Long = -2147483607
+Private Const pDetailInactiveBackColor As Long = 16250871
+Private pFirstInactiveRowIndex As Long
+Private pFirstInactiveColumnIndex As Long
 
 
 Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
@@ -3060,6 +3135,16 @@ Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     pViewport.PropagateMouseWheel Page, Count
 End Sub
 
+'Private Sub FormDetail_Paint()
+''    If CLng(Me.Bookmark(0)) < pFirstInactiveRowIndex + 1 Then
+'''        Me.FormDetail.BackColor = pDetailBackColor
+'''        Me.FormDetail.AlternateBackColor = pDetailAlternateBackColor
+''    Else
+'''        Me.FormDetail.BackColor = pDetailInactiveBackColor
+'''        Me.FormDetail.AlternateBackColor = pDetailInactiveBackColor
+''    End If
+'End Sub
+
 
 ' --- SETUP / BINDING ---
 
@@ -3083,10 +3168,12 @@ Private Sub SetupGridSizes()
     
     Me.DS_HR_BG.Left = 0
     Me.DS_HR_BG.Width = pGridCellSizeX * pMaxAvailColumns
+    Me.DS_PAGE_ROW_NUM.Left = 0
+    Me.DS_PAGE_ROW_NUM.Width = pGridCellSizeX * pMaxAvailColumns
     Me.Width = pGridCellSizeX * pMaxAvailColumns
 End Sub
 
-Public Sub SetupColumns(ByVal FirstColumnIndex As Long, ByRef dsT As dsTable)
+Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long, ByRef dsT As dsTable)
     Dim i As Long, sNames As Variant
     
     sNames = dsT.GetColumnNames(FirstColumnIndex, pMaxAvailColumns)
@@ -3097,6 +3184,23 @@ Public Sub SetupColumns(ByVal FirstColumnIndex As Long, ByRef dsT As dsTable)
         End With
         Me.Controls("DS_HC_2_" & CStr(i)) = sNames(i - 1)
     Next i
+    
+    pFirstInactiveColumnIndex = Max(Min(dsT.ColumnCount - FirstColumnIndex, pMaxAvailColumns), 0)
+    pFirstInactiveRowIndex = Max(dsT.Count - FirstRowIndex, 0)
+    SetupInactiveColumnsBackground
+End Sub
+
+Private Sub SetupInactiveColumnsBackground()
+    With Me.DS_RC_BG_INACTIVE
+        If pFirstInactiveColumnIndex < pMaxAvailColumns Then
+            .Width = 15
+            .Left = Me.Controls("DS_RC_1_" & CStr(pFirstInactiveColumnIndex + 1)).Left
+            .Width = Me.Width - .Left - 150
+            If Not .Visible Then .Visible = True
+        Else
+            If .Visible Then .Visible = False
+        End If
+    End With
 End Sub
 
 Friend Sub SetSelectedColumns(ByRef aX As ArrayListEx)
@@ -3167,6 +3271,9 @@ Private Function TryGetActiveControl(ByRef OutActiveControl As Variant) As Boole
 Finally:
 End Function
 
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+
 
 ' --- MISC ---
 
@@ -3179,4 +3286,14 @@ Private Function ColumnLetter(ByVal ColumnIndex As Long) As String
         ColumnLetter = VBA.Mid$(sChars, Int(ColumnIndex / 26), 1) & _
                        VBA.Mid$(sChars, 1 + (ColumnIndex Mod 26), 1)
     End If
+End Function
+
+' =GetPositionInRecordset([Formulario])
+Public Function GetPositionInRecordset(ByVal f As Access.Form) As Long
+    GetPositionInRecordset = CLng(f.Bookmark(0))
+End Function
+
+Public Function GetPageRowNum() As Long
+    GetPageRowNum = CLng(Me.Bookmark(0))
+    If GetPageRowNum >= pFirstInactiveRowIndex + 1 Then GetPageRowNum = 0
 End Function

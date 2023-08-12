@@ -313,8 +313,7 @@ Begin Form
             Name ="Detalle"
             AlternateBackThemeColorIndex =4
             AlternateBackTint =40.0
-            BackThemeColorIndex =9
-            BackTint =40.0
+            BackThemeColorIndex =1
             Begin
                 Begin Subform
                     CanGrow = NotDefault
@@ -495,18 +494,24 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
 End Function
 
 Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
-    Dim sView As TViewportState, lgChanged As Boolean
+    Dim sView As TViewportState
     
     sView = GetViewportStateAt(X, Y)
-    WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
+    'Worksheet.Painting = False
     
     If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
+        Worksheet.Painting = False
+        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
         Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
-        Worksheet.SetupColumns sView.TrackIndex * sView.ColumnsToLargeChangeTrack, Scrollview.Table
+        Worksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, Scrollview.Table
+        Worksheet.Painting = True
+    Else
+        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
     End If
     
     AdjustScrollY sView
+    'Worksheet.Painting = True
     this = sView
 End Sub
 
@@ -572,7 +577,7 @@ Public Sub OnSourceTableChange()
 End Sub
 
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
-    Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long
+    Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long, RowStartIndex As Long
 
     Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
@@ -582,12 +587,17 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
         Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
     Else
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
+            ' TODO: Add empty rows up to PageSize * PageCount
             Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
         Else
-            nRows = Min(dsT.Count - (PageSize * PageIndex * NumPagesInLargeChangeRows), PageSize * PageCount)
-            Set dsT2 = dsT.GetRange(PageSize * PageIndex * NumPagesInLargeChangeRows, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
+            nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
+            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
             Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
             Set dsT2 = dsT2.Join(dsT3)
+            If nRows < PageSize * PageCount Then
+                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+            End If
             Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
         End If
     End If

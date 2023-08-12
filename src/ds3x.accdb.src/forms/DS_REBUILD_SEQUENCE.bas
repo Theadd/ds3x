@@ -1231,7 +1231,7 @@ Private Function CreateListItemHeader(Optional ByVal Title As String = "") As Va
         CreateListItemHeader = Array(pIndexCountdown, Title, 4)
     Else
         CreateListItemHeader = Array(pIndexCountdown, _
-            "<div align=center><font face=""72 Black"" size=1 color=""#A5A5A5"">" & Title & "</font><font color=white>&nbsp;&nbsp;.<br>" & _
+            "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5"">" & Title & "</font><font color=white>&nbsp;&nbsp;.<br>" & _
             "</font><font style=""BACKGROUND-COLOR:#808080"">______ _______ _________ ________ ________ _______ ____ ______ _____</font></div>", _
             4)
     End If
