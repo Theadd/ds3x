@@ -352,6 +352,27 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
 End Function
 
+' Concatenate all elements of TargetArray as additional columns into a new ArrayListEx
+Public Function Join(ByVal TargetArray As ArrayListEx) As ArrayListEx
+    Dim i As Long, c As Long, cMax As Long, cMax2 As Long, aX As ArrayListEx, Aux As ArrayListEx
+    
+    Set aX = ArrayListEx.Create()
+    Set Aux = ArrayListEx.Create()
+    cMax = Me.ColumnCount - 1
+    cMax2 = TargetArray.ColumnCount - 1
+    For i = 0 To Me.Count - 1
+        Aux.Clear
+        For c = 0 To cMax
+            Aux.Add Me(i)(c)
+        Next c
+        For c = 0 To cMax2
+            Aux.Add TargetArray(i)(c)
+        Next c
+        aX.Add Aux.ToArray()
+    Next i
+    
+    Set Join = aX
+End Function
 
 
 

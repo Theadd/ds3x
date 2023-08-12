@@ -205,17 +205,28 @@ End Function
 
 ' Concatenate all elements of dsTable as additional columns into a new dsTable
 Public Function Join(ByVal TargetTable As dsTable) As dsTable
-    Set Join = Me _
-                .Create(Me.RecordArray.Join(TargetTable.RecordArray)) _
-                .SetHeaders(Me.HeaderArray.Join(TargetTable.HeaderArray))
+    Dim dsT As dsTable
+    
+    Select Case 0
+        Case Me.Count, Me.ColumnCount, TargetTable.ColumnCount, TargetTable.Count
+            Set dsT = Me.Create(Me.RecordList.Join(TargetTable.RecordList))
+        Case Else
+            Set dsT = Me.Create(Me.RecordArray.Join(TargetTable.RecordArray))
+    End Select
+
+    Set Join = dsT.SetHeaders(Me.HeaderList.Join(TargetTable.HeaderList))
 End Function
 
+Public Function AddRange(ByVal TargetTable As dsTable) As dsTable
+    Set AddRange = Me _
+                .Create(Me.RecordList.AddRange(TargetTable.RecordList)) _
+                .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count))
+End Function
 
 '
 '
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
-
     Set GetRange = Me.Create(Me.Records.GetRange(Index, GetCount, ColumnIndexes)) _
                      .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count, ColumnIndexes))
 End Function
@@ -271,7 +282,6 @@ ExitFunc:
 ErrorHandler:
     On Error GoTo ExitFunc
     Debug.Print CStr(Err.Number) & " - " & Err.Description
-    Stop
     Resume Next
 End Function
 
@@ -525,6 +535,7 @@ Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Opti
     
     GetColumnNames = t
 End Function
+
 
 ' --- TYPE CASTING ---
 
