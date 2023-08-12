@@ -38,22 +38,24 @@ End Property
 'Sets or returns an item for a specified key.
 Public Property Get Item(ByVal Index As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
-        Index = CLng(Index)
-        Select Case Index
-                Case Is < 0
-                        Index = Instance.Count + Index
-                        If Index < 0 Then Exit Property
-                        Assign Item, Instance(Index)
-                Case Is < Instance.Count
-                        Assign Item, Instance(Index)
-        End Select
+    Index = CLng(Index)
+    Select Case Index
+        Case Is < 0
+            Index = Instance.Count + Index
+            If Index < 0 Then Exit Property
+            Assign Item, Instance(Index)
+        Case Is < Instance.Count
+            Assign Item, Instance(Index)
+    End Select
 End Property
 
 Public Property Let Item(ByVal Index As Variant, Value As Variant)
+    If Index >= Instance.Count Then Allocate Index
     Instance(CLng(Index)) = Value
 End Property
 
 Public Property Set Item(ByVal Index As Variant, Value As Variant)
+    If Index >= Instance.Count Then Allocate Index
     Set Instance(CLng(Index)) = Value
 End Property
 
@@ -350,6 +352,27 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
 End Function
 
+' Concatenate all elements of TargetArray as additional columns into a new ArrayListEx
+Public Function Join(ByVal TargetArray As ArrayListEx) As ArrayListEx
+    Dim i As Long, c As Long, cMax As Long, cMax2 As Long, aX As ArrayListEx, Aux As ArrayListEx
+    
+    Set aX = ArrayListEx.Create()
+    Set Aux = ArrayListEx.Create()
+    cMax = Me.ColumnCount - 1
+    cMax2 = TargetArray.ColumnCount - 1
+    For i = 0 To Me.Count - 1
+        Aux.Clear
+        For c = 0 To cMax
+            Aux.Add Me(i)(c)
+        Next c
+        For c = 0 To cMax2
+            Aux.Add TargetArray(i)(c)
+        Next c
+        aX.Add Aux.ToArray()
+    Next i
+    
+    Set Join = aX
+End Function
 
 
 
@@ -424,6 +447,14 @@ Private Function ValueToCSV(ByVal Value As Variant) As String
 End Function
 
 ' --- PRIVATE METHODS ---
+
+Private Sub Allocate(ByVal Index As Variant)
+    Dim i As Long
+    
+    For i = Instance.Count To Index
+        Instance.Add Empty
+    Next i
+End Sub
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     If Not IsMissing(Value) Then

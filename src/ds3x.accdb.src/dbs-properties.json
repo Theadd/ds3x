@@ -112,6 +112,10 @@
       "Value": 142,
       "Type": 3
     },
+    "Property Sheet Label Width": {
+      "Value": 2715,
+      "Type": 4
+    },
     "QueryTimeout": {
       "Value": 60,
       "Type": 3

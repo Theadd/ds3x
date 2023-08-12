@@ -205,17 +205,28 @@ End Function
 
 ' Concatenate all elements of dsTable as additional columns into a new dsTable
 Public Function Join(ByVal TargetTable As dsTable) As dsTable
-    Set Join = Me _
-                .Create(Me.RecordArray.Join(TargetTable.RecordArray)) _
-                .SetHeaders(Me.HeaderArray.Join(TargetTable.HeaderArray))
+    Dim dsT As dsTable
+    
+    Select Case 0
+        Case Me.Count, Me.ColumnCount, TargetTable.ColumnCount, TargetTable.Count
+            Set dsT = Me.Create(Me.RecordList.Join(TargetTable.RecordList))
+        Case Else
+            Set dsT = Me.Create(Me.RecordArray.Join(TargetTable.RecordArray))
+    End Select
+
+    Set Join = dsT.SetHeaders(Me.HeaderList.Join(TargetTable.HeaderList))
 End Function
 
+Public Function AddRange(ByVal TargetTable As dsTable) As dsTable
+    Set AddRange = Me _
+                .Create(Me.RecordList.AddRange(TargetTable.RecordList)) _
+                .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count))
+End Function
 
 '
 '
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
-
     Set GetRange = Me.Create(Me.Records.GetRange(Index, GetCount, ColumnIndexes)) _
                      .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count, ColumnIndexes))
 End Function
@@ -271,7 +282,6 @@ ExitFunc:
 ErrorHandler:
     On Error GoTo ExitFunc
     Debug.Print CStr(Err.Number) & " - " & Err.Description
-    Stop
     Resume Next
 End Function
 
@@ -407,12 +417,12 @@ Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByV
 End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx
     
     iRow = GetHeaderNames
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    Set allValues = Me.RecordList
+    Set AllValues = Me.RecordList
     
     With rs
         For c = cMin To cMax
@@ -422,7 +432,7 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
         .Open
         
         For i = 0 To Me.Count - 1
-            .AddNew FieldList:=iRow, Values:=allValues(i)
+            .AddNew FieldList:=iRow, Values:=AllValues(i)
         Next i
         
         If Me.Count > 0 Then .MoveFirst
@@ -431,15 +441,31 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
     Set CreateNamedRecordset = rs
 End Function
 
-Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, allValues As ArrayListEx, iMax As Long
+
+Public Function CreateIndexRecordset( _
+        Optional ByVal PageSize As Variant, _
+        Optional ByVal PageIndex As Variant, _
+        Optional ByVal PageCount As Long = 1, _
+        Optional ByVal ColumnStartIndex As Variant, _
+        Optional ByVal ColumnsCount As Variant, _
+        Optional ByVal ColumnIndexStartsOnZero As Boolean = False _
+        ) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, iMax As Long
     
     If IsMissing(PageSize) Then PageSize = Me.Count
     If IsMissing(PageIndex) Then PageIndex = 0
-    iRow = CreateIndexHeaders
+    If IsMissing(ColumnStartIndex) Then ColumnStartIndex = 0
+    If IsMissing(ColumnsCount) Then ColumnsCount = Me.ColumnCount - ColumnStartIndex
+    
+    iRow = CreateIndexHeaders(ColumnStartIndex, ColumnsCount, ColumnIndexStartsOnZero)
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    Set allValues = Me.RecordList
+    
+    If ColumnStartIndex <> 0 Or ColumnsCount <> Me.ColumnCount Then
+        Set AllValues = Me.RecordList.GetRange(, , CreateIndexHeaders(ColumnStartIndex, ColumnsCount, False))
+    Else
+        Set AllValues = Me.RecordList
+    End If
     
     With rs
         For c = cMin To cMax
@@ -447,10 +473,10 @@ Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Option
         Next c
         
         .Open
-        iMax = (PageSize * (PageIndex + 1)) - 1
+        iMax = ((PageSize * (PageIndex + 1)) - 1) + ((PageCount - 1) * PageSize)
         If iMax > Me.Count - 1 Then iMax = Me.Count - 1
         For i = (PageSize * PageIndex) To iMax
-            .AddNew FieldList:=iRow, Values:=allValues(i)
+            .AddNew FieldList:=iRow, Values:=AllValues(i)
         Next i
         
         If Me.Count > 0 Then .MoveFirst
@@ -459,18 +485,24 @@ Private Function CreateIndexRecordset(Optional ByVal PageSize As Variant, Option
     Set CreateIndexRecordset = rs
 End Function
 
-Private Function CreateIndexHeaders() As Variant
-    Dim t As Variant, c As Long, cMax As Long
-    cMax = Me.ColumnCount - 1
+Private Function CreateIndexHeaders(ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long, ByVal ColumnIndexStartsOnZero As Boolean) As Variant
+    Dim t As Variant, c As Long, cMax As Long, cMin As Long
+    cMax = (ColumnsCount - 1) ' + ColumnStartIndex
+    
+    If Not ColumnIndexStartsOnZero Then
+        cMin = ColumnStartIndex
+    End If
+    
     ReDim t(0 To cMax)
     
     For c = 0 To cMax
-        t(c) = CStr(c)
+        t(c) = CStr(c + cMin)
     Next c
     
     CreateIndexHeaders = t
 End Function
 
+' DEPRECATED, use GetColumnNames() instead.
 Public Function GetHeaderNames() As Variant
     Dim t As Variant, c As Long, d As Scripting.Dictionary, hItems As Variant
     ReDim t(0 To Me.ColumnCount - 1)
@@ -483,6 +515,25 @@ Public Function GetHeaderNames() As Variant
     Next c
     
     GetHeaderNames = t
+End Function
+
+Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Optional ByVal GetCount As Variant) As Variant
+    Dim t As Variant, c As Long, hItems As Variant, sLimit As Long
+    
+    If IsMissing(GetCount) Then GetCount = Me.ColumnCount - FirstColumnIndex
+    ReDim t(0 To GetCount - 1)
+    hItems = Me.HeaderList(0)
+    sLimit = IIf(Me.ColumnCount - FirstColumnIndex < GetCount, Me.ColumnCount - FirstColumnIndex, GetCount)
+    
+    For c = 0 To sLimit - 1
+        t(c) = CStr(hItems(c + FirstColumnIndex)("ColumnName"))
+    Next c
+    If sLimit < 0 Then sLimit = 0
+    For c = sLimit To GetCount - 1
+        t(c) = vbNullString
+    Next c
+    
+    GetColumnNames = t
 End Function
 
 

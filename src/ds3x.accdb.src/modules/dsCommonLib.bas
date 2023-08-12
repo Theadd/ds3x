@@ -100,6 +100,33 @@ Finally:
     End Function
 #End If
 
+' ---
+' TODO: REMOVE
+Public Sub ShowMemStats()
+    Dim Mem As MEMORYSTATUS
+    Mem.dwLength = LenB(Mem)
+#If Win64 Then
+    GlobalMemoryStatusEx Mem
+#Else
+    GlobalMemoryStatus Mem
+#End If
+
+    Debug.Print "Memory load:", , Mem.dwMemoryLoad; "%"
+    Debug.Print
+    Debug.Print "Total physical memory:", BytesToMB(Mem.dwTotalPhys)
+    Debug.Print "Physical memory free: ", BytesToMB(Mem.dwAvailPhys)
+    Debug.Print
+    Debug.Print "Total paging file:", BytesToMB(Mem.dwTotalPageFile)
+    Debug.Print "Paging file  free: ", BytesToMB(Mem.dwAvailPageFile)
+    Debug.Print
+    Debug.Print "Total virtual memory:", BytesToMB(Mem.dwTotalVirtual)
+    Debug.Print "Virtual memory free: ", BytesToMB(Mem.dwAvailVirtual)
+#If Win64 Then
+    Debug.Print "Virtual memory free: ", BytesToMB(Mem.dwAvailExtendedVirtual)
+#End If
+
+End Sub
+' ---
 
 ' --- Utility Functions ---
 

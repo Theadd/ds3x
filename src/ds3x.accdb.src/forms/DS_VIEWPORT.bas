@@ -18,9 +18,9 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =14542
+    Width =3436
     DatasheetFontHeight =11
-    ItemSuffix =1572
+    ItemSuffix =1559
     Left =4065
     Top =3030
     Right =28545
@@ -29,11 +29,8 @@ Begin Form
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="ds3x - LiveEd"
+    Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
-    OnTimer ="[Event Procedure]"
-    OnResize ="[Event Procedure]"
-    OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
     FilterOnLoad =0
     SplitFormDatasheet =1
@@ -70,13 +67,6 @@ Begin Form
             Width =850
             Height =850
             BorderShade =65.0
-            GridlineShade =65.0
-        End
-        Begin Line
-            BorderLineStyle =0
-            Width =1701
-            BorderThemeColorIndex =0
-            GridlineThemeColorIndex =1
             GridlineShade =65.0
         End
         Begin CommandButton
@@ -319,34 +309,55 @@ Begin Form
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =5700
+            Height =2865
             Name ="Detalle"
             AlternateBackThemeColorIndex =4
             AlternateBackTint =40.0
-            BackThemeColorIndex =3
+            BackThemeColorIndex =1
             Begin
+                Begin Subform
+                    CanGrow = NotDefault
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    OldBorderStyle =0
+                    Top =15
+                    Width =3433
+                    Height =2835
+                    TabIndex =1
+                    BorderColor =10921638
+                    Name ="DS_WORKSHEET"
+                    SourceObject ="Form.DS_WORKSHEET"
+                    GroupTable =2
+                    LeftPadding =0
+                    TopPadding =15
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =3433
+                    LayoutCachedHeight =2850
+                    LayoutGroup =1
+                    GroupTable =2
+                End
                 Begin CommandButton
-                    OverlapFlags =93
+                    OverlapFlags =85
                     TextFontCharSet =177
                     TextFontFamily =0
-                    Left =284
-                    Top =284
                     Width =15
                     Height =15
                     FontSize =1
                     FontWeight =100
-                    TabIndex =1
                     Name ="HiddenControl"
+                    Caption ="Comando1435"
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
 
-                    LayoutCachedLeft =284
-                    LayoutCachedTop =284
-                    LayoutCachedWidth =299
-                    LayoutCachedHeight =299
+                    LayoutCachedWidth =15
+                    LayoutCachedHeight =15
                     Alignment =1
                     ForeThemeColorIndex =1
                     ForeTint =100.0
@@ -371,115 +382,6 @@ Begin Form
                     QuickStyleMask =-1009
                     Overlaps =1
                 End
-                Begin Subform
-                    Visible = NotDefault
-                    TabStop = NotDefault
-                    OverlapFlags =215
-                    OldBorderStyle =0
-                    Top =30
-                    Width =10770
-                    Height =5670
-                    TabIndex =2
-                    BorderColor =10921638
-                    Name ="DS_MAIN_PANEL"
-                    GroupTable =2
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =10770
-                    LayoutCachedHeight =5700
-                    ColumnEnd =6
-                    LayoutGroup =1
-                    GridlineShade =50.0
-                    GroupTable =2
-                End
-                Begin Subform
-                    Visible = NotDefault
-                    OverlapFlags =85
-                    OldBorderStyle =0
-                    Left =10800
-                    Top =30
-                    Width =3734
-                    Height =5670
-                    BorderColor =10921638
-                    Name ="DS_SIDE_PANEL"
-                    GroupTable =2
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-
-                    LayoutCachedLeft =10800
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =14534
-                    LayoutCachedHeight =5700
-                    ColumnStart =8
-                    ColumnEnd =8
-                    LayoutGroup =1
-                    GridlineShade =50.0
-                    WidthStretch =33
-                    GroupTable =2
-                    Begin
-                        Begin Label
-                            OverlapFlags =85
-                            TextFontCharSet =177
-                            TextAlign =1
-                            TextFontFamily =0
-                            Left =10770
-                            Top =30
-                            Width =30
-                            Height =5670
-                            BorderColor =8355711
-                            ForeColor =8355711
-                            Name ="DS_VERTICAL_SPLITTER"
-                            GroupTable =2
-                            LeftPadding =0
-                            TopPadding =15
-                            RightPadding =0
-                            BottomPadding =0
-                            GridlineStyleLeft =1
-                            GridlineStyleTop =1
-                            GridlineColor =8355711
-                            VerticalAnchor =2
-                            LayoutCachedLeft =10770
-                            LayoutCachedTop =30
-                            LayoutCachedWidth =10800
-                            LayoutCachedHeight =5700
-                            ColumnStart =7
-                            ColumnEnd =7
-                            LayoutGroup =1
-                            WidthStretch =33
-                            GridlineShade =50.0
-                            GroupTable =2
-                        End
-                    End
-                End
-                Begin Line
-                    OverlapFlags =85
-                    Top =15
-                    Width =14542
-                    Name ="Línea1571"
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    HorizontalAnchor =2
-                    LayoutCachedTop =15
-                    LayoutCachedWidth =14542
-                    LayoutCachedHeight =15
-                    BorderThemeColorIndex =1
-                    BorderShade =50.0
-                End
             End
         End
     End
@@ -492,108 +394,219 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private WithEvents pController As dsLiveEd
-Attribute pController.VB_VarHelpID = -1
+Private Declare PtrSafe Function SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As LongPtr, ByVal wMsg As Long, ByVal wParam As LongPtr, lParam As Any) As LongPtr
 
-Property Get IsSubform() As Boolean
-    On Error Resume Next
-    IsSubform = Len(Me.Parent.Name) > 0
-End Property
+Private Const WM_VSCROLL = &H115
+Private Const SB_LINEUP = 0
+Private Const SB_LINEDOWN = 1
+Private Const SB_TOP = 6
 
-Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property
-Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Property
+Private pWorksheet As Form_DS_WORKSHEET
+Private pScrollview As Form_DS_SCROLLVIEW
+
+' The current ColumnsToLargeChangeTrack value used in CachedTracks, CachedTracks resets when this value changes
+Private pTrackColumnSizesInCache As Long
+Const NumPagesInLargeChangeRows As Long = 5
+Const PageSize As Long = 10
+Const PageCount As Long = 10
+
+Private Type TViewportState
+    ScrollPosX As Long
+    ScrollPosY As Long
+    ' Index of current visible track in Viewport
+    TrackIndex As Long
+    ' Index of current visible page in Viewport
+    PageIndex As Long
+    ' Index of the first visible column in **Table**
+    FirstVisibleColumn As Long
+    ' Index of the first visible row in **Table**
+    FirstVisibleRow As Long
+    ' The distance between the start of the first visible column to the viewport left edge (must be less than GridCellSizeX)
+    FirstVisibleColumnPositionModX As Long
+    ' Index of the first visible column relative to current visible **Track**
+    FirstVisibleColumnInTrack As Long
+    ' Index of the first visible row relative to current visible **Page**
+    FirstVisibleRowInPage As Long
+    ' Number of columns as the distance between track switching
+    ColumnsToLargeChangeTrack As Long
+    ' The distance from the current track left edge to the viewport left edge
+    TrackPositionModX As Long
+End Type
+
+Private this As TViewportState
+
+' ---
+
+Private pScrollX As Long
+Private pScrollY As Long
+
+Private pScrollModX As Long
+Private pScrollModY As Long
+
+Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
+Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
+
+Public Property Get Scrollview() As Form_DS_SCROLLVIEW: Set Scrollview = pScrollview: End Property
+Public Property Set Scrollview(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollview = Value: End Property
+
+Friend Property Get FirstColumnIndex() As Long: FirstColumnIndex = this.TrackIndex * this.ColumnsToLargeChangeTrack: End Property
+
+Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 
 
-
-Private Sub Form_Load()
-    ScreenLib_Resync
-    
-    WindowSizeTo Me, 22030, 11000
-    WindowCenterTo Me, ScreenLib.PrimaryScreen
-
-    Me.TimerInterval = 1
-End Sub
-
-Private Sub Bind(ByVal TargetController As dsLiveEd)
-    Debug.Print "  # Form_Bind() ObjPtr(Me): " & CStr(ObjPtr(Me))
-    
-    If (Not TargetController Is Nothing) And (Not pController Is Nothing) Then
-        ' More than one DS_LIVE_EDITOR windows can point to the same dsLiveEd controller
-        ' But NOT more than one dsLiveEd instance can point to the same window, so:
-        ' Unbind this form from controller's pLiveEditor if ObjPtr's of TargetController and pController differ
-        If ObjPtr(pController) <> ObjPtr(TargetController) Then
-            If Not pController.LiveEditor Is Nothing Then
-                If ObjPtr(pController.LiveEditor) = ObjPtr(Me) Then
-                    Set pController.LiveEditor = Nothing
-                End If
-            End If
-            Set pController = Nothing
-        End If
-    End If
-    Set pController = TargetController
-
-    Me.DS_MAIN_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_MAIN_PANEL"
-    Me.DS_SIDE_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_SIDE_PANEL"
-    Set Me.DS_SIDE_PANEL.Form.Controller = pController
-    Set Me.DS_MAIN_PANEL.Form.Controller = pController
-    Me.DS_SIDE_PANEL.Visible = True
-'    If pController.TaskController.Initialized Then
-        Me.DS_MAIN_PANEL.Visible = True
-'    End If
-End Sub
-
-Private Sub Form_Resize()
-    ResizeToFitAllControls
-End Sub
-
-Private Sub Form_Timer()
-    Me.TimerInterval = 0
-
-    If pController Is Nothing Then
-        Dim d As dsLiveEd
-        Set d = New dsLiveEd
-        Bind d
-        Set d.LiveEditor = Me
-        d.DisposeOnClose = True
-        ' TODO: REMOVE 3 LINES BELOW
-'        pController.LoadADifferentSetOfSampleValues
-'        pController.MockAddTasks
-'        Debug.Print Printf("Mocked Tasks: %1", pController.TaskController.RebuildSequence.Count)
-    End If
-End Sub
+' --- FORM EVENTS ---
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
-    pController.TriggerLiveEditorWindowClose True
-    Set pController = Nothing
+    Me.TimerInterval = 0
 End Sub
 
 
-Private Sub ResizeToFitAllControls()
-    Dim parentWidth As Long, pSize As Long
+' --- SETUP / BINDING ---
+
+Public Sub Setup()
+    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long
     
-    Focus Me
-    parentWidth = Me.InsideWidth
+    Set Worksheet = Me.DS_WORKSHEET.Form
+    Set Worksheet.Viewport = Me
+    Worksheet.Setup
     
-    pSize = Me.DS_SIDE_PANEL.Width
-    Me.DS_SIDE_PANEL.Left = parentWidth - pSize
-    pSize = pSize + Me.DS_VERTICAL_SPLITTER.Width
-    Me.DS_VERTICAL_SPLITTER.Left = parentWidth - pSize
-    Me.DS_MAIN_PANEL.Width = parentWidth - (pSize + Me.DS_MAIN_PANEL.Left)
-    ' Force resize event on side panel subform as quick fix for incorrect rendering
-    If Me.DS_SIDE_PANEL.Width Mod 2 = 0 Then
-        Me.DS_SIDE_PANEL.Width = Me.DS_SIDE_PANEL.Width - 15
+    r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
+    b = ScreenLib.RectToBounds(r)
+    
+    t = Worksheet.MaxContentWidthLimit
+    Me.Width = t
+    Me.Detalle.Height = CLng(Min(b.h * 1.95, 31500))
+    With Me.DS_WORKSHEET
+        .Left = 0
+        .Top = 0
+        .Width = t
+        .Height = CLng(Min(b.h * 1.95, 31500))
+    End With
+End Sub
+
+
+' --- SCROLLING ---
+
+Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
+    On Error Resume Next
+    pScrollview.PropagateMouseWheel Page, Count
+End Function
+
+Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
+    Dim sView As TViewportState
+    
+    sView = GetViewportStateAt(X, Y)
+    'Worksheet.Painting = False
+    
+    If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
+        Worksheet.Painting = False
+        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
+        pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
+        Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
+        Worksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, Scrollview.Table
+        Worksheet.Painting = True
     Else
-        Me.DS_SIDE_PANEL.Width = Me.DS_SIDE_PANEL.Width + 15
+        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
+    End If
+    
+    AdjustScrollY sView
+    'Worksheet.Painting = True
+    this = sView
+End Sub
+
+Private Sub AdjustScrollY(ByRef sView As TViewportState)
+    Dim rowOrigin As Long, hW As LongPtr, i As Long
+    
+    rowOrigin = this.FirstVisibleRowInPage
+    hW = Worksheet.hWnd
+    If this.PageIndex <> sView.PageIndex Then
+        SendMessage hW, WM_VSCROLL, SB_TOP, 0&
+        rowOrigin = 0
+    End If
+    If rowOrigin <> sView.FirstVisibleRowInPage Then
+        Worksheet.Painting = False
+        If rowOrigin < sView.FirstVisibleRowInPage Then
+            For i = rowOrigin To sView.FirstVisibleRowInPage - 1
+                SendMessage hW, WM_VSCROLL, SB_LINEDOWN, 0&
+            Next i
+        ElseIf rowOrigin > sView.FirstVisibleRowInPage Then
+            For i = rowOrigin - 1 To sView.FirstVisibleRowInPage Step -1
+                SendMessage hW, WM_VSCROLL, SB_LINEUP, 0&
+            Next i
+        End If
+        Worksheet.Painting = True
     End If
 End Sub
 
-Private Sub pController_OnDataSourceChange()
-    If Not Me.DS_MAIN_PANEL.Visible Then Me.DS_MAIN_PANEL.Visible = True
+
+' --- STATE MANAGEMENT ---
+
+Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewportState
+    Dim t As TViewportState, maxTrackWidth As Long, cellWidth As Long, viewWidth As Long, cellHeight As Long
+    
+    t.ScrollPosX = X
+    t.ScrollPosY = Y
+    
+    maxTrackWidth = Worksheet.MaxContentWidthLimit
+    cellWidth = Worksheet.GridCellSizeX
+    cellHeight = Worksheet.GridCellSizeY
+    viewWidth = Scrollview.ScrollPageSizeX
+    
+    t.ColumnsToLargeChangeTrack = Max(CLng((maxTrackWidth - viewWidth) / cellWidth) - 1, 1)
+    
+    t.FirstVisibleColumn = CLng(Int(X / cellWidth))
+    t.FirstVisibleRow = CLng(Int(Y / cellHeight))
+    t.FirstVisibleColumnPositionModX = X Mod cellWidth
+    t.TrackIndex = CLng(Int(X / (cellWidth * t.ColumnsToLargeChangeTrack)))
+    t.PageIndex = CLng(Int(t.FirstVisibleRow / (PageSize * NumPagesInLargeChangeRows)))
+    t.FirstVisibleColumnInTrack = t.FirstVisibleColumn - (t.ColumnsToLargeChangeTrack * t.TrackIndex)
+    t.FirstVisibleRowInPage = t.FirstVisibleRow - (t.PageIndex * PageSize * NumPagesInLargeChangeRows)
+    t.TrackPositionModX = (t.FirstVisibleColumnInTrack * cellWidth) + t.FirstVisibleColumnPositionModX
+    
+    GetViewportStateAt = t
+End Function
+
+Public Sub OnSourceTableChange()
+    this.TrackIndex = -1
+    If Scrollview.KeepScrollPositionOnTableChange Then
+        ScrollTo this.ScrollPosX, this.ScrollPosY
+    Else
+        ScrollTo 0, 0
+    End If
 End Sub
 
-Private Sub Focus(ByRef frm As Access.Form)
-    On Error Resume Next
-    frm.Controls("HiddenControl").SetFocus
-    DoEvents
-End Sub
+Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
+    Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long, RowStartIndex As Long
+
+    Set dsT = Scrollview.Table
+    ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
+    nCols = Worksheet.MaxAvailColumns
+
+    If ColumnStartIndex >= dsT.ColumnCount Then
+        Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
+    Else
+        If dsT.ColumnCount - ColumnStartIndex > nCols Then
+            ' TODO: Add empty rows up to PageSize * PageCount
+            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
+        Else
+            RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
+            nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
+            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
+            Set dsT2 = dsT2.Join(dsT3)
+            If nRows < PageSize * PageCount Then
+                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+            End If
+            Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
+        End If
+    End If
+    
+    Set GetTrack = rX
+End Function
+
+
+' --- HELPERS ---
+
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function

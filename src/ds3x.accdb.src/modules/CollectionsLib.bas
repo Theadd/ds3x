@@ -26,8 +26,8 @@ Private Const JSON_SERIALIZER As String = "'object'!=typeof JSON&&(JSON={}),func
 '    PatternMatching As PatternMatchingType,
 '    Tokens() As Variant
 ' )
-' Donde Tokens() es un array de arrays, delimitando el primer nivel del array con el operador lÃ³gico AND y el
-' segundo nivel con el operador lÃ³gico OR. Una posible representaciÃ³n serÃ­a: Tokens() = ANDs(ORs()).
+' Donde Tokens() es un array de arrays, delimitando el primer nivel del array con el operador lógico AND y el
+' segundo nivel con el operador lógico OR. Una posible representación sería: Tokens() = ANDs(ORs()).
 '
 
 Public Enum PatternMatchingType
@@ -86,31 +86,27 @@ End Function
 
 ' ---
 
-Public Function CreateDSLiveEd() As dsLiveEd
-    Set CreateDSLiveEd = New dsLiveEd
-End Function
-
 
 ' Devuelve un array estructurado en formato SearchDefinition como el descrito en los comentarios de la parte superior
-' de este mÃ³dulo, partiendo de una SearchString que puede estar compuesta por mÃºltiples criterios de bÃºsqueda y en
+' de este módulo, partiendo de una SearchString que puede estar compuesta por múltiples criterios de búsqueda y en
 ' distintos formatos.
 '
-' Se pueden usar los siguientes carÃ¡cteres especiales:
-'   ' ' (espacio)   -> Operador lÃ³gico AND.
-'   '|'             -> Operador lÃ³gico OR.
-'   '"'             -> 1. Interpreta el texto entre comillas dobles como un solo criterio de bÃºsqueda.
+' Se pueden usar los siguientes carácteres especiales:
+'   ' ' (espacio)   -> Operador lógico AND.
+'   '|'             -> Operador lógico OR.
+'   '"'             -> 1. Interpreta el texto entre comillas dobles como un solo criterio de búsqueda.
 '                         Es decir, 'A "B C"' se convertiria en: 'A' AND 'B C'.
-'                      2. Pero tambiÃ©n se puede utilizar para forzar un match exacto sobre un valor en lugar de parcial
+'                      2. Pero también se puede utilizar para forzar un match exacto sobre un valor en lugar de parcial
 '                         si estos engloban todo el contenido del texto.
-'                         Es decir, '"XYZ"' solo harÃ¡ match si un valor es exactamente 'XYZ', en este caso, no haria
+'                         Es decir, '"XYZ"' solo hará match si un valor es exactamente 'XYZ', en este caso, no haria
 '                         match si por ejemplo el valor es 'AXYZ'.
 '
-' Si el valor devuelto es utilizado juntamente con TryMatchSearchDefinitionIn, tambiÃ©n acepta los carÃ¡cteres especiales del 'Like':
-'   '?'             -> Cualquier carÃ¡cter.
-'   '#'             -> Cualquier dÃ­gito (0-9).
-'   '*'             -> Cero o mÃ¡s carÃ¡cteres.
-'   '[charlist]     -> Cualquier carÃ¡cter en la lista.
-'   '[!charlist]    -> Cualquier carÃ¡cter que no estÃ© en la lista.
+' Si el valor devuelto es utilizado juntamente con TryMatchSearchDefinitionIn, también acepta los carácteres especiales del 'Like':
+'   '?'             -> Cualquier carácter.
+'   '#'             -> Cualquier dígito (0-9).
+'   '*'             -> Cero o más carácteres.
+'   '[charlist]     -> Cualquier carácter en la lista.
+'   '[!charlist]    -> Cualquier carácter que no esté en la lista.
 '
 Public Function GenerateSearchDefinition(ByVal SearchString As String) As Variant()
     Dim i As Long, k As Long, nGroups() As String, oGroups() As String, PatternMatching As Long, Tokens() As Variant
@@ -156,7 +152,7 @@ End Function
 
 ' Devuelve True si los criterios en la SearchDefinition coinciden con Items.
 '
-' Siendo Items una colecciÃ³n iterable como la propiedad .Fields de un Recordset o simplemente un Array de valores.
+' Siendo Items una colección iterable como la propiedad .Fields de un Recordset o simplemente un Array de valores.
 Public Function TryMatchSearchDefinitionIn(ByRef SearchDefinition As Variant, ByRef Items As Variant) As Boolean
     Dim sTerm As Variant, orTerm As Variant, isMatch As Boolean
     
@@ -183,9 +179,9 @@ End Function
 
 ' Similar a TryMatchSearchDefinitionIn pero mediante una SearchCriteria en lugar de una SearchDefinition.
 '
-' Siendo SearchCriteria una string que delimita los distintos criterios de bÃºsqueda mediante el carÃ¡cter
-' espacio " ", equivalente al operador lÃ³gico AND y mediante el caracter de barra vertical "|", equivalente
-' al operador lÃ³gico OR.
+' Siendo SearchCriteria una string que delimita los distintos criterios de búsqueda mediante el carácter
+' espacio " ", equivalente al operador lógico AND y mediante el caracter de barra vertical "|", equivalente
+' al operador lógico OR.
 Public Function TryMatchSearchCriteriaIn(ByRef SearchCriteria As Variant, ByRef Items As Variant) As Boolean
     Dim sTerm As Variant, orTerm As Variant, isMatch As Boolean
     
@@ -351,6 +347,75 @@ Private Function TokenizeArgs(ByRef SearchString As String) As String
       End If
    Next
    TokenizeArgs = sArgs
+End Function
+
+' EXAMPLE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
+Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
+    Dim t() As Variant, i As Long, aSize As Long
+
+    If IsMissing(RangeEnd) Then RangeEnd = RangeStart
+    aSize = RangeEnd - RangeStart
+    ReDim t(0 To aSize)
+
+    For i = 0 To aSize
+        t(i) = RangeStart + i
+    Next i
+
+    ArrayRange = t
+End Function
+
+Public Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
+    
+    ReDim iRow(0 To ColumnsCount - 1)
+    ReDim rValues(0 To ColumnsCount - 1)
+    
+    With rs
+        For i = LBound(iRow) To UBound(iRow)
+            iRow(i) = CStr(ColumnStartIndex + i)
+            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
+            rValues(i) = ""
+        Next i
+        .Open
+        For i = 0 To RowsCount - 1
+            .AddNew FieldList:=iRow, Values:=rValues
+        Next i
+        .MoveFirst
+    End With
+    
+    Set CreateBlankRecordset = rs
+End Function
+
+Public Function CreateBlankTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
+    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
+    
+    If RowsCount > 0 And ColumnsCount > 0 Then
+        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+        Set dsT = dsTable.Create(Array2dEx.Create(t))
+    Else
+        Set aX = ArrayListEx.Create()
+        If RowsCount > 0 Then
+            For i = 0 To RowsCount - 1
+                aX.Add Array()
+            Next i
+'            Set dsT = dsTable.Create(aX)
+'        ElseIf ColumnsCount > 0 Then
+'
+'        Else
+'
+        End If
+        Set dsT = dsTable.Create(aX)
+    End If
+    
+    If ColumnsCount > 0 Then
+        ReDim k(0 To ColumnsCount - 1)
+        For i = 0 To ColumnsCount - 1
+            k(i) = vbNullString
+        Next i
+        Set CreateBlankTable = dsT.SetHeaders(k)
+    Else
+        Set CreateBlankTable = dsT.SetHeaders(Array())
+    End If
 End Function
 
 

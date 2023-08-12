@@ -4,7 +4,6 @@ Begin Form
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
-    MaxButton = NotDefault
     MinButton = NotDefault
     ShortcutMenu = NotDefault
     AutoCenter = NotDefault
@@ -23,11 +22,11 @@ Begin Form
     GridY =10
     Width =8145
     DatasheetFontHeight =11
-    ItemSuffix =1577
-    Left =18645
-    Top =3165
-    Right =28455
-    Bottom =10380
+    ItemSuffix =1578
+    Left =4065
+    Top =3030
+    Right =21105
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -341,13 +340,13 @@ Begin Form
                     Top =3000
                     Width =5070
                     Height =1440
-                    FontSize =8
+                    FontSize =9
                     FontWeight =100
                     TabIndex =7
                     TopMargin =58
                     ForeColor =8355711
                     Name ="DS_TASK_TEXT_CONTENT"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     GroupTable =9
                     LeftPadding =0
                     TopPadding =119
@@ -384,13 +383,14 @@ Begin Form
                     Top =615
                     Width =2400
                     Height =330
-                    FontSize =8
+                    FontSize =9
                     FontWeight =100
                     TabIndex =2
                     BorderColor =16777215
                     Name ="DS_TASK_PARAM_0"
                     RowSourceType ="Value List"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
+                    OnChange ="[Event Procedure]"
                     GroupTable =3
                     LeftPadding =0
                     TopPadding =0
@@ -437,7 +437,6 @@ Begin Form
                             RightMargin =57
                             ForeColor =5855577
                             Name ="DS_LABEL_TASK_PARAM_0"
-                            Caption ="FirstNumber"
                             GroupTable =3
                             LeftPadding =0
                             TopPadding =0
@@ -471,13 +470,13 @@ Begin Form
                     Top =1065
                     Width =2400
                     Height =330
-                    FontSize =8
+                    FontSize =9
                     FontWeight =100
                     TabIndex =3
                     BorderColor =16777215
                     Name ="DS_TASK_PARAM_1"
                     RowSourceType ="Value List"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     GroupTable =4
                     LeftPadding =0
                     TopPadding =0
@@ -524,7 +523,6 @@ Begin Form
                             RightMargin =57
                             ForeColor =5855577
                             Name ="DS_LABEL_TASK_PARAM_1"
-                            Caption ="FirstNumber"
                             GroupTable =4
                             LeftPadding =0
                             TopPadding =0
@@ -558,13 +556,13 @@ Begin Form
                     Top =1515
                     Width =2400
                     Height =330
-                    FontSize =8
+                    FontSize =9
                     FontWeight =100
                     TabIndex =4
                     BorderColor =16777215
                     Name ="DS_TASK_PARAM_2"
                     RowSourceType ="Value List"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     GroupTable =5
                     LeftPadding =0
                     TopPadding =0
@@ -611,7 +609,6 @@ Begin Form
                             RightMargin =57
                             ForeColor =5855577
                             Name ="DS_LABEL_TASK_PARAM_2"
-                            Caption ="FirstNumber"
                             GroupTable =5
                             LeftPadding =0
                             TopPadding =0
@@ -645,13 +642,13 @@ Begin Form
                     Top =1965
                     Width =2400
                     Height =330
-                    FontSize =8
+                    FontSize =9
                     FontWeight =100
                     TabIndex =5
                     BorderColor =16777215
                     Name ="DS_TASK_PARAM_3"
                     RowSourceType ="Value List"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     GroupTable =6
                     LeftPadding =0
                     TopPadding =0
@@ -698,7 +695,6 @@ Begin Form
                             RightMargin =57
                             ForeColor =5855577
                             Name ="DS_LABEL_TASK_PARAM_3"
-                            Caption ="FirstNumber"
                             GroupTable =6
                             LeftPadding =0
                             TopPadding =0
@@ -729,6 +725,7 @@ Begin Form
                     OldBorderStyle =0
                     OverlapFlags =85
                     TextAlign =1
+                    TextFontFamily =49
                     BackStyle =0
                     IMESentenceMode =3
                     Left =2910
@@ -741,7 +738,7 @@ Begin Form
                     TopMargin =58
                     ForeColor =5026082
                     Name ="DS_TASK_DEFINITION_SYNTAX"
-                    FontName ="Nirmala UI"
+                    FontName ="Consolas"
                     GroupTable =7
                     LeftPadding =0
                     TopPadding =0
@@ -778,13 +775,13 @@ Begin Form
                     Top =2415
                     Width =2400
                     Height =330
-                    FontSize =8
+                    FontSize =9
                     FontWeight =100
                     TabIndex =6
                     BorderColor =16777215
                     Name ="DS_TASK_PARAM_4"
                     RowSourceType ="Value List"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     GroupTable =8
                     LeftPadding =0
                     TopPadding =0
@@ -831,7 +828,6 @@ Begin Form
                             RightMargin =57
                             ForeColor =5855577
                             Name ="DS_LABEL_TASK_PARAM_4"
-                            Caption ="FirstNumber"
                             GroupTable =8
                             LeftPadding =0
                             TopPadding =0
@@ -1063,6 +1059,55 @@ Begin Form
                         End
                     End
                 End
+                Begin CommandButton
+                    OverlapFlags =215
+                    TextFontCharSet =177
+                    Left =165
+                    Top =4755
+                    Width =1755
+                    Height =360
+                    FontSize =10
+                    TabIndex =10
+                    Name ="DS_ENABLE_ALL_TASKS_BUTTON"
+                    Caption ="ENABLE ALL TASKS"
+                    OnClick ="[Event Procedure]"
+                    GroupTable =13
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =15
+                    BottomPadding =15
+                    GridlineColor =10921638
+                    VerticalAnchor =1
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =165
+                    LayoutCachedTop =4755
+                    LayoutCachedWidth =1920
+                    LayoutCachedHeight =5115
+                    LayoutGroup =12
+                    ForeThemeColorIndex =1
+                    ForeTint =100.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =8
+                    BackTint =100.0
+                    BorderWidth =1
+                    BorderThemeColorIndex =8
+                    BorderTint =100.0
+                    ThemeFontIndex =-1
+                    HoverThemeColorIndex =8
+                    HoverTint =80.0
+                    PressedThemeColorIndex =8
+                    PressedShade =80.0
+                    HoverForeThemeColorIndex =1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =1
+                    PressedForeTint =100.0
+                    GroupTable =13
+                    QuickStyle =13
+                    QuickStyleMask =-1
+                    Overlaps =1
+                End
             End
         End
     End
@@ -1087,6 +1132,7 @@ Private pTaskGroups As DictionaryEx
 Private pActiveTaskName As String
 Private pActiveTaskIndex As Long
 Private pEditMode As Boolean
+Private pEnableAllTasks As Boolean
 
 '    {
 '      "AddRowNumbers": [
@@ -1178,7 +1224,7 @@ Public Sub RebuildTasksList()
         If Not pTaskGroups.Exists(TaskType) Then
             pTaskGroups.Add TaskType, ArrayListEx.Create()
         End If
-        ValidRequiredType = pEditMode Or (ActiveTaskType Like RequiresPattern)
+        ValidRequiredType = pEnableAllTasks Or pEditMode Or (ActiveTaskType Like RequiresPattern)
         pTaskGroups(TaskType).Add Array(i, TaskName, IIf(ValidRequiredType, 1, 4))
     Next i
     
@@ -1217,9 +1263,26 @@ End Function
 
 Private Function CreateListItemTextHeader(ByVal Title As String) As String
     CreateListItemTextHeader = _
-        "<div align=center><font face=""72 Black"" size=1 color=""#A5A5A5"">" & Title & "</font><font color=white>&nbsp;&nbsp;.<br>" & _
+        "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5""><b>" & Title & "</b></font><font color=white>&nbsp;&nbsp;.<br>" & _
         "</font><font style=""BACKGROUND-COLOR:#808080"">______ _______ _________ ________ ________ _______ ____ ______ _____</font></div>"
 End Function
+
+Private Sub DS_ENABLE_ALL_TASKS_BUTTON_Click()
+    pEnableAllTasks = Not pEnableAllTasks
+    RebuildTasksList
+End Sub
+
+Private Sub DS_TASK_PARAM_0_Change()
+    Dim Target As String
+    
+    If GetControlText(Me.DS_TASK_PARAM_0) = "< Select... >" Then
+        If FileSystemLib.TryFileOpenDialog(Target) Then
+            SetControlText Me.DS_TASK_PARAM_0, Target
+        Else
+            SetControlText Me.DS_TASK_PARAM_0, ""
+        End If
+    End If
+End Sub
 
 Private Sub Form_Load()
     Debug.Print RectToString(GetWindowRect(Me))
@@ -1323,6 +1386,9 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
             Else
                 .Value = ""
             End If
+        ElseIf TaskParams(ParamIndex)(0) Like "*TargetFile*" Then
+            .AddItem ""
+            .AddItem "< Select... >"
         Else
             Select Case TaskParams(ParamIndex)(1)
                 Case "Table", "Worksheet"
@@ -1330,6 +1396,14 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                     For Each Item In GetListOfPreviousTaskResults(TaskParams(ParamIndex)(1))
                         .AddItem CStr(Item)
                     Next Item
+                Case "String|Dictionary"
+                    Select Case TaskName
+                        Case "LoadFromExcelFile", "OpenWorksheetFromFile"
+                            .AddItem ""
+                            .AddItem "{""UpdateLinks"": false, ""ReadOnly"": true, ""Local"": true, ""UTF8"": false, ""NoTextQualifier"": true}"
+                        Case Else
+                            ' ...
+                    End Select
                 Case Else
                     ' ...
             End Select
@@ -1425,6 +1499,18 @@ Private Sub pController_OnChange()
     If pSelectedTask <> "" Then
         RebuildUIForTask pSelectedTask
     End If
+End Sub
+
+Private Function GetControlText(ByRef TargetControl As Access.Control) As String
+    On Error Resume Next
+    GetControlText = TargetControl.Value
+    GetControlText = TargetControl.Text
+End Function
+
+Private Sub SetControlText(ByRef TargetControl As Access.Control, ByVal Text As String)
+    On Error Resume Next
+    TargetControl.Value = Text
+    TargetControl.Text = Text
 End Sub
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)

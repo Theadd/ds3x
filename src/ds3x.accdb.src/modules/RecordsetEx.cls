@@ -115,11 +115,28 @@ Attribute Columns.VB_Description = "Equivalente a Recordset.Fields.Count"
     On Error Resume Next: Columns = Instance.Fields.Count
 End Property
 
-' Devuelve un RecordsetEx (Shallow Copy) apuntando a la fila especificada en ItemPosition.
-Public Property Get Item(ByVal ItemPosition As Long) As RecordsetEx
-Attribute Item.VB_Description = "Devuelve un RecordsetEx (Shallow Copy) apuntando a la fila especificada en ItemPosition."
-Attribute Item.VB_UserMemId = 0
-    Set Item = CreateShallowCopy(ItemPosition)
+' Devuelve un RecordsetEx (Shallow Copy) que se desplazará automáticamente a la fila (record)
+' indicada, pero solo en el momento en que se accede a sus respectivos campos o valores, ya que
+' al ser una "Shallow Copy" comparte la misma instancia del Recordset con el RecordsetEx original
+' y otras posibles copias.
+'
+' Como alternativa, puedes pasarle una String con el nombre de un campo o su posición (base 0)
+' para obtener dicho campo (ADODB.Field) o diréctamente su valor.
+'
+' Incluso se puede combinar ambas posibilidades para acceder directamente a un valor concreto.
+'
+' Es decir, dado el siguiente código: Set rX = RecordsetEx.Create(...)
+'   rX(4)       -> Devuelve un RecordsetEx (ShallowCopy), al acceder a sus valores, se moverá a la fila 4.
+'   rX("ID")    -> Devuelve un ADODB.Field del valor ID del registro al que esté apuntando rX.Instance en ese instante.
+'   rX(4)("ID") -> Se mueve a la fila 4 y devuelve el campo ID.
+'   rX(1)("0")    -> Se mueve a la primera fila y devuelve el campo en primera posición.
+'
+Public Property Get Item(ByVal NumRowOrFieldName As Variant) As Variant
+    If VarType(NumRowOrFieldName) = vbString Then
+        Set Item = Field(NumRowOrFieldName)
+    Else
+        Set Item = CreateShallowCopy(NumRowOrFieldName)
+    End If
 End Property
 
 ' Equivalente a Recordset.Fields
@@ -133,7 +150,13 @@ End Property
 Public Property Get Field(ByRef FieldNameOrIndex As Variant) As ADODB.Field
 Attribute Field.VB_Description = "Equivalente a Recordset.Fields(FieldNameOrIndex)"
     MoveToShallowRecord
+    On Error GoTo Fallback
     Set Field = Instance.Fields(FieldNameOrIndex)
+    Exit Property
+Fallback:
+    If VarType(FieldNameOrIndex) = vbString And CStr(Val(FieldNameOrIndex)) = CStr(FieldNameOrIndex) Then
+        Set Field = Instance.Fields(CLng(Val(FieldNameOrIndex)))
+    End If
 End Property
 
 ' Devuelve un array de strings con los nombres de las columnas del Recordset.

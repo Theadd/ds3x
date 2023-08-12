@@ -20,10 +20,10 @@ Begin Form
     Width =1361
     DatasheetFontHeight =11
     ItemSuffix =2096
-    Left =13395
-    Top =3165
-    Right =28455
-    Bottom =11835
+    Left =4065
+    Top =3030
+    Right =21105
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -601,7 +601,6 @@ Begin Form
                     Transparent = NotDefault
                     TabStop = NotDefault
                     OverlapFlags =247
-                    TextFontCharSet =177
                     TextFontFamily =49
                     Width =1361
                     Height =285
@@ -610,7 +609,7 @@ Begin Form
                     Name ="DS_LIST_ITEM_OVERLAY"
                     OnClick ="[Event Procedure]"
                     OnDblClick ="[Event Procedure]"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
@@ -686,7 +685,6 @@ End Sub
 
 Private Sub DS_LIST_ITEM_OVERLAY_Click()
     On Error GoTo Finally
-    Debug.Print "[EVENT] @DS_LIST_ITEM_OVERLAY.Click()"
 
     If CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_STATE)))) = 4 Then Exit Sub
     SetCurrentAsActiveIndex

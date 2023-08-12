@@ -1,12 +1,17 @@
 ﻿Version =20
 VersionRequired =20
 Begin Form
+    AllowFilters = NotDefault
+    AutoResize = NotDefault
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
-    AutoCenter = NotDefault
+    MaxButton = NotDefault
+    MinButton = NotDefault
     NavigationButtons = NotDefault
+    AllowDeletions = NotDefault
     DividingLines = NotDefault
+    AllowAdditions = NotDefault
     KeyPreview = NotDefault
     DataEntry = NotDefault
     AllowDesignChanges = NotDefault
@@ -14,36 +19,38 @@ Begin Form
     ViewsAllowed =1
     TabularCharSet =177
     TabularFamily =0
+    BorderStyle =0
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =27774
+    Width =31680
     DatasheetFontHeight =11
-    ItemSuffix =2052
-    Left =18480
-    Top =3045
-    Right =28530
-    Bottom =15210
-    OnUnload ="[Event Procedure]"
+    ItemSuffix =2084
+    Left =4065
+    Top =3030
+    Right =21105
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="GRID"
+    Caption ="WORKSHEET"
     DatasheetFontName ="Calibri"
-    OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
     OnMouseWheel ="[Event Procedure]"
+    FetchDefaults =0
     FilterOnLoad =0
     OrderByOnLoad =0
     SplitFormDatasheet =1
+    SaveSplitterBarPosition =0
+    FetchDefaults =0
     OrderByOnLoad =0
     SplitFormDatasheet =1
+    SaveSplitterBarPosition =0
     ShowPageMargins =0
     DisplayOnSharePointSite =1
     DatasheetAlternateBackColor =15921906
     DatasheetGridlinesColor12 =0
-    FitToScreen =255
     DatasheetBackThemeColorIndex =1
     BorderThemeColorIndex =3
     ThemeFontIndex =1
@@ -345,54 +352,20 @@ Begin Form
             ForeTint =75.0
         End
         Begin FormHeader
-            Height =630
-            Name ="EncabezadoDelFormulario"
+            Height =615
+            Name ="FormHeaders"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
             BackThemeColorIndex =3
             Begin
-                Begin TextBox
-                    TabStop = NotDefault
-                    OldBorderStyle =0
-                    OverlapFlags =93
-                    TextAlign =1
-                    BackStyle =0
-                    IMESentenceMode =3
-                    Left =284
-                    Top =170
-                    Width =15
-                    Height =15
-                    FontSize =1
-                    TabIndex =31
-                    TopMargin =851
-                    BackColor =-2147483603
-                    BorderColor =-2147483603
-                    Name ="ScrollCursor"
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    ShowDatePicker =0
-
-                    LayoutCachedLeft =284
-                    LayoutCachedTop =170
-                    LayoutCachedWidth =299
-                    LayoutCachedHeight =185
-                    BackThemeColorIndex =-1
-                    BorderThemeColorIndex =-1
-                    BorderShade =100.0
-                    ForeThemeColorIndex =1
-                    ForeTint =100.0
-                End
                 Begin Rectangle
                     SpecialEffect =0
                     BackStyle =1
                     OverlapFlags =93
                     Left =15
                     Top =270
-                    Width =27759
-                    Height =340
+                    Width =31621
+                    Height =326
                     BackColor =-2147483603
                     BorderColor =-2147483603
                     Name ="DS_HR_BG"
@@ -400,25 +373,23 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    HorizontalAnchor =2
                     LayoutCachedLeft =15
                     LayoutCachedTop =270
-                    LayoutCachedWidth =27774
-                    LayoutCachedHeight =610
+                    LayoutCachedWidth =31636
+                    LayoutCachedHeight =596
                     BorderShade =100.0
                 End
                 Begin CommandButton
                     TabStop = NotDefault
-                    OverlapFlags =85
+                    OverlapFlags =93
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =660
-                    Top =30
-                    Width =1935
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =2
+                    TabIndex =1
                     ForeColor =5855577
                     Name ="DS_HC_1_1"
                     Caption ="ABC"
@@ -435,13 +406,10 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =660
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =2595
-                    LayoutCachedHeight =270
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =1966
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
-                    ColumnStart =1
-                    ColumnEnd =1
                     LayoutGroup =1
                     ForeTint =65.0
                     WidthStretch =33
@@ -471,7 +439,7 @@ Begin Form
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =87
                     TextFontCharSet =177
                     TextFontFamily =0
                     IMESentenceMode =3
@@ -506,9 +474,8 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =660
-                    Top =270
-                    Width =1935
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =17
@@ -528,17 +495,15 @@ Begin Form
                     BottomPadding =0
                     GridlineStyleLeft =1
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =660
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =2595
-                    LayoutCachedHeight =630
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =1966
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =1
-                    ColumnEnd =1
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -558,9 +523,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =2595
-                    Top =270
-                    Width =1935
+                    Left =1965
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =18
@@ -579,17 +544,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =2595
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =4530
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =1965
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =3931
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =2
-                    ColumnEnd =2
+                    ColumnStart =1
+                    ColumnEnd =1
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -604,12 +570,12 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =2595
-                    Top =30
-                    Width =1935
+                    Left =1965
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =3
+                    TabIndex =2
                     ForeColor =5855577
                     Name ="DS_HC_1_2"
                     Caption ="ABC"
@@ -626,13 +592,13 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =2595
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =4530
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =1965
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =3931
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
-                    ColumnStart =2
-                    ColumnEnd =2
+                    ColumnStart =1
+                    ColumnEnd =1
                     LayoutGroup =1
                     ForeTint =65.0
                     Shape =0
@@ -663,12 +629,12 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =4530
-                    Top =30
-                    Width =1935
+                    Left =3930
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =4
+                    TabIndex =3
                     ForeColor =5855577
                     Name ="DS_HC_1_3"
                     Caption ="ABC"
@@ -685,13 +651,13 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =4530
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =6465
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =3930
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =5896
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
-                    ColumnStart =3
-                    ColumnEnd =3
+                    ColumnStart =2
+                    ColumnEnd =2
                     LayoutGroup =1
                     ForeTint =65.0
                     Shape =0
@@ -726,9 +692,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =4530
-                    Top =270
-                    Width =1935
+                    Left =3930
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =19
@@ -747,17 +713,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =4530
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =6465
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =3930
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =5896
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =3
-                    ColumnEnd =3
+                    ColumnStart =2
+                    ColumnEnd =2
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -772,12 +739,12 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =6465
-                    Top =30
-                    Width =1935
+                    Left =5895
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =5
+                    TabIndex =4
                     ForeColor =5855577
                     Name ="DS_HC_1_4"
                     Caption ="ABC"
@@ -794,13 +761,13 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =6465
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =8400
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =5895
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =7861
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
-                    ColumnStart =4
-                    ColumnEnd =4
+                    ColumnStart =3
+                    ColumnEnd =3
                     LayoutGroup =1
                     ForeTint =65.0
                     Shape =0
@@ -835,9 +802,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =6465
-                    Top =270
-                    Width =1935
+                    Left =5895
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =20
@@ -856,17 +823,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =6465
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =8400
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =5895
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =7861
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =4
-                    ColumnEnd =4
+                    ColumnStart =3
+                    ColumnEnd =3
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -885,9 +853,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =8400
-                    Top =270
-                    Width =1935
+                    Left =7860
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =21
@@ -906,17 +874,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =8400
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =10335
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =7860
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =9826
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =5
-                    ColumnEnd =5
+                    ColumnStart =4
+                    ColumnEnd =4
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -931,12 +900,12 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =8400
-                    Top =30
-                    Width =1935
+                    Left =7860
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =6
+                    TabIndex =5
                     ForeColor =5855577
                     Name ="DS_HC_1_5"
                     Caption ="ABC"
@@ -953,10 +922,69 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =8400
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =10335
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =7860
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =9826
+                    LayoutCachedHeight =255
+                    PictureCaptionArrangement =4
+                    ColumnStart =4
+                    ColumnEnd =4
+                    LayoutGroup =1
+                    ForeTint =65.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =3
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    ThemeFontIndex =-1
+                    HoverColor =-2147483604
+                    HoverThemeColorIndex =-1
+                    HoverTint =100.0
+                    PressedThemeColorIndex =8
+                    PressedTint =45.0
+                    PressedShade =100.0
+                    HoverForeColor =-2147483600
+                    HoverForeThemeColorIndex =-1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =-1
+                    PressedForeTint =100.0
+                    GroupTable =18
+                    Overlaps =1
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    TextFontCharSet =177
+                    TextFontFamily =0
+                    PictureType =2
+                    Left =9825
+                    Top =15
+                    Width =1966
+                    Height =240
+                    FontSize =10
+                    TabIndex =6
+                    ForeColor =5855577
+                    Name ="DS_HC_1_6"
+                    Caption ="ABC"
+                    OnClick ="=OnColumnHeaderClick()"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleLeft =1
+                    GridlineStyleTop =1
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =9825
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =11791
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =5
                     ColumnEnd =5
@@ -990,71 +1018,12 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =10335
-                    Top =30
-                    Width =1935
+                    Left =11790
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
                     TabIndex =7
-                    ForeColor =5855577
-                    Name ="DS_HC_1_6"
-                    Caption ="ABC"
-                    OnClick ="=OnColumnHeaderClick()"
-                    GroupTable =18
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleLeft =1
-                    GridlineStyleTop =1
-                    GridlineStyleRight =1
-                    GridlineStyleBottom =1
-                    GridlineColor =10921638
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =10335
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =12270
-                    LayoutCachedHeight =270
-                    PictureCaptionArrangement =4
-                    ColumnStart =6
-                    ColumnEnd =6
-                    LayoutGroup =1
-                    ForeTint =65.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =3
-                    BackTint =100.0
-                    OldBorderStyle =0
-                    BorderThemeColorIndex =0
-                    BorderTint =50.0
-                    ThemeFontIndex =-1
-                    HoverColor =-2147483604
-                    HoverThemeColorIndex =-1
-                    HoverTint =100.0
-                    PressedThemeColorIndex =8
-                    PressedTint =45.0
-                    PressedShade =100.0
-                    HoverForeColor =-2147483600
-                    HoverForeThemeColorIndex =-1
-                    HoverForeTint =100.0
-                    PressedForeThemeColorIndex =-1
-                    PressedForeTint =100.0
-                    GroupTable =18
-                    Overlaps =1
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
-                    OverlapFlags =85
-                    TextFontCharSet =177
-                    TextFontFamily =0
-                    PictureType =2
-                    Left =12270
-                    Top =30
-                    Width =1935
-                    Height =240
-                    FontSize =10
-                    TabIndex =8
                     ForeColor =5855577
                     Name ="DS_HC_1_7"
                     Caption ="ABC"
@@ -1071,13 +1040,13 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =12270
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =14205
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =11790
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =13756
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
-                    ColumnStart =7
-                    ColumnEnd =7
+                    ColumnStart =6
+                    ColumnEnd =6
                     LayoutGroup =1
                     ForeTint =65.0
                     Shape =0
@@ -1112,9 +1081,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =10335
-                    Top =270
-                    Width =1935
+                    Left =9825
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =22
@@ -1133,17 +1102,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =10335
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =12270
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =9825
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =11791
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =6
-                    ColumnEnd =6
+                    ColumnStart =5
+                    ColumnEnd =5
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -1162,9 +1132,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =12270
-                    Top =270
-                    Width =1935
+                    Left =11790
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =23
@@ -1183,17 +1153,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =12270
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =14205
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =11790
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =13756
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =7
-                    ColumnEnd =7
+                    ColumnStart =6
+                    ColumnEnd =6
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -1204,123 +1175,16 @@ Begin Form
                 End
                 Begin CommandButton
                     TabStop = NotDefault
-                    OverlapFlags =215
-                    PictureType =2
-                    Left =15
-                    Top =30
-                    Width =645
-                    Height =240
-                    FontSize =9
-                    FontWeight =100
-                    TabIndex =1
-                    ForeColor =5855577
-                    Name ="DS_HC_1_0"
-                    Caption ="◢"
-                    OnClick ="[Event Procedure]"
-                    FontName ="Segoe UI Symbol"
-                    GroupTable =18
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =15
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =660
-                    LayoutCachedHeight =270
-                    PictureCaptionArrangement =4
-                    Alignment =3
-                    LayoutGroup =1
-                    ForeTint =65.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =3
-                    BackTint =100.0
-                    OldBorderStyle =0
-                    BorderThemeColorIndex =0
-                    BorderTint =50.0
-                    ThemeFontIndex =-1
-                    HoverThemeColorIndex =3
-                    HoverTint =100.0
-                    PressedThemeColorIndex =3
-                    PressedShade =100.0
-                    HoverForeThemeColorIndex =8
-                    HoverForeTint =100.0
-                    HoverForeShade =75.0
-                    PressedForeThemeColorIndex =7
-                    PressedForeTint =100.0
-                    GroupTable =18
-                    Overlaps =1
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
-                    OverlapFlags =215
-                    PictureType =2
-                    Left =15
-                    Top =270
-                    Width =645
-                    Height =360
-                    FontSize =9
-                    TabIndex =16
-                    ForeColor =5855577
-                    Name ="DS_HC_2_0"
-                    Caption ="⧩\015\012."
-                    OnClick ="[Event Procedure]"
-                    FontName ="Segoe UI Symbol"
-                    GroupTable =18
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleLeft =1
-                    GridlineStyleTop =1
-                    GridlineColor =10921638
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =15
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =660
-                    LayoutCachedHeight =630
-                    PictureCaptionArrangement =4
-                    Alignment =3
-                    RowStart =1
-                    RowEnd =1
-                    LayoutGroup =1
-                    ForeTint =65.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =3
-                    BackTint =100.0
-                    OldBorderStyle =0
-                    BorderThemeColorIndex =0
-                    BorderTint =50.0
-                    ThemeFontIndex =-1
-                    HoverThemeColorIndex =3
-                    HoverTint =100.0
-                    PressedThemeColorIndex =3
-                    PressedShade =100.0
-                    HoverForeThemeColorIndex =8
-                    HoverForeTint =100.0
-                    HoverForeShade =75.0
-                    PressedForeThemeColorIndex =7
-                    PressedForeTint =100.0
-                    GroupTable =18
-                    Overlaps =1
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
                     OverlapFlags =85
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =14205
-                    Top =30
-                    Width =1935
+                    Left =13755
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =9
+                    TabIndex =8
                     ForeColor =5855577
                     Name ="DS_HC_1_8"
                     Caption ="ABC"
@@ -1337,10 +1201,69 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =14205
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =16140
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =13755
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =15721
+                    LayoutCachedHeight =255
+                    PictureCaptionArrangement =4
+                    ColumnStart =7
+                    ColumnEnd =7
+                    LayoutGroup =1
+                    ForeTint =65.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =3
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    ThemeFontIndex =-1
+                    HoverColor =-2147483604
+                    HoverThemeColorIndex =-1
+                    HoverTint =100.0
+                    PressedThemeColorIndex =8
+                    PressedTint =45.0
+                    PressedShade =100.0
+                    HoverForeColor =-2147483600
+                    HoverForeThemeColorIndex =-1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =-1
+                    PressedForeTint =100.0
+                    GroupTable =18
+                    Overlaps =1
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    TextFontCharSet =177
+                    TextFontFamily =0
+                    PictureType =2
+                    Left =15720
+                    Top =15
+                    Width =1966
+                    Height =240
+                    FontSize =10
+                    TabIndex =9
+                    ForeColor =5855577
+                    Name ="DS_HC_1_9"
+                    Caption ="ABC"
+                    OnClick ="=OnColumnHeaderClick()"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleLeft =1
+                    GridlineStyleTop =1
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =15720
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =17686
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =8
                     ColumnEnd =8
@@ -1374,14 +1297,14 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =16140
-                    Top =30
-                    Width =1935
+                    Left =17685
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
                     TabIndex =10
                     ForeColor =5855577
-                    Name ="DS_HC_1_9"
+                    Name ="DS_HC_1_10"
                     Caption ="ABC"
                     OnClick ="=OnColumnHeaderClick()"
                     GroupTable =18
@@ -1396,10 +1319,10 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =16140
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =18075
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =17685
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =19651
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =9
                     ColumnEnd =9
@@ -1433,14 +1356,14 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =18075
-                    Top =30
-                    Width =1935
+                    Left =19650
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
                     TabIndex =11
                     ForeColor =5855577
-                    Name ="DS_HC_1_10"
+                    Name ="DS_HC_1_11"
                     Caption ="ABC"
                     OnClick ="=OnColumnHeaderClick()"
                     GroupTable =18
@@ -1455,10 +1378,10 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =18075
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =20010
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =19650
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =21616
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =10
                     ColumnEnd =10
@@ -1492,14 +1415,14 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =20010
-                    Top =30
-                    Width =1935
+                    Left =21615
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
                     TabIndex =12
                     ForeColor =5855577
-                    Name ="DS_HC_1_11"
+                    Name ="DS_HC_1_12"
                     Caption ="ABC"
                     OnClick ="=OnColumnHeaderClick()"
                     GroupTable =18
@@ -1514,10 +1437,10 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =20010
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =21945
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =21615
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =23581
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =11
                     ColumnEnd =11
@@ -1551,71 +1474,12 @@ Begin Form
                     TextFontCharSet =177
                     TextFontFamily =0
                     PictureType =2
-                    Left =21945
-                    Top =30
-                    Width =1935
+                    Left =23580
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
                     TabIndex =13
-                    ForeColor =5855577
-                    Name ="DS_HC_1_12"
-                    Caption ="ABC"
-                    OnClick ="=OnColumnHeaderClick()"
-                    GroupTable =18
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleLeft =1
-                    GridlineStyleTop =1
-                    GridlineStyleRight =1
-                    GridlineStyleBottom =1
-                    GridlineColor =10921638
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =21945
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =23880
-                    LayoutCachedHeight =270
-                    PictureCaptionArrangement =4
-                    ColumnStart =12
-                    ColumnEnd =12
-                    LayoutGroup =1
-                    ForeTint =65.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =3
-                    BackTint =100.0
-                    OldBorderStyle =0
-                    BorderThemeColorIndex =0
-                    BorderTint =50.0
-                    ThemeFontIndex =-1
-                    HoverColor =-2147483604
-                    HoverThemeColorIndex =-1
-                    HoverTint =100.0
-                    PressedThemeColorIndex =8
-                    PressedTint =45.0
-                    PressedShade =100.0
-                    HoverForeColor =-2147483600
-                    HoverForeThemeColorIndex =-1
-                    HoverForeTint =100.0
-                    PressedForeThemeColorIndex =-1
-                    PressedForeTint =100.0
-                    GroupTable =18
-                    Overlaps =1
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
-                    OverlapFlags =85
-                    TextFontCharSet =177
-                    TextFontFamily =0
-                    PictureType =2
-                    Left =23880
-                    Top =30
-                    Width =1935
-                    Height =240
-                    FontSize =10
-                    TabIndex =14
                     ForeColor =5855577
                     Name ="DS_HC_1_13"
                     Caption ="ABC"
@@ -1632,13 +1496,13 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =23880
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =25815
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =23580
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =25546
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
-                    ColumnStart =13
-                    ColumnEnd =13
+                    ColumnStart =12
+                    ColumnEnd =12
                     LayoutGroup =1
                     ForeTint =65.0
                     Shape =0
@@ -1673,9 +1537,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =14205
-                    Top =270
-                    Width =1935
+                    Left =13755
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =24
@@ -1694,13 +1558,65 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =14205
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =16140
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =13755
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =15721
+                    LayoutCachedHeight =615
+                    RowStart =1
+                    RowEnd =1
+                    ColumnStart =7
+                    ColumnEnd =7
+                    LayoutGroup =1
+                    BackThemeColorIndex =-1
+                    BorderThemeColorIndex =-1
+                    BorderShade =100.0
+                    ThemeFontIndex =-1
+                    ForeTint =50.0
+                    GroupTable =18
+                End
+                Begin TextBox
+                    TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =215
+                    TextFontCharSet =177
+                    TextAlign =2
+                    TextFontFamily =0
+                    BackStyle =0
+                    IMESentenceMode =3
+                    Left =15720
+                    Top =255
+                    Width =1966
+                    Height =360
+                    FontSize =10
+                    TabIndex =25
+                    LeftMargin =42
+                    TopMargin =42
+                    RightMargin =42
+                    BottomMargin =42
+                    BackColor =13434879
+                    BorderColor =13434879
+                    ForeColor =8355711
+                    Name ="DS_HC_2_9"
+                    OnLostFocus ="=OnColumnNameChange()"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+                    ShowDatePicker =0
+
+                    LayoutCachedLeft =15720
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =17686
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =8
@@ -1723,12 +1639,12 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =16140
-                    Top =270
-                    Width =1935
+                    Left =17685
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
-                    TabIndex =25
+                    TabIndex =26
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -1736,7 +1652,7 @@ Begin Form
                     BackColor =13434879
                     BorderColor =13434879
                     ForeColor =8355711
-                    Name ="DS_HC_2_9"
+                    Name ="DS_HC_2_10"
                     OnLostFocus ="=OnColumnNameChange()"
                     GroupTable =18
                     LeftPadding =0
@@ -1744,13 +1660,14 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =16140
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =18075
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =17685
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =19651
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =9
@@ -1773,12 +1690,12 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =18075
-                    Top =270
-                    Width =1935
+                    Left =19650
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
-                    TabIndex =26
+                    TabIndex =27
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -1786,7 +1703,7 @@ Begin Form
                     BackColor =13434879
                     BorderColor =13434879
                     ForeColor =8355711
-                    Name ="DS_HC_2_10"
+                    Name ="DS_HC_2_11"
                     OnLostFocus ="=OnColumnNameChange()"
                     GroupTable =18
                     LeftPadding =0
@@ -1794,13 +1711,14 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =18075
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =20010
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =19650
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =21616
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =10
@@ -1823,12 +1741,12 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =20010
-                    Top =270
-                    Width =1935
+                    Left =21615
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
-                    TabIndex =27
+                    TabIndex =28
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -1836,7 +1754,7 @@ Begin Form
                     BackColor =13434879
                     BorderColor =13434879
                     ForeColor =8355711
-                    Name ="DS_HC_2_11"
+                    Name ="DS_HC_2_12"
                     OnLostFocus ="=OnColumnNameChange()"
                     GroupTable =18
                     LeftPadding =0
@@ -1844,13 +1762,14 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =20010
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =21945
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =21615
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =23581
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
                     ColumnStart =11
@@ -1873,59 +1792,9 @@ Begin Form
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =21945
-                    Top =270
-                    Width =1935
-                    Height =360
-                    FontSize =10
-                    TabIndex =28
-                    LeftMargin =42
-                    TopMargin =42
-                    RightMargin =42
-                    BottomMargin =42
-                    BackColor =13434879
-                    BorderColor =13434879
-                    ForeColor =8355711
-                    Name ="DS_HC_2_12"
-                    OnLostFocus ="=OnColumnNameChange()"
-                    GroupTable =18
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleRight =1
-                    GridlineColor =10921638
-                    ShowDatePicker =0
-
-                    LayoutCachedLeft =21945
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =23880
-                    LayoutCachedHeight =630
-                    RowStart =1
-                    RowEnd =1
-                    ColumnStart =12
-                    ColumnEnd =12
-                    LayoutGroup =1
-                    BackThemeColorIndex =-1
-                    BorderThemeColorIndex =-1
-                    BorderShade =100.0
-                    ThemeFontIndex =-1
-                    ForeTint =50.0
-                    GroupTable =18
-                End
-                Begin TextBox
-                    TabStop = NotDefault
-                    AllowAutoCorrect = NotDefault
-                    OldBorderStyle =0
-                    OverlapFlags =215
-                    TextFontCharSet =177
-                    TextAlign =2
-                    TextFontFamily =0
-                    BackStyle =0
-                    IMESentenceMode =3
-                    Left =23880
-                    Top =270
-                    Width =1935
+                    Left =23580
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =29
@@ -1944,17 +1813,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =23880
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =25815
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =23580
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =25546
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =13
-                    ColumnEnd =13
+                    ColumnStart =12
+                    ColumnEnd =12
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -1971,9 +1841,9 @@ Begin Form
                     TextAlign =2
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =25815
-                    Top =270
-                    Width =1935
+                    Left =25545
+                    Top =255
+                    Width =1966
                     Height =360
                     FontSize =10
                     TabIndex =30
@@ -1992,17 +1862,18 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =25815
-                    LayoutCachedTop =270
-                    LayoutCachedWidth =27750
-                    LayoutCachedHeight =630
+                    LayoutCachedLeft =25545
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =27511
+                    LayoutCachedHeight =615
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =14
-                    ColumnEnd =14
+                    ColumnStart =13
+                    ColumnEnd =13
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -2016,12 +1887,12 @@ Begin Form
                     OverlapFlags =85
                     TextFontCharSet =177
                     PictureType =2
-                    Left =25815
-                    Top =30
-                    Width =1935
+                    Left =25545
+                    Top =15
+                    Width =1966
                     Height =240
                     FontSize =10
-                    TabIndex =15
+                    TabIndex =14
                     ForeColor =5855577
                     Name ="DS_HC_1_14"
                     Caption ="ABC"
@@ -2038,10 +1909,68 @@ Begin Form
                     GridlineColor =10921638
 
                     CursorOnHover =1
-                    LayoutCachedLeft =25815
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =27750
-                    LayoutCachedHeight =270
+                    LayoutCachedLeft =25545
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =27511
+                    LayoutCachedHeight =255
+                    PictureCaptionArrangement =4
+                    ColumnStart =13
+                    ColumnEnd =13
+                    LayoutGroup =1
+                    ForeTint =65.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =3
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    ThemeFontIndex =-1
+                    HoverColor =-2147483604
+                    HoverThemeColorIndex =-1
+                    HoverTint =100.0
+                    PressedThemeColorIndex =8
+                    PressedTint =45.0
+                    PressedShade =100.0
+                    HoverForeColor =-2147483600
+                    HoverForeThemeColorIndex =-1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =-1
+                    PressedForeTint =100.0
+                    GroupTable =18
+                    Overlaps =1
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    TextFontCharSet =177
+                    PictureType =2
+                    Left =27510
+                    Top =15
+                    Width =1966
+                    Height =240
+                    FontSize =10
+                    TabIndex =15
+                    ForeColor =5855577
+                    Name ="DS_HC_1_15"
+                    Caption ="ABC"
+                    OnClick ="=OnColumnHeaderClick()"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleLeft =1
+                    GridlineStyleTop =1
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =27510
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =29476
+                    LayoutCachedHeight =255
                     PictureCaptionArrangement =4
                     ColumnStart =14
                     ColumnEnd =14
@@ -2069,65 +1998,244 @@ Begin Form
                     GroupTable =18
                     Overlaps =1
                 End
-            End
-        End
-        Begin Section
-            CanGrow = NotDefault
-            CanShrink = NotDefault
-            Height =375
-            Name ="Detalle"
-            OnPaint ="[Event Procedure]"
-            AlternateBackColor =-2147483607
-            BackThemeColorIndex =1
-            Begin
-                Begin TextBox
-                    Enabled = NotDefault
-                    Locked = NotDefault
+                Begin CommandButton
                     TabStop = NotDefault
-                    OldBorderStyle =0
-                    OverlapFlags =93
+                    OverlapFlags =85
                     TextFontCharSet =177
-                    TextAlign =1
-                    TextFontFamily =0
-                    BackStyle =0
-                    IMESentenceMode =3
-                    Left =60
-                    Top =60
-                    Width =15
-                    Height =15
-                    FontSize =1
-                    TabIndex =17
-                    TopMargin =567
-                    BackColor =13434879
-                    BorderColor =13434879
-                    Name ="ROW_NUMBER"
-                    FontName ="Calibri Light"
-                    GroupTable =19
+                    PictureType =2
+                    Left =29475
+                    Top =15
+                    Width =1966
+                    Height =240
+                    FontSize =10
+                    TabIndex =16
+                    ForeColor =5855577
+                    Name ="DS_HC_1_16"
+                    Caption ="ABC"
+                    OnClick ="=OnColumnHeaderClick()"
+                    GroupTable =18
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
+                    GridlineStyleLeft =1
+                    GridlineStyleTop =1
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =29475
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =31441
+                    LayoutCachedHeight =255
+                    PictureCaptionArrangement =4
+                    ColumnStart =15
+                    ColumnEnd =15
+                    LayoutGroup =1
+                    ForeTint =65.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =3
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    ThemeFontIndex =-1
+                    HoverColor =-2147483604
+                    HoverThemeColorIndex =-1
+                    HoverTint =100.0
+                    PressedThemeColorIndex =8
+                    PressedTint =45.0
+                    PressedShade =100.0
+                    HoverForeColor =-2147483600
+                    HoverForeThemeColorIndex =-1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =-1
+                    PressedForeTint =100.0
+                    GroupTable =18
+                    Overlaps =1
+                End
+                Begin TextBox
+                    TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =215
+                    TextAlign =2
+                    BackStyle =0
+                    IMESentenceMode =3
+                    Left =27510
+                    Top =255
+                    Width =1966
+                    Height =360
+                    FontSize =10
+                    TabIndex =31
+                    LeftMargin =42
+                    TopMargin =42
+                    RightMargin =42
+                    BottomMargin =42
+                    BackColor =13434879
+                    BorderColor =13434879
+                    ForeColor =8355711
+                    Name ="DS_HC_2_15"
+                    OnLostFocus ="=OnColumnNameChange()"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =60
-                    LayoutCachedTop =60
-                    LayoutCachedWidth =75
-                    LayoutCachedHeight =75
-                    LayoutGroup =2
+                    LayoutCachedLeft =27510
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =29476
+                    LayoutCachedHeight =615
+                    RowStart =1
+                    RowEnd =1
+                    ColumnStart =14
+                    ColumnEnd =14
+                    LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
-                    ForeThemeColorIndex =3
-                    ForeTint =100.0
-                    GroupTable =19
+                    ForeTint =50.0
+                    GroupTable =18
+                End
+                Begin TextBox
+                    TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =215
+                    TextAlign =2
+                    BackStyle =0
+                    IMESentenceMode =3
+                    Left =29475
+                    Top =255
+                    Width =1966
+                    Height =360
+                    FontSize =10
+                    TabIndex =32
+                    LeftMargin =42
+                    TopMargin =42
+                    RightMargin =42
+                    BottomMargin =42
+                    BackColor =13434879
+                    BorderColor =13434879
+                    ForeColor =8355711
+                    Name ="DS_HC_2_16"
+                    OnLostFocus ="=OnColumnNameChange()"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+                    ShowDatePicker =0
+
+                    LayoutCachedLeft =29475
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =31441
+                    LayoutCachedHeight =615
+                    RowStart =1
+                    RowEnd =1
+                    ColumnStart =15
+                    ColumnEnd =15
+                    LayoutGroup =1
+                    BackThemeColorIndex =-1
+                    BorderThemeColorIndex =-1
+                    BorderShade =100.0
+                    ThemeFontIndex =-1
+                    ForeTint =50.0
+                    GroupTable =18
+                End
+            End
+        End
+        Begin Section
+            Height =375
+            Name ="FormDetail"
+            AlternateBackColor =-2147483607
+            BackThemeColorIndex =1
+            Begin
+                Begin TextBox
+                    Locked = NotDefault
+                    TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =93
+                    TextAlign =1
+                    IMESentenceMode =3
+                    Top =15
+                    Width =31621
+                    Height =360
+                    FontSize =1
+                    TabIndex =17
+                    TopMargin =567
+                    BorderColor =16777215
+                    ForeColor =8355711
+                    Name ="DS_PAGE_ROW_NUM"
+                    ControlSource ="=GetPageRowNum()"
+                    ConditionalFormat = Begin
+                        0x0100000066000000010000000000000002000000000000000200000001000000 ,
+                        0x00000000f7f7f700000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x300000000000
+                    End
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =12566463
+                    GridlineWidthLeft =0
+                    GridlineWidthTop =0
+                    GridlineWidthRight =0
+                    GridlineWidthBottom =0
+                    ShowDatePicker =0
+
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =31621
+                    LayoutCachedHeight =375
+                    BorderShade =100.0
+                    ForeTint =50.0
+                    ConditionalFormat14 = Begin
+                        0x01000100000000000000020000000100000000000000f7f7f700010000003000 ,
+                        0x000000000000000000000000000000000000000000
+                    End
+                    GridlineShade =75.0
+                End
+                Begin Rectangle
+                    SpecialEffect =0
+                    BackStyle =1
+                    OldBorderStyle =0
+                    OverlapFlags =255
+                    Left =1701
+                    Top =15
+                    Width =3402
+                    Height =345
+                    BorderColor =-2147483603
+                    Name ="DS_RC_BG_INACTIVE"
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    LayoutCachedLeft =1701
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =5103
+                    LayoutCachedHeight =360
+                    BackThemeColorIndex =1
+                    BackShade =97.0
+                    BorderShade =100.0
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =93
+                    OverlapFlags =95
                     TextFontCharSet =177
                     TextFontFamily =0
                     IMESentenceMode =3
@@ -2154,17 +2262,16 @@ Begin Form
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =93
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =660
-                    Width =1935
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =3
+                    TabIndex =1
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2181,19 +2288,15 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineStyleLeft =1
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =660
-                    LayoutCachedWidth =2595
+                    LayoutCachedWidth =1966
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =1
-                    ColumnEnd =1
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
@@ -2201,23 +2304,22 @@ Begin Form
                     ThemeFontIndex =-1
                     ForeTint =50.0
                     WidthStretch =33
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
-                    TextFontCharSet =177
+                    OverlapFlags =247
                     TextAlign =1
-                    TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =2595
-                    Width =1935
+                    Left =1965
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =4
+                    TabIndex =2
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2233,42 +2335,40 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =2595
-                    LayoutCachedWidth =4530
+                    LayoutCachedLeft =1965
+                    LayoutCachedWidth =3931
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =2
-                    ColumnEnd =2
+                    ColumnStart =1
+                    ColumnEnd =1
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
-                    TextFontCharSet =177
+                    OverlapFlags =247
                     TextAlign =1
-                    TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =4530
-                    Width =1935
+                    Left =3930
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =5
+                    TabIndex =3
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2284,42 +2384,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =4530
-                    LayoutCachedWidth =6465
+                    LayoutCachedLeft =3930
+                    LayoutCachedWidth =5896
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =3
-                    ColumnEnd =3
+                    ColumnStart =2
+                    ColumnEnd =2
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =6465
-                    Width =1935
+                    Left =5895
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =6
+                    TabIndex =4
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2335,42 +2435,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =6465
-                    LayoutCachedWidth =8400
+                    LayoutCachedLeft =5895
+                    LayoutCachedWidth =7861
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =4
-                    ColumnEnd =4
+                    ColumnStart =3
+                    ColumnEnd =3
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =8400
-                    Width =1935
+                    Left =7860
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =7
+                    TabIndex =5
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2386,42 +2486,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =8400
-                    LayoutCachedWidth =10335
+                    LayoutCachedLeft =7860
+                    LayoutCachedWidth =9826
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =5
-                    ColumnEnd =5
+                    ColumnStart =4
+                    ColumnEnd =4
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =10335
-                    Width =1935
+                    Left =9825
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =8
+                    TabIndex =6
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2437,42 +2537,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =10335
-                    LayoutCachedWidth =12270
+                    LayoutCachedLeft =9825
+                    LayoutCachedWidth =11791
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =6
-                    ColumnEnd =6
+                    ColumnStart =5
+                    ColumnEnd =5
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =12270
-                    Width =1935
+                    Left =11790
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =9
+                    TabIndex =7
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2488,42 +2588,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =12270
-                    LayoutCachedWidth =14205
+                    LayoutCachedLeft =11790
+                    LayoutCachedWidth =13756
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =7
-                    ColumnEnd =7
+                    ColumnStart =6
+                    ColumnEnd =6
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =14205
-                    Width =1935
+                    Left =13755
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =10
+                    TabIndex =8
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2539,42 +2639,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =14205
-                    LayoutCachedWidth =16140
+                    LayoutCachedLeft =13755
+                    LayoutCachedWidth =15721
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =8
-                    ColumnEnd =8
+                    ColumnStart =7
+                    ColumnEnd =7
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =16140
-                    Width =1935
+                    Left =15720
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =11
+                    TabIndex =9
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2590,42 +2690,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =16140
-                    LayoutCachedWidth =18075
+                    LayoutCachedLeft =15720
+                    LayoutCachedWidth =17686
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =9
-                    ColumnEnd =9
+                    ColumnStart =8
+                    ColumnEnd =8
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =18075
-                    Width =1935
+                    Left =17685
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =12
+                    TabIndex =10
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2641,42 +2741,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =18075
-                    LayoutCachedWidth =20010
+                    LayoutCachedLeft =17685
+                    LayoutCachedWidth =19651
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =10
-                    ColumnEnd =10
+                    ColumnStart =9
+                    ColumnEnd =9
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =20010
-                    Width =1935
+                    Left =19650
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =13
+                    TabIndex =11
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2692,42 +2792,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =20010
-                    LayoutCachedWidth =21945
+                    LayoutCachedLeft =19650
+                    LayoutCachedWidth =21616
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =11
-                    ColumnEnd =11
+                    ColumnStart =10
+                    ColumnEnd =10
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =21945
-                    Width =1935
+                    Left =21615
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =14
+                    TabIndex =12
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2743,42 +2843,42 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =21945
-                    LayoutCachedWidth =23880
+                    LayoutCachedLeft =21615
+                    LayoutCachedWidth =23581
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =12
-                    ColumnEnd =12
+                    ColumnStart =11
+                    ColumnEnd =11
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextFontCharSet =177
                     TextAlign =1
                     TextFontFamily =0
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =23880
-                    Width =1935
+                    Left =23580
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =15
+                    TabIndex =13
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2794,40 +2894,40 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =23880
-                    LayoutCachedWidth =25815
+                    LayoutCachedLeft =23580
+                    LayoutCachedWidth =25546
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
-                    ColumnStart =13
-                    ColumnEnd =13
+                    ColumnStart =12
+                    ColumnEnd =12
                     LayoutGroup =1
                     BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =85
+                    OverlapFlags =247
                     TextAlign =1
                     BackStyle =0
                     IMESentenceMode =3
-                    Left =25815
-                    Width =1935
+                    Left =25545
+                    Width =1966
                     Height =375
                     FontSize =10
-                    TabIndex =16
+                    TabIndex =14
                     LeftMargin =42
                     TopMargin =42
                     RightMargin =42
@@ -2843,14 +2943,62 @@ Begin Form
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineStyleTop =1
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
-                    GridlineColor =10921638
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =25815
-                    LayoutCachedWidth =27750
+                    LayoutCachedLeft =25545
+                    LayoutCachedWidth =27511
+                    LayoutCachedHeight =375
+                    RowStart =2
+                    RowEnd =2
+                    ColumnStart =13
+                    ColumnEnd =13
+                    LayoutGroup =1
+                    BackThemeColorIndex =-1
+                    BorderThemeColorIndex =-1
+                    BorderShade =100.0
+                    ThemeFontIndex =-1
+                    ForeTint =50.0
+                    GridlineShade =75.0
+                    GroupTable =18
+                End
+                Begin TextBox
+                    Locked = NotDefault
+                    TabStop = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =247
+                    TextAlign =1
+                    BackStyle =0
+                    IMESentenceMode =3
+                    Left =27510
+                    Width =1966
+                    Height =375
+                    FontSize =10
+                    TabIndex =15
+                    LeftMargin =42
+                    TopMargin =42
+                    RightMargin =42
+                    BottomMargin =42
+                    BackColor =13434879
+                    BorderColor =13434879
+                    ForeColor =8355711
+                    Name ="DS_RC_1_15"
+                    ControlSource ="14"
+                    FontName ="Calibri Light"
+                    GroupTable =18
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
+                    ShowDatePicker =0
+
+                    LayoutCachedLeft =27510
+                    LayoutCachedWidth =29476
                     LayoutCachedHeight =375
                     RowStart =2
                     RowEnd =2
@@ -2862,112 +3010,57 @@ Begin Form
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
+                    GridlineShade =75.0
                     GroupTable =18
                 End
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =223
+                    OverlapFlags =247
                     TextAlign =1
+                    BackStyle =0
                     IMESentenceMode =3
-                    Left =15
-                    Width =645
+                    Left =29475
+                    Width =1966
                     Height =375
-                    FontSize =1
-                    TabIndex =1
-                    TopMargin =851
+                    FontSize =10
+                    TabIndex =16
+                    LeftMargin =42
+                    TopMargin =42
+                    RightMargin =42
+                    BottomMargin =42
+                    BackColor =13434879
                     BorderColor =13434879
                     ForeColor =8355711
-                    Name ="DS_RB_1_0"
-                    ControlSource ="=GetRowSelectedValue([Form])"
+                    Name ="DS_RC_1_16"
+                    ControlSource ="15"
                     FontName ="Calibri Light"
-                    ConditionalFormat = Begin
-                        0x0100000066000000010000000000000002000000000000000200000001000000 ,
-                        0x00000000ffffcc00000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x310000000000
-                    End
+                    GroupTable =18
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
-                    GridlineColor =10921638
-                    GridlineWidthLeft =0
-                    GridlineWidthTop =0
-                    GridlineWidthRight =0
-                    GridlineWidthBottom =0
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =12566463
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =15
-                    LayoutCachedWidth =660
+                    LayoutCachedLeft =29475
+                    LayoutCachedWidth =31441
                     LayoutCachedHeight =375
-                    BackThemeColorIndex =3
+                    RowStart =2
+                    RowEnd =2
+                    ColumnStart =15
+                    ColumnEnd =15
+                    LayoutGroup =1
+                    BackThemeColorIndex =-1
                     BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ThemeFontIndex =-1
                     ForeTint =50.0
-                    ConditionalFormat14 = Begin
-                        0x01000100000000000000020000000100000000000000ffffcc00010000003100 ,
-                        0x000000000000000000000000000000000000000000
-                    End
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
-                    OverlapFlags =247
-                    TextFontCharSet =177
-                    TextFontFamily =0
-                    PictureType =2
-                    Left =15
-                    Width =645
-                    Height =375
-                    FontSize =10
-                    TabIndex =2
-                    ForeColor =5855577
-                    Name ="DS_RC_1_0"
-                    OnClick ="=OnRowHeaderClick()"
+                    GridlineShade =75.0
                     GroupTable =18
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleLeft =1
-                    GridlineStyleTop =1
-                    GridlineStyleBottom =1
-                    GridlineColor =10921638
-                    BackStyle =0
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =15
-                    LayoutCachedWidth =660
-                    LayoutCachedHeight =375
-                    PictureCaptionArrangement =4
-                    RowStart =2
-                    RowEnd =2
-                    LayoutGroup =1
-                    ForeTint =65.0
-                    Shape =0
-                    Gradient =0
-                    BackColor =-2147483610
-                    BackThemeColorIndex =-1
-                    BackTint =100.0
-                    OldBorderStyle =0
-                    BorderThemeColorIndex =0
-                    BorderTint =50.0
-                    ThemeFontIndex =-1
-                    HoverColor =-2147483604
-                    HoverThemeColorIndex =-1
-                    HoverTint =100.0
-                    PressedThemeColorIndex =8
-                    PressedTint =45.0
-                    PressedShade =100.0
-                    HoverForeColor =-2147483600
-                    HoverForeThemeColorIndex =-1
-                    HoverForeTint =100.0
-                    PressedForeThemeColorIndex =-1
-                    PressedForeTint =100.0
-                    GroupTable =18
-                    Overlaps =1
                 End
             End
         End
@@ -2989,192 +3082,179 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
+Private pCallCount As Long
+
 Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
-Private WithEvents pController As dsGridController
-Attribute pController.VB_VarHelpID = -1
+Public Event OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+Public Event OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
 
-Private Const pABC As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+Private pViewport As Form_DS_VIEWPORT
+Private pSelectedColumns As ArrayListEx
 
-Private Const pMaxAvailColumns As Long = 14
-' MaxViewportColumns is the number of columns up to MaxAvailColumns that fit on current viewport's width.
-Private pMaxViewportColumns As Long
-Private pScrollPosX As Long
+Private Const pMaxAvailColumns As Long = 16
+Private Const pGridCellSizeX As Long = 1965
+Private Const pGridCellSizeY As Long = 375
 
-Private pNumColumnsInViewport As Long
-Private pNumColumnsOnTheRight As Long
-Private pHasRowNumbers As Boolean
-Private pIsViewportSizeInitialized As Boolean
-Private pIsViewportDirty As Boolean
-Private pCurrentFirstColumn As Long
+Private Const pHeaderButtonBackColorSelected As Long = 12644351
+Private Const pHeaderButtonBackColorNormal As Long = 15132391
+Private Const pCellGridlineShadeNormal As Long = 65
+Private Const pCellGridlineShadeInactive As Long = 85
+Private Const pDetailBackColor As Long = 16777215
+Private Const pDetailAlternateBackColor As Long = -2147483607
+Private Const pDetailInactiveBackColor As Long = 16250871
+Private pFirstInactiveRowIndex As Long
+Private pFirstInactiveColumnIndex As Long
 
 
-
-Property Get IsSubform() As Boolean
-    On Error Resume Next
-    IsSubform = Len(Me.Parent.Name) > 0
-End Property
-
-Public Property Get Controller() As dsGridController
-    Set Controller = pController
-End Property
-
-Public Property Set Controller(ByRef Value As dsGridController)
-    Set pController = Value
-End Property
+Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
+Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = Value: End Property
 
 Public Property Get MaxAvailColumns() As Long: MaxAvailColumns = pMaxAvailColumns: End Property
-Public Property Get MaxViewportColumns() As Long: MaxViewportColumns = pMaxViewportColumns: End Property
-Public Property Get NumColumnsInViewport() As Long: NumColumnsInViewport = pNumColumnsInViewport: End Property
-Public Property Let NumColumnsInViewport(ByVal Value As Long): pNumColumnsInViewport = Value: End Property
-Public Property Get NumColumnsOnTheRight() As Long: NumColumnsOnTheRight = pNumColumnsOnTheRight: End Property
-Public Property Let NumColumnsOnTheRight(ByVal Value As Long): pNumColumnsOnTheRight = Value: End Property
-Public Property Get CurrentFirstColumn() As Long: CurrentFirstColumn = pCurrentFirstColumn: End Property
+' Maximum available form width filled with table-related controls (almost 22 inches ~= 55.478cm ~= 31456 twips in my dev environment).
+Public Property Get MaxContentWidthLimit() As Long: MaxContentWidthLimit = pGridCellSizeX * pMaxAvailColumns: End Property
+' Default Cell/Column width
+Public Property Get GridCellSizeX() As Long: GridCellSizeX = pGridCellSizeX: End Property
+Public Property Get GridCellSizeY() As Long: GridCellSizeY = pGridCellSizeY: End Property
 
 
-Private Sub Detalle_Paint()
-    On Error GoTo Fallback
+' --- FORM EVENTS ---
 
-    If pHasRowNumbers Then
-        Me.DS_RC_1_0.Caption = Nz(Me.ROW_NUMBER.Value)
-    Else
-        Me.DS_RC_1_0.Caption = CStr(CLng(Me.Bookmark(0)))
-    End If
-    
-Finally:
-    Exit Sub
-Fallback:
+Private Sub Form_Load()
+    Set pSelectedColumns = ArrayListEx.Create()
+End Sub
+
+Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
-    Me.DS_RC_1_0.Caption = ""
-    Resume Finally
+    pViewport.PropagateMouseWheel Page, Count
 End Sub
 
-Private Function GetH1Text(ByVal ColumnIndex As Long) As String
-    Dim firstColumnIndex As Long
-    
-    firstColumnIndex = Int(ColumnIndex / 26)
-    If firstColumnIndex = 0 Then
-        GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1 + ColumnIndex, 1)
-    Else
-        GetH1Text = VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", firstColumnIndex, 1) & _
-                    VBA.Mid$("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1 + (ColumnIndex Mod 26), 1)
-    End If
-End Function
+'Private Sub FormDetail_Paint()
+''    If CLng(Me.Bookmark(0)) < pFirstInactiveRowIndex + 1 Then
+'''        Me.FormDetail.BackColor = pDetailBackColor
+'''        Me.FormDetail.AlternateBackColor = pDetailAlternateBackColor
+''    Else
+'''        Me.FormDetail.BackColor = pDetailInactiveBackColor
+'''        Me.FormDetail.AlternateBackColor = pDetailInactiveBackColor
+''    End If
+'End Sub
 
-Public Sub RebuildActiveColumns()
-    Dim cH As Variant, c As Long, cViewport As Long, cMod As Long, dX As New DictionaryEx, d As New Scripting.Dictionary
-    Dim viewportFirstColumn As Long, nColumnsInTable As Long, mFirstColumnInViewport As Long
-    Dim bgHeader As Long, bgHeaderSelected As Long, selectedCols As ArrayListEx
-    
-    If Not pIsViewportDirty Then Controller.TriggerViewportSizeUpdate
-    pIsViewportDirty = False
-    
-    cH = Controller.Table.HeaderList(0)
-    mFirstColumnInViewport = pController.FirstColumnInViewport
-    pCurrentFirstColumn = mFirstColumnInViewport
-    pHasRowNumbers = Controller.Table.RowNumbers
-    cMod = IIf(pHasRowNumbers, 1, 0)
-    Me.ROW_NUMBER.ControlSource = IIf(pHasRowNumbers, "0", "")
-    nColumnsInTable = UBound(cH) + IIf(pHasRowNumbers, 0, 1)
-    pNumColumnsOnTheRight = nColumnsInTable - mFirstColumnInViewport
-    pNumColumnsInViewport = IIf(pNumColumnsOnTheRight < pMaxViewportColumns + 1, pNumColumnsOnTheRight, pMaxViewportColumns + 1)
-    bgHeader = pController.HeaderButtonBackColorNormal
-    bgHeaderSelected = pController.HeaderButtonBackColorSelected
-    Set selectedCols = pController.SelectedColumnIndexes
-    
-    If mFirstColumnInViewport = 0 Then
-        viewportFirstColumn = 0
-    Else
-        viewportFirstColumn = mFirstColumnInViewport + pController.FixedColumnsOnTheLeft
-    End If
-    
-    For c = viewportFirstColumn To (mFirstColumnInViewport + (pNumColumnsInViewport - 1))
-        Set d = cH(c + cMod)
-        'dX.Bind d
-        cViewport = 1 + c - mFirstColumnInViewport
-        If cViewport > pMaxAvailColumns Then Exit For
-        With Me.Controls("DS_HC_1_" & CStr(cViewport))
-            .Caption = GetH1Text(c)
-            .BackColor = IIf(selectedCols.Contains(c + cMod), bgHeaderSelected, bgHeader)
-        End With
-        Me.Controls("DS_RC_1_" & CStr(cViewport)).ControlSource = CStr(c + cMod)
-        Me.Controls("DS_HC_2_" & CStr(cViewport)) = CStr(d("ColumnName"))
-        
-    Next c
-    
-    For c = cViewport + 1 To pMaxViewportColumns
-        Me.Controls("DS_HC_1_" & CStr(c)).Caption = GetH1Text(mFirstColumnInViewport + c - 1)
-        Me.Controls("DS_HC_2_" & CStr(c)) = ""
-        Me.Controls("DS_RC_1_" & CStr(c)).ControlSource = ""
-    Next c
+
+' --- SETUP / BINDING ---
+
+Public Sub Setup()
+    SetupGridSizes
 End Sub
 
-Private Function TryGetColumnIndexOfControl(ByRef Target As Access.Control, ByRef OutColumnIndex As Long) As Boolean
-    On Error GoTo Finally
-    If Not Target.Name Like "DS_*C_*_*" Then Exit Function
+Private Sub SetupGridSizes()
+    Dim i As Long
     
-    OutColumnIndex = CLng(Me.Controls("DS_RC_1_" & VBA.Mid(Target.Name, 9)).ControlSource)
-    TryGetColumnIndexOfControl = (OutColumnIndex >= 0)
-Finally:
-End Function
-
-
-Public Function OnColumnNameChange()
-    Dim Target As Access.TextBox, colIndex As Long, dX As New DictionaryEx
-    'On Error GoTo Finally
-
-    If TryGetActiveControl(Target) Then
-        If TryGetColumnIndexOfControl(Target, colIndex) Then
-            If Controller.TryGetColumnHeaderAt(colIndex, dX) Then
-                If GetControlText(Target) <> dX("ColumnName") Then
-                    Controller.TaskController().AddTask _
-                        "SetColumnName", _
-                        Array(, colIndex, GetControlText(Target))
-                Else
-                    Debug.Print "No change detected."
-                End If
-            Else
-                Debug.Print "Unable to get column header of active column."
-            End If
-        Else
-            Debug.Print "Unable to get column index of active control."
+    For i = 1 To pMaxAvailColumns
+        If i = 1 Then
+            Me.DS_HC_1_1.Left = 0
+            Me.DS_HC_2_1.Left = 0
+            Me.DS_RC_1_1.Left = 0
         End If
-    Else
-        Debug.Print "Unable to get Screen.ActiveControl in debug mode."
-    End If
+        Me.Controls("DS_HC_1_" & CStr(i)).Width = pGridCellSizeX
+        Me.Controls("DS_HC_2_" & CStr(i)).Width = pGridCellSizeX
+        Me.Controls("DS_RC_1_" & CStr(i)).Width = pGridCellSizeX
+    Next i
+    
+    Me.DS_HR_BG.Left = 0
+    Me.DS_HR_BG.Width = pGridCellSizeX * pMaxAvailColumns
+    Me.DS_PAGE_ROW_NUM.Left = 0
+    Me.DS_PAGE_ROW_NUM.Width = pGridCellSizeX * pMaxAvailColumns
+    Me.Width = pGridCellSizeX * pMaxAvailColumns
+End Sub
 
-'Finally:
+Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long, ByRef dsT As dsTable)
+    Dim i As Long, sNames As Variant
+    
+    sNames = dsT.GetColumnNames(FirstColumnIndex, pMaxAvailColumns)
+    For i = 1 To pMaxAvailColumns
+        With Me.Controls("DS_HC_1_" & CStr(i))
+            .Caption = ColumnLetter(FirstColumnIndex + i - 1)
+            .BackColor = IIf(pSelectedColumns.Contains(FirstColumnIndex + i - 1), pHeaderButtonBackColorSelected, pHeaderButtonBackColorNormal)
+        End With
+        Me.Controls("DS_HC_2_" & CStr(i)) = sNames(i - 1)
+    Next i
+    
+    pFirstInactiveColumnIndex = Max(Min(dsT.ColumnCount - FirstColumnIndex, pMaxAvailColumns), 0)
+    pFirstInactiveRowIndex = Max(dsT.Count - FirstRowIndex, 0)
+    SetupInactiveColumnsBackground
+End Sub
+
+Private Sub SetupInactiveColumnsBackground()
+    With Me.DS_RC_BG_INACTIVE
+        If pFirstInactiveColumnIndex < pMaxAvailColumns Then
+            .Width = 15
+            .Left = Me.Controls("DS_RC_1_" & CStr(pFirstInactiveColumnIndex + 1)).Left
+            .Width = Me.Width - .Left - 150
+            If Not .Visible Then .Visible = True
+        Else
+            If .Visible Then .Visible = False
+        End If
+    End With
+End Sub
+
+Friend Sub SetSelectedColumns(ByRef aX As ArrayListEx)
+    Dim FirstColumnIndex As Long, i As Long
+    
+    Set pSelectedColumns = aX
+    FirstColumnIndex = pViewport.FirstColumnIndex
+    For i = 1 To pMaxAvailColumns
+        Me.Controls("DS_HC_1_" & CStr(i)).BackColor = IIf(aX.Contains(FirstColumnIndex + i - 1), pHeaderButtonBackColorSelected, pHeaderButtonBackColorNormal)
+    Next i
+End Sub
+
+Public Function HideColumnLetters(ByVal Value As Boolean) As Boolean
+    Const hc1Top As Long = 15, hc1Height As Long = 240, hc2Height As Long = 360, bgHeight As Long = 340
+    Dim i As Long
+    
+    If Viewport.Scrollview.HideColumnLetters <> Value Then
+        For i = 1 To pMaxAvailColumns
+            With Me.Controls("DS_HC_1_" & CStr(i))
+                .Visible = Not Value
+                .GridlineStyleTop = VBA.Abs(Int(Not Value))
+                .GridlineStyleBottom = VBA.Abs(Int(Not Value))
+            End With
+            Me.Controls("DS_HC_2_" & CStr(i)).GridlineStyleTop = VBA.Abs(Int(Value))
+        Next i
+
+        Me.DS_HC_1_1.Top = IIf(Value, 0, hc1Top)
+        Me.DS_HC_1_1.Height = IIf(Value, 0, hc1Height)
+        Me.DS_HC_2_1.Top = IIf(Value, 0, hc1Top + hc1Height)
+        Me.DS_HC_2_1.Height = hc2Height
+        Me.DS_HR_BG.Top = Me.DS_HC_2_1.Top + 15
+        Me.DS_HR_BG.Height = bgHeight
+        Me.FormHeaders.Height = Me.DS_HC_2_1.Top + Me.DS_HC_2_1.Height
+    End If
+    
+    HideColumnLetters = Value
 End Function
+
+
+' --- UI EVENT HANDLERS ---
 
 Public Function OnColumnHeaderClick()
-    Dim Target As Access.CommandButton, colIndex As Long, ShiftKey As Boolean, CtrlKey As Boolean
+    RaiseEvent OnColumnLetterClick(pViewport.FirstColumnIndex + (Me.SelLeft - 2), GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
+End Function
+
+Public Function OnColumnNameChange()
+    Dim Target As Access.TextBox
     
     If TryGetActiveControl(Target) Then
-        Me.HiddenControl.SetFocus
-        If TryGetColumnIndexOfControl(Target, colIndex) Then
-            ShiftKey = GetAsyncKeyState(vbKeyShift)
-            CtrlKey = GetAsyncKeyState(vbKeyControl)
-            
-            Debug.Print Printf("Click: %1, ColumnIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, colIndex, ShiftKey, CtrlKey)
-            Controller.HandleClickOnColumnHeader colIndex, ShiftKey, CtrlKey
-        End If
+        RaiseEvent OnColumnNameWillChange(pViewport.FirstColumnIndex + (Me.SelLeft - (pMaxAvailColumns + 0) - 2), GetControlText(Target))
     End If
 End Function
 
-Public Function OnRowHeaderClick()
-    Dim Target As Access.CommandButton, RowIndex As Long, ShiftKey As Boolean, CtrlKey As Boolean
-    
-    If TryGetActiveControl(Target) Then
-        Me.RowHiddenControl.SetFocus
-        'If TryGetColumnIndexOfControl(Target, colIndex) Then
-            RowIndex = CLng(Me.SelTop)
-            ShiftKey = GetAsyncKeyState(vbKeyShift)
-            CtrlKey = GetAsyncKeyState(vbKeyControl)
-            
-            Debug.Print Printf("Click: %1, RowIndex: %2, ShiftKey: %3, ctrlKey: %4", Target.Name, RowIndex, ShiftKey, CtrlKey)
-            Controller.HandleClickOnRowHeader RowIndex, ShiftKey, CtrlKey
-        'End If
-    End If
+
+' --- UTILITY HELPERS ---
+
+Private Function GetControlText(ByRef TargetControl As Access.Control) As String
+    On Error Resume Next
+    GetControlText = TargetControl.Value
+    GetControlText = TargetControl.Text
 End Function
 
 Private Function TryGetActiveControl(ByRef OutActiveControl As Variant) As Boolean
@@ -3185,133 +3265,29 @@ Private Function TryGetActiveControl(ByRef OutActiveControl As Variant) As Boole
 Finally:
 End Function
 
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
 
 
-Private Sub DS_HC_1_0_Click()
-    Dim aX As New ArrayListEx, i As Long, Item As Variant
-    ' Toggle select all columns
-    If pController.SelectedColumnIndexes.Count = pController.Table.ColumnCount Then
-        pController.SelectedColumnIndexes.Clear
+' --- MISC ---
+
+Private Function ColumnLetter(ByVal ColumnIndex As Long) As String
+    Const sChars As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    If Int(ColumnIndex / 26) = 0 Then
+        ColumnLetter = VBA.Mid$(sChars, 1 + ColumnIndex, 1)
     Else
-        ' Select all
-        With pController.SelectedColumnIndexes
-            .Clear
-            For i = 0 To pController.Table.ColumnCount - 1
-                .Add i
-            Next i
-        End With
+        ColumnLetter = VBA.Mid$(sChars, Int(ColumnIndex / 26), 1) & _
+                       VBA.Mid$(sChars, 1 + (ColumnIndex Mod 26), 1)
     End If
-    pController.TriggerOnChangeEvent
-End Sub
-
-Private Sub DS_HC_2_0_Click()
-    ' Invert selection
-    Dim aX As New ArrayListEx, i As Long, Item As Variant
-    ' Toggle select all columns
-    If pController.SelectedColumnIndexes.Count <> 0 Then
-        For Each Item In pController.SelectedColumnIndexes
-            aX.Add CLng(Item)
-        Next Item
-        With pController.SelectedColumnIndexes
-            .Clear
-            For i = 0 To pController.Table.ColumnCount - 1
-                If Not aX.Contains(i) Then
-                    .Add i
-                End If
-            Next i
-        End With
-    End If
-    pController.TriggerOnChangeEvent
-End Sub
-
-Private Sub Form_Load()
-    Debug.Print "IN DS_GRID.Load()"
-    pMaxViewportColumns = pMaxAvailColumns
-    pCurrentFirstColumn = -1
-End Sub
-
-
-Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
-    On Error Resume Next
-    Me.Parent.PropagateMouseWheel Page, Count
-End Sub
-
-Private Sub Form_Resize()
-    'LogMe "[DEBUG] @DS_GRID.Resize()", True
-    If pIsViewportSizeInitialized Then
-        Controller.TriggerViewportSizeUpdate
-        ' If the number of columns in viewport changed, rebuild the grid
-        If pIsViewportDirty Then RebuildActiveColumns
-    End If
-End Sub
-
-Public Sub ViewportSizeUpdate(Optional ByVal ViewportWidth As Long = 0, Optional ByVal ViewportColumns As Long = 0)
-    Dim vCols As Long, vWidth As Long, vColWidth As Long, colBaseX As Long, i As Long
-'    Debug.Print " --> DS_GRID.ViewportSizeUpdate()"
-    colBaseX = Me.DS_HC_2_1.Left
-    If ViewportWidth = 0 Then ViewportWidth = Me.InsideWidth
-    vWidth = ViewportWidth - colBaseX
-'    vCols = CLng(vWidth / Controller.DefaultColumnWidth)
-    vCols = CLng(Int(vWidth / Controller.DefaultColumnWidth)) + 2
-    vCols = IIf(vCols > pMaxAvailColumns, pMaxAvailColumns, vCols)
-'    vColWidth = CLng(vWidth / vCols)
-'
-'    For i = 0 To vCols - 1
-'        With Me.Controls("DS_HC_2_" & CStr(i + 1))
-'            .Left = colBaseX + (i * vColWidth)
-'            If i = vCols - 1 Then
-'                .Width = (ViewportWidth + 15) - .Left
-'            Else
-'                .Width = vColWidth
-'            End If
-'        End With
-'    Next i
-    
-    If ViewportColumns <> 0 Then vCols = ViewportColumns
-    
-    ' Set viewport dirty if the number of columns in viewport changes
-    If pMaxViewportColumns <> vCols Then pIsViewportDirty = True
-    
-    pMaxViewportColumns = vCols
-    pIsViewportSizeInitialized = True
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
-    Debug.Print "[INFO] @DS_GRID.Unload()"
-End Sub
-
-Public Sub SetScrollPositionX(ByVal ScrollPosX As Long)
-    If Abs(Me.CurrentSectionLeft) > ScrollPosX Then
-        Me.ScrollCursor.Left = ScrollPosX
-        Me.ScrollCursor.SetFocus
-    Else
-        Me.ScrollCursor.Left = ScrollPosX + Me.InsideWidth - Me.ScrollCursor.Width + 15
-        Me.ScrollCursor.SetFocus
-    End If
-    DoEvents
-End Sub
-
-' =GetRowSelectedValue([Formulario])
-Public Function GetRowSelectedValue(f As Access.Form) As String
-    On Error GoTo ErrorHandler
-    Dim rValue As Long
-
-    If pController.SelectedRowIndexes.Contains(CLng(f.Bookmark(0))) Then
-        GetRowSelectedValue = "1"
-    Else
-        GetRowSelectedValue = "0"
-    End If
-    Exit Function
-
-Finally:
-    GetRowSelectedValue = CStr(rValue)
-    Exit Function
-ErrorHandler:
-    Resume Finally
 End Function
 
-Private Function GetControlText(ByRef TargetControl As Access.Control) As String
-    On Error Resume Next
-    GetControlText = TargetControl.Value
-    GetControlText = TargetControl.Text
+' =GetPositionInRecordset([Formulario])
+Public Function GetPositionInRecordset(ByVal f As Access.Form) As Long
+    GetPositionInRecordset = CLng(f.Bookmark(0))
+End Function
+
+Public Function GetPageRowNum() As Long
+    GetPageRowNum = CLng(Me.Bookmark(0))
+    If GetPageRowNum >= pFirstInactiveRowIndex + 1 Then GetPageRowNum = 0
 End Function

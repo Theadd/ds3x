@@ -126,8 +126,8 @@ Public Function Create(Optional ByVal WorksheetName As String = "Sheet%1", Optio
     SetExcelApplicationVisibility xlApp, False
     
     If Not IsMissing(TargetFile) Then
-        If TryWaitFileExists(TargetFile, 0) Then
-            Set xWb = LoadWorkbookAt(xlApp, TargetFile, Options)
+        If FileSystemLib.TryWaitFileExists(FileSystemLib.GetFileMatchingPattern(TargetFile), 0) Then
+            Set xWb = LoadWorkbookAt(xlApp, FileSystemLib.GetFileMatchingPattern(TargetFile), Options)
             Set xWs = xWb.Worksheets(1)
         Else
             ' TODO: Save empty worksheet to file
@@ -168,7 +168,7 @@ Private Function LoadWorkbookAt(ByRef xlApp As Excel.Application, ByVal TargetFi
             TextQualifier:=TTextQualifier, _
             DataType:=xlDelimited, _
             Semicolon:=True, _
-            Local:=Options.GetValue("ReadOnly", True)
+            Local:=Options.GetValue("Local", True)
 '        xlApp.Application.Workbooks.OpenText TargetFile, Origin:=65001, DataType:=xlDelimited, Other:=True, OtherChar:=";"
         Set LoadWorkbookAt = xlApp.Application.Workbooks(1)
     Else

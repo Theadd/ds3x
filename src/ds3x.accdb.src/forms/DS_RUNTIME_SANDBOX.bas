@@ -4,6 +4,9 @@ Begin Form
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
+    MaxButton = NotDefault
+    MinButton = NotDefault
+    ShortcutMenu = NotDefault
     AutoCenter = NotDefault
     NavigationButtons = NotDefault
     DividingLines = NotDefault
@@ -18,9 +21,9 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =14542
+    Width =5329
     DatasheetFontHeight =11
-    ItemSuffix =1572
+    ItemSuffix =1579
     Left =4065
     Top =3030
     Right =28545
@@ -29,10 +32,9 @@ Begin Form
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="ds3x - LiveEd"
+    Caption ="RUNTIME SANDBOX"
     DatasheetFontName ="Calibri"
     OnTimer ="[Event Procedure]"
-    OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
     FilterOnLoad =0
@@ -70,13 +72,6 @@ Begin Form
             Width =850
             Height =850
             BorderShade =65.0
-            GridlineShade =65.0
-        End
-        Begin Line
-            BorderLineStyle =0
-            Width =1701
-            BorderThemeColorIndex =0
-            GridlineThemeColorIndex =1
             GridlineShade =65.0
         End
         Begin CommandButton
@@ -319,166 +314,220 @@ Begin Form
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =5700
+            Height =6633
             Name ="Detalle"
             AlternateBackThemeColorIndex =4
             AlternateBackTint =40.0
             BackThemeColorIndex =3
             Begin
-                Begin CommandButton
+                Begin TextBox
+                    Locked = NotDefault
+                    OldBorderStyle =0
                     OverlapFlags =93
                     TextFontCharSet =177
                     TextFontFamily =0
+                    IMESentenceMode =3
                     Left =284
                     Top =284
                     Width =15
                     Height =15
                     FontSize =1
-                    FontWeight =100
-                    TabIndex =1
+                    TabIndex =3
+                    TopMargin =851
+                    BackColor =-2147483603
+                    BorderColor =10921638
+                    ForeColor =4210752
                     Name ="HiddenControl"
+                    FontName ="Calibri Light"
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
+                    ShowDatePicker =0
 
                     LayoutCachedLeft =284
                     LayoutCachedTop =284
                     LayoutCachedWidth =299
                     LayoutCachedHeight =299
-                    Alignment =1
-                    ForeThemeColorIndex =1
-                    ForeTint =100.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =1
-                    BackTint =100.0
-                    OldBorderStyle =0
-                    BorderThemeColorIndex =1
-                    BorderTint =100.0
-                    HoverColor =-2
-                    HoverThemeColorIndex =-1
-                    HoverTint =80.0
-                    PressedColor =-2
-                    PressedThemeColorIndex =-1
-                    PressedShade =80.0
-                    HoverForeColor =0
-                    HoverForeTint =100.0
-                    PressedForeColor =0
-                    PressedForeTint =100.0
-                    QuickStyle =4
-                    QuickStyleMask =-1009
-                    Overlaps =1
+                    BackThemeColorIndex =-1
+                    ThemeFontIndex =-1
                 End
-                Begin Subform
-                    Visible = NotDefault
+                Begin TextBox
+                    Locked = NotDefault
                     TabStop = NotDefault
+                    EnterKeyBehavior = NotDefault
                     OverlapFlags =215
-                    OldBorderStyle =0
-                    Top =30
-                    Width =10770
-                    Height =5670
+                    TextAlign =1
+                    TextFontFamily =49
+                    IMESentenceMode =3
+                    Left =135
+                    Top =120
+                    Width =5020
+                    Height =5835
+                    FontSize =10
+                    FontWeight =100
+                    LeftMargin =113
+                    TopMargin =58
+                    RightMargin =57
+                    BorderColor =16777215
+                    ForeColor =5855577
+                    Name ="DS_DISPLAY_VALUE"
+                    FontName ="72 Monospace"
+                    OnLostFocus ="[Event Procedure]"
+                    GroupTable =2
+                    LeftPadding =15
+                    TopPadding =15
+                    RightPadding =15
+                    BottomPadding =0
+                    GridlineStyleLeft =1
+                    GridlineStyleTop =1
+                    GridlineStyleRight =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+                    VerticalAnchor =2
+                    ShowDatePicker =0
+
+                    LayoutCachedLeft =135
+                    LayoutCachedTop =120
+                    LayoutCachedWidth =5155
+                    LayoutCachedHeight =5955
+                    ColumnEnd =1
+                    LayoutGroup =1
+                    BorderShade =100.0
+                    ThemeFontIndex =-1
+                    ForeTint =65.0
+                    GroupTable =2
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    TextFontCharSet =177
+                    Left =3735
+                    Top =6120
+                    Width =1440
+                    Height =360
+                    FontSize =10
                     TabIndex =2
-                    BorderColor =10921638
-                    Name ="DS_MAIN_PANEL"
-                    GroupTable =2
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =10770
-                    LayoutCachedHeight =5700
-                    ColumnEnd =6
-                    LayoutGroup =1
-                    GridlineShade =50.0
-                    GroupTable =2
-                End
-                Begin Subform
-                    Visible = NotDefault
-                    OverlapFlags =85
-                    OldBorderStyle =0
-                    Left =10800
-                    Top =30
-                    Width =3734
-                    Height =5670
-                    BorderColor =10921638
-                    Name ="DS_SIDE_PANEL"
-                    GroupTable =2
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-
-                    LayoutCachedLeft =10800
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =14534
-                    LayoutCachedHeight =5700
-                    ColumnStart =8
-                    ColumnEnd =8
-                    LayoutGroup =1
-                    GridlineShade =50.0
-                    WidthStretch =33
-                    GroupTable =2
-                    Begin
-                        Begin Label
-                            OverlapFlags =85
-                            TextFontCharSet =177
-                            TextAlign =1
-                            TextFontFamily =0
-                            Left =10770
-                            Top =30
-                            Width =30
-                            Height =5670
-                            BorderColor =8355711
-                            ForeColor =8355711
-                            Name ="DS_VERTICAL_SPLITTER"
-                            GroupTable =2
-                            LeftPadding =0
-                            TopPadding =15
-                            RightPadding =0
-                            BottomPadding =0
-                            GridlineStyleLeft =1
-                            GridlineStyleTop =1
-                            GridlineColor =8355711
-                            VerticalAnchor =2
-                            LayoutCachedLeft =10770
-                            LayoutCachedTop =30
-                            LayoutCachedWidth =10800
-                            LayoutCachedHeight =5700
-                            ColumnStart =7
-                            ColumnEnd =7
-                            LayoutGroup =1
-                            WidthStretch =33
-                            GridlineShade =50.0
-                            GroupTable =2
-                        End
-                    End
-                End
-                Begin Line
-                    OverlapFlags =85
-                    Top =15
-                    Width =14542
-                    Name ="Línea1571"
+                    Name ="DS_REFRESH_BUTTON"
+                    Caption ="REFRESH"
+                    OnClick ="[Event Procedure]"
+                    GroupTable =4
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    HorizontalAnchor =2
-                    LayoutCachedTop =15
-                    LayoutCachedWidth =14542
-                    LayoutCachedHeight =15
-                    BorderThemeColorIndex =1
-                    BorderShade =50.0
+                    HorizontalAnchor =1
+                    VerticalAnchor =1
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =3735
+                    LayoutCachedTop =6120
+                    LayoutCachedWidth =5175
+                    LayoutCachedHeight =6480
+                    ColumnStart =2
+                    ColumnEnd =2
+                    LayoutGroup =2
+                    ForeThemeColorIndex =1
+                    ForeTint =100.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =8
+                    BackTint =100.0
+                    BorderWidth =1
+                    BorderThemeColorIndex =8
+                    BorderTint =100.0
+                    ThemeFontIndex =-1
+                    HoverThemeColorIndex =8
+                    HoverTint =80.0
+                    PressedThemeColorIndex =8
+                    PressedShade =80.0
+                    HoverForeThemeColorIndex =1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =1
+                    PressedForeTint =100.0
+                    GroupTable =4
+                    QuickStyle =13
+                    QuickStyleMask =-1
+                    WebImagePaddingRight =-1
+                    WebImagePaddingBottom =-1
+                End
+                Begin EmptyCell
+                    Left =3570
+                    Top =6120
+                    Width =165
+                    Height =360
+                    Name ="CeldaVacía1561"
+                    GroupTable =4
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    HorizontalAnchor =1
+                    VerticalAnchor =1
+                    LayoutCachedLeft =3570
+                    LayoutCachedTop =6120
+                    LayoutCachedWidth =3735
+                    LayoutCachedHeight =6480
+                    ColumnStart =1
+                    ColumnEnd =1
+                    LayoutGroup =2
+                    GroupTable =4
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =87
+                    TextFontCharSet =177
+                    Left =2325
+                    Top =6120
+                    Width =1245
+                    Height =360
+                    FontSize =10
+                    TabIndex =1
+                    Name ="DS_AUTO_REFRESH_BUTTON"
+                    Caption ="AUTO"
+                    OnClick ="[Event Procedure]"
+                    GroupTable =4
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    HorizontalAnchor =1
+                    VerticalAnchor =1
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =2325
+                    LayoutCachedTop =6120
+                    LayoutCachedWidth =3570
+                    LayoutCachedHeight =6480
+                    LayoutGroup =2
+                    ForeThemeColorIndex =1
+                    ForeTint =100.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =8
+                    BackTint =100.0
+                    BorderWidth =1
+                    BorderThemeColorIndex =8
+                    BorderTint =100.0
+                    ThemeFontIndex =-1
+                    HoverThemeColorIndex =8
+                    HoverTint =80.0
+                    PressedThemeColorIndex =8
+                    PressedShade =80.0
+                    HoverForeThemeColorIndex =1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =1
+                    PressedForeTint =100.0
+                    GroupTable =4
+                    QuickStyle =13
+                    QuickStyleMask =-1
+                    WebImagePaddingRight =-1
+                    WebImagePaddingBottom =-1
+                    Overlaps =1
                 End
             End
         End
@@ -492,108 +541,61 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private WithEvents pController As dsLiveEd
-Attribute pController.VB_VarHelpID = -1
 
-Property Get IsSubform() As Boolean
-    On Error Resume Next
-    IsSubform = Len(Me.Parent.Name) > 0
-End Property
-
-Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property
-Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Property
+Private pAutoRefresh As Boolean
+Private dX As DictionaryEx
 
 
+Private Sub DS_AUTO_REFRESH_BUTTON_Click()
+    pAutoRefresh = Not pAutoRefresh
+End Sub
+
+Private Sub DS_REFRESH_BUTTON_Click()
+    RefreshDisplayValue
+End Sub
 
 Private Sub Form_Load()
-    ScreenLib_Resync
-    
-    WindowSizeTo Me, 22030, 11000
-    WindowCenterTo Me, ScreenLib.PrimaryScreen
-
-    Me.TimerInterval = 1
-End Sub
-
-Private Sub Bind(ByVal TargetController As dsLiveEd)
-    Debug.Print "  # Form_Bind() ObjPtr(Me): " & CStr(ObjPtr(Me))
-    
-    If (Not TargetController Is Nothing) And (Not pController Is Nothing) Then
-        ' More than one DS_LIVE_EDITOR windows can point to the same dsLiveEd controller
-        ' But NOT more than one dsLiveEd instance can point to the same window, so:
-        ' Unbind this form from controller's pLiveEditor if ObjPtr's of TargetController and pController differ
-        If ObjPtr(pController) <> ObjPtr(TargetController) Then
-            If Not pController.LiveEditor Is Nothing Then
-                If ObjPtr(pController.LiveEditor) = ObjPtr(Me) Then
-                    Set pController.LiveEditor = Nothing
-                End If
-            End If
-            Set pController = Nothing
-        End If
-    End If
-    Set pController = TargetController
-
-    Me.DS_MAIN_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_MAIN_PANEL"
-    Me.DS_SIDE_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_SIDE_PANEL"
-    Set Me.DS_SIDE_PANEL.Form.Controller = pController
-    Set Me.DS_MAIN_PANEL.Form.Controller = pController
-    Me.DS_SIDE_PANEL.Visible = True
-'    If pController.TaskController.Initialized Then
-        Me.DS_MAIN_PANEL.Visible = True
-'    End If
-End Sub
-
-Private Sub Form_Resize()
-    ResizeToFitAllControls
+    WindowAlwaysOnTop Me
+    Set dX = DictionaryEx.Create()
+    Me.DS_DISPLAY_VALUE.HorizontalAnchor = acHorizontalAnchorBoth
+    Me.TimerInterval = 1000
 End Sub
 
 Private Sub Form_Timer()
-    Me.TimerInterval = 0
-
-    If pController Is Nothing Then
-        Dim d As dsLiveEd
-        Set d = New dsLiveEd
-        Bind d
-        Set d.LiveEditor = Me
-        d.DisposeOnClose = True
-        ' TODO: REMOVE 3 LINES BELOW
-'        pController.LoadADifferentSetOfSampleValues
-'        pController.MockAddTasks
-'        Debug.Print Printf("Mocked Tasks: %1", pController.TaskController.RebuildSequence.Count)
+    
+    If pAutoRefresh Then
+        RefreshDisplayValue
     End If
+    
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
-    pController.TriggerLiveEditorWindowClose True
-    Set pController = Nothing
+    Me.TimerInterval = 0
+    Set dX = Nothing
 End Sub
 
-
-Private Sub ResizeToFitAllControls()
-    Dim parentWidth As Long, pSize As Long
+Private Sub RefreshDisplayValue()
+    Dim v As Variant, t As Variant
     
-    Focus Me
-    parentWidth = Me.InsideWidth
+    dX.RemoveAll
     
-    pSize = Me.DS_SIDE_PANEL.Width
-    Me.DS_SIDE_PANEL.Left = parentWidth - pSize
-    pSize = pSize + Me.DS_VERTICAL_SPLITTER.Width
-    Me.DS_VERTICAL_SPLITTER.Left = parentWidth - pSize
-    Me.DS_MAIN_PANEL.Width = parentWidth - (pSize + Me.DS_MAIN_PANEL.Left)
-    ' Force resize event on side panel subform as quick fix for incorrect rendering
-    If Me.DS_SIDE_PANEL.Width Mod 2 = 0 Then
-        Me.DS_SIDE_PANEL.Width = Me.DS_SIDE_PANEL.Width - 15
-    Else
-        Me.DS_SIDE_PANEL.Width = Me.DS_SIDE_PANEL.Width + 15
-    End If
-End Sub
-
-Private Sub pController_OnDataSourceChange()
-    If Not Me.DS_MAIN_PANEL.Visible Then Me.DS_MAIN_PANEL.Visible = True
-End Sub
-
-Private Sub Focus(ByRef frm As Access.Form)
-    On Error Resume Next
-    frm.Controls("HiddenControl").SetFocus
-    DoEvents
+    Set v = InspectMe("DS_GRID")
+    
+    dX("DS_GRID.CurrentFirstColumn") = v.CurrentFirstColumn
+    dX("DS_GRID.NumColumnsInViewport") = v.NumColumnsInViewport
+    dX("DS_GRID.MaxViewportColumns") = v.MaxViewportColumns
+    dX("DS_GRID.NumColumnsOnTheRight") = v.NumColumnsOnTheRight
+    
+    Set v = InspectMe("dsGridController")
+    
+    dX("dsGridController.FirstColumnInViewport") = v.FirstColumnInViewport
+    dX("dsGridController.FixedColumnsOnTheLeft") = v.FixedColumnsOnTheLeft
+    dX("dsGridController.NumColumnsInTable") = v.NumColumnsInTable
+    dX("dsGridController.ScrollIncrement") = v.ScrollIncrement
+    dX("dsGridController.ViewportScrollX") = v.ViewportScrollX
+    dX("dsGridController.VirtualScrollX") = v.VirtualScrollX
+    
+    Me.DS_DISPLAY_VALUE = JSON.Stringify(dX, 2) & vbNewLine
+    
 End Sub

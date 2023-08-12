@@ -22,18 +22,13 @@ End Property
 'If it doesn't exist, it returns the default rather than raise an error.
 Public Property Get GetValue(mKey As Variant, Optional ByRef mDefaultVal As Variant) As Variant
     If Instance.Exists(mKey) Then
-        If IsObject(Instance.Item(mKey)) Then
-            Set GetValue = Instance.Item(mKey)
-        Else
-            GetValue = Instance.Item(mKey)
-        End If
+        Assign GetValue, Instance.Item(mKey)
     Else
-        If IsMissing(mDefaultVal) Then Exit Property
-
-        If IsObject(mDefaultVal) Then
-            Set GetValue = mDefaultVal
-        Else
-            GetValue = mDefaultVal
+        If VarType(mKey) = vbString Then
+            Assign GetValue, GetNestedItem(CStr(mKey))
+        End If
+        If IsEmpty(GetValue) Then
+            If Not IsMissing(mDefaultVal) Then Assign GetValue, mDefaultVal
         End If
     End If
 End Property
@@ -41,14 +36,16 @@ End Property
 'Sets or returns an item for a specified key.
 Public Property Get Item(mKey As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
-    If Not Instance.Exists(mKey) Then Exit Property
-
-    If IsObject(Instance.Item(mKey)) Then
-        Set Item = Instance.Item(mKey)
+    If Instance.Exists(mKey) Then
+        Assign Item, Instance.Item(mKey)
     Else
-        Item = Instance.Item(mKey)
+        If VarType(mKey) = vbString Then
+            Assign Item, GetNestedItem(CStr(mKey))
+        End If
     End If
 End Property
+
+
 
 Public Property Let Item(mKey As Variant, mVal As Variant)
     Instance.Item(mKey) = mVal
@@ -64,25 +61,24 @@ Public Property Let Key(mKey As Variant, mNewKey As Variant)
 End Property
 
 
-
-'Public Function Create(Optional ByRef TargetDictionary As Scripting.Dictionary = Nothing) As DictionaryEx
-'    Set Create = New DictionaryEx
-'    If TargetDictionary Is Nothing Then
-'        Dim t As Scripting.Dictionary
-'        Set t = New Scripting.Dictionary
-'        Create.Bind t
-'    Else
-'        Create.Bind TargetDictionary
-'    End If
-'End Function
+' --- PUBLIC METHODS ---
 
 Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
     Set Create = New DictionaryEx
     
     If Not IsMissing(DictionaryLike) Then
-        If Not DictionaryLike Is Nothing Then
-            Create.Bind DictionaryLike
-            Exit Function
+        If IsObject(DictionaryLike) Then
+            If Not DictionaryLike Is Nothing Then
+                Create.Bind DictionaryLike
+                Exit Function
+            End If
+        Else
+            If VarType(DictionaryLike) = vbString Then
+                If VBA.Left(LTrim(DictionaryLike), 1) = "{" Then
+                    Create.Bind JSON.Parse(DictionaryLike, True, True)
+                    Exit Function
+                End If
+            End If
         End If
     End If
     
@@ -90,10 +86,6 @@ Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
     Set t = New Scripting.Dictionary
     Create.Bind t
 End Function
-
-'Public Function Bind(ByRef TargetDictionary As Scripting.Dictionary) As DictionaryEx
-'    Set Instance = TargetDictionary: Set Bind = Me
-'End Function
 
 Public Function Bind(ByRef DictionaryLike As Variant) As DictionaryEx
     Set Bind = Me
@@ -169,18 +161,6 @@ Public Function Clone() As DictionaryEx
     Set t.Instance = ShallowCopyDictionary(Instance)
     
     Set Clone = t
-'    Dim k As Variant
-'    Set Clone = Create()
-'
-'    With Clone
-'        For Each k In Me.Keys()
-'            If IsObject(Instance.Item(k)) Then
-'                Set .Item(k) = Instance.Item(k)
-'            Else
-'                .Item(k) = Instance.Item(k)
-'            End If
-'        Next k
-'    End With
 End Function
 
 Public Function Duplicate() As DictionaryEx
@@ -211,7 +191,7 @@ Public Function PrintAll() As DictionaryEx
 End Function
 
 
-
+' --- PRIVATE ---
 
 Private Function ShallowCopyDictionary(ByVal d As Scripting.Dictionary) As Scripting.Dictionary
     Dim s As New Scripting.Dictionary, k As Variant
@@ -223,6 +203,66 @@ Private Function ShallowCopyDictionary(ByVal d As Scripting.Dictionary) As Scrip
     
     Set ShallowCopyDictionary = s
 End Function
+
+Private Function GetNestedItem(ByVal mKey As String) As Variant
+    Dim t As Long, c As Long, c2 As Long, v As Variant, tEnd As Boolean, cEnd As Boolean
+    On Error GoTo Finally
+    
+    Do
+        t = InStr(1 + t, mKey, ".", vbBinaryCompare)
+        c = InStr(1 + c, mKey, "[", vbBinaryCompare)
+        If t = 0 Then tEnd = True
+        If c = 0 Then cEnd = True
+        If Not cEnd Then
+            If Instance.Exists(VBA.Mid$(mKey, 1, c - 1)) Then
+                c2 = InStr(1 + c, mKey, "]", vbBinaryCompare)
+                If c2 <> 0 Then
+                    v = VBA.Mid$(mKey, 1 + c, c2 - c - 1)
+                    If CStr(Val(v)) = CStr(v) Then
+                        c2 = CLng(Val(v))
+                        Assign v, Instance.Item(VBA.Mid$(mKey, 1, c - 1))
+                        Assign v, v(c2)
+                        If Len(mKey) = (c + Len(CStr(c2)) + 1) Then
+                            Assign GetNestedItem, v
+                        Else
+                            Assign GetNestedItem, ContinueNestedItem(v, VBA.Mid$(mKey, 1 + c + Len(CStr(c2)) + 1, Len(mKey)))
+                        End If
+                        Exit Do
+                    End If
+                End If
+            End If
+        End If
+        If Not tEnd Then
+            If Instance.Exists(VBA.Mid$(mKey, 1, t - 1)) Then
+                Assign GetNestedItem, ContinueNestedItem(Instance.Item(VBA.Mid$(mKey, 1, t - 1)), VBA.Mid$(mKey, 1 + t, Len(mKey)))
+                Exit Do
+            End If
+        End If
+    Loop Until (tEnd And cEnd)
+Finally:
+End Function
+
+Private Function ContinueNestedItem(ByRef NestedItem As Variant, ByVal mKey As String) As Variant
+    On Error GoTo Finally
+    If IsObject(NestedItem) Then
+        If TypeOf NestedItem Is Scripting.Dictionary Then
+            Assign ContinueNestedItem, DictionaryEx.Create(NestedItem)(mKey)
+        Else
+            Assign ContinueNestedItem, NestedItem(mKey)
+        End If
+    Else
+        Assign ContinueNestedItem, NestedItem(mKey)
+    End If
+Finally:
+End Function
+
+Private Sub Assign(ByRef Target, ByRef Value As Variant)
+    If IsObject(Value) Then
+        Set Target = Value
+    Else
+        Target = Value
+    End If
+End Sub
 
 Private Sub Class_Terminate()
     On Error Resume Next

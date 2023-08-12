@@ -3,6 +3,7 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
+
 ' --- dsAppGlobals Module ---
 
 #If AutomationSupport = 1 Then
@@ -133,6 +134,10 @@ End Property
     
 #End If
 
+
+Public Function CreateDSLiveEd() As dsLiveEd
+    Set CreateDSLiveEd = New dsLiveEd
+End Function
 
 
 

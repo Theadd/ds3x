@@ -24,10 +24,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =4080
-    Top =3045
-    Right =14130
-    Bottom =15210
+    Left =4065
+    Top =3030
+    Right =21105
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -364,15 +364,14 @@ Begin Form
                     Top =120
                     Width =3175
                     Height =345
-                    FontSize =10
                     FontWeight =100
                     LeftMargin =113
-                    TopMargin =58
+                    TopMargin =42
                     RightMargin =57
                     BorderColor =16777215
                     ForeColor =5855577
                     Name ="DS_JSON_EDITOR"
-                    FontName ="72 Monospace"
+                    FontName ="Consolas"
                     OnLostFocus ="[Event Procedure]"
                     GroupTable =2
                     LeftPadding =15
@@ -561,7 +560,7 @@ End Sub
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
     On Error Resume Next
     If KeyCode = vbKeyReturn And Shift = 0 Then
-        Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.KeyDown(vbKeyReturn, 0)"
+        ' Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.KeyDown(vbKeyReturn, 0)"
         KeyCode = 0
         Me.HiddenControl.SetFocus
         DoEvents
@@ -574,7 +573,7 @@ Private Sub Form_Resize()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.Unload()"
+    ' Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.Unload()"
 End Sub
 
 Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
@@ -631,6 +630,7 @@ Private Function Encode(ByVal JSONString As String) As String
     s = Replace(JSONString, """TaskName"":", "TaskName:")
     s = Replace(s, """Id"":", "Id:")
     s = Replace(s, """Values"":", "Values:")
+    s = Replace(s, "\\", "\")
     
     Encode = s
 End Function
@@ -639,6 +639,7 @@ Private Function Decode(ByVal RenderedString As String) As String
     Dim s As String
     
     s = RenderedString
+    s = Replace(s, "\", "\\")
     
     Decode = s
 End Function
