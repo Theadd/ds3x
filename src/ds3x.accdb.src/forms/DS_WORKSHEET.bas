@@ -25,7 +25,7 @@ Begin Form
     GridY =10
     Width =31680
     DatasheetFontHeight =11
-    ItemSuffix =2083
+    ItemSuffix =2084
     Left =4065
     Top =3030
     Right =21105
@@ -2170,23 +2170,22 @@ Begin Form
                     OverlapFlags =93
                     TextAlign =1
                     IMESentenceMode =3
+                    Top =15
                     Width =31621
-                    Height =375
-                    FontSize =10
+                    Height =360
+                    FontSize =1
                     TabIndex =17
                     TopMargin =567
-                    BorderColor =13434879
+                    BorderColor =16777215
                     ForeColor =8355711
                     Name ="DS_PAGE_ROW_NUM"
                     ControlSource ="=GetPageRowNum()"
                     ConditionalFormat = Begin
-                        0x010000009c000000020000000000000002000000000000000200000001000000 ,
-                        0x00000000f7f7f7000100000000000000030000001d0000000100000000000000 ,
-                        0xf2f8ff0000000000000000000000000000000000000000000000000000000000 ,
-                        0x3000000000005b00440053005f0050004100470045005f0052004f0057005f00 ,
-                        0x4e0055004d005d0020004d006f006400200032003d00300000000000
+                        0x0100000066000000010000000000000002000000000000000200000001000000 ,
+                        0x00000000f7f7f700000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x300000000000
                     End
-                    GroupTable =19
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
@@ -2198,21 +2197,16 @@ Begin Form
                     GridlineWidthBottom =0
                     ShowDatePicker =0
 
+                    LayoutCachedTop =15
                     LayoutCachedWidth =31621
                     LayoutCachedHeight =375
-                    LayoutGroup =2
-                    BorderThemeColorIndex =-1
                     BorderShade =100.0
                     ForeTint =50.0
                     ConditionalFormat14 = Begin
-                        0x01000200000000000000020000000100000000000000f7f7f700010000003000 ,
-                        0x0000000000000000000000000000000000000000000100000000000000010000 ,
-                        0x0000000000f2f8ff00190000005b00440053005f0050004100470045005f0052 ,
-                        0x004f0057005f004e0055004d005d0020004d006f006400200032003d00300000 ,
-                        0x0000000000000000000000000000000000000000
+                        0x01000100000000000000020000000100000000000000f7f7f700010000003000 ,
+                        0x000000000000000000000000000000000000000000
                     End
                     GridlineShade =75.0
-                    GroupTable =19
                 End
                 Begin Rectangle
                     SpecialEffect =0
@@ -2241,7 +2235,7 @@ Begin Form
                     Locked = NotDefault
                     TabStop = NotDefault
                     OldBorderStyle =0
-                    OverlapFlags =127
+                    OverlapFlags =95
                     TextFontCharSet =177
                     TextFontFamily =0
                     IMESentenceMode =3
