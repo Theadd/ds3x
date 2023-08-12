@@ -387,17 +387,37 @@ Public Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartI
 End Function
 
 Public Function CreateBlankTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
-    Dim t() As Variant, i As Long, k() As Variant
+    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
     
-    ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
-    ReDim k(0 To ColumnsCount - 1)
+    If RowsCount > 0 And ColumnsCount > 0 Then
+        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+        Set dsT = dsTable.Create(Array2dEx.Create(t))
+    Else
+        Set aX = ArrayListEx.Create()
+        If RowsCount > 0 Then
+            For i = 0 To RowsCount - 1
+                aX.Add Array()
+            Next i
+'            Set dsT = dsTable.Create(aX)
+'        ElseIf ColumnsCount > 0 Then
+'
+'        Else
+'
+        End If
+        Set dsT = dsTable.Create(aX)
+    End If
     
-    For i = 0 To ColumnsCount - 1
-        k(i) = vbNullString
-    Next i
-
-    Set CreateBlankTable = dsTable.Create(Array2dEx.Create(t)).SetHeaders(k)
+    If ColumnsCount > 0 Then
+        ReDim k(0 To ColumnsCount - 1)
+        For i = 0 To ColumnsCount - 1
+            k(i) = vbNullString
+        Next i
+        Set CreateBlankTable = dsT.SetHeaders(k)
+    Else
+        Set CreateBlankTable = dsT.SetHeaders(Array())
+    End If
 End Function
+
 
 
 
