@@ -18,9 +18,6 @@ Public Event OnClose()
 Private pTaskController As New dsTaskController
 Private pGridController As dsGridController
 
-'Private pSourceRecordsetEx As New RecordsetEx
-'Private pTargetExcelSheetEx As xlSheetsEx
-
 Private pLiveEditor As Access.Form
 
 Private pPresetObject As Scripting.Dictionary
@@ -43,7 +40,6 @@ Public Property Let PresetFile(ByVal Value As String): pPresetFile = Value: End 
 Public Property Get DisposeOnClose() As Boolean: DisposeOnClose = pDisposeOnClose: End Property
 Public Property Let DisposeOnClose(ByVal Value As Boolean): pDisposeOnClose = Value: End Property
 
-
 Public Property Get Visible() As Boolean
     If pLiveEditor Is Nothing Then Exit Property
     Visible = pLiveEditor.Visible
@@ -64,7 +60,6 @@ Public Property Let Visible(ByVal Value As Boolean)
         If Value Then WindowAndTaskbarIconAsVisible pLiveEditor
     End If
 End Property
-
 
 
 
@@ -275,7 +270,6 @@ Private Function Destroy()
     Visible = False
     Set pPresetObject = Nothing
     pPresetFile = ""
-'    pSourceRecordsetEx.Unbind
     If Not pGridController Is Nothing Then Set pGridController.TaskController = Nothing
     Set pGridController = Nothing
     pTaskController.Dispose
@@ -496,146 +490,5 @@ Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean 
     
     RaiseEvent OnClose
 End Sub
-
-
-
-' --- SAMPLE MOCKS FOR DEVELOPMENT ---
-
-
-Friend Sub LoadSampleValues()
-    ' SELECT U.UR, E.DEMANDA, E.CONTRATO, E.TAREA_PROCESO, E.FECHA_ENTRADA, E.FECHA_ULTIMO_HITO, E.INFORME_FISCAL, U.DIRECCION, U.CODIGO_POSTAL, U.PROVINCIA, U.TIPO_INMUEBLE, U.VALOR_TASACION, U.PRINCIPAL, U.TOTAL_DEUDA, U.VALOR_SUBASTA, U.PORCENTAJE_PROPIEDAD, U.FECHA_PETICION_CALCULOS, U.TIPO, E.OBSERVACIONES
-    AddSource _
-        dbQuery.Create( _
-            "SELECT U.UR, E.DEMANDA, E.FECHA_ENTRADA, U.PRINCIPAL, U.TIPO, E.CONTRATO, E.TAREA_PROCESO, E.FECHA_ULTIMO_HITO, U.TOTAL_DEUDA " & _
-            "FROM [dbo].[T_ATM_ISCS_URS_LOTE] UL INNER JOIN [dbo].[T_ATM_ISCS_EXPEDIENTES] E ON E.DEMANDA = UL.DEMANDA INNER JOIN [dbo].[T_ATM_ISCS_URS] U ON U.UR = UL.UR " & _
-            "WHERE e.OBSERVACIONES Is Not Null And U.DIRECCION Is Not Null And U.PRINCIPAL Is Not Null " _
-        )
-End Sub
-
-Friend Sub LoadADifferentSetOfSampleValues()
-    AddSource dbQuery.Create("EXEC [dbo].[P_ATM_ISCS_APP_USER_MONTHLY_TIME]")
-End Sub
-
-Friend Sub MockAddTasks()
-    Dim aX As ArrayListEx
-    
-    Set aX = ArrayListEx.Create(TaskController.RebuildSequence)
-    With aX
-        .Add DictionaryEx.Create() _
-                            .Add("Id", "DS1") _
-                            .Add("TaskName", "DataSource") _
-                            .Add("Values", Array())
-                            
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T1") _
-'                            .Add("TaskName", "AddRowNumbers") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("VALUE", 13)))
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T2") _
-'                            .Add("TaskName", "SetColumnName") _
-'                            .Add("RETURNS", "Table") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("VALUE", 3), _
-'                                Array("VALUE", "NEW_COLUMN_NAME")))
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T3") _
-'                            .Add("TaskName", "SetColumnName") _
-'                            .Add("RETURNS", "Table") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("VALUE", 5), _
-'                                Array("VALUE", "YET_ANOTHER_NEW_COLUMN_NAME")))
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T4") _
-'                            .Add("TaskName", "Filter") _
-'                            .Add("RETURNS", "Table") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("VALUE", "[TAREA_PROCESO] LIKE '35*'")))
-
-        ' GetRange(ByRef TargetTable As Variant, Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
-        
-        .Add DictionaryEx.Create() _
-                            .Add("Id", "T2") _
-                            .Add("TaskName", "GetRange") _
-                            .Add("Values", Array(, , , Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)))
-        
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T2") _
-'                            .Add("TaskName", "GetRange") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                , _
-'                                , _
-'                                Array("VALUE", Array(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33))))
-
-        .Add DictionaryEx.Create() _
-                            .Add("Id", "T3") _
-                            .Add("TaskName", "ReplaceValues") _
-                            .Add("Values", Array(, "SecondsToHMS"))
-
-
-        .Add DictionaryEx.Create() _
-                            .Add("Id", "T4") _
-                            .Add("TaskName", "GetRange") _
-                            .Add("Values", Array("DS1", , , Array(0, 1)))
-        
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T4") _
-'                            .Add("TaskName", "GetRange") _
-'                            .Add("Values", Array( _
-'                                Array("REFERENCE", "T1"), _
-'                                , _
-'                                , _
-'                                Array("VALUE", Array(0, 1, 2))))
-        
-        .Add DictionaryEx.Create() _
-                            .Add("Id", "T5") _
-                            .Add("TaskName", "Join") _
-                            .Add("Values", Array(, "T3"))
-                                
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T5") _
-'                            .Add("TaskName", "Join") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("REFERENCE", "T3")))
-        
-        .Add DictionaryEx.Create() _
-                            .Add("Id", "T6") _
-                            .Add("TaskName", "ReplaceColumnNames") _
-                            .Add("Values", Array( _
-                                , _
-                                "XDaysAgo"))
-
-        ' XDaysAgo
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T6") _
-'                            .Add("TaskName", "ReplaceColumnNames") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("CALLABLE", "XDaysAgo")))
-
-'        .Add DictionaryEx.Create() _
-'                            .Add("Id", "T7") _
-'                            .Add("TaskName", "SetColumnName") _
-'                            .Add("RETURNS", "Table") _
-'                            .Add("Values", Array( _
-'                                Array("CURRENT", "Table"), _
-'                                Array("VALUE", 3), _
-'                                Array("VALUE", "NEW_COLUMN_NAME")))
-
-    End With
-    
-    Set TaskController.RebuildSequence = aX
-End Sub
-
-
-
-
-
 
 
