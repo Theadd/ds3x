@@ -23,10 +23,10 @@ Begin Form
     GridY =10
     Width =5329
     DatasheetFontHeight =11
-    ItemSuffix =1579
+    ItemSuffix =1580
     Left =4065
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
@@ -529,6 +529,36 @@ Begin Form
                     WebImagePaddingBottom =-1
                     Overlaps =1
                 End
+                Begin Label
+                    OverlapFlags =85
+                    TextAlign =2
+                    Left =453
+                    Top =6066
+                    Width =680
+                    Height =453
+                    FontSize =16
+                    BorderColor =8355711
+                    ForeColor =4210752
+                    Name ="DS_FULL_AXIS_SCROLLING"
+                    Caption ="❖"
+                    FontName ="Segoe UI Symbol"
+                    OnMouseDown ="[Event Procedure]"
+                    OnMouseUp ="[Event Procedure]"
+                    OnMouseMove ="[Event Procedure]"
+                    Tag ="⦻⌖⌬ⓢⓈ🕸☻❖"
+                    ControlTipText ="Click and drag this icon for 2-Axis scrolling.\015\012(Ctrl + Space)"
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    LayoutCachedLeft =453
+                    LayoutCachedTop =6066
+                    LayoutCachedWidth =1133
+                    LayoutCachedHeight =6519
+                    ThemeFontIndex =-1
+                    ForeTint =75.0
+                End
             End
         End
     End
@@ -545,9 +575,32 @@ Option Explicit
 Private pAutoRefresh As Boolean
 Private dX As DictionaryEx
 
+Private pFullAxisScrolling As Boolean
+
 
 Private Sub DS_AUTO_REFRESH_BUTTON_Click()
     pAutoRefresh = Not pAutoRefresh
+End Sub
+
+Private Sub DS_FULL_AXIS_SCROLLING_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    Debug.Print "DOWN"
+    pFullAxisScrolling = True
+End Sub
+
+Private Sub DS_FULL_AXIS_SCROLLING_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    Static lastFullAxisScrollingState As Long
+    
+    If CLng(pFullAxisScrolling) - 1 <> lastFullAxisScrollingState Then
+        lastFullAxisScrollingState = CLng(pFullAxisScrolling) - 1
+        If pFullAxisScrolling Then ScreenLib.MouseMoveCursor = True
+    Else
+        If Not pFullAxisScrolling Then ScreenLib.MouseHelpCursor = True
+    End If
+End Sub
+
+Private Sub DS_FULL_AXIS_SCROLLING_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    Debug.Print "UP"
+    pFullAxisScrolling = False
 End Sub
 
 Private Sub DS_REFRESH_BUTTON_Click()

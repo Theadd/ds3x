@@ -18,13 +18,13 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =3713
+    Width =4399
     DatasheetFontHeight =11
-    ItemSuffix =1562
-    Left =4440
-    Top =4500
-    Right =7590
-    Bottom =7080
+    ItemSuffix =1574
+    Left =4065
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -32,6 +32,8 @@ Begin Form
     Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
     OnKeyDown ="[Event Procedure]"
+    OnKeyUp ="[Event Procedure]"
+    OnTimer ="[Event Procedure]"
     OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
@@ -312,24 +314,26 @@ Begin Form
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =3120
+            Height =3074
             Name ="Detalle"
-            AlternateBackThemeColorIndex =4
-            AlternateBackTint =40.0
-            BackThemeColorIndex =3
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =60.0
+            BackThemeColorIndex =1
+            BackShade =60.0
             Begin
                 Begin Subform
+                    Locked = NotDefault
                     CanGrow = NotDefault
                     TabStop = NotDefault
                     OverlapFlags =85
                     OldBorderStyle =0
                     Top =15
-                    Width =3433
-                    Height =2834
-                    TabIndex =1
+                    Width =690
+                    Height =2788
+                    TabIndex =3
                     BorderColor =10921638
-                    Name ="DS_VIEWPORT"
-                    SourceObject ="Form.DS_VIEWPORT"
+                    Name ="DS_VIEWPORT_STICKY"
+                    SourceObject ="Form.DS_VIEWPORT_STICKY"
                     GroupTable =2
                     LeftPadding =0
                     TopPadding =15
@@ -338,8 +342,38 @@ Begin Form
                     GridlineColor =10921638
 
                     LayoutCachedTop =15
-                    LayoutCachedWidth =3433
-                    LayoutCachedHeight =2849
+                    LayoutCachedWidth =690
+                    LayoutCachedHeight =2803
+                    LayoutGroup =1
+                    GroupTable =2
+                    ShowPageHeaderAndPageFooter =0
+                End
+                Begin Subform
+                    CanGrow = NotDefault
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    OldBorderStyle =0
+                    Left =705
+                    Top =15
+                    Width =3433
+                    Height =2788
+                    TabIndex =1
+                    BorderColor =10921638
+                    Name ="DS_VIEWPORT"
+                    SourceObject ="Form.DS_VIEWPORT"
+                    GroupTable =2
+                    LeftPadding =15
+                    TopPadding =15
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+
+                    LayoutCachedLeft =705
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =4138
+                    LayoutCachedHeight =2803
+                    ColumnStart =1
+                    ColumnEnd =1
                     LayoutGroup =1
                     GroupTable =2
                     ShowPageHeaderAndPageFooter =0
@@ -392,11 +426,11 @@ Begin Form
                     SizeMode =1
                     OldBorderStyle =0
                     OverlapFlags =85
-                    Top =2850
-                    Width =3433
-                    Height =270
+                    Top =2805
+                    Width =4138
+                    Height =269
                     AutoActivate =1
-                    TabIndex =3
+                    TabIndex =4
                     BorderColor =10921638
                     Name ="SCROLLBAR_X"
                     OleData = Begin
@@ -419,11 +453,11 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000a0b897a498c4d9010700000080000000 ,
+                        0x004a803d000000000000000000000000d0a44e477ecdd9010700000080000000 ,
                         0x0000000003004f006c0065004f0062006a006500630074004400610074006100 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x000000001e000201ffffffff02000000ffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000100000030000000 ,
+                        0x000000000000000000000000000000000000000000000000010000002c000000 ,
                         0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
                         0x4400610074006100000000000000000000000000000000000000000000000000 ,
                         0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
@@ -451,7 +485,7 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000306010159bc4d9010500000080000000 ,
+                        0x004a803d000000000000000000000000b0bdc6388acdd9010500000080000000 ,
                         0x0000000003004f006c0065004f0062006a006500630074004400610074006100 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x000000001e000201ffffffff02000000ffffffff000000000000000000000000 ,
@@ -499,7 +533,7 @@ Begin Form
                         0xffffffff38000000000000000100000000000000000000000000000000000000 ,
                         0x0000000038000000000000000000000000000000000000000000000000000000 ,
                         0x00000000e081d1df2f5ece11a44900aa004a803d0002180048300000e02e0000 ,
-                        0xb004000001000000a5170000da010000da010000000000000000000000000000 ,
+                        0xb004000001000000811c0000d8010000da010000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
@@ -523,19 +557,21 @@ Begin Form
                     BottomPadding =0
                     GridlineColor =10921638
 
-                    LayoutCachedTop =2850
-                    LayoutCachedWidth =3433
-                    LayoutCachedHeight =3120
+                    LayoutCachedTop =2805
+                    LayoutCachedWidth =4138
+                    LayoutCachedHeight =3074
                     RowStart =1
                     RowEnd =1
+                    ColumnEnd =1
                     LayoutGroup =1
                     GroupTable =2
                 End
                 Begin EmptyCell
-                    Left =3435
-                    Top =2850
-                    Width =270
-                    Height =270
+                    BackStyle =1
+                    Left =4140
+                    Top =2805
+                    Width =259
+                    Height =269
                     Name ="CeldaVacía1559"
                     GroupTable =2
                     LeftPadding =0
@@ -543,15 +579,16 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    LayoutCachedLeft =3435
-                    LayoutCachedTop =2850
-                    LayoutCachedWidth =3705
-                    LayoutCachedHeight =3120
+                    LayoutCachedLeft =4140
+                    LayoutCachedTop =2805
+                    LayoutCachedWidth =4399
+                    LayoutCachedHeight =3074
                     RowStart =1
                     RowEnd =1
-                    ColumnStart =1
-                    ColumnEnd =1
+                    ColumnStart =2
+                    ColumnEnd =2
                     LayoutGroup =1
+                    BackThemeColorIndex =3
                     GroupTable =2
                 End
                 Begin CustomControl
@@ -560,18 +597,18 @@ Begin Form
                     SizeMode =1
                     OldBorderStyle =0
                     OverlapFlags =85
-                    Left =3435
+                    Left =4140
                     Top =15
-                    Width =270
-                    Height =2834
+                    Width =259
+                    Height =2788
                     AutoActivate =1
                     TabIndex =2
                     BorderColor =10921638
                     Name ="SCROLLBAR_Y"
                     OleData = Begin
-                        0x00120000d0cf11e0a1b11ae1000000000000000000000000000000003e000300 ,
-                        0xfeff090006000000000000000000000001000000000000000000000000100000 ,
-                        0x0600000001000000feffffff0000000001000000ffffffffffffffffffffffff ,
+                        0x000e0000d0cf11e0a1b11ae1000000000000000000000000000000003e000300 ,
+                        0xfeff090006000000000000000000000001000000020000000000000000100000 ,
+                        0x0400000001000000feffffff0000000003000000ffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
@@ -588,7 +625,7 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000d00ed8e922cad9010700000040010000 ,
+                        0x004a803d000000000000000000000000e0e5b27c7fcdd9010700000040010000 ,
                         0x0000000063006f006e00740065006e0074007300000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x00000000120002010200000003000000ffffffff000000000000000000000000 ,
@@ -620,19 +657,19 @@ Begin Form
                         0xffffffff52006f006f007400200045006e007400720079000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000016000500ffffffffffffffff01000000e081d1df2f5ece11a44900aa ,
-                        0x004a803d000000000000000000000000209b9c7b22cad9010500000000010000 ,
+                        0x004a803d00000000000000000000000040cd04e582cdd9010500000040010000 ,
                         0x0000000063006f006e00740065006e0074007300000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x000000001200020102000000ffffffffffffffff000000000000000000000000 ,
-                        0x000000000000000000000000000000000000000000000000030000001c000000 ,
+                        0x00000000120002010200000003000000ffffffff000000000000000000000000 ,
+                        0x000000000000000000000000000000000000000000000000040000001c000000 ,
                         0x00000000010043006f006d0070004f0062006a00000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000012000200ffffffffffffffffffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000088000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000ffffffffffffffffffffffff000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000100000088000000 ,
+                        0x0000000003004100630063006500730073004f0062006a005300690074006500 ,
+                        0x4400610074006100000000000000000000000000000000000000000000000000 ,
+                        0x0000000026000200ffffffffffffffffffffffff000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000038000000 ,
                         0x00000000fffffffffffffffffefffffffdfffffffefffffffeffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
@@ -649,39 +686,7 @@ Begin Form
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffff0100000002000000fefffffffeffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
-                        0xffffffff0100feff030a0000ffffffffe081d1df2f5ece11a44900aa004a803d ,
-                        0x2e000000426172726120646520646573706c617a616d69656e746f206465204d ,
-                        0x6963726f736f667420466f726d7320322e0010000000456d626564646564204f ,
-                        0x626a6563740012000000466f726d732e5363726f6c6c4261722e3100f439b271 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x000000000002180048300000e02e0000b004000001000000a5170000da010000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x00000000feffffff0200000003000000fefffffffeffffffffffffffffffffff ,
+                        0xfffffffffeffffff0200000003000000fefffffffeffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
                         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff ,
@@ -705,7 +710,7 @@ Begin Form
                         0x626a6563740012000000466f726d732e5363726f6c6c4261722e3100f439b271 ,
                         0x000000000000000000000000e02e0000b004000001000000a5170000da010000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
-                        0x000000000002180048300000e02e0000b004000000000000da01000085130000 ,
+                        0x000000000002180048300000e02e0000b004000000000000c701000032130000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
                         0x0000000000000000000000000000000000000000000000000000000000000000 ,
@@ -724,12 +729,12 @@ Begin Form
                     BottomPadding =0
                     GridlineColor =10921638
 
-                    LayoutCachedLeft =3435
+                    LayoutCachedLeft =4140
                     LayoutCachedTop =15
-                    LayoutCachedWidth =3705
-                    LayoutCachedHeight =2849
-                    ColumnStart =1
-                    ColumnEnd =1
+                    LayoutCachedWidth =4399
+                    LayoutCachedHeight =2803
+                    ColumnStart =2
+                    ColumnEnd =2
                     LayoutGroup =1
                     GroupTable =2
                 End
@@ -748,37 +753,46 @@ Option Explicit
 Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
 
 
-' --- EVENTS ---
+' --- PUBLIC EVENTS ---
 
+Public Event OnRowNumberClick(ByVal RowIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
 Public Event OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
 Public Event OnColumnNameChange(ByVal ColumnIndex As Long, ByVal FromValue As String, ByVal ToValue As String)
+Public Event OnCellEnter(ByVal RowIndex As Long, ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+Public Event OnClearSelectionRequest()
+Public Event OnSelectionControlKeyDown(ByRef KeyCode As Integer, ByRef Shift As Integer)
 
-' ---
+' --- PRIVATE ---
 
 Private pKeepScrollPositionOnTableChange As Boolean
 Private pEnableOutOfRangeScrolling As Boolean
-Private pHideColumnLetters As Boolean
 Private pInvertScrollInputAxis As Boolean
 
 Private pTable As dsTable
 Private pSelectedColumns As ArrayListEx
-
-
-' --- INTERNAL ---
+Private pSelectedRows As ArrayListEx
 
 ' The amount of overflowing scroll to the right after the last table column
 Private pOutOfBoundsScrollX As Long
 Private pOutOfBoundsScrollY As Long
-'Private pCurrentPageIndex As Long
 Private pScrollPageSizeX As Long
 Private pScrollPageSizeY As Long
 Private pInitialized As Boolean
+Private pReady As Boolean
 Private pLastScrollX As Variant
 Private pLastScrollY As Variant
+Private pPointerCapture As Boolean
+Private pCapturedPointerPosition As ScreenLib.POINTAPI
+Private pScrollSpeedMultiplier As Long
 
 Private pViewport As Form_DS_VIEWPORT
+Private pViewportSticky As Form_DS_VIEWPORT_STICKY
 Private WithEvents pWorksheet As Form_DS_WORKSHEET
 Attribute pWorksheet.VB_VarHelpID = -1
+Private WithEvents pWorksheetHeaders As Form_DS_WORKSHEET_HEADERS
+Attribute pWorksheetHeaders.VB_VarHelpID = -1
+Private WithEvents pWorksheetNumbers As Form_DS_WORKSHEET_NUMBERS
+Attribute pWorksheetNumbers.VB_VarHelpID = -1
 
 
 ' --- PUBLIC PROPERTIES ---
@@ -789,12 +803,13 @@ Public Property Set Table(ByRef Value As dsTable): SetTable Value: End Property
 Public Property Get SelectedColumns() As Variant: SelectedColumns = pSelectedColumns.ToArray(): End Property
 Public Property Let SelectedColumns(ByVal Value As Variant): SetSelectedColumns Value: End Property
 
+Public Property Get SelectedRows() As Variant: SelectedRows = pSelectedRows.ToArray(): End Property
+Public Property Let SelectedRows(ByVal Value As Variant): SetSelectedRows Value: End Property
+
 Public Property Get KeepScrollPositionOnTableChange() As Boolean: KeepScrollPositionOnTableChange = pKeepScrollPositionOnTableChange: End Property
 Public Property Let KeepScrollPositionOnTableChange(ByVal Value As Boolean): pKeepScrollPositionOnTableChange = Value: End Property
 Public Property Get EnableOutOfRangeScrolling() As Boolean: EnableOutOfRangeScrolling = pEnableOutOfRangeScrolling: End Property
 Public Property Let EnableOutOfRangeScrolling(ByVal Value As Boolean): pEnableOutOfRangeScrolling = Value: End Property
-Public Property Get HideColumnLetters() As Boolean: HideColumnLetters = pHideColumnLetters: End Property
-Public Property Let HideColumnLetters(ByVal Value As Boolean): pHideColumnLetters = Worksheet.HideColumnLetters(Value): End Property
 Public Property Get InvertScrollInputAxis() As Boolean: InvertScrollInputAxis = pInvertScrollInputAxis: End Property
 Public Property Let InvertScrollInputAxis(ByVal Value As Boolean): pInvertScrollInputAxis = Value: End Property
 
@@ -804,8 +819,17 @@ Public Property Let InvertScrollInputAxis(ByVal Value As Boolean): pInvertScroll
 Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
 Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
 
+Public Property Get WorksheetHeaders() As Form_DS_WORKSHEET_HEADERS: Set WorksheetHeaders = pWorksheetHeaders: End Property
+Public Property Set WorksheetHeaders(ByRef Value As Form_DS_WORKSHEET_HEADERS): Set pWorksheetHeaders = Value: End Property
+
+Public Property Get WorksheetNumbers() As Form_DS_WORKSHEET_NUMBERS: Set WorksheetNumbers = pWorksheetNumbers: End Property
+Public Property Set WorksheetNumbers(ByRef Value As Form_DS_WORKSHEET_NUMBERS): Set pWorksheetNumbers = Value: End Property
+
 Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
 Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = Value: End Property
+
+Public Property Get ViewportSticky() As Form_DS_VIEWPORT_STICKY: Set ViewportSticky = pViewportSticky: End Property
+Public Property Set ViewportSticky(ByRef Value As Form_DS_VIEWPORT_STICKY): Set pViewportSticky = Value: End Property
 
 Public Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
@@ -821,27 +845,19 @@ Public Property Let OutOfBoundsScrollY(ByVal Value As Long): pOutOfBoundsScrollY
 Public Property Get ScrollPageSizeX() As Long: ScrollPageSizeX = pScrollPageSizeX: End Property
 Public Property Get ScrollPageSizeY() As Long: ScrollPageSizeY = pScrollPageSizeY: End Property
 
+Public Property Get PointerCapture() As Boolean: PointerCapture = pPointerCapture: End Property
+Public Property Let PointerCapture(ByVal Value As Boolean): SetPointerCapture Value: End Property
+
 
 ' --- FORM EVENTS ---
 
-Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
-    If KeyCode = vbKeyP Then
-        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-            Stop
-        End If
-    End If
-    If KeyCode = vbKeyH Then
-        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-            HideColumnLetters = Not HideColumnLetters
-        End If
-    End If
-End Sub
-
 Private Sub Form_Load()
     ScreenLib_Resync
+    pScrollSpeedMultiplier = 1
     pLastScrollX = Array(0, 0)
     pLastScrollY = Array(0, 0)
     Set pSelectedColumns = ArrayListEx.Create()
+    Set pSelectedRows = ArrayListEx.Create()
     Setup
     
     If Not IsSubform Then
@@ -850,6 +866,7 @@ Private Sub Form_Load()
         ' TODO: Remove
         SetupDevelopmentEnvironment
     End If
+    Me.TimerInterval = 1
 End Sub
 
 Private Sub Form_Resize()
@@ -860,19 +877,40 @@ Private Sub Form_Resize()
     End If
 End Sub
 
+Private Sub Form_Timer()
+    Me.TimerInterval = 0
+    If pPointerCapture Then
+        ScrollUsingLastCapturedPointerPosition
+        If pPointerCapture Then Me.TimerInterval = 100
+    End If
+    If Not pReady Then
+        pReady = True
+        ApplyScrollbarY 0
+    End If
+End Sub
+
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
     Me.TimerInterval = 0
 End Sub
+
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): OnKeyDownHandler KeyCode, Shift: End Sub
+Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): OnKeyUpHandler KeyCode, Shift: End Sub
 
 
 ' --- SETUP / BINDING ---
 
 Private Sub Setup()
     Set Viewport = Me.DS_VIEWPORT.Form
-    Set Viewport.Scrollview = Me
-    Viewport.Setup
-    Set Worksheet = Viewport.Worksheet
+    Set pViewport.Scrollview = Me
+    Set ViewportSticky = Me.DS_VIEWPORT_STICKY.Form
+    Set pViewportSticky.Scrollview = Me
+    pViewportSticky.Setup
+    Set WorksheetNumbers = pViewportSticky.WorksheetNumbers
+    Set pViewport.WorksheetNumbers = pWorksheetNumbers
+    pViewport.Setup
+    Set Worksheet = pViewport.Worksheet
+    Set WorksheetHeaders = pViewport.WorksheetHeaders
 End Sub
 
 Private Sub SetTable(ByRef Value As dsTable)
@@ -889,17 +927,24 @@ End Sub
 Private Sub SetSelectedColumns(ByVal Value As Variant)
     pSelectedColumns.Clear
     pSelectedColumns.AddRange Value
-    pWorksheet.SetSelectedColumns pSelectedColumns
+    pWorksheetHeaders.SetSelectedColumns pSelectedColumns
+End Sub
+
+Private Sub SetSelectedRows(ByVal Value As Variant)
+    pSelectedRows.Clear
+    pSelectedRows.AddRange Value
+    pWorksheetNumbers.SetSelectedRows pSelectedRows
 End Sub
 
 
 ' --- CONTENT RESIZING ---
 
 Private Sub ResizeFormContent()
-    Dim mW As Long, mH As Long
+    Dim mW As Long, mH As Long, c As Long, t As Long
     
     mW = Me.InsideWidth
-    mH = Me.InsideHeight
+    mH = Me.InsideHeight + 15
+    c = Me.DS_VIEWPORT_STICKY.Form.DS_WORKSHEET_NUMBERS.Form.MaxContentWidthLimit
     
     With Me.SCROLLBAR_X
         .Height = 270
@@ -908,38 +953,49 @@ Private Sub ResizeFormContent()
     End With
     With Me.DS_VIEWPORT
         .Height = mH - (270 + .Top)
-        .Width = mW - 270
+        .Width = mW - (270 + c)
+        .Left = c
         Me.SCROLLBAR_X.Top = .Height + .Top
+    End With
+    With Me.DS_VIEWPORT_STICKY
+        .Left = 0
+        .Width = c
+        .Height = Me.DS_VIEWPORT.Height
     End With
     With Me.SCROLLBAR_Y
         .Height = mH - (270 + .Top)
         .Width = 270
-        .Left = mW - 270
+        .Left = mW - (270 + c)
     End With
+End Sub
+
+
+' --- SELECTION ---
+
+Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional ByVal PropagateEvent As Boolean = True)
+    ' TODO
 End Sub
 
 
 ' --- SCROLLING ---
 
+Private Sub ScrollUsingLastCapturedPointerPosition()
+    Dim p As ScreenLib.POINTAPI, X As Long, Y As Long
+
+    p = ScreenLib.GetCursorPosition
+    X = p.X - pCapturedPointerPosition.X
+    Y = p.Y - pCapturedPointerPosition.Y
+    ScreenLib.SetCursorPosition pCapturedPointerPosition
+    ApplyScrollbarX Max(Me.SCROLLBAR_X.Value + (X * pScrollSpeedMultiplier), 0)
+    ApplyScrollbarY Max(Me.SCROLLBAR_Y.Value + (Y * pScrollSpeedMultiplier), 0)
+End Sub
+
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
-    Dim sAxisX As Boolean, sMod As Double
+    Dim sAxisX As Boolean, sMod As Long
     sAxisX = pInvertScrollInputAxis
     
-    If GetAsyncKeyState(vbKeyShift) Then
-        If GetAsyncKeyState(vbKeyControl) Then
-            sAxisX = Not sAxisX
-            sMod = 3#
-        Else
-            sMod = 3#
-        End If
-    Else
-        If GetAsyncKeyState(vbKeyControl) Then
-            sAxisX = Not sAxisX
-            sMod = 1#
-        Else
-            sMod = 1#
-        End If
-    End If
+    sMod = IIf(GetAsyncKeyState(vbKeyShift), 3, 1)
+    sAxisX = IIf(GetAsyncKeyState(vbKeyControl), Not sAxisX, sAxisX)
     
     If sAxisX Then
         ApplyScrollbarX CLng(Me.SCROLLBAR_X.Value + (Count * sMod * Me.SCROLLBAR_X.SmallChange))
@@ -948,23 +1004,12 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     End If
 End Function
 
-Private Sub SCROLLBAR_X_Change()
-    ApplyScrollbarX
-End Sub
+Private Sub SCROLLBAR_X_Change(): ApplyScrollbarX: End Sub
+Private Sub SCROLLBAR_X_Scroll(): ApplyScrollbarX: End Sub
+Private Sub SCROLLBAR_Y_Change(): ApplyScrollbarY: End Sub
+Private Sub SCROLLBAR_Y_Scroll(): ApplyScrollbarY: End Sub
 
-Private Sub SCROLLBAR_X_Scroll()
-    ApplyScrollbarX
-End Sub
-
-Private Sub SCROLLBAR_Y_Change()
-    ApplyScrollbarY
-End Sub
-
-Private Sub SCROLLBAR_Y_Scroll()
-    ApplyScrollbarY
-End Sub
-
-Private Sub ApplyScrollbarY(Optional ByVal yVal As Variant)
+Public Sub ApplyScrollbarY(Optional ByVal yVal As Variant)
     If (Not Me.SCROLLBAR_Y.Visible) Or (Not pInitialized) Then Exit Sub
     Dim rawMax As Long
     
@@ -996,7 +1041,7 @@ Private Sub ApplyScrollbarY(Optional ByVal yVal As Variant)
     End With
 End Sub
 
-Private Sub ApplyScrollbarX(Optional ByVal xVal As Variant)
+Public Sub ApplyScrollbarX(Optional ByVal xVal As Variant)
     ' TODO: On Error GoTo Finally
     If (Not Me.SCROLLBAR_X.Visible) Or (Not pInitialized) Then Exit Sub
     Dim rawMax As Long
@@ -1065,12 +1110,13 @@ Private Sub UpdateScrollbarX()
     '|________________________________________|
     '                                         * Viewport.ViewportContentFullWidth
     
-    Dim xMax As Long, cellSizeX As Long, fullViewportContentSizeX As Long
+    Dim xMax As Long, cellSizeX As Long, fullViewportContentSizeX As Long, viewSizeX As Long
     
+    viewSizeX = Me.InsideWidth - 270 - Me.DS_VIEWPORT.Left
     cellSizeX = Worksheet.GridCellSizeX
-    pScrollPageSizeX = CLng(Int(Me.InsideWidth / cellSizeX)) * cellSizeX
+    pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
     fullViewportContentSizeX = (pTable.ColumnCount - 0) * cellSizeX
-    xMax = Max((fullViewportContentSizeX + OutOfBoundsScrollX) - Me.InsideWidth, 0)
+    xMax = Max((fullViewportContentSizeX + OutOfBoundsScrollX) - viewSizeX, 0)
     With Me.SCROLLBAR_X
         .Max = xMax
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
@@ -1086,11 +1132,12 @@ End Sub
 
 ' --- EVENTS ---
 
-Private Sub pWorksheet_OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+Private Sub pWorksheetHeaders_OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    pWorksheetHeaders.RemoveFocus
     RaiseEvent OnColumnLetterClick(ColumnIndex, CtrlKey, ShiftKey)
 End Sub
 
-Private Sub pWorksheet_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
+Private Sub pWorksheetHeaders_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
     Dim oldValue As String
     
     On Error GoTo Finally
@@ -1101,6 +1148,66 @@ Private Sub pWorksheet_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal V
         RaiseEvent OnColumnNameChange(ColumnIndex, oldValue, Value)
     End If
 Finally:
+End Sub
+
+Private Sub pWorksheetNumbers_OnRowNumberClick(ByVal RowIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    pWorksheetHeaders.RemoveFocus
+    RaiseEvent OnRowNumberClick(RowIndex, CtrlKey, ShiftKey)
+End Sub
+
+Private Sub pWorksheet_OnCellEnter(ByVal RowIndex As Long, ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    pWorksheetHeaders.RemoveFocus
+    RaiseEvent OnCellEnter(RowIndex, ColumnIndex, CtrlKey, ShiftKey)
+End Sub
+
+
+' --- EVENTS: Internal Event Actions
+
+Friend Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
+    Select Case KeyCode
+        Case vbKeyUp, vbKeyRight, vbKeyDown, vbKeyLeft, vbKeyPageUp, vbKeyPageDown, vbKeyHome, vbKeyEnd, vbKeyEscape, vbKeyTab, vbKeyReturn
+            RaiseEvent OnSelectionControlKeyDown(KeyCode, Shift)
+            Debug.Print Printf("KeyCode AFTER RAISING EVENT: %1", KeyCode)
+    End Select
+    
+    If KeyCode = vbKeyDown Then
+        If Shift = 2 Then
+            Debug.Print "Stop default action for Ctrl + Down"
+            KeyCode = 0
+        End If
+    End If
+    If KeyCode = vbKeyP Then
+        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
+            Stop
+        End If
+    End If
+    If KeyCode = vbKeyShift Then
+        pScrollSpeedMultiplier = 3
+    Else
+        SetPointerCapture (KeyCode = vbKeySpace And (Shift = 2 Or Shift = 3))
+    End If
+End Sub
+
+Friend Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
+    If KeyCode = vbKeyShift Then
+        pScrollSpeedMultiplier = 1
+    ElseIf pPointerCapture Then
+        SetPointerCapture False
+    End If
+End Sub
+
+Friend Sub TriggerOnClearSelectionRequest()
+    RaiseEvent OnClearSelectionRequest
+End Sub
+
+Private Sub SetPointerCapture(ByVal Value As Boolean)
+    If pPointerCapture = Value Then Exit Sub
+    Me.TimerInterval = 0
+    pPointerCapture = Value
+    If Value Then
+        pCapturedPointerPosition = ScreenLib.GetCursorPosition
+        Me.TimerInterval = 100
+    End If
 End Sub
 
 
