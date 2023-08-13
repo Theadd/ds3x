@@ -21,6 +21,9 @@ Public Declare PtrSafe Function ClientToScreen Lib "user32" (ByVal hWnd As LongP
 Public Declare PtrSafe Function ScreenToClient Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
 
 Private Declare PtrSafe Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As Long
+Private Declare PtrSafe Function SetCursorPos Lib "user32" (ByVal X As Long, ByVal Y As Long) As Long
+Private Declare PtrSafe Function LoadCursor Lib "user32" Alias "LoadCursorA" (ByVal hInstance As LongPtr, ByVal lpCursorName As Long) As LongPtr
+Private Declare PtrSafe Function SetCursor Lib "user32" (ByVal hCursor As LongPtr) As LongPtr
 
 Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As LongPtr) As LongPtr
 Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As LongPtr, ByVal hDC As LongPtr) As Long
@@ -31,7 +34,7 @@ Public Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, 
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
-Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal CY As Long, ByVal wFlags As Long) As Long
+Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long) As Long
 Private Declare PtrSafe Function GetDesktopWindow Lib "user32" () As LongPtr
 
 Private Declare PtrSafe Function CalculatePopupWindowPosition Lib "user32" (anchorPoint As POINTAPI, windowSize As SIZE, ByVal flags As Long, excludeRect As RECT, outPosition As RECT) As Boolean  ' https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-calculatepopupwindowposition
@@ -82,7 +85,7 @@ Private Const HWND_BOTTOM As Long = 1        ' Places the window at the bottom o
 
 Private Type SIZE
         cX As Long
-        CY As Long
+        cY As Long
 End Type
 
 Public Type POINTAPI
@@ -117,7 +120,6 @@ Public Enum DirectionType
 End Enum
 
 
-
 ' --- MEMBERS ---
 
 Public TwipsPerPixelX As Long   ' Twips per pixel for screen in X
@@ -147,7 +149,14 @@ Private VirtualScreenRect As RECT
 Private TotalScreenMonitors As Long
 Private SecondaryScreenDirection As DirectionType
 
+' --- MOUSE CURSORS ----
 
+Private pMouseMoveCursor As LongPtr
+Private pMouseHandCursor As LongPtr
+Private pMouseBusyCursor As LongPtr
+Private pMouseLoadingCursor As LongPtr
+Private pMouseUnavailableCursor As LongPtr
+Private pMouseHelpCursor As LongPtr
 
 
 ' --- PROPERTIES ---
@@ -181,9 +190,20 @@ Public Property Let IsVBEMainWindowVisible(ByVal ShouldBeVisible As Boolean)
 End Property
 
 
+' --- PROPERTIES: MOUSE CURSORS ---
+
+' More cursor types at https://learn.microsoft.com/en-us/windows/win32/menurc/about-cursors
+Public Property Let MouseMoveCursor(ByVal Value As Boolean): SetCursorType pMouseMoveCursor, 32646&, Value: End Property
+Public Property Let MouseHandCursor(ByVal Value As Boolean): SetCursorType pMouseHandCursor, 32649&, Value: End Property
+Public Property Let MouseBusyCursor(ByVal Value As Boolean): SetCursorType pMouseBusyCursor, 32514&, Value: End Property
+Public Property Let MouseLoadingCursor(ByVal Value As Boolean): SetCursorType pMouseLoadingCursor, 32650&, Value: End Property
+Public Property Let MouseUnavailableCursor(ByVal Value As Boolean): SetCursorType pMouseUnavailableCursor, 32648&, Value: End Property
+Public Property Let MouseHelpCursor(ByVal Value As Boolean): SetCursorType pMouseHelpCursor, 32651&, Value: End Property
+
+
 ' --- PRIVATE FUNCTIONS ---
 
-Private Function PointToSize(p As POINTAPI) As SIZE: PointToSize.cX = p.X: PointToSize.CY = p.Y: End Function
+Private Function PointToSize(p As POINTAPI) As SIZE: PointToSize.cX = p.X: PointToSize.cY = p.Y: End Function
 
 ' --- PUBLIC FUNCTIONS ---
 
@@ -255,6 +275,11 @@ Public Function PointInPixels(p As POINTAPI) As POINTAPI
 End Function
 
 Public Function GetCursorPosition() As POINTAPI: GetCursorPos GetCursorPosition: GetCursorPosition = PointInTwips(GetCursorPosition): End Function
+Public Sub SetCursorPosition(p As POINTAPI)
+    With PointInPixels(p)
+        SetCursorPos .X, .Y
+    End With
+End Sub
 
 Public Function GetWindowRect(f As Access.Form) As RECT: GetWindowRect32 f.hWnd, GetWindowRect: GetWindowRect = RectInTwips(GetWindowRect): End Function
 
@@ -612,6 +637,19 @@ Private Function GetClassName(ByVal lgHwnd As LongPtr) As String
     dl = GetClassName32(lgHwnd, stBuf, 255)
     If InStr(stBuf, Chr$(0)) Then stBuf = Left$(stBuf, InStr(stBuf, Chr$(0)) - 1)
     GetClassName = stBuf
+End Function
+
+Private Function SetCursorType(ByRef TargetCursor As LongPtr, ByVal CursorId As Long, ByVal ActiveState As Boolean) As LongPtr
+    If ActiveState Then
+        If Not TargetCursor > 0 Then TargetCursor = LoadCursor(0, CLng(CursorId))
+        If TargetCursor > 0 Then
+            SetCursorType = SetCursor(TargetCursor)
+            Exit Function
+        End If
+    End If
+    ' TODO: Remove
+    Debug.Print "FALLBACK TO NORMAL CURSOR"
+    Screen.MousePointer = 1
 End Function
 
 
