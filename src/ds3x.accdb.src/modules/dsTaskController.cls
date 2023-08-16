@@ -164,18 +164,13 @@ Private Sub Rebuild(ByVal TargetIndex As Long)
         If TryGetSourceWorksheetForSequence(pDirtyRebuildIndex, oWorksheet) Then
             Set pWorksheet = oWorksheet
         End If
-'        If (Not oTable Is Nothing) Or (Not oWorksheet Is Nothing) Then
-            On Error GoTo RebuildTaskFail
-            For i = pDirtyRebuildIndex To TargetIndex
-                pSequenceIndex = i
-                RebuildTask dX.Bind(pRebuildSequence.Item(i)).Instance
-                pDirtyRebuildIndex = i + 1
-            Next i
-'        Else
-'            On Error GoTo RebuildTaskFail
-'            pSequenceIndex = pDirtyRebuildIndex
-'            Err.Raise 31004     ' No Object
-'        End If
+
+        On Error GoTo RebuildTaskFail
+        For i = pDirtyRebuildIndex To TargetIndex
+            pSequenceIndex = i
+            RebuildTask dX.Bind(pRebuildSequence.Item(i)).Instance
+            pDirtyRebuildIndex = i + 1
+        Next i
     End If
     
     On Error GoTo 0
@@ -185,8 +180,6 @@ Private Sub Rebuild(ByVal TargetIndex As Long)
         If TryGetSourceWorksheetForSequence(TargetIndex + 1, oWorksheet) Then
             Set pWorksheet = oWorksheet
         End If
-    Else
-        'Stop    ' TODO: REMOVE
     End If
     
 ExitRebuild:
@@ -247,7 +240,7 @@ End Sub
 
 Public Sub Dispose()
     On Error Resume Next
-    Debug.Print "[INFO] @dsTaskController.Dispose()"
+'    Debug.Print "[INFO] @dsTaskController.Dispose()"
     Set pTable = Nothing
     pTaskResults.RemoveAll
     pDataSources.RemoveAll
@@ -589,11 +582,10 @@ Public Sub FreeUnlinkedResources()
     iMax = UBound(gcKeys)
     
     On Error GoTo StopOnError
-    
-    Debug.Print "[DEBUG] Running GarbageCollector:"
-    Debug.Print "    TaskResults.Keys: " & JSON.Stringify(trKeys)
-    Debug.Print "    DataSources.Keys: " & JSON.Stringify(dsKeys)
-    Debug.Print "    GarbageCollector.Keys: " & JSON.Stringify(gcKeys)
+'    Debug.Print "[DEBUG] Running GarbageCollector:"
+'    Debug.Print "    TaskResults.Keys: " & JSON.Stringify(trKeys)
+'    Debug.Print "    DataSources.Keys: " & JSON.Stringify(dsKeys)
+'    Debug.Print "    GarbageCollector.Keys: " & JSON.Stringify(gcKeys)
     
     For i = iMax To 0 Step -1
         cKey = gcKeys(i)

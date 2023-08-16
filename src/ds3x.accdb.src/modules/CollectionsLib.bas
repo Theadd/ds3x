@@ -398,11 +398,6 @@ Public Function CreateBlankTable(ByVal RowsCount As Long, ByVal ColumnsCount As 
             For i = 0 To RowsCount - 1
                 aX.Add Array()
             Next i
-'            Set dsT = dsTable.Create(aX)
-'        ElseIf ColumnsCount > 0 Then
-'
-'        Else
-'
         End If
         Set dsT = dsTable.Create(aX)
     End If

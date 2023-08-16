@@ -257,11 +257,7 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
-    Debug.Print "[INFO] dsLiveEd.Terminate()"
-'    On Error Resume Next
-'    If Not pTaskController Is Nothing Then
-'        Destroy
-'    End If
+'    Debug.Print "[INFO] dsLiveEd.Terminate()"
     Destroy
 End Sub
 
