@@ -126,15 +126,20 @@ Private Sub pScrollview_OnClearSelectionRequest()
     SelectionApply
 End Sub
 
+Private Sub pScrollview_OnSelectAllRequest()
+    SelectionAddColumns 0, pScrollview.Table.ColumnCount - 1
+    SelectionApply
+End Sub
 
-'Friend Sub TriggerOnChangeEvent()
-'    RaiseEvent OnChange
-'    If pTaskController.IsValidTable Then
-'        Set pScrollview.Table = pTaskController.Table
-'    Else
-'        Set pScrollview.Table = CreateBlankTable(100, 0)
-'    End If
-'End Sub
+Private Sub pScrollview_OnInvertSelectionRequest()
+    Dim i As Long, iMax As Long
+    iMax = pScrollview.Table.ColumnCount - 1
+    
+    For i = 0 To iMax
+        SelectionToggleColumn i
+    Next i
+    SelectionApply
+End Sub
 
 
 ' --- SELECTION ---
@@ -147,56 +152,30 @@ Public Sub SelectionClear()
 End Sub
 
 Public Sub SelectionToggleRow(ByVal RowIndex As Long)
-    If pSelectedRowIndexes.Contains(RowIndex) Then
-        pSelectedRowIndexes.Remove RowIndex
-    Else
-        pSelectedRowIndexes.Add RowIndex
-    End If
+    ToggleElementInList pSelectedRowIndexes, RowIndex
 End Sub
 
 Public Sub SelectionToggleColumn(ByVal ColumnIndex As Long)
-    If pSelectedColumnIndexes.Contains(ColumnIndex) Then
-        pSelectedColumnIndexes.Remove ColumnIndex
-    Else
-        pSelectedColumnIndexes.Add ColumnIndex
-    End If
+    ToggleElementInList pSelectedColumnIndexes, ColumnIndex
 End Sub
 
 Public Sub SelectionAddRow(ByVal RowIndex As Long)
-    pSelectedRowIndexes.Add RowIndex
+    AddElementIfNotExists pSelectedRowIndexes, RowIndex
 End Sub
 
 Public Sub SelectionAddColumn(ByVal ColumnIndex As Long)
-    pSelectedColumnIndexes.Add ColumnIndex
+    AddElementIfNotExists pSelectedColumnIndexes, ColumnIndex
 End Sub
 
 Public Sub SelectionAddRows(ByVal FromRowIndex As Long, ByVal ToRowIndex As Long)
-    Dim i As Long, iStep As Long
-    
-    iStep = IIf(FromRowIndex <= ToRowIndex, 1, -1)
-    For i = FromRowIndex To ToRowIndex Step iStep
-        pSelectedRowIndexes.Add i
-    Next i
+    AddAllNonExistingInRange pSelectedRowIndexes, FromRowIndex, ToRowIndex
 End Sub
 
 Public Sub SelectionAddColumns(ByVal FromColumnIndex As Long, ByVal ToColumnIndex As Long)
-    Dim i As Long, iStep As Long
-
-    iStep = IIf(FromColumnIndex <= ToColumnIndex, 1, -1)
-    For i = FromColumnIndex To ToColumnIndex Step iStep
-        pSelectedColumnIndexes.Add i
-    Next i
+    AddAllNonExistingInRange pSelectedColumnIndexes, FromColumnIndex, ToColumnIndex
 End Sub
 
 Public Sub SelectionApply()
-    If pSelectedColumnIndexes.Count > 1 Then
-        pSelectedColumnIndexes.Unique
-        pSelectedColumnIndexes.Sort
-    End If
-    If pSelectedRowIndexes.Count > 1 Then
-        pSelectedRowIndexes.Unique
-        pSelectedRowIndexes.Sort
-    End If
     pScrollview.SelectedColumns = pSelectedColumnIndexes.ToArray
     pScrollview.SelectedRows = pSelectedRowIndexes.ToArray
 End Sub
@@ -217,9 +196,12 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
     Dim iAux As Long, cIndex As Long, rIndex As Long, sKeyCode As Integer: sKeyCode = KeyCode
     KeyCode = 0
     
+    Debug.Print Printf("%1 %2 CALLING OnSelectionControlKeyDown(%3, %4)", TimerSpan, vbTab, sKeyCode, Shift)
+    
     ' NOTE: use KeyCode = sKeyCode to avoid "preventing default action"
     With sView
         Select Case sKeyCode
+            ' KeyDown Arrow
             Case vbKeyDown
                 Select Case True
                     Case .IsColumnTrigger
@@ -256,27 +238,145 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
                             End If
                         End If
                 End Select
+            ' KeyUp Arrow
             Case vbKeyUp
-                
+                Select Case True
+                    Case .IsColumnTrigger
+                        SelectionClear
+                        MoveTo 0, .ColumnIndex, True
+                    Case .IsRowTrigger, .IsCellTrigger
+                        cIndex = IIf(.IsRowTrigger, -1, .Cell(1))
+                        rIndex = IIf(.IsRowTrigger, .RowIndex, .Cell(0))
+                        If Shift = 0 Then
+                            SelectionClear
+                            MoveTo rIndex - 1, cIndex, True
+                        ElseIf Shift = acCtrlMask Then
+                            SelectionClear
+                            If rIndex > .LastRowIndex Then
+                                MoveTo .LastRowIndex, cIndex, True
+                            Else
+                                MoveTo 0, cIndex, True
+                            End If
+                        ElseIf Shift = (acCtrlMask Or acShiftMask) Then ' Ctrl + Shift + ArrowDown
+                            iAux = rIndex
+                            rIndex = IIf(rIndex > .LastRowIndex, .LastRowIndex, 0)
+                            SelectionAddRows iAux, rIndex
+                            SelectionApply
+                            MoveTo rIndex, cIndex, False
+                        ElseIf Shift = acShiftMask Then
+                            If rIndex > 0 Then
+                                rIndex = rIndex - 1
+                                SelectionAddRow rIndex
+                                SelectionApply
+                                MoveTo rIndex, cIndex, False
+                            End If
+                        End If
+                End Select
+            ' KeyRight Arrow
+            Case vbKeyRight
+                Select Case True
+                    Case .IsColumnTrigger, .IsCellTrigger
+                        cIndex = IIf(.IsColumnTrigger, .ColumnIndex, .Cell(1))
+                        rIndex = IIf(.IsColumnTrigger, -1, .Cell(0))
+                        If Shift = 0 Then
+                            SelectionClear
+                            MoveTo rIndex, cIndex + 1, True
+                        ElseIf Shift = acCtrlMask Then
+                            SelectionClear
+                            MoveTo rIndex, GetNextColumnIndexInFullJump(sView), True
+                        ElseIf Shift = (acCtrlMask Or acShiftMask) Then ' Ctrl + Shift
+                            iAux = cIndex
+                            cIndex = GetNextColumnIndexInFullJump(sView)
+                            SelectionAddColumns iAux, cIndex
+                            SelectionApply
+                            MoveTo rIndex, cIndex, False
+                        ElseIf Shift = acShiftMask Then
+                            If .OutOfRangeScrolling Or ((Not .OutOfRangeScrolling) And cIndex < .LastColumnIndex) Then
+                                cIndex = cIndex + 1
+                                SelectionAddColumn cIndex
+                                SelectionApply
+                                MoveTo rIndex, cIndex, False
+                            End If
+                        End If
+                    Case .IsRowTrigger
+                        If Shift = 0 Then   ' No key mods
+                            SelectionClear
+                            MoveTo .RowIndex, 0, True
+                        ElseIf Shift = acCtrlMask Then   ' Only CtrlKey mod
+                            SelectionClear
+                            MoveTo .RowIndex, .LastColumnIndex, True
+                        End If
+                End Select
+            ' KeyLeft Arrow
+            Case vbKeyLeft
+                Select Case True
+                    Case .IsColumnTrigger, .IsCellTrigger
+                        cIndex = IIf(.IsColumnTrigger, .ColumnIndex, .Cell(1))
+                        rIndex = IIf(.IsColumnTrigger, -1, .Cell(0))
+                        If Shift = 0 Then
+                            SelectionClear
+                            MoveTo rIndex, cIndex - 1, True
+                        ElseIf Shift = acCtrlMask Then
+                            SelectionClear
+                            If cIndex > .LastColumnIndex Then
+                                MoveTo rIndex, .LastColumnIndex, True
+                            Else
+                                MoveTo rIndex, 0, True
+                            End If
+                        ElseIf Shift = (acCtrlMask Or acShiftMask) Then ' Ctrl + Shift + ArrowDown
+                            iAux = cIndex
+                            cIndex = IIf(cIndex > .LastColumnIndex, .LastColumnIndex, 0)
+                            SelectionAddRows iAux, cIndex
+                            SelectionApply
+                            MoveTo rIndex, cIndex, False
+                        ElseIf Shift = acShiftMask Then
+                            If cIndex > 0 Then
+                                cIndex = cIndex - 1
+                                SelectionAddColumn cIndex
+                                SelectionApply
+                                MoveTo rIndex, cIndex, False
+                            End If
+                        End If
+                    Case .IsRowTrigger
+                        SelectionClear
+                        MoveTo .RowIndex, 0, True
+                End Select
+            Case Else
+                ' TODO
         End Select
     End With
     
     ' Update last clicked/entered row/col/cell for those calls to MoveTo without event propagation.
-    If KeyCode = 0 Then UpdateSelectionStateAfterMoveTo sView, rIndex, cIndex
+    If KeyCode = 0 Then UpdateSelectionStateAfterMoveTo sView, rIndex, cIndex, sKeyCode
 End Sub
 
-Private Sub UpdateSelectionStateAfterMoveTo(ByRef sView As TScrollviewState, ByVal rIndex As Long, ByVal cIndex As Long)
+Private Sub UpdateSelectionStateAfterMoveTo(ByRef sView As TScrollviewState, ByVal rIndex As Long, ByVal cIndex As Long, ByVal KeyCode As Integer)
     With sView
-        If .IsRowTrigger Then
-            If pLastClickedRowIndex = .RowIndex And .RowIndex <> rIndex Then
-                pLastClickedRowIndex = rIndex
-            End If
-        ElseIf .IsCellTrigger Then
-            If (pLastEnteredCell(0) = .Cell(0) And .Cell(0) <> rIndex) Or _
-               (pLastEnteredCell(1) = .Cell(1) And .Cell(1) <> cIndex) Then
-                pLastEnteredCell = Array(rIndex, cIndex)
-            End If
-        End If
+        Select Case KeyCode
+            Case vbKeyUp, vbKeyDown
+                If .IsRowTrigger Then
+                    If pLastClickedRowIndex = .RowIndex And .RowIndex <> rIndex Then
+                        pLastClickedRowIndex = rIndex
+                    End If
+                ElseIf .IsCellTrigger Then
+                    If (pLastEnteredCell(0) = .Cell(0) And .Cell(0) <> rIndex) Or _
+                       (pLastEnteredCell(1) = .Cell(1) And .Cell(1) <> cIndex) Then
+                        pLastEnteredCell = Array(rIndex, cIndex)
+                    End If
+                End If
+            Case vbKeyRight, vbKeyLeft
+                If .IsRowTrigger Then
+                    If pLastClickedColumnIndex = .ColumnIndex And .ColumnIndex <> cIndex Then
+                        pLastClickedColumnIndex = cIndex
+                    End If
+                ' TODO: refactor (DRY)
+                ElseIf .IsCellTrigger Then
+                    If (pLastEnteredCell(0) = .Cell(0) And .Cell(0) <> rIndex) Or _
+                       (pLastEnteredCell(1) = .Cell(1) And .Cell(1) <> cIndex) Then
+                        pLastEnteredCell = Array(rIndex, cIndex)
+                    End If
+                End If
+        End Select
     End With
 End Sub
 
@@ -293,6 +393,23 @@ Private Function GetNextRowIndexInFullJump(ByRef sView As TScrollviewState) As L
             End If
         Else
             GetNextRowIndexInFullJump = .LastRowIndex
+        End If
+    End With
+End Function
+
+Private Function GetNextColumnIndexInFullJump(ByRef sView As TScrollviewState) As Long
+    Dim cIndex As Long
+    
+    With sView
+        cIndex = IIf(.IsColumnTrigger, .ColumnIndex, .Cell(1))
+        If cIndex >= .LastColumnIndex Then
+            If .OutOfRangeScrolling Then
+                GetNextColumnIndexInFullJump = CLng(Int((cIndex + 50000) / 50000)) * 50000
+            Else
+                GetNextColumnIndexInFullJump = .LastColumnIndex
+            End If
+        Else
+            GetNextColumnIndexInFullJump = .LastColumnIndex
         End If
     End With
 End Function
@@ -335,6 +452,65 @@ Private Function GetScrollviewState(ByVal Shift As Integer) As TScrollviewState
     
     GetScrollviewState = t
 End Function
+
+Private Sub AddAllNonExistingInRange(ByRef aX As ArrayListEx, ByVal FromIndex As Long, ByVal ToIndex As Long)
+    Dim i As Long, r As Long, c As Long: c = -1
+    
+    If ToIndex < FromIndex Then
+        i = FromIndex
+        FromIndex = ToIndex
+        ToIndex = i
+    End If
+
+    With aX
+        For i = FromIndex To ToIndex
+            r = .BinarySearch(i, r, , dsComparer)
+            If r < 0 Then
+                r = (Not r)
+                If r = .Instance.Count Then
+                    c = i
+                    Exit For
+                End If
+                .Insert r, i
+            End If
+        Next i
+        If c <> -1 Then
+            For i = c To ToIndex
+                .Add i
+            Next i
+        End If
+    End With
+End Sub
+
+Private Sub ToggleElementInList(ByRef aX As ArrayListEx, ByVal Value As Long)
+    Dim r As Long
+    
+    r = aX.BinarySearch(Value, 0, , dsComparer)
+    If r < 0 Then
+        r = (Not r)
+        If r = aX.Instance.Count Then
+            aX.Add Value
+        Else
+            aX.Insert r, Value
+        End If
+    Else
+        aX.RemoveAt r
+    End If
+End Sub
+
+Private Sub AddElementIfNotExists(ByRef aX As ArrayListEx, ByVal Value As Long)
+    Dim r As Long
+    
+    r = aX.BinarySearch(Value, 0, , dsComparer)
+    If r < 0 Then
+        r = (Not r)
+        If r = aX.Instance.Count Then
+            aX.Add Value
+        Else
+            aX.Insert r, Value
+        End If
+    End If
+End Sub
 
 
 
