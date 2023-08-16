@@ -23,7 +23,7 @@ Begin Form
     ItemSuffix =1574
     Left =4065
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
@@ -760,7 +760,10 @@ Public Event OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boo
 Public Event OnColumnNameChange(ByVal ColumnIndex As Long, ByVal FromValue As String, ByVal ToValue As String)
 Public Event OnCellEnter(ByVal RowIndex As Long, ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
 Public Event OnClearSelectionRequest()
+Public Event OnSelectAllRequest()
+Public Event OnInvertSelectionRequest()
 Public Event OnSelectionControlKeyDown(ByRef KeyCode As Integer, ByRef Shift As Integer)
+
 
 ' --- PRIVATE ---
 
@@ -970,13 +973,6 @@ Private Sub ResizeFormContent()
 End Sub
 
 
-' --- SELECTION ---
-
-Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional ByVal PropagateEvent As Boolean = True)
-    ' TODO
-End Sub
-
-
 ' --- SCROLLING ---
 
 Private Sub ScrollUsingLastCapturedPointerPosition()
@@ -986,8 +982,13 @@ Private Sub ScrollUsingLastCapturedPointerPosition()
     X = p.X - pCapturedPointerPosition.X
     Y = p.Y - pCapturedPointerPosition.Y
     ScreenLib.SetCursorPosition pCapturedPointerPosition
-    ApplyScrollbarX Max(Me.SCROLLBAR_X.Value + (X * pScrollSpeedMultiplier), 0)
-    ApplyScrollbarY Max(Me.SCROLLBAR_Y.Value + (Y * pScrollSpeedMultiplier), 0)
+    ScrollTo Max(Me.SCROLLBAR_X.Value + (X * pScrollSpeedMultiplier), 0), Max(Me.SCROLLBAR_Y.Value + (Y * pScrollSpeedMultiplier), 0)
+End Sub
+
+' TODO: Flatten as a single call to Viewport.ScrollTo
+Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
+    ApplyScrollbarX X
+    ApplyScrollbarY Y
 End Sub
 
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
@@ -1115,8 +1116,8 @@ Private Sub UpdateScrollbarX()
     viewSizeX = Me.InsideWidth - 270 - Me.DS_VIEWPORT.Left
     cellSizeX = Worksheet.GridCellSizeX
     pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
-    fullViewportContentSizeX = (pTable.ColumnCount - 0) * cellSizeX
-    xMax = Max((fullViewportContentSizeX + OutOfBoundsScrollX) - viewSizeX, 0)
+    fullViewportContentSizeX = Max((pTable.ColumnCount - 0) * cellSizeX, viewSizeX)
+    xMax = Max((fullViewportContentSizeX + pOutOfBoundsScrollX) - viewSizeX, 0)
     With Me.SCROLLBAR_X
         .Max = xMax
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
@@ -1130,11 +1131,58 @@ Private Sub UpdateScrollbarX()
 End Sub
 
 
+' --- SELECTION ---
+
+Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional ByVal PropagateEvent As Boolean = True)
+    Dim X As Long, Y As Long
+    
+    Debug.Print Printf("%1 %2 CALLING MoveTo(%3, %4, %5)", TimerSpan, vbTab, RowIndex, ColumnIndex, PropagateEvent)
+    
+    Select Case CLng(0 - 1)
+        Case RowIndex
+            Y = Me.ScrollbarY
+            X = pViewport.GetScrollXTo(ColumnIndex)
+        Case ColumnIndex
+            X = Me.ScrollbarX
+            Y = pViewport.GetScrollYTo(RowIndex)
+        Case Else
+            X = pViewport.GetScrollXTo(ColumnIndex)
+            Y = pViewport.GetScrollYTo(RowIndex)
+    End Select
+    
+    
+    Debug.Print Printf("%1 %2 CALLING ScrollTo(%3, %4)", TimerSpan, vbTab, X, Y)
+    ScrollTo X, Y
+    Debug.Print Printf("%1 %2 CALL TO ScrollTo(%3, %4) DONE!", TimerSpan, vbTab, X, Y)
+    
+    If PropagateEvent Then
+        Select Case CLng(0 - 1)
+            Case RowIndex
+                RaiseEvent OnColumnLetterClick(ColumnIndex, False, False)
+            Case ColumnIndex
+                RaiseEvent OnRowNumberClick(RowIndex, False, False)
+            Case Else
+                RaiseEvent OnCellEnter(RowIndex, ColumnIndex, False, False)
+        End Select
+    End If
+    Debug.Print Printf("%1 %2 CALL TO MoveTo(%3, %4, %5) DONE!", TimerSpan, vbTab, RowIndex, ColumnIndex, PropagateEvent)
+End Sub
+
+Friend Sub TriggerClickOnSelectAll()
+    RaiseEvent OnSelectAllRequest
+End Sub
+
+Friend Sub TriggerClickOnInvertSelection()
+    RaiseEvent OnInvertSelectionRequest
+End Sub
+
+
 ' --- EVENTS ---
 
 Private Sub pWorksheetHeaders_OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    'Debug.Print Printf("OnColumnLetterClick R%1 C%2: CtrlKey: %3, ShiftKey: %4", "~", ColumnIndex, CtrlKey, ShiftKey)
     pWorksheetHeaders.RemoveFocus
-    RaiseEvent OnColumnLetterClick(ColumnIndex, CtrlKey, ShiftKey)
+    RaiseEvent OnColumnLetterClick(ColumnIndex, GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
 End Sub
 
 Private Sub pWorksheetHeaders_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
@@ -1151,13 +1199,15 @@ Finally:
 End Sub
 
 Private Sub pWorksheetNumbers_OnRowNumberClick(ByVal RowIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    'Debug.Print Printf("OnRowNumberClick R%1 C%2: CtrlKey: %3, ShiftKey: %4", RowIndex, "~", CtrlKey, ShiftKey)
     pWorksheetHeaders.RemoveFocus
-    RaiseEvent OnRowNumberClick(RowIndex, CtrlKey, ShiftKey)
+    RaiseEvent OnRowNumberClick(RowIndex, GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
 End Sub
 
 Private Sub pWorksheet_OnCellEnter(ByVal RowIndex As Long, ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+    'Debug.Print Printf("OnCellEnter R%1 C%2: CtrlKey: %3, ShiftKey: %4, ShiftKeyAgain: %5", RowIndex, ColumnIndex, CtrlKey, ShiftKey, GetAsyncKeyState(vbKeyShift))
     pWorksheetHeaders.RemoveFocus
-    RaiseEvent OnCellEnter(RowIndex, ColumnIndex, CtrlKey, ShiftKey)
+    RaiseEvent OnCellEnter(RowIndex, ColumnIndex, GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
 End Sub
 
 

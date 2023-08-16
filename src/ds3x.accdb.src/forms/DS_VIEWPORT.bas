@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =4065
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =5115
+    Top =3675
+    Right =8295
+    Bottom =6210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -618,6 +618,55 @@ Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewpo
     t.PagePositionModY = (t.FirstVisibleRowInPage * cellHeight) + t.FirstVisibleRowPositionModY
     
     GetViewportStateAt = t
+End Function
+
+Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Long
+    Dim cellWidth As Long, viewWidth As Long, curViewMinX As Long, curViewMaxX As Long
+    Dim targetCellMinX As Long, targetCellMaxX As Long, X As Long
+    
+    cellWidth = Worksheet.GridCellSizeX
+    viewWidth = Scrollview.ScrollPageSizeX  ' pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
+    
+    X = cellWidth * ColumnIndex
+    targetCellMinX = Max(X - cellWidth, 0)
+    targetCellMaxX = X + (3 * cellWidth)    ' EDIT: 2 -> 3
+    ' NOT NEEDED: if not pscrollview.EnableOutOfRangeScrolling then targetcellmaxx = min(targetcellmaxx, )
+    
+    curViewMinX = this.ScrollPosX
+    curViewMaxX = curViewMinX + viewWidth
+    
+    X = this.ScrollPosX
+    If curViewMinX > targetCellMinX Then
+        X = targetCellMinX
+    ElseIf curViewMaxX < targetCellMaxX Then
+        X = targetCellMaxX - viewWidth
+    End If
+    
+    GetScrollXTo = X
+End Function
+
+Public Function GetScrollYTo(ByVal RowIndex As Long) As Long
+    Dim cellHeight As Long, viewHeight As Long, curViewMinY As Long, curViewMaxY As Long
+    Dim targetCellMinY As Long, targetCellMaxY As Long, Y As Long
+    
+    cellHeight = Worksheet.GridCellSizeY
+    viewHeight = Scrollview.ScrollPageSizeY
+    
+    Y = cellHeight * RowIndex
+    targetCellMinY = Max(Y - cellHeight, 0)
+    targetCellMaxY = Y + (3 * cellHeight)
+    
+    curViewMinY = this.ScrollPosY
+    curViewMaxY = curViewMinY + viewHeight
+    
+    Y = this.ScrollPosY
+    If curViewMinY > targetCellMinY Then
+        Y = targetCellMinY
+    ElseIf curViewMaxY < targetCellMaxY Then
+        Y = targetCellMaxY - viewHeight
+    End If
+    
+    GetScrollYTo = Y
 End Function
 
 Public Sub OnSourceTableChange()

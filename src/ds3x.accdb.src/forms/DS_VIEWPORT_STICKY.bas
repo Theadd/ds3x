@@ -23,7 +23,7 @@ Begin Form
     ItemSuffix =1591
     Left =4065
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -367,10 +367,9 @@ Begin Form
                     Caption ="⧩"
                     FontName ="Segoe UI Symbol"
                     OnClick ="[Event Procedure]"
+                    OnMouseMove ="[Event Procedure]"
                     Tag ="⦻⌖⌬ⓢⓈ🕸☻❖"
-                    ControlTipText ="(Ctrl + Space)\015\012Click and drag this icon for 2-Axis scrolling.\015\012\015"
-                        "\012Hint: As with scrolling using the mouse wheel, you can increase the scrollin"
-                        "g speed by holding down the Shift key."
+                    ControlTipText ="Invert selection."
                     GroupTable =6
                     LeftPadding =0
                     TopPadding =0
@@ -606,11 +605,19 @@ Private Sub DS_FULL_AXIS_SCROLLING_MouseUp(Button As Integer, Shift As Integer, 
 End Sub
 
 Private Sub DS_HC_2_0_Click()
-    Debug.Print "DS_HC_2_0_Click"
+    pScrollview.TriggerClickOnInvertSelection
+End Sub
+
+Private Sub DS_HC_2_0_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    ScreenLib.MouseHandCursor = True
+    DoEvents
 End Sub
 
 Private Sub DS_HC_1_0_Click()
-    Debug.Print "DS_HC_1_0_Click"
+    Me.HiddenControl.SetFocus
+    DoEvents
+    
+    pScrollview.TriggerClickOnSelectAll
 End Sub
 
 
