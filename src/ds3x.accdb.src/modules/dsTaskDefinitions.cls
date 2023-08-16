@@ -334,6 +334,47 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
     End With
 End Function
 
+Public Function LoadFromFileAsJSON(ByVal TargetFile As Variant, Optional ByVal DisableCache As Variant) As dsTable
+    Dim dsT As dsTable, sContent As String
+    DisableCache = GetParam(DisableCache, False)
+    
+    If Not DisableCache Then
+        On Error GoTo LoadFromFileAsJSONFallback
+        Set dsT = TaskController().DataSource(ActiveTaskId())
+        If IsObject(dsT) And Not (dsT Is Nothing) Then
+            Set LoadFromFileAsJSON = dsT
+            Exit Function
+        End If
+    End If
+    
+LoadFromFileAsJSONFallback:
+    On Error GoTo 0
+    TargetFile = GetParam(TargetFile, "")
+    
+    If Not FileSystemLib.TryReadAllTextInFile(TargetFile, sContent, False) Then
+        Err.Raise 17, , "Unable to read text from provided file"
+    End If
+    Set dsT = dsTable.Create(sContent)
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
+
+    Set LoadFromFileAsJSON = pTaskController.AddResource(dsT)
+End Function
+
+
+' --- GENERATION TASKS ---
+
+Public Function SaveToFileAsJSON(ByRef SourceTable As Variant, ByVal FilePath As Variant) As dsTable
+    Dim Target As dsTable
+    FilePath = GetParam(FilePath, "")
+    
+    Set Target = SourceTable
+    If Not FileSystemLib.TryWriteTextToFile(FilePath, JSON.Stringify(Target, 2), True, False) Then
+        Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
+    End If
+    Set SaveToFileAsJSON = Target
+End Function
 
 
 ' --- XL GENERATION TASKS ---
@@ -579,6 +620,12 @@ Private Sub AddAllTasks()
     
     AddTask "LoadFromExcelFile", "TargetFile: String, [WorksheetNameOrIndex]: String|Long, [FirstRowHasHeaders = True]: Boolean, " & _
                                  "[Options = {}]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+                                 
+    AddTask "LoadFromFileAsJSON", "TargetFile: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+    
+    ' --- GENERATION TASKS ---
+    
+    AddTask "SaveToFileAsJSON", "[Source]: Table, TargetFile: String", TaskType:="DSG"
     
     ' --- XL GENERATION TASKS ---
     
@@ -596,7 +643,7 @@ Private Sub AddAllTasks()
     
     AddTask "GetWorksheet", "[Source]: Worksheet, WorksheetNameOrIndex: String|Long", TaskType:="XLG"
     
-    AddTask "SaveWorkbook", "[Source]: Worksheet, FilePath: String", TaskType:="XLG"
+    AddTask "SaveWorkbook", "[Source]: Worksheet, TargetFile: String", TaskType:="XLG"
     
     ' --- XL FORMATTING TASKS ---
     
