@@ -16,26 +16,25 @@ Option Base 0
 Private pCustomVars As DictionaryEx
 
 
-
 Public Property Get CustomVars() As DictionaryEx
-    If pCustomVars Is Nothing Then Set pCustomVars = DictionaryEx.Create()
+    If pCustomVars Is Nothing Then InitializeCustomVars
     Set CustomVars = pCustomVars
 End Property
 
 Public Property Get CustomVar(ByVal VarName As String) As Variant
-    If pCustomVars Is Nothing Then Set pCustomVars = DictionaryEx.Create()
+    If pCustomVars Is Nothing Then InitializeCustomVars
     If Not (Left(VarName, 2) = "${") Then VarName = "${" & VarName & "}"
     CustomVar = pCustomVars.GetValue(VarName, vbNullString)
 End Property
 
 Public Property Let CustomVar(ByVal VarName As String, ByVal VarValue As Variant)
-    If pCustomVars Is Nothing Then Set pCustomVars = DictionaryEx.Create()
+    If pCustomVars Is Nothing Then InitializeCustomVars
     If Not (Left(VarName, 2) = "${") Then VarName = "${" & VarName & "}"
     pCustomVars(VarName) = VarValue
 End Property
 
 Public Property Get ApplyCustomVarsOn(ByVal Target As Variant) As Variant
-    If pCustomVars Is Nothing Then GoTo NoCustomVars
+    If pCustomVars Is Nothing Then InitializeCustomVars
     If pCustomVars.Count = 0 Then GoTo NoCustomVars
     
     If IsObject(Target) Then
@@ -140,8 +139,21 @@ Public Function CreateDSLiveEd() As dsLiveEd
 End Function
 
 
-
 ' --- CustomVars ---
+
+Private Sub InitializeCustomVars()
+    Set pCustomVars = DictionaryEx.Create()
+    
+    pCustomVars.Add "${Timestamp}", CStr(DateDiff("s", DateValue("1970-01-01"), Now()))
+    pCustomVars.Add "${Date}", VBA.Format$(Date, "yyyymmdd")
+    pCustomVars.Add "${DateTime}", VBA.Format$(Now(), "yyyymmddhhMMss")
+    pCustomVars.Add "${Year}", VBA.Format$(Date, "yyyy")
+    pCustomVars.Add "${Month}", VBA.Format$(Date, "mm")
+    pCustomVars.Add "${Day}", VBA.Format$(Date, "dd")
+    pCustomVars.Add "${Username}", Nz(CreateObject("WScript.Network").UserName, "")
+    pCustomVars.Add "${UserProfile}", VBA.Environ$("USERPROFILE")
+    pCustomVars.Add "${Temp}", VBA.Environ$("TEMP")
+End Sub
 
 Private Function ReplaceCustomVars(ByVal Target As Variant) As Variant
     Select Case CLng(VarType(Target))
