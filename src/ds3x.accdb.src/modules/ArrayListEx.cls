@@ -36,6 +36,7 @@ Public Property Get ColumnCount() As Long
 End Property
 
 'Sets or returns an item for a specified key.
+'@DefaultMember
 Public Property Get Item(ByVal Index As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Index = CLng(Index)
@@ -65,7 +66,9 @@ End Property
 ' If specified, ArrayLike can be from one of the following types:
 '   - ArrayListEx, ArrayList, ICollection or any other class implementing the ICollection interface.
 '   - A single dimension Array (1D Array).
+'   - A 2D Array.
 '   - A Collection
+'   - A Scripting.Dictionary or DictionaryEx.
 '   - Any other class instance with support for enumeration (VB_UserMemId = -4) and default value (VB_UserMemId = 0).
 '   - A Range, being converted as an ArrayList (rows) of Variant arrays (columns).
 Public Function Create(Optional ByRef ArrayLike As Variant) As ArrayListEx
@@ -90,6 +93,7 @@ Public Function Unbind() As ArrayListEx
     Set Instance = Nothing: Set Unbind = Me
 End Function
 
+'@Enumerator
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
     Dim enumerator As IUnknown
@@ -119,6 +123,8 @@ Public Function AddRange(Optional ByRef ArrayLike As Variant) As ArrayListEx
             End If
         ElseIf TypeOf ArrayLike Is Excel.Range Then
             AddFromExcelRange C2ExcelRange(ArrayLike)
+        ElseIf TypeOf ArrayLike Is Scripting.Dictionary Then
+            AddRange DictionaryEx.Create(C2Dictionary(ArrayLike))
         ElseIf TypeOf C2Object(ArrayLike) Is Array2dEx Then
             AddFrom2dArray ArrayLike.Instance
         Else
@@ -392,11 +398,6 @@ Public Function IndexOf(ByVal Value As Variant, Optional ByVal StartIndex As Var
     IndexOf = Instance.IndexOf(Value, StartIndex)
 End Function
 
-Public Function Sort() As ArrayListEx
-    Instance.Sort
-    Set Sort = Me
-End Function
-
 Public Function Reverse() As ArrayListEx
     Instance.Reverse
     Set Reverse = Me
@@ -404,6 +405,26 @@ End Function
 
 Public Function Clone() As ArrayListEx
     Set Clone = ArrayListEx.Create(Me)
+End Function
+
+
+
+Public Function Sort(Optional ByVal Comparer As mscorlib.IComparer = Nothing) As ArrayListEx
+    If Comparer Is Nothing Then
+        Instance.Sort
+    Else
+        Instance.Sort_2 Comparer
+    End If
+    Set Sort = Me
+End Function
+
+Public Function BinarySearch(ByVal Value As Variant, Optional ByVal StartIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+    If IsMissing(SearchCount) Then SearchCount = Instance.Count - StartIndex
+    If Comparer Is Nothing Then
+        BinarySearch = Instance.BinarySearch(StartIndex, SearchCount, Value, dsComparer)
+    Else
+        BinarySearch = Instance.BinarySearch(StartIndex, SearchCount, Value, Comparer)
+    End If
 End Function
 
 
@@ -466,17 +487,10 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     End If
 End Sub
 
-Private Function C2Object(ByRef Value As Variant) As Object
-    Set C2Object = Value
-End Function
-
-Private Function C2ArrayList(ByRef Value As Variant) As ArrayList
-    Set C2ArrayList = Value
-End Function
-
-Private Function C2ExcelRange(ByRef Value As Variant) As Excel.Range
-    Set C2ExcelRange = Value
-End Function
+Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
+Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
+Private Function C2ExcelRange(ByRef Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
+Private Function C2Dictionary(ByRef Value As Variant) As Scripting.Dictionary: Set C2Dictionary = Value: End Function
 
 
 Private Sub Class_Initialize()
