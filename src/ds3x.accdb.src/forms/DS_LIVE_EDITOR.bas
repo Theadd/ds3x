@@ -515,7 +515,6 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Bind(ByVal TargetController As dsLiveEd)
-    Debug.Print "  # Form_Bind() ObjPtr(Me): " & CStr(ObjPtr(Me))
     
     If (Not TargetController Is Nothing) And (Not pController Is Nothing) Then
         ' More than one DS_LIVE_EDITOR windows can point to the same dsLiveEd controller

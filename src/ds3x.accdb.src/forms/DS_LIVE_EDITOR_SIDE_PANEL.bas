@@ -25,9 +25,9 @@ Begin Form
     DatasheetFontHeight =11
     ItemSuffix =1594
     Left =4065
-    Top =2775
-    Right =28545
-    Bottom =15345
+    Top =3030
+    Right =21780
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -932,10 +932,6 @@ Private Sub DS_CLOSE_BUTTON_Click()
     pController.TriggerLiveEditorWindowClose
 End Sub
 
-'Private Sub DS_ADD_SOURCE_BUTTON_Click()
-'    Controller.TaskController.AddTask "DataSource", Array()
-'End Sub
-
 Private Sub DS_EDIT_BUTTON_Click()
     ' Set Controller.TaskController.DataSource("DS1") = dsTable.Create(ArrayListEx.Create().Add(Array(1, 2, 3)).Add(Array(4, 5, 6))).SetHeaders(Array("ColA", "ColB", "ColC"))
     'Stop
@@ -954,25 +950,24 @@ Private Sub DS_NEW_BUTTON_Click()
     
     dsEditor.Visible = True
     Set dsEditor.LiveEditor.Controller = dsEditor
-    Debug.Print "DONE!"
 End Sub
 
 Private Sub DS_OPEN_BUTTON_Click()
-    SetControlAsEnabled Me.DS_EDIT_BUTTON, True
+'    SetControlAsEnabled Me.DS_EDIT_BUTTON, True
     If Not Controller.ImportPreset() Then
-        MsgBox "FAILED TO OPEN THAT PRESET FILE"
+'        MsgBox "FAILED TO OPEN THAT PRESET FILE"
     End If
 End Sub
 
 Private Sub DS_SAVE_AS_BUTTON_Click()
     If Not Controller.SavePreset(VBA.Environ$("USERPROFILE")) Then
-        MsgBox "SAVE AS... FAILED!"
+'        MsgBox "SAVE AS... FAILED!"
     End If
 End Sub
 
 Private Sub DS_SAVE_BUTTON_Click()
     If Not Controller.SavePreset Then
-        MsgBox "SAVE FAILED!"
+'        MsgBox "SAVE FAILED!"
     End If
 End Sub
 

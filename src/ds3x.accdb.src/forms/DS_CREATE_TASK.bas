@@ -25,7 +25,7 @@ Begin Form
     ItemSuffix =1578
     Left =4065
     Top =3030
-    Right =21105
+    Right =28545
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -477,6 +477,7 @@ Begin Form
                     Name ="DS_TASK_PARAM_1"
                     RowSourceType ="Value List"
                     FontName ="Consolas"
+                    OnChange ="[Event Procedure]"
                     GroupTable =4
                     LeftPadding =0
                     TopPadding =0
@@ -1253,6 +1254,7 @@ Private Function GetTaskTypeHeader(ByVal TaskType As String) As Variant
         Case "XLG": Title = "XL GENERATION"
         Case "DS": Title = "DATA SOURCES"
         Case "T": Title = "TRANSFORMATION"
+        Case "DSG": Title = "GENERATION"
         Case Else
             GetTaskTypeHeader = Array(IndexCountdown, " ", 4)
             Exit Function
@@ -1263,7 +1265,7 @@ End Function
 
 Private Function CreateListItemTextHeader(ByVal Title As String) As String
     CreateListItemTextHeader = _
-        "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5""><b>" & Title & "</b></font><font color=white>&nbsp;&nbsp;.<br>" & _
+        "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5""><b>" & Title & "</b></font><font color=white size=2>&nbsp;&nbsp;.<br>" & _
         "</font><font style=""BACKGROUND-COLOR:#808080"">______ _______ _________ ________ ________ _______ ____ ______ _____</font></div>"
 End Function
 
@@ -1280,6 +1282,23 @@ Private Sub DS_TASK_PARAM_0_Change()
             SetControlText Me.DS_TASK_PARAM_0, Target
         Else
             SetControlText Me.DS_TASK_PARAM_0, ""
+        End If
+    End If
+End Sub
+
+Private Sub DS_TASK_PARAM_1_Change()
+    Dim Target As String, sExtension As String
+    
+    If GetControlText(Me.DS_TASK_PARAM_1) = "< Select... >" Then
+        If pSelectedTask Like "*JSON*" Then
+            sExtension = "*.json"
+        Else
+            sExtension = "*.xlsx"
+        End If
+        If FileSystemLib.TrySaveAsDialog(Target, sExtension) Then
+            SetControlText Me.DS_TASK_PARAM_1, Target
+        Else
+            SetControlText Me.DS_TASK_PARAM_1, ""
         End If
     End If
 End Sub
@@ -1469,8 +1488,9 @@ Private Sub AddTaskUsingCurrentValuesAs(ByVal TaskName As String)
         pController.TaskController.SetTask pController.TaskController.GenerateTask(TaskName, t, TaskId).Instance, ActiveTaskIndex
         pController.TaskController.SequenceIndex = ActiveTaskIndex
     Else
+        i = IIf(pController.TaskController.RebuildSequence.Count - 1 < pController.TaskController.SequenceIndex, pController.TaskController.RebuildSequence.Count - 1, pController.TaskController.SequenceIndex)
         pController.TaskController.AddTask TaskName, t
-        pController.TaskController.SequenceIndex = pController.TaskController.SequenceIndex + 1
+        pController.TaskController.SequenceIndex = i + 1
     End If
     DoCmd.Close acForm, "DS_CREATE_TASK", acSaveNo
 End Sub

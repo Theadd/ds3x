@@ -26,7 +26,7 @@ Begin Form
     GridY =10
     Width =705
     DatasheetFontHeight =11
-    ItemSuffix =2138
+    ItemSuffix =2139
     Left =4065
     Top =3030
     Right =21780
@@ -357,10 +357,8 @@ Begin Form
         Begin Section
             Height =375
             Name ="FormDetail"
-            AlternateBackThemeColorIndex =1
-            AlternateBackShade =60.0
-            BackThemeColorIndex =1
-            BackShade =60.0
+            AlternateBackThemeColorIndex =3
+            BackThemeColorIndex =3
             Begin
                 Begin TextBox
                     Locked = NotDefault
@@ -529,6 +527,19 @@ Begin Form
                     LayoutCachedWidth =15
                     LayoutCachedHeight =15
                     ThemeFontIndex =-1
+                End
+                Begin Line
+                    OverlapFlags =119
+                    Top =360
+                    Width =705
+                    Height =15
+                    Name ="DS_GRIDLINE_BOTTOM"
+                    GridlineColor =10921638
+                    LayoutCachedTop =360
+                    LayoutCachedWidth =705
+                    LayoutCachedHeight =375
+                    BorderThemeColorIndex =1
+                    BorderShade =60.0
                 End
             End
         End
