@@ -131,7 +131,9 @@ End Property
 '   rX(4)("ID") -> Se mueve a la fila 4 y devuelve el campo ID.
 '   rX(1)("0")    -> Se mueve a la primera fila y devuelve el campo en primera posición.
 '
+'@DefaultMember
 Public Property Get Item(ByVal NumRowOrFieldName As Variant) As Variant
+Attribute Item.VB_UserMemId = 0
     If VarType(NumRowOrFieldName) = vbString Then
         Set Item = Field(NumRowOrFieldName)
     Else
@@ -654,5 +656,3 @@ Private Function CreateFromArrayList(ByRef ArrayLike As ArrayList) As ADODB.Reco
     End With
     Set CreateFromArrayList = rs
 End Function
-
-
