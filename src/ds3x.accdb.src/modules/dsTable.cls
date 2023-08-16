@@ -43,6 +43,15 @@ Public Property Get ColumnCount() As Long
     End If
 End Property
 
+Public Property Get Instance() As Scripting.Dictionary
+    Set Instance = DictionaryEx.Create() _
+        .Add("dsTable", DictionaryEx.Create() _
+            .Add("Headers", Me.Headers) _
+            .Add("Records", Me.Records) _
+            .Instance) _
+        .Instance
+End Property
+
 Public Property Get HeaderList() As ArrayListEx
     If pHeaderList Is Nothing Then RebuildHeaderList
     Set HeaderList = pHeaderList
@@ -104,7 +113,7 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
                     Err.Raise 13
                 End If
             ElseIf VarType(TableLike) = vbString Then
-                If Left(LTrim(TableLike), 1) = "[" Then
+                If Left(LTrim(TableLike), 1) Like "[{[]" Then
                     Bind JSON.Parse(TableLike, True, True)
                 Else
                     Err.Raise 13
@@ -123,6 +132,10 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
                 Set pRecordList = TableLike
             ElseIf TypeOf TableLike Is Array2dEx Then
                 Set pRecordArray = TableLike
+            ElseIf TypeOf TableLike Is Scripting.Dictionary Then
+                Set Bind = CreateFromDictionary(C2Dictionary(TableLike), AutoHeaders)
+            ElseIf TypeOf TableLike Is DictionaryEx Then
+                Set Bind = CreateFromDictionary(TableLike.Instance, AutoHeaders)
             Else
                 If TypeOf TableLike Is xlSheetsEx Then
                     Set Bind = CreateFromExcelRange(C2xlSheetsEx(TableLike).UsedRange, AutoHeaders)
@@ -236,8 +249,10 @@ End Function
 'End Function
 
 Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
-    ToCSV = GetHeaderNames.ToCSV(Delimiter) & Me.Records.ToCSV(Delimiter)
+    ToCSV = ArrayListEx.Create().Add(GetColumnNames).ToCSV(Delimiter) & Me.Records.ToCSV(Delimiter)
 End Function
+
+Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
     Dim aX As ArrayListEx, cRow As Long, cRange As Excel.Range, i As Long, iMax As Long, rCount As Long, bX As ArrayListEx, a2dX As Array2dEx, iNumRows As Long
@@ -416,6 +431,46 @@ Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByV
     Set CreateFromExcelRange = Me
 End Function
 
+Private Function CreateFromDictionary(ByRef Target As Scripting.Dictionary, Optional ByVal AutoHeaders As Boolean = False) As dsTable
+    Dim dX As DictionaryEx
+    On Error GoTo Fallback
+    
+    Set dX = DictionaryEx.Create(Target)
+    If Not dX.Exists("dsTable") Then
+        Set CreateFromDictionary = CreateFromKeyValueDictionary(Target, AutoHeaders)
+        Exit Function
+    End If
+    Set dX = DictionaryEx.Create(dX("dsTable"))
+    Set pRecordList = ArrayListEx.Create()
+    pRecordList.AddRange dX("Records")
+    Set pHeaderList = ArrayListEx.Create()
+    pHeaderList.AddRange dX("Headers")
+    
+    Set CreateFromDictionary = Me
+    Exit Function
+Fallback:
+    Err.Raise 13, , "Unable to create a dsTable from provided dictionary."
+End Function
+
+Private Function CreateFromKeyValueDictionary(ByRef Target As Scripting.Dictionary, Optional ByVal AutoHeaders As Boolean = False) As dsTable
+    Dim dX As DictionaryEx, dKey As Variant
+    On Error GoTo Fallback
+    
+    Set dX = DictionaryEx.Create(Target)
+    Set pRecordList = ArrayListEx.Create()
+    For Each dKey In dX.Keys()
+        pRecordList.Add Array(dKey, dX(dKey))
+    Next dKey
+    If AutoHeaders Then
+        SetHeaders Array("Key", "Value")
+    End If
+    
+    Set CreateFromKeyValueDictionary = Me
+    Exit Function
+Fallback:
+    Err.Raise 13, , "Unable to create a dsTable from provided dictionary."
+End Function
+
 Private Function CreateNamedRecordset() As ADODB.Recordset
     Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx
     
@@ -543,6 +598,7 @@ Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2R
 Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
 Private Function C2ExcelWorksheet(ByVal Value As Variant) As Excel.Worksheet: Set C2ExcelWorksheet = Value: End Function
 Private Function C2xlSheetsEx(ByVal Value As Variant) As xlSheetsEx: Set C2xlSheetsEx = Value: End Function
+Private Function C2Dictionary(ByVal Value As Variant) As Scripting.Dictionary: Set C2Dictionary = Value: End Function
 
 
 
