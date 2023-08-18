@@ -109,10 +109,14 @@ Attribute Count.VB_Description = "Equivalente a Recordset.RecordCount"
     On Error Resume Next: Count = Instance.RecordCount
 End Property
 
-' Equivalente a Recordset.Fields.Count
+' DEPRECATED
 Public Property Get Columns() As Long
 Attribute Columns.VB_Description = "Equivalente a Recordset.Fields.Count"
     On Error Resume Next: Columns = Instance.Fields.Count
+End Property
+
+Public Property Get ColumnCount() As Long
+    On Error Resume Next: ColumnCount = Instance.Fields.Count
 End Property
 
 ' Devuelve un RecordsetEx (Shallow Copy) que se desplazará automáticamente a la fila (record)
@@ -265,6 +269,43 @@ Attribute Move.VB_Description = "Alternativa segura y encadenable al método .Mo
     On Error Resume Next: Instance.Move NumRecords: Set Move = Me
 End Function
 
+Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
+    Dim i As Long, c As Long, t() As Variant, r() As Variant
+    
+    If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
+    If Index >= Me.Count Then
+        Index = IIf(Me.Count - 1 < 0, 0, Me.Count - 1)
+        GetCount = 0
+    Else
+        If IsMissing(GetCount) Or IsEmpty(GetCount) Then GetCount = Me.Count - Index
+        If GetCount + Index > Me.Count Then GetCount = Me.Count - Index
+    End If
+    If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then ColumnIndexes = CreateNumericIndexHeaders
+    If GetCount <= 0 Then GoTo Finally
+    ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes))
+    
+    For c = 0 To UBound(ColumnIndexes)
+        If Index > 0 Then
+            Instance.AbsolutePosition = Index + 1
+        Else
+            Me.MoveFirst
+        End If
+        r = Instance.GetRows(GetCount, adBookmarkCurrent, Array(ColumnIndexes(c)))
+        If Instance.Fields(ColumnIndexes(c)).Type = adVarWChar Then
+            For i = 0 To GetCount - 1
+                t(i, c) = C2Date(r(0, i))
+            Next i
+        Else
+            For i = 0 To GetCount - 1
+                t(i, c) = r(0, i)
+            Next i
+        End If
+    Next c
+    
+Finally:
+    Set GetRange = New Array2dEx
+    GetRange.Instance = CollectionsLib.GetArrayByRef(t)
+End Function
 
 ' Devuelve un Array() de Scripting.Dictionary (@SEE: RecordsetEx.AsIterableString).
 Public Function AsIterableDictionary(ParamArray QueryColumns() As Variant) As Variant()
@@ -630,6 +671,13 @@ Private Function TryMoveIn(MoveDirection As SearchDirectionEnum) As Boolean
 MoveFail:
 End Function
 
+Private Function C2Date(Optional ByVal Value As Variant) As Variant
+    If IsMissing(Value) Then Exit Function
+    On Error Resume Next
+    C2Date = Value
+    C2Date = DateValue(Value)
+End Function
+
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList
     Set C2ArrayList = Value
 End Function
@@ -656,3 +704,18 @@ Private Function CreateFromArrayList(ByRef ArrayLike As ArrayList) As ADODB.Reco
     End With
     Set CreateFromArrayList = rs
 End Function
+
+Private Function CreateNumericIndexHeaders() As Variant
+    Dim t As Variant, c As Long, cMax As Long
+    cMax = Me.ColumnCount - 1
+    ReDim t(0 To cMax)
+    
+    For c = 0 To cMax
+        t(c) = c
+    Next c
+    
+    CreateNumericIndexHeaders = t
+End Function
+
+
+
