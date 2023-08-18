@@ -97,10 +97,16 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     If Not Me.Count > 0 Then Exit Function
 
     With RangeObject.Resize(Me.Count, 1 + (UBound(Instance, 2) - LBound(Instance, 2)))
-        .Value = Instance
+'        .Value = Instance
+'        If ApplyUserLocale Then
+'            On Error GoTo UserLocaleFail
+'            .FormulaR1C1Local = .FormulaR1C1Local
+'        End If
         If ApplyUserLocale Then
             On Error GoTo UserLocaleFail
-            .FormulaR1C1Local = .FormulaR1C1Local
+            .FormulaR1C1Local = Instance
+        Else
+            .Value = Instance
         End If
     End With
     
@@ -109,8 +115,6 @@ UserLocaleFail:
     Debug.Print "[ERROR] @Array2dEx.CopyToRange() -> ApplyUserLocale - " & Err.Description
     Resume Next
 End Function
-
-
 
 Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
     Dim r As Long, c As Long, t() As Variant, ubRows As Long, ubCols As Long, k() As Variant
@@ -250,28 +254,36 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     Dim t() As Variant, i As Long, c As Variant, c0 As Long
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
-    If IsMissing(GetCount) Or IsEmpty(GetCount) Then GetCount = Me.Count
+    If Index >= Me.Count Then
+        Index = IIf(Me.Count - 1 < 0, 0, Me.Count - 1)
+        GetCount = 0
+    Else
+        If IsMissing(GetCount) Or IsEmpty(GetCount) Then GetCount = Me.Count - Index
+        If GetCount + Index > Me.Count Then GetCount = Me.Count - Index
+    End If
     If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then
         ColumnIndexes = CreateNumericIndexHeaders
     Else
         If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array(ColumnIndexes)
     End If
     
-    ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes) - LBound(ColumnIndexes))
+    If GetCount > 0 Then
+        ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes) - LBound(ColumnIndexes))
     
-    'If UBound(ColumnIndexes) >= 0 Then c0 = CLng(ColumnIndexes(0))
-    
-    For i = Index To Index + GetCount - 1
-        c0 = 0
-        For Each c In ColumnIndexes
-            If IsObject(Instance(i, CLng(c))) Then
-                Set t(i, c0) = Instance(i, CLng(c))
-            Else
-                t(i, c0) = Instance(i, CLng(c))
-            End If
-            c0 = c0 + 1
-        Next c
-    Next i
+        For i = Index To Index + GetCount - 1
+            c0 = 0
+            For Each c In ColumnIndexes
+                If IsObject(Instance(i, CLng(c))) Then
+                    Set t(i - Index, c0) = Instance(i, CLng(c))
+                Else
+                    t(i - Index, c0) = Instance(i, CLng(c))
+                End If
+                c0 = c0 + 1
+            Next c
+        Next i
+    Else
+        t = CreateBlank2DArray()
+    End If
     
     Set GetRange = New Array2dEx
     GetRange.Instance = CollectionsLib.GetArrayByRef(t)
@@ -405,6 +417,13 @@ Public Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
     
 Fallback:
     Is1dArray = IsArray(ArrayLike)
+End Function
+
+Private Function CreateBlank2DArray() As Variant
+    With CreateObject("Forms.ComboBox.1")
+        .List = Array()
+        CreateBlank2DArray = .List
+    End With
 End Function
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)

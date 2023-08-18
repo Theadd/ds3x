@@ -334,7 +334,13 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     Dim Aux As ArrayList, xRange As ArrayListEx, Entry As Variant, i As Long
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
-    If IsMissing(GetCount) Or IsEmpty(GetCount) Then GetCount = Instance.Count
+    If Index >= Instance.Count Then
+        Index = IIf(Instance.Count - 1 < 0, 0, Instance.Count - 1)
+        GetCount = 0
+    Else
+        If IsMissing(GetCount) Or IsEmpty(GetCount) Then GetCount = Instance.Count - Index
+        If GetCount + Index > Instance.Count Then GetCount = Instance.Count - Index
+    End If
     
     If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then
         Set GetRange = ArrayListEx.Create(Instance.GetRange(Index, GetCount))
@@ -345,8 +351,9 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         Else
             Set GetRange = New ArrayListEx
             Set Aux = New ArrayList
-            Set xRange = New ArrayListEx
-            xRange.Bind Instance.GetRange(Index, GetCount)
+'            Set xRange = New ArrayListEx
+'            xRange.Bind Instance.GetRange(Index, GetCount)
+            Set xRange = ArrayListEx.Create(Instance.GetRange(Index, GetCount))
             For Each Entry In xRange.Instance
                 Aux.Clear
                 For i = 0 To UBound(ColumnIndexes)
