@@ -156,6 +156,7 @@ End Sub
 Private Sub Rebuild(ByVal TargetIndex As Long)
     Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx
     
+    VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
         If TryGetSourceTableForSequence(pDirtyRebuildIndex, oTable) Then
@@ -183,7 +184,9 @@ Private Sub Rebuild(ByVal TargetIndex As Long)
     End If
     
 ExitRebuild:
+    'VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE RaiseEvent OnTableChange"
     RaiseEvent OnTableChange
+    'VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") AFTER RaiseEvent OnTableChange"
     Exit Sub
 RebuildTaskFail:
     MakeRebuildSequenceDirtyOn pSequenceIndex
@@ -230,8 +233,6 @@ Private Sub Class_Initialize()
     Set pTable = Nothing
     Set pAvailableTasks = New dsTaskDefinitions
     Set pAvailableTasks.TaskController = Me
-    'pRebuildSequence.Add GenerateTask("DataSource", Array())
-
 End Sub
 
 Private Sub Class_Terminate()
@@ -356,10 +357,13 @@ Private Sub SetActiveSequenceIndex(ByVal Value As Long)
     On Error GoTo Finally
     
     pSequenceIndex = Value
+    VMemAnalysis "@SetActiveSequenceIndex"
     Rebuild Value
 Finally:
     On Error GoTo 0
+    'VMemAnalysis "@SetActiveSequenceIndex BEFORE RaiseEvent OnActiveSequenceIndexChange"
     RaiseEvent OnActiveSequenceIndexChange(Value)
+    'VMemAnalysis "@SetActiveSequenceIndex AFTER RaiseEvent OnActiveSequenceIndexChange"
 End Sub
 
 Private Function GetNextSequenceId(ByVal IdPrefix As String) As String
@@ -566,7 +570,9 @@ End Function
 
 Public Function AddResource(ByRef TargetResource As Object) As Object
     If Not TargetResource Is Nothing Then
-        pGarbageCollector.Add ObjPtr(TargetResource), TargetResource
+        pGarbageCollector.Add CStr(ObjPtr(TargetResource)), TargetResource
+'        Debug.Print Printf("[GARBAGE COLLECTOR] @AddResource %1 (%2)", CStr(ObjPtr(TargetResource)), TypeName(TargetResource))
+'        Debug.Print JSON.Stringify(pGarbageCollector.Keys())
     End If
     Set AddResource = TargetResource
 End Function
@@ -593,7 +599,7 @@ Public Sub FreeUnlinkedResources()
         
         For iTR = 0 To UBound(trKeys)
             If IsObject(pTaskResults(trKeys(iTR))) Then
-                If ObjPtr(pTaskResults(trKeys(iTR))) = cKey Then
+                If CStr(ObjPtr(pTaskResults(trKeys(iTR)))) = cKey Then
                     isMatch = True
                     Exit For
                 End If
@@ -603,7 +609,7 @@ Public Sub FreeUnlinkedResources()
         If Not isMatch Then
             For iDS = 0 To UBound(dsKeys)
                 If IsObject(pDataSources(dsKeys(iDS))) Then
-                    If ObjPtr(pDataSources(dsKeys(iDS))) = cKey Then
+                    If CStr(ObjPtr(pDataSources(dsKeys(iDS)))) = cKey Then
                         isMatch = True
                         Exit For
                     End If
@@ -644,9 +650,7 @@ Private Sub VMemAnalysis(Optional ByVal Message As Variant)
     cVMemFree = GetAvailableVirtualMemory()
     sVMemCallCount = sVMemCallCount + 1
     If LastVMemFree <> 0 Then
-        If Abs(LastVMemFree - cVMemFree) >= 5 Then
-            Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
-        End If
+        Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
     End If
     LastVMemFree = cVMemFree
 End Sub
