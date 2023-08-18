@@ -342,12 +342,16 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         json_IsFirstItem2D = True
                     Else
                         ' 1D Array
-                        ' json_Converted = Stringify(jsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
                         If IsObject(jsonValue(json_Index)) Or IsArray(jsonValue(json_Index)) Then
-                            json_Converted = Stringify(jsonValue(json_Index), , json_CurrentIndentation + 1)
+                            If HasNestedLevels(jsonValue(json_Index)) Then
+                                json_Converted = Stringify(jsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
+                            Else
+                                json_Converted = Stringify(jsonValue(json_Index), , json_CurrentIndentation + 1)
+                            End If
                         Else
-                            json_Converted = Stringify(jsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
+                            json_Converted = Stringify(jsonValue(json_Index), , json_CurrentIndentation + 1)
                         End If
+                        
                         
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
                         If json_Converted = "" Then
@@ -447,10 +451,13 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         Else
                             json_BufferAppend json_Buffer, ", ", json_BufferPosition, json_BufferLength
                         End If
-        
-                        ' json_Converted = Stringify(json_Value, Whitespace, json_CurrentIndentation + 1)
-                        If HasNestedLevels(json_Value) Then
-                            json_Converted = Stringify(json_Value, Whitespace, json_CurrentIndentation + 1)
+                        
+                        If IsObject(json_Value) Or IsArray(json_Value) Then
+                            If HasNestedLevels(json_Value) Then
+                                json_Converted = Stringify(json_Value, Whitespace, json_CurrentIndentation + 1)
+                            Else
+                                json_Converted = Stringify(json_Value, , json_CurrentIndentation + 1)
+                            End If
                         Else
                             json_Converted = Stringify(json_Value, , json_CurrentIndentation + 1)
                         End If
@@ -511,8 +518,16 @@ Private Function HasNestedLevels(ByRef Target As Variant) As Boolean
     On Error GoTo Finally
     
     If IsObject(Target) Then
-        i = IIf(Target.Count > 1, 1, 0)
-        HasNestedLevels = (IsObject(Target(i)) Or IsArray(Target(i)))
+        If VBA.Left$(TypeName(Target), 10) = "Dictionary" Then
+            For Each Item In Target.Items()
+                HasNestedLevels = (IsObject(Item) Or IsArray(Item))
+                If i >= 1 Or HasNestedLevels Then Exit For
+                i = i + 1
+            Next Item
+        Else
+            i = IIf(Target.Count > 1, 1, 0)
+            HasNestedLevels = (IsObject(Target(i)) Or IsArray(Target(i)))
+        End If
     ElseIf IsArray(Target) Then
         If Array2dEx.Is2dArray(Target) Then
             HasNestedLevels = True
