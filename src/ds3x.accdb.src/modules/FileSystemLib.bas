@@ -22,6 +22,8 @@ Public Property Get FSO() As Scripting.FileSystemObject
 End Property
 
 Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
+Public Property Get Resolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String: Resolve = PathResolve(Path, RelativeTo): End Property
+Public Property Get ReadAllTextInFile(ByVal TargetFile As String, Optional ByVal asUnicode As Boolean = True) As String: Dim s As String: FileSystemLib.TryReadAllTextInFile TargetFile, s, asUnicode: ReadAllTextInFile = s: End Property
 
 
 ' --- FILE SYSTEM UTILITIES ---
@@ -42,18 +44,18 @@ Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
 '   @param retryAttempts - [Optional] Máximo número de intentos (100ms) que esperará hasta tener
 '                                     acceso al archivo.
 '
-Public Function TryWriteAccessOfSaveAsDialog(ByRef path As String, Optional ByVal saveAsFileExtension As String = "*.xlsx", Optional ByVal windowTitle As String = "Save As", Optional ByVal retryAttempts As Integer = 100) As Boolean
-    Dim success As Boolean: success = TrySaveAsDialog(path, saveAsFileExtension, windowTitle)
+Public Function TryWriteAccessOfSaveAsDialog(ByRef Path As String, Optional ByVal saveAsFileExtension As String = "*.xlsx", Optional ByVal windowTitle As String = "Save As", Optional ByVal retryAttempts As Integer = 100) As Boolean
+    Dim success As Boolean: success = TrySaveAsDialog(Path, saveAsFileExtension, windowTitle)
     
     If success Then
-        success = TryWaitFileWriteAccess(path, retryAttempts)
+        success = TryWaitFileWriteAccess(Path, retryAttempts)
     End If
     
     TryWriteAccessOfSaveAsDialog = success
 End Function
 
 
-Public Function TrySaveAsDialog(ByRef path As String, Optional ByVal saveAsFileExtension As String = "*.xlsx", Optional ByVal windowTitle As String = "Save As") As Boolean
+Public Function TrySaveAsDialog(ByRef Path As String, Optional ByVal saveAsFileExtension As String = "*.xlsx", Optional ByVal windowTitle As String = "Save As") As Boolean
     Dim selectedItem As Variant
 
     With Application.FileDialog(msoFileDialogSaveAs)
@@ -61,7 +63,7 @@ Public Function TrySaveAsDialog(ByRef path As String, Optional ByVal saveAsFileE
         .InitialView = msoFileDialogViewDetails
         .AllowMultiSelect = False
         'Setup default filename, it can contain a initial path too
-        .InitialFileName = PathCombine(path, saveAsFileExtension)
+        .InitialFileName = PathCombine(Path, saveAsFileExtension)
         .Title = windowTitle
 
         If .Show Then
@@ -70,14 +72,14 @@ Public Function TrySaveAsDialog(ByRef path As String, Optional ByVal saveAsFileE
                 'selectedItem is aString that contains the path of each selected item.
                 'Use any file I/O functions that you want to work with this path.
                 'This example displays the path in a message box.
-                path = "" & selectedItem
+                Path = "" & selectedItem
             Next selectedItem
-            TrySaveAsDialog = (Len(path) > 0)
+            TrySaveAsDialog = (Len(Path) > 0)
         End If
     End With
 End Function
 
-Public Function TryFileOpenDialog(ByRef path As String, Optional ByVal initialPath As String = "", Optional ByVal commaSeparatedStringFiltersPairs As String = "All files,*.*,Excel files,*.xlsx;*.xls;*.xlsm", Optional ByVal windowTitle As String = "Open") As Boolean
+Public Function TryFileOpenDialog(ByRef Path As String, Optional ByVal initialPath As String = "", Optional ByVal commaSeparatedStringFiltersPairs As String = "All files,*.*,Excel files,*.xlsx;*.xls;*.xlsm", Optional ByVal windowTitle As String = "Open") As Boolean
     Dim selectedItem As Variant, i As Integer, lastIndex As Integer, filtersArray() As String
 
     With Application.FileDialog(msoFileDialogOpen)
@@ -102,9 +104,9 @@ Public Function TryFileOpenDialog(ByRef path As String, Optional ByVal initialPa
                 'selectedItem is aString that contains the path of each selected item.
                 'Use any file I/O functions that you want to work with this path.
                 'This example displays the path in a message box.
-                path = "" & selectedItem
+                Path = "" & selectedItem
             Next selectedItem
-            TryFileOpenDialog = (Len(path) > 0)
+            TryFileOpenDialog = (Len(Path) > 0)
         End If
     End With
 End Function
@@ -390,7 +392,7 @@ Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As 
     On Error GoTo ErrorHandler
     Dim stream As TextStream
     
-    Set stream = FSO.CreateTextFile(TargetFile, overwriteIfAlreadyExists, asUnicode)
+    Set stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, asUnicode)
     stream.Write (Content)
     stream.Close
     
@@ -401,14 +403,13 @@ ErrorHandler:
     On Error Resume Next
     TryWriteTextToFile = False
     If Not (stream Is Nothing) Then stream.Close
-    
 End Function
 
 Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal asUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
     Dim stream As TextStream
     
-    Set stream = FSO.OpenTextFile(TargetFile, ForReading, False, IIf(asUnicode, TristateTrue, TristateFalse))
+    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, IIf(asUnicode, TristateTrue, TristateFalse))
     Content = stream.ReadAll
     stream.Close
     
@@ -419,7 +420,23 @@ ErrorHandler:
     On Error Resume Next
     TryReadAllTextInFile = False
     If Not (stream Is Nothing) Then stream.Close
+End Function
+
+Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As String, Optional ByVal asUnicode As Boolean = True) As Boolean
+    On Error GoTo ErrorHandler
+    Dim stream As TextStream
     
+    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(asUnicode, TristateTrue, TristateFalse))
+    stream.Write Content
+    stream.Close
+    
+    TryAppendTextInFile = True
+    Exit Function
+    
+ErrorHandler:
+    On Error Resume Next
+    TryAppendTextInFile = False
+    If Not (stream Is Nothing) Then stream.Close
 End Function
 
 Public Function TryShellExecute(ByRef TargetFile As String, Optional ByVal ShowStyle As VbAppWinStyle = vbNormalFocus) As Boolean
@@ -441,6 +458,15 @@ Public Function GetAllFilesInPath(ByVal TargetPath As String, Optional ByVal Fil
     
     Set GetAllFilesInPath = allFiles
 End Function
+
+Private Function PathResolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String
+    PathResolve = FSO.GetAbsolutePathName(Path)
+    If VBA.Left$(PathResolve, 2) <> VBA.UCase$(VBA.Left$(Path, 2)) Then
+        If IsMissing(RelativeTo) Then RelativeTo = Application.CurrentProject.Path
+        PathResolve = FSO.GetAbsolutePathName(FSO.BuildPath(RelativeTo, Path))
+    End If
+End Function
+
 
 
 
