@@ -19,7 +19,7 @@ Public Property Get Count() As Variant
 End Property
 
 'Wrapper property that returns the value for the specified key if it exists.
-'If it doesn't exist, it returns the default rather than raise an error.
+'If it doesn't exist, it returns the default rather than raising an error.
 Public Property Get GetValue(mKey As Variant, Optional ByRef mDefaultVal As Variant) As Variant
     If Instance.Exists(mKey) Then
         Assign GetValue, Instance.Item(mKey)
@@ -34,6 +34,7 @@ Public Property Get GetValue(mKey As Variant, Optional ByRef mDefaultVal As Vari
 End Property
 
 'Sets or returns an item for a specified key.
+'@DefaultMember
 Public Property Get Item(mKey As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     If Instance.Exists(mKey) Then
@@ -152,8 +153,30 @@ Public Function Items() As Variant()
 End Function
 
 'Returns an array containing all existing keys in the Scripting.Dictionary.
-Public Function Keys()
+Public Function Keys() As Variant()
     Keys = Instance.Keys
+End Function
+
+'Returns an iterable containing all the Key -> Value pair arrays in the Scripting.Dictionary.
+Public Function Entries() As Variant()
+    Dim aX As ArrayListEx, dKey As Variant
+    Set aX = ArrayListEx.Create()
+    
+    For Each dKey In Instance.Keys()
+        aX.Add Array(dKey, Instance(dKey))
+    Next dKey
+    
+    Entries = aX.ToArray()
+End Function
+
+'@Enumerator
+Public Function NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+    Dim enumerator As IUnknown, aX As ArrayListEx
+    Set aX = ArrayListEx.Create(Entries())
+    
+    Set enumerator = aX.Instance.GetEnumerator(0, aX.Instance.Count)
+    Set NewEnum = enumerator
 End Function
 
 Public Function Clone() As DictionaryEx
@@ -268,7 +291,3 @@ Private Sub Class_Terminate()
     On Error Resume Next
     Set Instance = Nothing
 End Sub
-
-
-
-

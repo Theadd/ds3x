@@ -116,7 +116,7 @@ Public Function CreateFrom(ByRef Target As Object) As xlSheetsEx
 End Function
 
 Public Function Create(Optional ByVal WorksheetName As String = "Sheet%1", Optional ByVal TargetFile As Variant, Optional ByVal Options As DictionaryEx = Nothing) As xlSheetsEx
-    Dim xlApp As Excel.Application, xWb As Excel.Workbook, xWs As Excel.Worksheet
+    Dim xlApp As Excel.Application, xWb As Excel.Workbook, xWs As Excel.Worksheet, sTarget As String
     Set Create = New xlSheetsEx
     If Options Is Nothing Then Set Options = DictionaryEx.Create()
     
@@ -126,8 +126,9 @@ Public Function Create(Optional ByVal WorksheetName As String = "Sheet%1", Optio
     SetExcelApplicationVisibility xlApp, False
     
     If Not IsMissing(TargetFile) Then
-        If FileSystemLib.TryWaitFileExists(FileSystemLib.GetFileMatchingPattern(TargetFile), 0) Then
-            Set xWb = LoadWorkbookAt(xlApp, FileSystemLib.GetFileMatchingPattern(TargetFile), Options)
+        sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
+        If FileSystemLib.TryWaitFileExists(sTarget, 0) Then
+            Set xWb = LoadWorkbookAt(xlApp, sTarget, Options)
             Set xWs = xWb.Worksheets(1)
         Else
             ' TODO: Save empty worksheet to file
@@ -181,7 +182,7 @@ End Function
 
 Public Function AddSheet(Optional ByVal WorksheetName As String = "Sheet%1") As xlSheetsEx
     With Me.Workbook
-        .Sheets.Add Type:=xlWorksheet, After:=.Worksheets(.Worksheets.Count)
+        .Sheets.Add Type:=xlWorksheet, AFTER:=.Worksheets(.Worksheets.Count)
         Set AddSheet = GetSheet(.Sheets.Count)
         AddSheet.SheetName = Printf(WorksheetName, .Sheets.Count)
     End With

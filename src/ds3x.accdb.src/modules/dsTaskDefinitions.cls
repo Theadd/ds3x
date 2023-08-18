@@ -69,7 +69,7 @@ Public Function GetRange(ByRef TargetTable As Variant, Optional ByVal Index As V
     Dim Target As dsTable
     Set Target = TargetTable
     Index = GetParam(Index, 0)
-    GetCount = GetParam(GetCount, Target.Count)
+    GetCount = GetParam(GetCount, Target.Count - Index)
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     
     If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array()
@@ -334,6 +334,76 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
     End With
 End Function
 
+Public Function LoadFromFileAsJSON(ByVal TargetFile As Variant, Optional ByVal DisableCache As Variant) As dsTable
+    Dim dsT As dsTable, sContent As String, sTarget As String
+    DisableCache = GetParam(DisableCache, False)
+    
+    If Not DisableCache Then
+        On Error GoTo LoadFromFileAsJSONFallback
+        Set dsT = TaskController().DataSource(ActiveTaskId())
+        If IsObject(dsT) And Not (dsT Is Nothing) Then
+            Set LoadFromFileAsJSON = dsT
+            Exit Function
+        End If
+    End If
+    
+LoadFromFileAsJSONFallback:
+    On Error GoTo 0
+    TargetFile = GetParam(TargetFile, "")
+    sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
+    
+    If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent, False) Then
+        Err.Raise 17, , "Unable to read text from provided file"
+    End If
+    Set dsT = dsTable.Create(sContent)
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
+
+    Set LoadFromFileAsJSON = pTaskController.AddResource(dsT)
+End Function
+
+Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal ConnectionString As Variant, Optional ByVal DisableCache As Variant) As dsTable
+    Dim dsT As dsTable, dbQ As dbQuery
+    DisableCache = GetParam(DisableCache, False)
+    
+    If Not DisableCache Then
+        On Error GoTo LoadFromSQLFallback
+        Set dsT = TaskController().DataSource(ActiveTaskId())
+        If IsObject(dsT) And Not (dsT Is Nothing) Then
+            Set LoadFromSQL = dsT
+            Exit Function
+        End If
+    End If
+    
+LoadFromSQLFallback:
+    On Error GoTo 0
+    ConnectionString = GetParam(ConnectionString, "")
+    Set dbQ = New dbQuery
+    If Trim(CStr(ConnectionString)) <> "" Then dbQ.ConnectionString = CStr(ConnectionString)
+    dbQ.CloseOnTerminate = False
+    
+    Set dsT = dsTable.Create(dbQ.Create(CStr(QueryString)), True)
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
+
+    Set LoadFromSQL = pTaskController.AddResource(dsT)
+End Function
+
+
+' --- GENERATION TASKS ---
+
+Public Function SaveToFileAsJSON(ByRef SourceTable As Variant, ByVal FilePath As Variant) As dsTable
+    Dim Target As dsTable
+    FilePath = GetParam(FilePath, "")
+    
+    Set Target = SourceTable
+    If Not FileSystemLib.TryWriteTextToFile(FileSystemLib.Resolve(FilePath), JSON.Stringify(Target, 2), True, False) Then
+        Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
+    End If
+    Set SaveToFileAsJSON = Target
+End Function
 
 
 ' --- XL GENERATION TASKS ---
@@ -359,14 +429,16 @@ Public Function CopyToRangeInNewExcelApp(ByRef SourceTable As Variant, Optional 
     'xlSheet.Protected = True
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
     Set xlRange = xlSheet.Range(RangeAddress)
+    ' TODO: EDIT True -> False
     Target.CopyToRange xlRange, True
     
     Set CopyToRangeInNewExcelApp = xlSheet
 End Function
 
-Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As Variant, Optional ByVal RangeAddress As Variant) As xlSheetsEx
+Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As Variant, Optional ByVal RangeAddress As Variant, Optional ByVal WriteHeaders As Variant) As xlSheetsEx
     Dim Target As dsTable, xlSheet As xlSheetsEx, xlRange As Excel.Range
     Assign RangeAddress, GetParam(RangeAddress, "A1")
+    WriteHeaders = GetParam(WriteHeaders, True)
     
     Set Target = SourceTable
     Set xlSheet = TargetSheet
@@ -375,7 +447,8 @@ Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As V
     Else
         Set xlRange = xlSheet.Range(RangeAddress)
     End If
-    Target.CopyToRange xlRange, True
+    ' TODO: EDIT True -> False
+    Target.CopyToRange xlRange, True, CBool(WriteHeaders)
     
     Set CopyToRange = xlSheet
 End Function
@@ -425,7 +498,7 @@ Public Function SaveWorkbook(ByRef SourceSheet As Variant, ByVal FilePath As Var
     Dim xlSheet As xlSheetsEx
     
     Set xlSheet = SourceSheet
-    Set SaveWorkbook = pTaskController.AddResource(xlSheet.SaveWorkbook(CStr(FilePath)))
+    Set SaveWorkbook = pTaskController.AddResource(xlSheet.SaveWorkbook(CStr(FileSystemLib.Resolve(FilePath))))
 End Function
 
 
@@ -578,17 +651,25 @@ Private Sub AddAllTasks()
     AddTask "LoadFromRange", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range, [FirstRowHasHeaders = True]: Boolean", TaskType:="DS", Requires:="X*"
     
     AddTask "LoadFromExcelFile", "TargetFile: String, [WorksheetNameOrIndex]: String|Long, [FirstRowHasHeaders = True]: Boolean, " & _
-                                 "[Options = {}]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+                                 "[Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+                                 
+    AddTask "LoadFromFileAsJSON", "TargetFile: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+    
+    AddTask "LoadFromSQL", "QueryString: String, [ConnectionString]: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+    
+    ' --- GENERATION TASKS ---
+    
+    AddTask "SaveToFileAsJSON", "[Source]: Table, TargetFile: String", TaskType:="DSG"
     
     ' --- XL GENERATION TASKS ---
     
-    AddTask "OpenWorksheetFromFile", "TargetFile: String, [Options = {}]: String|Dictionary", TaskType:="XLG", Requires:="*"
+    AddTask "OpenWorksheetFromFile", "TargetFile: String, [Options]: String|Dictionary", TaskType:="XLG", Requires:="*"
     
     AddTask "CreateNewExcelApp", "[WorksheetName = 'Sheet%1']: String", TaskType:="XLG", Requires:="*"
     
     AddTask "CopyToRangeInNewExcelApp", "[Source]: Table, [RangeAddress = 'A1']: String, [WorksheetName = 'Sheet%1']: String", TaskType:="XLG", Requires:="[TD]*"
 
-    AddTask "CopyToRange", "[Source]: Table, Target: Worksheet, [RangeAddress = 'A1']: String", TaskType:="XLG"
+    AddTask "CopyToRange", "[Source]: Table, Target: Worksheet, [RangeAddress = 'A1']: String, [WriteHeaders = True]: Boolean", TaskType:="XLG"
     
     AddTask "CopyRange", "[Source]: Worksheet, Target: Worksheet, [SourceRangeAddress = .UsedRange()]: String|Excel.Range, [TargetRangeAddress = 'A1']: String|Excel.Range", TaskType:="XLG"
     
@@ -596,13 +677,13 @@ Private Sub AddAllTasks()
     
     AddTask "GetWorksheet", "[Source]: Worksheet, WorksheetNameOrIndex: String|Long", TaskType:="XLG"
     
-    AddTask "SaveWorkbook", "[Source]: Worksheet, FilePath: String", TaskType:="XLG"
+    AddTask "SaveWorkbook", "[Source]: Worksheet, TargetFile: String", TaskType:="XLG"
     
     ' --- XL FORMATTING TASKS ---
     
     AddTask "AutoSizeCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
     
-    AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, [TableStyle = 'TableStyleMedium6']: String", TaskType:="XL"
+    AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, TableStyle: String", TaskType:="XL"
     
     AddTask "FreezeHeaders", "[Source]: Worksheet, [HeaderRows = 1]: Long, [HeaderColumns = 0]: Long", TaskType:="XL"
     

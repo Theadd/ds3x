@@ -18,23 +18,21 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =14542
+    Width =690
     DatasheetFontHeight =11
-    ItemSuffix =1572
+    ItemSuffix =1591
     Left =4065
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
-    OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="ds3x - LiveEd"
     DatasheetFontName ="Calibri"
-    OnTimer ="[Event Procedure]"
-    OnResize ="[Event Procedure]"
-    OnLoad ="[Event Procedure]"
+    OnKeyDown ="[Event Procedure]"
+    OnKeyUp ="[Event Procedure]"
     AllowDatasheetView =0
+    OnMouseWheel ="[Event Procedure]"
     FilterOnLoad =0
     SplitFormDatasheet =1
     SplitFormDatasheet =1
@@ -70,13 +68,6 @@ Begin Form
             Width =850
             Height =850
             BorderShade =65.0
-            GridlineShade =65.0
-        End
-        Begin Line
-            BorderLineStyle =0
-            Width =1701
-            BorderThemeColorIndex =0
-            GridlineThemeColorIndex =1
             GridlineShade =65.0
         End
         Begin CommandButton
@@ -316,37 +307,190 @@ Begin Form
             ForeThemeColorIndex =0
             ForeTint =75.0
         End
+        Begin FormHeader
+            Height =646
+            Name ="FormHeaders"
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =95.0
+            BackThemeColorIndex =3
+            Begin
+                Begin Label
+                    OverlapFlags =85
+                    TextAlign =1
+                    Top =255
+                    Width =345
+                    Height =391
+                    FontSize =12
+                    LeftMargin =57
+                    TopMargin =57
+                    BorderColor =8355711
+                    ForeColor =5855577
+                    Name ="DS_FULL_AXIS_SCROLLING"
+                    Caption ="❖"
+                    FontName ="Segoe UI Symbol"
+                    OnMouseDown ="[Event Procedure]"
+                    OnMouseUp ="[Event Procedure]"
+                    OnMouseMove ="[Event Procedure]"
+                    Tag ="⦻⌖⌬ⓢⓈ🕸☻❖"
+                    ControlTipText ="(Ctrl + Space)\015\012Click and drag this icon for 2-Axis scrolling.\015\012\015"
+                        "\012Hint: As with scrolling using the mouse wheel, you can increase the scrollin"
+                        "g speed by holding down the Shift key."
+                    GroupTable =6
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =345
+                    LayoutCachedHeight =646
+                    RowStart =1
+                    RowEnd =1
+                    LayoutGroup =1
+                    ThemeFontIndex =-1
+                    ForeTint =65.0
+                    GroupTable =6
+                End
+                Begin Label
+                    OverlapFlags =85
+                    TextAlign =3
+                    Left =345
+                    Top =255
+                    Width =345
+                    Height =391
+                    FontSize =9
+                    TopMargin =29
+                    RightMargin =29
+                    BorderColor =8355711
+                    ForeColor =5855577
+                    Name ="DS_HC_2_0"
+                    Caption ="⧩"
+                    FontName ="Segoe UI Symbol"
+                    OnClick ="[Event Procedure]"
+                    OnMouseMove ="[Event Procedure]"
+                    Tag ="⦻⌖⌬ⓢⓈ🕸☻❖"
+                    ControlTipText ="Invert selection."
+                    GroupTable =6
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    LayoutCachedLeft =345
+                    LayoutCachedTop =255
+                    LayoutCachedWidth =690
+                    LayoutCachedHeight =646
+                    RowStart =1
+                    RowEnd =1
+                    ColumnStart =1
+                    ColumnEnd =1
+                    LayoutGroup =1
+                    ThemeFontIndex =-1
+                    ForeTint =65.0
+                    GroupTable =6
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    PictureType =2
+                    Top =15
+                    Width =690
+                    Height =240
+                    FontSize =9
+                    FontWeight =100
+                    ForeColor =5855577
+                    Name ="DS_HC_1_0"
+                    Caption ="◢"
+                    OnClick ="[Event Procedure]"
+                    FontName ="Segoe UI Symbol"
+                    GroupTable =6
+                    LeftPadding =0
+                    TopPadding =15
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+
+                    CursorOnHover =1
+                    LayoutCachedTop =15
+                    LayoutCachedWidth =690
+                    LayoutCachedHeight =255
+                    PictureCaptionArrangement =4
+                    Alignment =3
+                    ColumnEnd =1
+                    LayoutGroup =1
+                    ForeTint =65.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =3
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    ThemeFontIndex =-1
+                    HoverThemeColorIndex =3
+                    HoverTint =100.0
+                    PressedThemeColorIndex =3
+                    PressedShade =100.0
+                    HoverForeThemeColorIndex =8
+                    HoverForeTint =100.0
+                    HoverForeShade =75.0
+                    PressedForeThemeColorIndex =7
+                    PressedForeTint =100.0
+                    GroupTable =6
+                    WebImagePaddingTop =1
+                End
+            End
+        End
         Begin Section
             CanGrow = NotDefault
             CanShrink = NotDefault
-            Height =5700
-            Name ="Detalle"
+            Height =2835
+            Name ="FormDetail"
             AlternateBackThemeColorIndex =4
             AlternateBackTint =40.0
-            BackThemeColorIndex =3
+            BackThemeColorIndex =1
+            BackShade =60.0
             Begin
-                Begin CommandButton
-                    OverlapFlags =93
-                    TextFontCharSet =177
-                    TextFontFamily =0
-                    Left =284
-                    Top =284
-                    Width =15
-                    Height =15
-                    FontSize =1
-                    FontWeight =100
+                Begin Subform
+                    Locked = NotDefault
+                    CanGrow = NotDefault
+                    TabStop = NotDefault
+                    OverlapFlags =215
+                    OldBorderStyle =0
+                    Width =690
+                    Height =2835
                     TabIndex =1
-                    Name ="HiddenControl"
+                    BorderColor =10921638
+                    Name ="DS_WORKSHEET_NUMBERS"
+                    SourceObject ="Form.DS_WORKSHEET_NUMBERS"
                     LeftPadding =0
                     TopPadding =0
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
 
-                    LayoutCachedLeft =284
-                    LayoutCachedTop =284
-                    LayoutCachedWidth =299
-                    LayoutCachedHeight =299
+                    LayoutCachedWidth =690
+                    LayoutCachedHeight =2835
+                    ShowPageHeaderAndPageFooter =0
+                End
+                Begin CommandButton
+                    OverlapFlags =93
+                    TextFontCharSet =177
+                    TextFontFamily =0
+                    Width =15
+                    Height =15
+                    FontSize =1
+                    FontWeight =100
+                    Name ="HiddenControl"
+                    Caption ="Comando1435"
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+
+                    LayoutCachedWidth =15
+                    LayoutCachedHeight =15
                     Alignment =1
                     ForeThemeColorIndex =1
                     ForeTint =100.0
@@ -371,116 +515,15 @@ Begin Form
                     QuickStyleMask =-1009
                     Overlaps =1
                 End
-                Begin Subform
-                    Visible = NotDefault
-                    TabStop = NotDefault
-                    OverlapFlags =215
-                    OldBorderStyle =0
-                    Top =30
-                    Width =10770
-                    Height =5670
-                    TabIndex =2
-                    BorderColor =10921638
-                    Name ="DS_MAIN_PANEL"
-                    GroupTable =2
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =10770
-                    LayoutCachedHeight =5700
-                    ColumnEnd =6
-                    LayoutGroup =1
-                    GridlineShade =50.0
-                    GroupTable =2
-                End
-                Begin Subform
-                    Visible = NotDefault
-                    OverlapFlags =85
-                    OldBorderStyle =0
-                    Left =10800
-                    Top =30
-                    Width =3734
-                    Height =5670
-                    BorderColor =10921638
-                    Name ="DS_SIDE_PANEL"
-                    GroupTable =2
-                    LeftPadding =0
-                    TopPadding =15
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineStyleTop =1
-                    GridlineColor =8355711
-                    VerticalAnchor =2
-
-                    LayoutCachedLeft =10800
-                    LayoutCachedTop =30
-                    LayoutCachedWidth =14534
-                    LayoutCachedHeight =5700
-                    ColumnStart =8
-                    ColumnEnd =8
-                    LayoutGroup =1
-                    GridlineShade =50.0
-                    WidthStretch =33
-                    GroupTable =2
-                    Begin
-                        Begin Label
-                            OverlapFlags =85
-                            TextFontCharSet =177
-                            TextAlign =1
-                            TextFontFamily =0
-                            Left =10770
-                            Top =30
-                            Width =30
-                            Height =5670
-                            BorderColor =8355711
-                            ForeColor =8355711
-                            Name ="DS_VERTICAL_SPLITTER"
-                            GroupTable =2
-                            LeftPadding =0
-                            TopPadding =15
-                            RightPadding =0
-                            BottomPadding =0
-                            GridlineStyleLeft =1
-                            GridlineStyleTop =1
-                            GridlineColor =8355711
-                            VerticalAnchor =2
-                            LayoutCachedLeft =10770
-                            LayoutCachedTop =30
-                            LayoutCachedWidth =10800
-                            LayoutCachedHeight =5700
-                            ColumnStart =7
-                            ColumnEnd =7
-                            LayoutGroup =1
-                            WidthStretch =33
-                            GridlineShade =50.0
-                            GroupTable =2
-                        End
-                    End
-                End
-                Begin Line
-                    OverlapFlags =85
-                    Top =15
-                    Width =14542
-                    Name ="Línea1571"
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    HorizontalAnchor =2
-                    LayoutCachedTop =15
-                    LayoutCachedWidth =14542
-                    LayoutCachedHeight =15
-                    BorderThemeColorIndex =1
-                    BorderShade =50.0
-                End
             End
+        End
+        Begin FormFooter
+            Visible = NotDefault
+            Height =0
+            Name ="FormFooter"
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =95.0
+            BackThemeColorIndex =1
         End
     End
 End
@@ -492,103 +535,93 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private WithEvents pController As dsLiveEd
-Attribute pController.VB_VarHelpID = -1
 
-Property Get IsSubform() As Boolean
+Private pWorksheetNumbers As Form_DS_WORKSHEET_NUMBERS
+Private pScrollview As Form_DS_SCROLLVIEW
+
+
+Public Property Get WorksheetNumbers() As Form_DS_WORKSHEET_NUMBERS: Set WorksheetNumbers = pWorksheetNumbers: End Property
+Public Property Set WorksheetNumbers(ByRef Value As Form_DS_WORKSHEET_NUMBERS): Set pWorksheetNumbers = Value: End Property
+
+Public Property Get Scrollview() As Form_DS_SCROLLVIEW: Set Scrollview = pScrollview: End Property
+Public Property Set Scrollview(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollview = Value: End Property
+
+
+' --- FORM EVENTS ---
+
+Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
-    IsSubform = Len(Me.Parent.Name) > 0
-End Property
+    pScrollview.PropagateMouseWheel Page, Count
+End Sub
 
-Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property
-Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Property
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyDownHandler KeyCode, Shift: End Sub
+Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyUpHandler KeyCode, Shift: End Sub
 
 
+' --- SETUP / BINDING ---
 
-Private Sub Form_Load()
-    ScreenLib_Resync
+Public Sub Setup()
+    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long
     
-    WindowSizeTo Me, 22050, 11000
-    WindowCenterTo Me, ScreenLib.PrimaryScreen
-
-    Me.TimerInterval = 1
-End Sub
-
-Private Sub Bind(ByVal TargetController As dsLiveEd)
+    Set WorksheetNumbers = Me.DS_WORKSHEET_NUMBERS.Form
     
-    If (Not TargetController Is Nothing) And (Not pController Is Nothing) Then
-        ' More than one DS_LIVE_EDITOR windows can point to the same dsLiveEd controller
-        ' But NOT more than one dsLiveEd instance can point to the same window, so:
-        ' Unbind this form from controller's pLiveEditor if ObjPtr's of TargetController and pController differ
-        If ObjPtr(pController) <> ObjPtr(TargetController) Then
-            If Not pController.LiveEditor Is Nothing Then
-                If ObjPtr(pController.LiveEditor) = ObjPtr(Me) Then
-                    Set pController.LiveEditor = Nothing
-                End If
-            End If
-            Set pController = Nothing
-        End If
-    End If
-    Set pController = TargetController
-
-    Me.DS_MAIN_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_MAIN_PANEL"
-    Me.DS_SIDE_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_SIDE_PANEL"
-    Set Me.DS_SIDE_PANEL.Form.Controller = pController
-    Set Me.DS_MAIN_PANEL.Form.Controller = pController
-    Me.DS_SIDE_PANEL.Visible = True
-'    If pController.TaskController.Initialized Then
-        Me.DS_MAIN_PANEL.Visible = True
-'    End If
-End Sub
-
-Private Sub Form_Resize()
-    ResizeToFitAllControls
-End Sub
-
-Private Sub Form_Timer()
-    Me.TimerInterval = 0
-
-    If pController Is Nothing Then
-        Dim d As dsLiveEd
-        Set d = New dsLiveEd
-        Bind d
-        Set d.LiveEditor = Me
-        d.DisposeOnClose = True
-    End If
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
-    On Error Resume Next
-    pController.TriggerLiveEditorWindowClose True
-    Set pController = Nothing
-End Sub
-
-
-Private Sub ResizeToFitAllControls()
-    Dim parentWidth As Long, pSize As Long
+    r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
+    b = ScreenLib.RectToBounds(r)
     
-    Focus Me
-    parentWidth = Me.InsideWidth
+    t = pWorksheetNumbers.MaxContentWidthLimit
+    Me.Width = t
+    Me.FormDetail.Height = CLng(Min(b.h * 1.95, 31500))
+    With Me.DS_WORKSHEET_NUMBERS
+        .Left = 0
+        .Top = 0
+        .Width = t
+        .Height = CLng(Min(b.h * 1.95, 31500))
+    End With
+    Me.Width = t
+End Sub
+
+
+' --- EVENTS ---
+
+Private Sub DS_FULL_AXIS_SCROLLING_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    pScrollview.PointerCapture = True
+End Sub
+
+Private Sub DS_FULL_AXIS_SCROLLING_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    Static lastPointerCapture As Long
+    Dim pCaptured As Boolean: pCaptured = pScrollview.PointerCapture
     
-    pSize = Me.DS_SIDE_PANEL.Width
-    Me.DS_SIDE_PANEL.Left = parentWidth - pSize
-    pSize = pSize + Me.DS_VERTICAL_SPLITTER.Width
-    Me.DS_VERTICAL_SPLITTER.Left = parentWidth - pSize
-    Me.DS_MAIN_PANEL.Width = parentWidth - (pSize + Me.DS_MAIN_PANEL.Left)
-    ' Force resize event on side panel subform as quick fix for incorrect rendering
-    If Me.DS_SIDE_PANEL.Width Mod 2 = 0 Then
-        Me.DS_SIDE_PANEL.Width = Me.DS_SIDE_PANEL.Width - 15
+    If CLng(pCaptured) - 1 <> lastPointerCapture Then
+        lastPointerCapture = CLng(pCaptured) - 1
+        If pCaptured Then ScreenLib.MouseMoveCursor = True
     Else
-        Me.DS_SIDE_PANEL.Width = Me.DS_SIDE_PANEL.Width + 15
+        If Not pCaptured Then ScreenLib.MouseHelpCursor = True
     End If
-End Sub
-
-Private Sub pController_OnDataSourceChange()
-    If Not Me.DS_MAIN_PANEL.Visible Then Me.DS_MAIN_PANEL.Visible = True
-End Sub
-
-Private Sub Focus(ByRef frm As Access.Form)
-    On Error Resume Next
-    frm.Controls("HiddenControl").SetFocus
     DoEvents
 End Sub
+
+Private Sub DS_FULL_AXIS_SCROLLING_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    pScrollview.PointerCapture = False
+End Sub
+
+Private Sub DS_HC_2_0_Click()
+    pScrollview.TriggerClickOnInvertSelection
+End Sub
+
+Private Sub DS_HC_2_0_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    ScreenLib.MouseHandCursor = True
+    DoEvents
+End Sub
+
+Private Sub DS_HC_1_0_Click()
+    Me.HiddenControl.SetFocus
+    DoEvents
+    
+    pScrollview.TriggerClickOnSelectAll
+End Sub
+
+
+' --- HELPERS ---
+
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function

@@ -342,8 +342,17 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         json_IsFirstItem2D = True
                     Else
                         ' 1D Array
-                        json_Converted = Stringify(jsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
-    
+                        If IsObject(jsonValue(json_Index)) Or IsArray(jsonValue(json_Index)) Then
+                            If HasNestedLevels(jsonValue(json_Index)) Then
+                                json_Converted = Stringify(jsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
+                            Else
+                                json_Converted = Stringify(jsonValue(json_Index), , json_CurrentIndentation + 1)
+                            End If
+                        Else
+                            json_Converted = Stringify(jsonValue(json_Index), , json_CurrentIndentation + 1)
+                        End If
+                        
+                        
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
                         If json_Converted = "" Then
                             ' (nest to only check if converted = "")
@@ -431,11 +440,10 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                     json_BufferAppend json_Buffer, json_Indentation & "}", json_BufferPosition, json_BufferLength
         
                 ' Collection
-                Case "Collection", "ArrayList", "Recordset", "Recordset2", "RecordsetEx", "ArrayListEx", "Array2dEx"
-                    json_BufferAppend json_Buffer, "[ ", json_BufferPosition, json_BufferLength
+                Case "Collection", "ArrayList", "Recordset", "Recordset2", "RecordsetEx", "ArrayListEx"
+                    json_BufferAppend json_Buffer, "[", json_BufferPosition, json_BufferLength
                     If VBA.TypeName(jsonValue) = "RecordsetEx" Then Set jsonValue = jsonValue.Instance
                     If VBA.TypeName(jsonValue) = "Recordset" Or VBA.TypeName(jsonValue) = "Recordset2" Then jsonValue = RecordsetAsDictionaryArray(jsonValue)
-                    If VBA.TypeName(jsonValue) = "Array2dEx" Then Set jsonValue = jsonValue.Instance
                     
                     For Each json_Value In jsonValue
                         If json_IsFirstItem Then
@@ -443,8 +451,16 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         Else
                             json_BufferAppend json_Buffer, ", ", json_BufferPosition, json_BufferLength
                         End If
-        
-                        json_Converted = Stringify(json_Value, Whitespace, json_CurrentIndentation + 1)
+                        
+                        If IsObject(json_Value) Or IsArray(json_Value) Then
+                            If HasNestedLevels(json_Value) Then
+                                json_Converted = Stringify(json_Value, Whitespace, json_CurrentIndentation + 1)
+                            Else
+                                json_Converted = Stringify(json_Value, , json_CurrentIndentation + 1)
+                            End If
+                        Else
+                            json_Converted = Stringify(json_Value, , json_CurrentIndentation + 1)
+                        End If
         
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
                         If json_Converted = "" Then
@@ -471,8 +487,12 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         End If
                     End If
         
-                    json_BufferAppend json_Buffer, json_Indentation & " ]", json_BufferPosition, json_BufferLength
-                
+                    json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
+                    
+                Case "Array2dEx", "dsTable"
+                    json_Converted = Stringify(jsonValue.Instance, Whitespace, IIf(json_PrettyPrint, json_CurrentIndentation, json_CurrentIndentation + 1))
+                    json_BufferAppend json_Buffer, json_Converted, json_BufferPosition, json_BufferLength
+                    
             End Select
             'End If
     
@@ -492,6 +512,34 @@ End Function
 ' ============================================= '
 ' Private Functions
 ' ============================================= '
+
+Private Function HasNestedLevels(ByRef Target As Variant) As Boolean
+    Dim i As Long, Item As Variant
+    On Error GoTo Finally
+    
+    If IsObject(Target) Then
+        If VBA.Left$(TypeName(Target), 10) = "Dictionary" Then
+            For Each Item In Target.Items()
+                HasNestedLevels = (IsObject(Item) Or IsArray(Item))
+                If i >= 1 Or HasNestedLevels Then Exit For
+                i = i + 1
+            Next Item
+        Else
+            i = IIf(Target.Count > 1, 1, 0)
+            HasNestedLevels = (IsObject(Target(i)) Or IsArray(Target(i)))
+        End If
+    ElseIf IsArray(Target) Then
+        If Array2dEx.Is2dArray(Target) Then
+            HasNestedLevels = True
+            Exit Function
+        End If
+        For Each Item In Target
+            HasNestedLevels = (IsObject(Item) Or IsArray(Item))
+            Exit For
+        Next Item
+    End If
+Finally:
+End Function
 
 Private Function RecordsetAsDictionaryArray(ByRef Instance As Variant) As Variant()
     Dim sValues As Variant, sRows() As Variant, Entry As Scripting.Dictionary, sColumns() As Variant, i As Long, c As Long, iBookmark As Variant

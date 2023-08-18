@@ -22,15 +22,15 @@ Begin Form
     GridY =10
     Width =8145
     DatasheetFontHeight =11
-    ItemSuffix =1578
-    Left =4065
-    Top =3030
-    Right =21105
-    Bottom =15225
+    ItemSuffix =1582
+    Left =7725
+    Top =4230
+    Right =22380
+    Bottom =14385
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="CREATE TASK"
+    Caption ="Create Task"
     DatasheetFontName ="Calibri"
     OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
@@ -477,6 +477,7 @@ Begin Form
                     Name ="DS_TASK_PARAM_1"
                     RowSourceType ="Value List"
                     FontName ="Consolas"
+                    OnChange ="[Event Procedure]"
                     GroupTable =4
                     LeftPadding =0
                     TopPadding =0
@@ -882,7 +883,7 @@ Begin Form
                     Width =1245
                     Height =360
                     FontSize =10
-                    TabIndex =9
+                    TabIndex =11
                     Name ="DS_ADD_TASK_BUTTON"
                     Caption ="ADD TASK"
                     OnClick ="[Event Procedure]"
@@ -932,7 +933,7 @@ Begin Form
                     Width =1245
                     Height =360
                     FontSize =10
-                    TabIndex =8
+                    TabIndex =10
                     Name ="DS_CANCEL_BUTTON"
                     Caption ="CANCEL"
                     OnClick ="[Event Procedure]"
@@ -1067,7 +1068,7 @@ Begin Form
                     Width =1755
                     Height =360
                     FontSize =10
-                    TabIndex =10
+                    TabIndex =8
                     Name ="DS_ENABLE_ALL_TASKS_BUTTON"
                     Caption ="ENABLE ALL TASKS"
                     OnClick ="[Event Procedure]"
@@ -1108,6 +1109,79 @@ Begin Form
                     QuickStyleMask =-1
                     Overlaps =1
                 End
+                Begin CommandButton
+                    OverlapFlags =215
+                    TextFontCharSet =177
+                    Left =2115
+                    Top =4755
+                    Width =1440
+                    Height =360
+                    FontSize =10
+                    TabIndex =9
+                    Name ="DS_SHOW_CUSTOM_VARS_BUTTON"
+                    Caption ="SHOW C. VARS"
+                    OnClick ="[Event Procedure]"
+                    GroupTable =13
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =15
+                    BottomPadding =15
+                    GridlineColor =10921638
+                    VerticalAnchor =1
+
+                    CursorOnHover =1
+                    LayoutCachedLeft =2115
+                    LayoutCachedTop =4755
+                    LayoutCachedWidth =3555
+                    LayoutCachedHeight =5115
+                    ColumnStart =2
+                    ColumnEnd =2
+                    LayoutGroup =12
+                    ForeThemeColorIndex =1
+                    ForeTint =100.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =8
+                    BackTint =100.0
+                    BorderWidth =1
+                    BorderThemeColorIndex =8
+                    BorderTint =100.0
+                    ThemeFontIndex =-1
+                    HoverThemeColorIndex =8
+                    HoverTint =80.0
+                    PressedThemeColorIndex =8
+                    PressedShade =80.0
+                    HoverForeThemeColorIndex =1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =1
+                    PressedForeTint =100.0
+                    GroupTable =13
+                    QuickStyle =13
+                    QuickStyleMask =-1
+                    Overlaps =1
+                End
+                Begin EmptyCell
+                    Left =1935
+                    Top =4755
+                    Width =165
+                    Height =360
+                    Name ="CeldaVacía1579"
+                    GroupTable =13
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =15
+                    BottomPadding =15
+                    GridlineColor =10921638
+                    VerticalAnchor =1
+                    LayoutCachedLeft =1935
+                    LayoutCachedTop =4755
+                    LayoutCachedWidth =2100
+                    LayoutCachedHeight =5115
+                    ColumnStart =1
+                    ColumnEnd =1
+                    LayoutGroup =12
+                    GroupTable =13
+                End
             End
         End
     End
@@ -1124,6 +1198,8 @@ Private WithEvents pController As dsGridController
 Attribute pController.VB_VarHelpID = -1
 Private WithEvents pContinuousList As Form_DS_RICHTEXT_LIST
 Attribute pContinuousList.VB_VarHelpID = -1
+Private WithEvents pCVarsScrollview As Form_DS_SCROLLVIEW
+Attribute pCVarsScrollview.VB_VarHelpID = -1
 
 Private pTasks As DictionaryEx
 Private pSelectedTask As String
@@ -1253,6 +1329,7 @@ Private Function GetTaskTypeHeader(ByVal TaskType As String) As Variant
         Case "XLG": Title = "XL GENERATION"
         Case "DS": Title = "DATA SOURCES"
         Case "T": Title = "TRANSFORMATION"
+        Case "DSG": Title = "GENERATION"
         Case Else
             GetTaskTypeHeader = Array(IndexCountdown, " ", 4)
             Exit Function
@@ -1263,13 +1340,17 @@ End Function
 
 Private Function CreateListItemTextHeader(ByVal Title As String) As String
     CreateListItemTextHeader = _
-        "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5""><b>" & Title & "</b></font><font color=white>&nbsp;&nbsp;.<br>" & _
+        "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5""><b>" & Title & "</b></font><font color=white size=2>&nbsp;&nbsp;.<br>" & _
         "</font><font style=""BACKGROUND-COLOR:#808080"">______ _______ _________ ________ ________ _______ ____ ______ _____</font></div>"
 End Function
 
 Private Sub DS_ENABLE_ALL_TASKS_BUTTON_Click()
     pEnableAllTasks = Not pEnableAllTasks
     RebuildTasksList
+End Sub
+
+Private Sub DS_SHOW_CUSTOM_VARS_BUTTON_Click()
+    ShowAvailableCustomVars
 End Sub
 
 Private Sub DS_TASK_PARAM_0_Change()
@@ -1284,8 +1365,24 @@ Private Sub DS_TASK_PARAM_0_Change()
     End If
 End Sub
 
+Private Sub DS_TASK_PARAM_1_Change()
+    Dim Target As String, sExtension As String
+    
+    If GetControlText(Me.DS_TASK_PARAM_1) = "< Select... >" Then
+        If pSelectedTask Like "*JSON*" Then
+            sExtension = "*.json"
+        Else
+            sExtension = "*.xlsx"
+        End If
+        If FileSystemLib.TrySaveAsDialog(Target, sExtension) Then
+            SetControlText Me.DS_TASK_PARAM_1, Target
+        Else
+            SetControlText Me.DS_TASK_PARAM_1, ""
+        End If
+    End If
+End Sub
+
 Private Sub Form_Load()
-    Debug.Print RectToString(GetWindowRect(Me))
     WindowSizeTo Me, 11000, 6000
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
     WindowAlwaysOnTop Me
@@ -1305,6 +1402,8 @@ End Function
 Private Sub RebuildUIForTask(ByVal TaskName As String)
     Dim Task As Variant, textContent As String, TaskParams As Variant, i As Long
     On Error GoTo Finally
+    
+    ResetAllTaskParamTextFields
     Task = pTasks(TaskName)
     
     Me.DS_TASK_DEFINITION_SYNTAX = Task(DS_T_NAME) & " (" & Task(DS_T_PARAMS)(0) & "): " & GetReturnTypeOf(TaskName)
@@ -1338,6 +1437,15 @@ End Sub
 
 Private Sub MoveTaskTextContentToFit(ByVal NumParams As Long)
     Me.DS_TASK_TEXT_CONTENT.Top = 3000 - ((5 - NumParams) * 450)
+End Sub
+
+Private Sub ResetAllTaskParamTextFields()
+    Dim i As Long
+    On Error Resume Next
+    
+    For i = 0 To 4
+        SetControlText Me.Controls("DS_TASK_PARAM_" & CStr(i)), ""
+    Next i
 End Sub
 
 Private Sub RefillExistingParamValues(ByVal TaskName As String, ByVal ParamIndex As Long, ByVal TaskParams As Variant, ByVal TaskIndex As Long)
@@ -1390,6 +1498,7 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
             .AddItem ""
             .AddItem "< Select... >"
         Else
+            ' Select by PARAM TYPE
             Select Case TaskParams(ParamIndex)(1)
                 Case "Table", "Worksheet"
                     If Not isRequired Then .AddItem ""
@@ -1397,13 +1506,39 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                         .AddItem CStr(Item)
                     Next Item
                 Case "String|Dictionary"
+                    ' Being PARAM TYPE "String|Dictionary", select by TASK NAME
                     Select Case TaskName
                         Case "LoadFromExcelFile", "OpenWorksheetFromFile"
+                            Item = "{""UpdateLinks"": false, ""ReadOnly"": true, ""Local"": true, ""UTF8"": false, ""NoTextQualifier"": true}"
                             .AddItem ""
-                            .AddItem "{""UpdateLinks"": false, ""ReadOnly"": true, ""Local"": true, ""UTF8"": false, ""NoTextQualifier"": true}"
+                            .AddItem Item
+                            .Value = Item
                         Case Else
                             ' ...
                     End Select
+                Case "String"
+                    ' Being PARAM TYPE "String", select by PARAM NAME
+                    Select Case TaskParams(ParamIndex)(0)
+                        Case "TableStyle"
+                            For Each Item In GetExcelTableStyles(): .AddItem CStr(Item): Next Item
+                            .Value = "TableStyleMedium6"
+                        Case "[ConnectionString]", "ConnectionString"
+                            Item = dbQuery.ConnectionString
+                            .AddItem ""
+                            .AddItem CStr(Item)
+                            .Value = CStr(Item)
+                        Case Else
+                            ' ...
+                    End Select
+                Case "Boolean"
+                    .AddItem "true"
+                    .AddItem "false"
+                    If Not isRequired Then
+                        On Error Resume Next
+                        Item = LCase(Trim(Split(TaskParams(ParamIndex)(0), "=")(1)))
+                        Item = Left(Item, Len(Item) - 1)
+                        .Value = CStr(Item)
+                    End If
                 Case Else
                     ' ...
             End Select
@@ -1419,6 +1554,7 @@ End Sub
 Private Function GetListOfPreviousTaskResults(Optional ByVal TaskReturnType As String = "") As ArrayListEx
     Dim t As New ArrayListEx, i As Long, aList As ArrayListEx
     
+    On Error GoTo Finally
     With pController.TaskController
         Set aList = .RebuildSequence
         
@@ -1432,7 +1568,7 @@ Private Function GetListOfPreviousTaskResults(Optional ByVal TaskReturnType As S
             End If
         Next i
     End With
-    
+Finally:
     Set GetListOfPreviousTaskResults = t
 End Function
 
@@ -1469,8 +1605,9 @@ Private Sub AddTaskUsingCurrentValuesAs(ByVal TaskName As String)
         pController.TaskController.SetTask pController.TaskController.GenerateTask(TaskName, t, TaskId).Instance, ActiveTaskIndex
         pController.TaskController.SequenceIndex = ActiveTaskIndex
     Else
+        i = IIf(pController.TaskController.RebuildSequence.Count - 1 < pController.TaskController.SequenceIndex, pController.TaskController.RebuildSequence.Count - 1, pController.TaskController.SequenceIndex)
         pController.TaskController.AddTask TaskName, t
-        pController.TaskController.SequenceIndex = pController.TaskController.SequenceIndex + 1
+        pController.TaskController.SequenceIndex = i + 1
     End If
     DoCmd.Close acForm, "DS_CREATE_TASK", acSaveNo
 End Sub
@@ -1521,4 +1658,44 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
             Target = Value
         End If
     End If
+End Sub
+
+Private Function GetExcelTableStyles() As Variant
+    Dim i As Long
+    
+    With ArrayListEx.Create()
+        For i = 1 To 21: .Add "TableStyleLight" & CStr(i): Next i
+        For i = 1 To 28: .Add "TableStyleMedium" & CStr(i): Next i
+        For i = 1 To 11: .Add "TableStyleDark" & CStr(i): Next i
+        GetExcelTableStyles = .ToArray()
+    End With
+End Function
+
+Private Sub ShowAvailableCustomVars()
+    Dim dsT As dsTable, r As ScreenLib.RECT, rScreen As ScreenLib.RECT
+    
+    If pCVarsScrollview Is Nothing Then
+        Set pCVarsScrollview = New Form_DS_SCROLLVIEW
+        Set dsT = dsTable.Create(dsAppGlobals.CustomVars).SetHeaders(Array("CustomVar", "Value"))
+        
+        pCVarsScrollview.Visible = True
+        ScreenLib.WindowSizeTo pCVarsScrollview, 5160, 8000
+        ScreenLib.WindowAlwaysOnTop pCVarsScrollview
+        r = GetWindowRect(Me)
+        rScreen = ScreenLib.GetScreenRectOfPoint(PointInRect(r, DirectionType.Center))
+        If CLng(r.Left) - CLng(rScreen.Left) > 5160 And r.Left > rScreen.Left Then
+            ScreenLib.WindowMoveTo pCVarsScrollview, CLng(r.Left) - 5160, CLng(r.Top)
+        ElseIf CLng(rScreen.Right) - CLng(r.Right) > 5160 And rScreen.Right > r.Right Then
+            ScreenLib.WindowMoveTo pCVarsScrollview, CLng(r.Right), CLng(r.Top)
+        End If
+        pCVarsScrollview.Caption = "Custom Vars"
+        Set pCVarsScrollview.Table = dsT
+    Else
+        pCVarsScrollview.Visible = False
+        pCVarsScrollview.Visible = True
+    End If
+End Sub
+
+Private Sub pCVarsScrollview_OnWindowClose(Cancel As Integer)
+    Set pCVarsScrollview = Nothing
 End Sub

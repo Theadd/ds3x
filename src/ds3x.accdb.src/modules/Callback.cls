@@ -51,6 +51,7 @@ End Function
 
 Public Function Self() As Callback: Set Self = Me: End Function
 
+'@DefaultMember
 Public Function Execute(ParamArray vArgs() As Variant) As Callback
 Attribute Execute.VB_UserMemId = 0
     If Not pInstance Is Nothing Then
@@ -242,6 +243,3 @@ ErrorHandler:
     Debug.Print "[ERROR] " & CStr(Err.Number) & " - " & CStr(Err.Description)
     Resume ExitFunc
 End Function
-
-
-

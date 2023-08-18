@@ -465,7 +465,11 @@ Private Sub SetController(ByVal TargetController As dsLiveEd)
 End Sub
 
 Private Sub Rebuild()
-    pController.GridController.TriggerOnChangeEvent
+    With pController.GridController
+        .SelectionClear
+        .TriggerOnChangeEvent
+        .SelectionApply
+    End With
 End Sub
 
 
