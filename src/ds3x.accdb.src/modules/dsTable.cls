@@ -24,9 +24,13 @@ Private Const dsChunkSize As Long = 4000
 Public Property Get Count() As Long
     On Error Resume Next
     If pRecordArray Is Nothing Then
-        Count = Me.RecordList.Count
+        If pRecordList Is Nothing Then
+            Count = pTableSource.Count
+        Else
+            Count = pRecordList.Count
+        End If
     Else
-        Count = Me.RecordArray.Count
+        Count = pRecordArray.Count
     End If
 End Property
 
@@ -36,11 +40,21 @@ Public Property Get ColumnCount() As Long
         If pHeaderList Is Nothing Then
             ColumnCount = Me.Records.ColumnCount
         Else
-            ColumnCount = 1 + UBound(Me.HeaderList.Item(0)) - LBound(Me.HeaderList.Item(0))
+            'ColumnCount = 1 + UBound(Me.HeaderList.Item(0)) - LBound(Me.HeaderList.Item(0))
+            ColumnCount = pHeaderList.ColumnCount
         End If
     Else
-        ColumnCount = Me.HeaderArray.ColumnCount
+        ColumnCount = pHeaderArray.ColumnCount
     End If
+End Property
+
+Public Property Get Instance() As Scripting.Dictionary
+    Set Instance = DictionaryEx.Create() _
+        .Add("dsTable", DictionaryEx.Create() _
+            .Add("Headers", Me.Headers) _
+            .Add("Records", Me.Records) _
+            .Instance) _
+        .Instance
 End Property
 
 Public Property Get HeaderList() As ArrayListEx
@@ -104,7 +118,7 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
                     Err.Raise 13
                 End If
             ElseIf VarType(TableLike) = vbString Then
-                If Left(LTrim(TableLike), 1) = "[" Then
+                If Left(LTrim(TableLike), 1) Like "[{[]" Then
                     Bind JSON.Parse(TableLike, True, True)
                 Else
                     Err.Raise 13
@@ -116,13 +130,21 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
             If TypeOf TableLike Is RecordsetEx Then
                 Set pTableSource = TableLike    '.Clone
                 If AutoHeaders Then Me.SetHeaders pTableSource
+                ' TODO: Uncomment
+'                Debug.Assert (TypeOf Me.Records Is Array2dEx) = True
             ElseIf TypeOf TableLike Is ADODB.Recordset Then
                 Set pTableSource = RecordsetEx.Create(C2Recordset(TableLike))
                 If AutoHeaders Then Me.SetHeaders pTableSource
+                ' TODO: Uncomment
+'                Debug.Assert (TypeOf Me.Records Is Array2dEx) = True
             ElseIf TypeOf TableLike Is ArrayListEx Then
                 Set pRecordList = TableLike
             ElseIf TypeOf TableLike Is Array2dEx Then
                 Set pRecordArray = TableLike
+            ElseIf TypeOf TableLike Is Scripting.Dictionary Then
+                Set Bind = CreateFromDictionary(C2Dictionary(TableLike), AutoHeaders)
+            ElseIf TypeOf TableLike Is DictionaryEx Then
+                Set Bind = CreateFromDictionary(TableLike.Instance, AutoHeaders)
             Else
                 If TypeOf TableLike Is xlSheetsEx Then
                     Set Bind = CreateFromExcelRange(C2xlSheetsEx(TableLike).UsedRange, AutoHeaders)
@@ -164,6 +186,8 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
         If IsObject(AllHeaders) Then
             If TypeOf AllHeaders Is RecordsetEx Then
                 Set pHeaderArray = CreateColumnHeadersFromRecordsetFields(AllHeaders.Fields)
+            ElseIf TypeOf AllHeaders Is ADODB.Recordset Then
+                Set pHeaderArray = CreateColumnHeadersFromRecordsetFields(C2Recordset(AllHeaders).Fields)
             ElseIf TypeOf AllHeaders Is ArrayListEx Then
                 Set pHeaderList = AllHeaders
             ElseIf TypeOf AllHeaders Is Array2dEx Then
@@ -227,8 +251,16 @@ End Function
 '
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
-    Set GetRange = Me.Create(Me.Records.GetRange(Index, GetCount, ColumnIndexes)) _
+    Set GetRange = Me.Create(GetRangeOfRecords(Index, GetCount, ColumnIndexes)) _
                      .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count, ColumnIndexes))
+End Function
+
+Private Function GetRangeOfRecords(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Variant
+    If (pRecordList Is Nothing) And (pRecordArray Is Nothing) And (TypeOf pTableSource Is RecordsetEx) Then
+        Set GetRangeOfRecords = C2RecordsetEx(pTableSource).GetRange(Index, GetCount, ColumnIndexes)
+    Else
+        Set GetRangeOfRecords = Me.Records.GetRange(Index, GetCount, ColumnIndexes)
+    End If
 End Function
 
 'Public Function Resize(Optional ByVal NumRows As Variant, Optional ByVal NumColumns As Variant, Optional ByVal DefaultValue As Variant) As Array2dEx
@@ -236,20 +268,24 @@ End Function
 'End Function
 
 Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
-    ToCSV = GetHeaderNames.ToCSV(Delimiter) & Me.Records.ToCSV(Delimiter)
+    ToCSV = ArrayListEx.Create().Add(GetColumnNames).ToCSV(Delimiter) & Me.Records.ToCSV(Delimiter)
 End Function
+
+Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
     Dim aX As ArrayListEx, cRow As Long, cRange As Excel.Range, i As Long, iMax As Long, rCount As Long, bX As ArrayListEx, a2dX As Array2dEx, iNumRows As Long
     
     If WriteHeaders Then
-        Set aX = ArrayListEx.Create(Array(GetHeaderNames))
+        Set aX = ArrayListEx.Create(Array(GetColumnNames()))
         Array2dEx.Create(aX).CopyToRange RangeObject, False
         aX.Dispose
         Set aX = Nothing
         cRow = cRow + 1
     End If
+    'GlobalVMemAnalysis "@dsTable.CopyToRange P0"
     If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
+    'GlobalVMemAnalysis "@dsTable.CopyToRange P1"
     If pRecordArray Is Nothing Then
         On Error GoTo ErrorHandler
         rCount = pRecordList.Count
@@ -269,9 +305,10 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
             iNumRows = rCount - (i * dsChunkSize)
             If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
         Wend
-
+        'GlobalVMemAnalysis "@dsTable.CopyToRange P2A"
     Else
         pRecordArray.CopyToRange RangeObject.Range("A" & CStr(1 + cRow)), ApplyUserLocale
+        'GlobalVMemAnalysis "@dsTable.CopyToRange P2B"
     End If
     
     ' Me.RecordArray.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
@@ -416,6 +453,46 @@ Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByV
     Set CreateFromExcelRange = Me
 End Function
 
+Private Function CreateFromDictionary(ByRef Target As Scripting.Dictionary, Optional ByVal AutoHeaders As Boolean = False) As dsTable
+    Dim dX As DictionaryEx
+    On Error GoTo Fallback
+    
+    Set dX = DictionaryEx.Create(Target)
+    If Not dX.Exists("dsTable") Then
+        Set CreateFromDictionary = CreateFromKeyValueDictionary(Target, AutoHeaders)
+        Exit Function
+    End If
+    Set dX = DictionaryEx.Create(dX("dsTable"))
+    Set pRecordList = ArrayListEx.Create()
+    pRecordList.AddRange dX("Records")
+    Set pHeaderList = ArrayListEx.Create()
+    pHeaderList.AddRange dX("Headers")
+    
+    Set CreateFromDictionary = Me
+    Exit Function
+Fallback:
+    Err.Raise 13, , "Unable to create a dsTable from provided dictionary."
+End Function
+
+Private Function CreateFromKeyValueDictionary(ByRef Target As Scripting.Dictionary, Optional ByVal AutoHeaders As Boolean = False) As dsTable
+    Dim dX As DictionaryEx, dKey As Variant
+    On Error GoTo Fallback
+    
+    Set dX = DictionaryEx.Create(Target)
+    Set pRecordList = ArrayListEx.Create()
+    For Each dKey In dX.Keys()
+        pRecordList.Add Array(dKey, dX(dKey))
+    Next dKey
+    If AutoHeaders Then
+        SetHeaders Array("Key", "Value")
+    End If
+    
+    Set CreateFromKeyValueDictionary = Me
+    Exit Function
+Fallback:
+    Err.Raise 13, , "Unable to create a dsTable from provided dictionary."
+End Function
+
 Private Function CreateNamedRecordset() As ADODB.Recordset
     Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx
     
@@ -461,8 +538,11 @@ Public Function CreateIndexRecordset( _
     cMax = UBound(iRow)
     cMin = LBound(iRow)
     
+    iMax = ((PageSize * (PageIndex + 1)) - 1) + ((PageCount - 1) * PageSize)
+    If iMax > Me.Count - 1 Then iMax = Me.Count - 1
+        
     If ColumnStartIndex <> 0 Or ColumnsCount <> Me.ColumnCount Then
-        Set AllValues = Me.RecordList.GetRange(, , CreateIndexHeaders(ColumnStartIndex, ColumnsCount, False))
+        Set AllValues = Me.RecordList.GetRange(PageSize * PageIndex, iMax - (PageSize * PageIndex) + 1, CreateIndexHeaders(ColumnStartIndex, ColumnsCount, False))
     Else
         Set AllValues = Me.RecordList
     End If
@@ -473,9 +553,7 @@ Public Function CreateIndexRecordset( _
         Next c
         
         .Open
-        iMax = ((PageSize * (PageIndex + 1)) - 1) + ((PageCount - 1) * PageSize)
-        If iMax > Me.Count - 1 Then iMax = Me.Count - 1
-        For i = (PageSize * PageIndex) To iMax
+        For i = 0 To iMax - (PageSize * PageIndex)
             .AddNew FieldList:=iRow, Values:=AllValues(i)
         Next i
         
@@ -540,9 +618,11 @@ End Function
 ' --- TYPE CASTING ---
 
 Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2Recordset = Value: End Function
+Private Function C2RecordsetEx(ByVal Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
 Private Function C2ExcelWorksheet(ByVal Value As Variant) As Excel.Worksheet: Set C2ExcelWorksheet = Value: End Function
 Private Function C2xlSheetsEx(ByVal Value As Variant) As xlSheetsEx: Set C2xlSheetsEx = Value: End Function
+Private Function C2Dictionary(ByVal Value As Variant) As Scripting.Dictionary: Set C2Dictionary = Value: End Function
 
 
 

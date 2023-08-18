@@ -25,6 +25,7 @@ Option Explicit
 Private pConn As ADODB.Connection
 Private pConnectionString As String
 Private pLastError As String
+Private pNoCloseOnTerminate As Boolean
 
 
 ' --- PROPERTIES ---
@@ -32,6 +33,9 @@ Private pLastError As String
 ' Contiene el Err.Description de la última llamada fallida a TryQuery().
 Public Property Get LastError() As String: LastError = pLastError: End Property
 Attribute LastError.VB_Description = "Contiene el err.Description de la última llamada fallida a TryQuery."
+
+Public Property Get CloseOnTerminate() As Boolean: CloseOnTerminate = Not pNoCloseOnTerminate: End Property
+Public Property Let CloseOnTerminate(ByVal Value As Boolean): pNoCloseOnTerminate = Not Value: End Property
 
 Public Property Get Connection() As ADODB.Connection
     If pConn Is Nothing Then OpenConnection
@@ -45,7 +49,7 @@ Public Property Get ConnectionString() As String
             pConnectionString = dbQuery.ConnectionString
         Else
             Dim s As String
-            s = FileSystemLib.PathCombine(Application.CurrentProject.path, "package.json")
+            s = FileSystemLib.PathCombine(Application.CurrentProject.Path, "package.json")
             If FileSystemLib.TryGetFileInAncestors(s, 3) Then
                 If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
                     pConnectionString = DictionaryEx.Create(s)("ds3x.dbQuery.ConnectionString")
@@ -198,16 +202,16 @@ Private Sub Class_Terminate()
     On Error Resume Next
     
     If Not pConn Is Nothing Then
-        pConn.Close
+        If Not pNoCloseOnTerminate Then pConn.Close
         Set pConn = Nothing
     End If
 End Sub
 
 Private Sub OpenConnection()
     Set pConn = New ADODB.Connection
-    pConn.ConnectionString = pConnectionString
+    pConn.ConnectionString = ConnectionString
     pConn.CommandTimeout = 240000   ' ~= 2d 18h
-    pConn.ConnectionTimeout = 0
+    pConn.ConnectionTimeout = 10
     pConn.Open
 End Sub
 

@@ -18,19 +18,20 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =3436
+    Width =3435
     DatasheetFontHeight =11
-    ItemSuffix =1559
-    Left =4065
-    Top =3030
-    Right =28545
-    Bottom =15225
+    ItemSuffix =1568
+    Left =4215
+    Top =3690
+    Right =21210
+    Bottom =13185
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
+    OnKeyDown ="[Event Procedure]"
+    OnKeyUp ="[Event Procedure]"
     AllowDatasheetView =0
     FilterOnLoad =0
     SplitFormDatasheet =1
@@ -306,22 +307,55 @@ Begin Form
             ForeThemeColorIndex =0
             ForeTint =75.0
         End
-        Begin Section
-            CanGrow = NotDefault
-            CanShrink = NotDefault
-            Height =2865
-            Name ="Detalle"
-            AlternateBackThemeColorIndex =4
-            AlternateBackTint =40.0
-            BackThemeColorIndex =1
+        Begin FormHeader
+            Height =645
+            Name ="FormHeaders"
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =95.0
+            BackThemeColorIndex =3
             Begin
                 Begin Subform
                     CanGrow = NotDefault
                     TabStop = NotDefault
                     OverlapFlags =85
                     OldBorderStyle =0
-                    Top =15
                     Width =3433
+                    Height =645
+                    BorderColor =10921638
+                    Name ="DS_WORKSHEET_HEADERS"
+                    SourceObject ="Form.DS_WORKSHEET_HEADERS"
+                    LeftPadding =0
+                    TopPadding =15
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    GridlineWidthLeft =0
+                    GridlineWidthTop =0
+                    GridlineWidthRight =0
+                    GridlineWidthBottom =0
+
+                    LayoutCachedWidth =3433
+                    LayoutCachedHeight =645
+                End
+            End
+        End
+        Begin Section
+            CanGrow = NotDefault
+            CanShrink = NotDefault
+            Height =2835
+            Name ="FormDetail"
+            AlternateBackThemeColorIndex =4
+            AlternateBackTint =40.0
+            BackThemeColorIndex =1
+            BackShade =60.0
+            Begin
+                Begin Subform
+                    Locked = NotDefault
+                    CanGrow = NotDefault
+                    TabStop = NotDefault
+                    OverlapFlags =87
+                    OldBorderStyle =0
+                    Width =3435
                     Height =2835
                     TabIndex =1
                     BorderColor =10921638
@@ -329,19 +363,19 @@ Begin Form
                     SourceObject ="Form.DS_WORKSHEET"
                     GroupTable =2
                     LeftPadding =0
-                    TopPadding =15
+                    TopPadding =0
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
 
-                    LayoutCachedTop =15
-                    LayoutCachedWidth =3433
-                    LayoutCachedHeight =2850
+                    LayoutCachedWidth =3435
+                    LayoutCachedHeight =2835
                     LayoutGroup =1
                     GroupTable =2
+                    ShowPageHeaderAndPageFooter =0
                 End
                 Begin CommandButton
-                    OverlapFlags =85
+                    OverlapFlags =93
                     TextFontCharSet =177
                     TextFontFamily =0
                     Width =15
@@ -384,6 +418,14 @@ Begin Form
                 End
             End
         End
+        Begin FormFooter
+            Visible = NotDefault
+            Height =0
+            Name ="FormFooter"
+            AlternateBackThemeColorIndex =1
+            AlternateBackShade =95.0
+            BackThemeColorIndex =1
+        End
     End
 End
 CodeBehindForm
@@ -402,6 +444,8 @@ Private Const SB_LINEDOWN = 1
 Private Const SB_TOP = 6
 
 Private pWorksheet As Form_DS_WORKSHEET
+Private pWorksheetHeaders As Form_DS_WORKSHEET_HEADERS
+Private pWorksheetNumbers As Form_DS_WORKSHEET_NUMBERS
 Private pScrollview As Form_DS_SCROLLVIEW
 
 ' The current ColumnsToLargeChangeTrack value used in CachedTracks, CachedTracks resets when this value changes
@@ -423,6 +467,8 @@ Private Type TViewportState
     FirstVisibleRow As Long
     ' The distance between the start of the first visible column to the viewport left edge (must be less than GridCellSizeX)
     FirstVisibleColumnPositionModX As Long
+    ' The distance between the start of the first visible row to the viewport top edge (must be less than GridCellSizeY)
+    FirstVisibleRowPositionModY As Long
     ' Index of the first visible column relative to current visible **Track**
     FirstVisibleColumnInTrack As Long
     ' Index of the first visible row relative to current visible **Page**
@@ -431,6 +477,8 @@ Private Type TViewportState
     ColumnsToLargeChangeTrack As Long
     ' The distance from the current track left edge to the viewport left edge
     TrackPositionModX As Long
+    ' The distance from the current page top edge to the viewport top edge
+    PagePositionModY As Long
 End Type
 
 Private this As TViewportState
@@ -445,6 +493,12 @@ Private pScrollModY As Long
 
 Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
 Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
+
+Public Property Get WorksheetHeaders() As Form_DS_WORKSHEET_HEADERS: Set WorksheetHeaders = pWorksheetHeaders: End Property
+Public Property Set WorksheetHeaders(ByRef Value As Form_DS_WORKSHEET_HEADERS): Set pWorksheetHeaders = Value: End Property
+
+Public Property Get WorksheetNumbers() As Form_DS_WORKSHEET_NUMBERS: Set WorksheetNumbers = pWorksheetNumbers: End Property
+Public Property Set WorksheetNumbers(ByRef Value As Form_DS_WORKSHEET_NUMBERS): Set pWorksheetNumbers = Value: End Property
 
 Public Property Get Scrollview() As Form_DS_SCROLLVIEW: Set Scrollview = pScrollview: End Property
 Public Property Set Scrollview(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollview = Value: End Property
@@ -461,22 +515,36 @@ Private Sub Form_Unload(Cancel As Integer)
     Me.TimerInterval = 0
 End Sub
 
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyDownHandler KeyCode, Shift: End Sub
+Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyUpHandler KeyCode, Shift: End Sub
+
 
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long
+    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long, c As Long
     
     Set Worksheet = Me.DS_WORKSHEET.Form
-    Set Worksheet.Viewport = Me
-    Worksheet.Setup
+    Set pWorksheet.Viewport = Me
+    Set WorksheetHeaders = Me.DS_WORKSHEET_HEADERS.Form
+    Set pWorksheetHeaders.Viewport = Me
+    Set pWorksheetNumbers.Viewport = Me
+    pWorksheet.Setup
+    pWorksheetHeaders.Setup
+    pWorksheetNumbers.Setup PageSize * PageCount
     
     r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
     b = ScreenLib.RectToBounds(r)
     
-    t = Worksheet.MaxContentWidthLimit
+    t = pWorksheet.MaxContentWidthLimit
     Me.Width = t
-    Me.Detalle.Height = CLng(Min(b.h * 1.95, 31500))
+    With Me.DS_WORKSHEET_HEADERS
+        .Left = 0
+        .Top = 0
+        .Width = t
+        Me.FormHeaders.Height = .Height
+    End With
+    Me.FormDetail.Height = CLng(Min(b.h * 1.95, 31500))
     With Me.DS_WORKSHEET
         .Left = 0
         .Top = 0
@@ -495,48 +563,38 @@ End Function
 
 Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
     Dim sView As TViewportState
-    
+    'GlobalVMemAnalysis "@Viewport.ScrollTo P0"
     sView = GetViewportStateAt(X, Y)
-    'Worksheet.Painting = False
-    
+    'GlobalVMemAnalysis "@Viewport.ScrollTo P1"
     If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
-        Worksheet.Painting = False
-        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
+        pWorksheet.Painting = False
+        pWorksheetHeaders.Painting = False
+        pWorksheetNumbers.Painting = False
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.0"
+        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
+        WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
+        WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.1"
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
-        Set Worksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
-        Worksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, Scrollview.Table
-        Worksheet.Painting = True
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.2"
+        Set pWorksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.3"
+        pWorksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
+        pWorksheetHeaders.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
+        pWorksheetNumbers.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
+        pWorksheetNumbers.Painting = True
+        pWorksheetHeaders.Painting = True
+        pWorksheet.Painting = True
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.4"
     Else
-        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P3.0"
+        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
+        WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
+        WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
+        'GlobalVMemAnalysis "@Viewport.ScrollTo P3.1"
     End If
-    
-    AdjustScrollY sView
-    'Worksheet.Painting = True
+    'GlobalVMemAnalysis "@Viewport.ScrollTo P4"
     this = sView
-End Sub
-
-Private Sub AdjustScrollY(ByRef sView As TViewportState)
-    Dim rowOrigin As Long, hW As LongPtr, i As Long
-    
-    rowOrigin = this.FirstVisibleRowInPage
-    hW = Worksheet.hWnd
-    If this.PageIndex <> sView.PageIndex Then
-        SendMessage hW, WM_VSCROLL, SB_TOP, 0&
-        rowOrigin = 0
-    End If
-    If rowOrigin <> sView.FirstVisibleRowInPage Then
-        Worksheet.Painting = False
-        If rowOrigin < sView.FirstVisibleRowInPage Then
-            For i = rowOrigin To sView.FirstVisibleRowInPage - 1
-                SendMessage hW, WM_VSCROLL, SB_LINEDOWN, 0&
-            Next i
-        ElseIf rowOrigin > sView.FirstVisibleRowInPage Then
-            For i = rowOrigin - 1 To sView.FirstVisibleRowInPage Step -1
-                SendMessage hW, WM_VSCROLL, SB_LINEUP, 0&
-            Next i
-        End If
-        Worksheet.Painting = True
-    End If
 End Sub
 
 
@@ -558,17 +616,69 @@ Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewpo
     t.FirstVisibleColumn = CLng(Int(X / cellWidth))
     t.FirstVisibleRow = CLng(Int(Y / cellHeight))
     t.FirstVisibleColumnPositionModX = X Mod cellWidth
+    t.FirstVisibleRowPositionModY = Y Mod cellHeight
     t.TrackIndex = CLng(Int(X / (cellWidth * t.ColumnsToLargeChangeTrack)))
     t.PageIndex = CLng(Int(t.FirstVisibleRow / (PageSize * NumPagesInLargeChangeRows)))
     t.FirstVisibleColumnInTrack = t.FirstVisibleColumn - (t.ColumnsToLargeChangeTrack * t.TrackIndex)
     t.FirstVisibleRowInPage = t.FirstVisibleRow - (t.PageIndex * PageSize * NumPagesInLargeChangeRows)
     t.TrackPositionModX = (t.FirstVisibleColumnInTrack * cellWidth) + t.FirstVisibleColumnPositionModX
+    t.PagePositionModY = (t.FirstVisibleRowInPage * cellHeight) + t.FirstVisibleRowPositionModY
     
     GetViewportStateAt = t
 End Function
 
+Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Long
+    Dim cellWidth As Long, viewWidth As Long, curViewMinX As Long, curViewMaxX As Long
+    Dim targetCellMinX As Long, targetCellMaxX As Long, X As Long
+    
+    cellWidth = Worksheet.GridCellSizeX
+    viewWidth = Scrollview.ScrollPageSizeX  ' pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
+    
+    X = cellWidth * ColumnIndex
+    targetCellMinX = Max(X - cellWidth, 0)
+    targetCellMaxX = X + (3 * cellWidth)    ' EDIT: 2 -> 3
+    ' NOT NEEDED: if not pscrollview.EnableOutOfRangeScrolling then targetcellmaxx = min(targetcellmaxx, )
+    
+    curViewMinX = this.ScrollPosX
+    curViewMaxX = curViewMinX + viewWidth
+    
+    X = this.ScrollPosX
+    If curViewMinX > targetCellMinX Then
+        X = targetCellMinX
+    ElseIf curViewMaxX < targetCellMaxX Then
+        X = targetCellMaxX - viewWidth
+    End If
+    
+    GetScrollXTo = X
+End Function
+
+Public Function GetScrollYTo(ByVal RowIndex As Long) As Long
+    Dim cellHeight As Long, viewHeight As Long, curViewMinY As Long, curViewMaxY As Long
+    Dim targetCellMinY As Long, targetCellMaxY As Long, Y As Long
+    
+    cellHeight = Worksheet.GridCellSizeY
+    viewHeight = Scrollview.ScrollPageSizeY
+    
+    Y = cellHeight * RowIndex
+    targetCellMinY = Max(Y - cellHeight, 0)
+    targetCellMaxY = Y + (3 * cellHeight)
+    
+    curViewMinY = this.ScrollPosY
+    curViewMaxY = curViewMinY + viewHeight
+    
+    Y = this.ScrollPosY
+    If curViewMinY > targetCellMinY Then
+        Y = targetCellMinY
+    ElseIf curViewMaxY < targetCellMaxY Then
+        Y = targetCellMaxY - viewHeight
+    End If
+    
+    GetScrollYTo = Y
+End Function
+
 Public Sub OnSourceTableChange()
     this.TrackIndex = -1
+    'GlobalVMemAnalysis "@OnSourceTableChange"
     If Scrollview.KeepScrollPositionOnTableChange Then
         ScrollTo this.ScrollPosX, this.ScrollPosY
     Else
@@ -579,30 +689,54 @@ End Sub
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
     Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long, RowStartIndex As Long
 
+    'GlobalVMemAnalysis "@Viewport.GetTrack P0"
     Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
     nCols = Worksheet.MaxAvailColumns
-
+    
+    'GlobalVMemAnalysis "@Viewport.GetTrack P1"
     If ColumnStartIndex >= dsT.ColumnCount Then
         Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
     Else
+        
+        RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
+        nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
+        'GlobalVMemAnalysis "@Viewport.GetTrack P2"
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
-            ' TODO: Add empty rows up to PageSize * PageCount
-            Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
+            'GlobalVMemAnalysis "@Viewport.GetTrack P2.1"
+            If nRows < PageSize * PageCount Then
+                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.1"
+                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
+                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.2"
+                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.3"
+                Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
+                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.4"
+            Else
+                'GlobalVMemAnalysis "@Viewport.GetTrack P2.2.1"
+                Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
+                'GlobalVMemAnalysis "@Viewport.GetTrack P2.2.2"
+            End If
         Else
-            RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
-            nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
+            'GlobalVMemAnalysis "@Viewport.GetTrack P3.1"
             Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            'GlobalVMemAnalysis "@Viewport.GetTrack P3.2"
             Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
+            'GlobalVMemAnalysis "@Viewport.GetTrack P3.3"
             Set dsT2 = dsT2.Join(dsT3)
+            'GlobalVMemAnalysis "@Viewport.GetTrack P3.4"
             If nRows < PageSize * PageCount Then
                 Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
             End If
+            'GlobalVMemAnalysis "@Viewport.GetTrack P3.5"
             Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
+            'GlobalVMemAnalysis "@Viewport.GetTrack P3.6"
         End If
+        'GlobalVMemAnalysis "@Viewport.GetTrack P4"
     End If
     
     Set GetTrack = rX
+    'GlobalVMemAnalysis "@Viewport.GetTrack P5"
 End Function
 
 

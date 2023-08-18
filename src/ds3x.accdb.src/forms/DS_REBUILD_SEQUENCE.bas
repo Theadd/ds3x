@@ -1220,7 +1220,7 @@ Private Sub DS_LIST_ITEM_REMOVE_Click()
 End Sub
 
 Private Sub Form_Load()
-    Debug.Print "IN DS_REBUILD_SEQUENCE.Load()"
+'    Debug.Print "IN DS_REBUILD_SEQUENCE.Load()"
     pFailedSequenceIndex = -1
 End Sub
 
@@ -1231,7 +1231,7 @@ Private Function CreateListItemHeader(Optional ByVal Title As String = "") As Va
         CreateListItemHeader = Array(pIndexCountdown, Title, 4)
     Else
         CreateListItemHeader = Array(pIndexCountdown, _
-            "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5"">" & Title & "</font><font color=white>&nbsp;&nbsp;.<br>" & _
+            "<div align=center><font face=""Consolas"" size=1 color=""#A5A5A5"">" & Title & "</font><font color=white size=2>&nbsp;&nbsp;.<br>" & _
             "</font><font style=""BACKGROUND-COLOR:#808080"">______ _______ _________ ________ ________ _______ ____ ______ _____</font></div>", _
             4)
     End If
@@ -1304,21 +1304,20 @@ End Sub
 
 Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
     On Error Resume Next
-    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnActiveSequenceIndexChange()"
-    ' TODO: REBUILD?
+'    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnActiveSequenceIndexChange()"
     RebuildSequenceList
     pContinuousList.SetActiveIndex pController.SequenceIndex, True
 End Sub
 
 Private Sub pController_OnRebuildSequenceChange()
-    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnRebuildSequenceChange()"
+'    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnRebuildSequenceChange()"
     pFailedSequenceIndex = -1
     RebuildSequenceList
 End Sub
 
 Private Sub pController_OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
     On Error Resume Next
-    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnRebuildSequenceFail()"
+'    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnRebuildSequenceFail()"
     pFailedSequenceIndex = FailedSequenceIndex
     RebuildSequenceList
     pContinuousList.SetActiveIndex pFailedSequenceIndex, True

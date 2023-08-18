@@ -37,6 +37,9 @@ Public Enum PatternMatchingType
 End Enum
 
 
+' USAGE: CollectionsLib.Tokenize("--task=..\Tasks\Entry.json --name=""Initial task"" --exec")   => ['--task=..\Tasks\Entry.json', '--name="Initial task"', '--exec']
+Public Property Get Tokenize(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As Variant: Tokenize = Split(TokenizeArgs(SearchString, Tokenizer), VBA.Chr$(0)): End Property
+Public Property Get ParseToken(ByVal Target As String, Optional ByVal Splitter As String = "=") As Variant: ParseToken = ParseTokenizedArg(Target, Splitter): End Property
 
 Public Property Get JScriptCode(ByVal JScriptName As String) As String
     Select Case JScriptName
@@ -326,17 +329,15 @@ Fallback:
 End Function
 
 ' USAGE: sArgv() = Split(TokenizeArgs("one ""two twoB twoC"" three ""four fourB"" five"), Chr$(0))
-Private Function TokenizeArgs(ByRef SearchString As String) As String
-   Dim sArgs As String
-   Dim sChar As String
-   Dim nCount As Long
-   Dim bQuotes As Boolean
+Private Function TokenizeArgs(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As String
+   Dim sArgs As String, sChar As String, nCount As Long, bQuotes As Boolean
+   
    For nCount = 1 To Len(SearchString)
       sChar = Mid$(SearchString, nCount, 1)
       If sChar = Chr$(34) Then
          bQuotes = Not bQuotes
       End If
-      If sChar = Chr$(32) Then
+      If sChar = Tokenizer Then
          If bQuotes Then
             sArgs = sArgs & sChar
          Else
@@ -349,7 +350,29 @@ Private Function TokenizeArgs(ByRef SearchString As String) As String
    TokenizeArgs = sArgs
 End Function
 
-' EXAMPLE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
+Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitter As String = "=") As Variant
+    Dim t(0 To 1) As Variant, r As Variant
+    
+    r = VBA.Split(Target, Splitter, 2)
+    t(0) = r(0)
+    If UBound(r) = 1 Then
+        If (Left(r(1), 1) = """" Or Left(r(1), 1) = "'") And (Left(r(1), 1) = Right(r(1), 1)) Then
+            t(1) = VBA.Mid$(r(1), 2, Len(r(1)) - 2)
+        Else
+            If r(1) = "true" Or r(1) = "false" Then
+                t(1) = CBool(r(1))
+            Else
+                t(1) = r(1)
+            End If
+        End If
+    Else
+        t(1) = True
+    End If
+    
+    ParseTokenizedArg = t
+End Function
+
+' USAGE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
 Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
     Dim t() As Variant, i As Long, aSize As Long
 
@@ -398,11 +421,6 @@ Public Function CreateBlankTable(ByVal RowsCount As Long, ByVal ColumnsCount As 
             For i = 0 To RowsCount - 1
                 aX.Add Array()
             Next i
-'            Set dsT = dsTable.Create(aX)
-'        ElseIf ColumnsCount > 0 Then
-'
-'        Else
-'
         End If
         Set dsT = dsTable.Create(aX)
     End If

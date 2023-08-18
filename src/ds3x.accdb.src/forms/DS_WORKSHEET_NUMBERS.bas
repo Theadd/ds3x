@@ -1,50 +1,59 @@
 ﻿Version =20
 VersionRequired =20
 Begin Form
+    AllowFilters = NotDefault
+    AutoResize = NotDefault
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
     MaxButton = NotDefault
     MinButton = NotDefault
     ShortcutMenu = NotDefault
-    AutoCenter = NotDefault
     NavigationButtons = NotDefault
+    AllowDeletions = NotDefault
     DividingLines = NotDefault
+    AllowAdditions = NotDefault
     KeyPreview = NotDefault
     DataEntry = NotDefault
     AllowDesignChanges = NotDefault
-    DefaultView =0
     ScrollBars =0
     ViewsAllowed =1
     TabularCharSet =177
     TabularFamily =0
+    BorderStyle =0
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =5329
+    Width =705
     DatasheetFontHeight =11
-    ItemSuffix =1579
+    ItemSuffix =2139
     Left =4065
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
-    OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="RUNTIME SANDBOX"
+    Caption ="WORKSHEET"
     DatasheetFontName ="Calibri"
-    OnTimer ="[Event Procedure]"
+    OnKeyDown ="[Event Procedure]"
+    OnKeyUp ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
+    OnMouseWheel ="[Event Procedure]"
+    FetchDefaults =0
     FilterOnLoad =0
+    OrderByOnLoad =0
     SplitFormDatasheet =1
+    SaveSplitterBarPosition =0
+    FetchDefaults =0
+    OrderByOnLoad =0
     SplitFormDatasheet =1
+    SaveSplitterBarPosition =0
     ShowPageMargins =0
     DisplayOnSharePointSite =1
     DatasheetAlternateBackColor =15921906
     DatasheetGridlinesColor12 =0
-    FitToScreen =255
     DatasheetBackThemeColorIndex =1
     BorderThemeColorIndex =3
     ThemeFontIndex =1
@@ -72,6 +81,13 @@ Begin Form
             Width =850
             Height =850
             BorderShade =65.0
+            GridlineShade =65.0
+        End
+        Begin Line
+            BorderLineStyle =0
+            Width =1701
+            BorderThemeColorIndex =0
+            GridlineThemeColorIndex =1
             GridlineShade =65.0
         End
         Begin CommandButton
@@ -236,6 +252,33 @@ Begin Form
             GridlineThemeColorIndex =1
             GridlineShade =65.0
         End
+        Begin ToggleButton
+            Width =283
+            Height =283
+            ForeThemeColorIndex =0
+            ForeTint =75.0
+            GridlineThemeColorIndex =1
+            GridlineShade =65.0
+            UseTheme =1
+            Shape =2
+            Bevel =1
+            BackColor =-1
+            BackThemeColorIndex =4
+            BackTint =60.0
+            OldBorderStyle =0
+            BorderLineStyle =0
+            BorderColor =-1
+            BorderThemeColorIndex =4
+            BorderTint =60.0
+            ThemeFontIndex =1
+            HoverThemeColorIndex =4
+            HoverTint =40.0
+            PressedThemeColorIndex =4
+            PressedShade =75.0
+            HoverForeThemeColorIndex =0
+            HoverForeTint =75.0
+            PressedForeThemeColorIndex =1
+        End
         Begin Tab
             Width =5103
             Height =3402
@@ -312,32 +355,167 @@ Begin Form
             ForeTint =75.0
         End
         Begin Section
-            CanGrow = NotDefault
-            CanShrink = NotDefault
-            Height =6633
-            Name ="Detalle"
-            AlternateBackThemeColorIndex =4
-            AlternateBackTint =40.0
+            Height =375
+            Name ="FormDetail"
+            AlternateBackThemeColorIndex =3
             BackThemeColorIndex =3
             Begin
                 Begin TextBox
                     Locked = NotDefault
+                    TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
                     OldBorderStyle =0
                     OverlapFlags =93
-                    TextFontCharSet =177
-                    TextFontFamily =0
+                    TextAlign =1
                     IMESentenceMode =3
-                    Left =284
-                    Top =284
+                    Width =705
+                    Height =375
+                    FontSize =1
+                    TabIndex =1
+                    TopMargin =851
+                    BorderColor =13434879
+                    ForeColor =8355711
+                    Name ="DS_HR_SELECTED"
+                    ControlSource ="=GetRowSelectedValue()"
+                    FontName ="Calibri Light"
+                    ConditionalFormat = Begin
+                        0x0100000066000000010000000000000002000000000000000200000001000000 ,
+                        0x00000000ffffcc00000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x310000000000
+                    End
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    GridlineWidthLeft =0
+                    GridlineWidthTop =0
+                    GridlineWidthRight =0
+                    GridlineWidthBottom =0
+                    ShowDatePicker =0
+
+                    LayoutCachedWidth =705
+                    LayoutCachedHeight =375
+                    BackThemeColorIndex =3
+                    BorderThemeColorIndex =-1
+                    BorderShade =100.0
+                    ThemeFontIndex =-1
+                    ForeTint =50.0
+                    ConditionalFormat14 = Begin
+                        0x01000100000000000000020000000100000000000000ffffcc00010000003100 ,
+                        0x000000000000000000000000000000000000000000
+                    End
+                End
+                Begin TextBox
+                    Locked = NotDefault
+                    TabStop = NotDefault
+                    AllowAutoCorrect = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =255
+                    TextAlign =2
+                    BackStyle =0
+                    IMESentenceMode =3
+                    Width =705
+                    Height =375
+                    FontSize =10
+                    TabIndex =2
+                    TopMargin =42
+                    BackColor =-2147483610
+                    ForeColor =5855577
+                    Name ="DS_HR_NUMBER"
+                    ControlSource ="=GetPageRowNum()"
+                    ConditionalFormat = Begin
+                        0x0100000066000000010000000000000002000000000000000200000001000000 ,
+                        0x00000000ffffcc00000000000000000000000000000000000000000000000000 ,
+                        0x0000000000000000000000000000000000000000000000000000000000000000 ,
+                        0x310000000000
+                    End
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+                    GridlineWidthLeft =0
+                    GridlineWidthTop =0
+                    GridlineWidthRight =0
+                    GridlineWidthBottom =0
+                    ShowDatePicker =0
+
+                    LayoutCachedWidth =705
+                    LayoutCachedHeight =375
+                    BackThemeColorIndex =-1
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    BorderShade =100.0
+                    ThemeFontIndex =-1
+                    ForeTint =65.0
+                    ConditionalFormat14 = Begin
+                        0x01000100000000000000020000000100000000000000ffffcc00010000003100 ,
+                        0x000000000000000000000000000000000000000000
+                    End
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =255
+                    TextFontCharSet =177
+                    PictureType =2
+                    Width =705
+                    Height =375
+                    FontSize =10
+                    TabIndex =3
+                    ForeColor =5855577
+                    Name ="DS_HR_BUTTON"
+                    OnClick ="=OnRowHeaderClick()"
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineStyleLeft =1
+                    GridlineStyleTop =1
+                    GridlineStyleBottom =1
+                    GridlineColor =10921638
+                    BackStyle =0
+
+                    CursorOnHover =1
+                    LayoutCachedWidth =705
+                    LayoutCachedHeight =375
+                    PictureCaptionArrangement =4
+                    ForeTint =65.0
+                    Shape =0
+                    Gradient =0
+                    BackColor =-2147483610
+                    BackThemeColorIndex =-1
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =0
+                    BorderTint =50.0
+                    ThemeFontIndex =-1
+                    HoverColor =-2147483604
+                    HoverThemeColorIndex =-1
+                    HoverTint =100.0
+                    PressedThemeColorIndex =8
+                    PressedTint =45.0
+                    PressedShade =100.0
+                    HoverForeColor =-2147483600
+                    HoverForeThemeColorIndex =-1
+                    HoverForeTint =100.0
+                    PressedForeThemeColorIndex =-1
+                    PressedForeTint =100.0
+                    Overlaps =1
+                End
+                Begin TextBox
+                    Locked = NotDefault
+                    OldBorderStyle =0
+                    OverlapFlags =119
+                    IMESentenceMode =3
                     Width =15
                     Height =15
                     FontSize =1
-                    TabIndex =3
                     TopMargin =851
-                    BackColor =-2147483603
                     BorderColor =10921638
                     ForeColor =4210752
-                    Name ="HiddenControl"
+                    Name ="RowHiddenControl"
                     FontName ="Calibri Light"
                     LeftPadding =0
                     TopPadding =0
@@ -346,188 +524,22 @@ Begin Form
                     GridlineColor =10921638
                     ShowDatePicker =0
 
-                    LayoutCachedLeft =284
-                    LayoutCachedTop =284
-                    LayoutCachedWidth =299
-                    LayoutCachedHeight =299
-                    BackThemeColorIndex =-1
+                    LayoutCachedWidth =15
+                    LayoutCachedHeight =15
                     ThemeFontIndex =-1
                 End
-                Begin TextBox
-                    Locked = NotDefault
-                    TabStop = NotDefault
-                    EnterKeyBehavior = NotDefault
-                    OverlapFlags =215
-                    TextAlign =1
-                    TextFontFamily =49
-                    IMESentenceMode =3
-                    Left =135
-                    Top =120
-                    Width =5020
-                    Height =5835
-                    FontSize =10
-                    FontWeight =100
-                    LeftMargin =113
-                    TopMargin =58
-                    RightMargin =57
-                    BorderColor =16777215
-                    ForeColor =5855577
-                    Name ="DS_DISPLAY_VALUE"
-                    FontName ="72 Monospace"
-                    OnLostFocus ="[Event Procedure]"
-                    GroupTable =2
-                    LeftPadding =15
-                    TopPadding =15
-                    RightPadding =15
-                    BottomPadding =0
-                    GridlineStyleLeft =1
-                    GridlineStyleTop =1
-                    GridlineStyleRight =1
-                    GridlineStyleBottom =1
+                Begin Line
+                    OverlapFlags =119
+                    Top =360
+                    Width =705
+                    Height =15
+                    Name ="DS_GRIDLINE_BOTTOM"
                     GridlineColor =10921638
-                    VerticalAnchor =2
-                    ShowDatePicker =0
-
-                    LayoutCachedLeft =135
-                    LayoutCachedTop =120
-                    LayoutCachedWidth =5155
-                    LayoutCachedHeight =5955
-                    ColumnEnd =1
-                    LayoutGroup =1
-                    BorderShade =100.0
-                    ThemeFontIndex =-1
-                    ForeTint =65.0
-                    GroupTable =2
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
-                    OverlapFlags =85
-                    TextFontCharSet =177
-                    Left =3735
-                    Top =6120
-                    Width =1440
-                    Height =360
-                    FontSize =10
-                    TabIndex =2
-                    Name ="DS_REFRESH_BUTTON"
-                    Caption ="REFRESH"
-                    OnClick ="[Event Procedure]"
-                    GroupTable =4
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    HorizontalAnchor =1
-                    VerticalAnchor =1
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =3735
-                    LayoutCachedTop =6120
-                    LayoutCachedWidth =5175
-                    LayoutCachedHeight =6480
-                    ColumnStart =2
-                    ColumnEnd =2
-                    LayoutGroup =2
-                    ForeThemeColorIndex =1
-                    ForeTint =100.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =8
-                    BackTint =100.0
-                    BorderWidth =1
-                    BorderThemeColorIndex =8
-                    BorderTint =100.0
-                    ThemeFontIndex =-1
-                    HoverThemeColorIndex =8
-                    HoverTint =80.0
-                    PressedThemeColorIndex =8
-                    PressedShade =80.0
-                    HoverForeThemeColorIndex =1
-                    HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
-                    GroupTable =4
-                    QuickStyle =13
-                    QuickStyleMask =-1
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
-                End
-                Begin EmptyCell
-                    Left =3570
-                    Top =6120
-                    Width =165
-                    Height =360
-                    Name ="CeldaVacía1561"
-                    GroupTable =4
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    HorizontalAnchor =1
-                    VerticalAnchor =1
-                    LayoutCachedLeft =3570
-                    LayoutCachedTop =6120
-                    LayoutCachedWidth =3735
-                    LayoutCachedHeight =6480
-                    ColumnStart =1
-                    ColumnEnd =1
-                    LayoutGroup =2
-                    GroupTable =4
-                End
-                Begin CommandButton
-                    TabStop = NotDefault
-                    OverlapFlags =87
-                    TextFontCharSet =177
-                    Left =2325
-                    Top =6120
-                    Width =1245
-                    Height =360
-                    FontSize =10
-                    TabIndex =1
-                    Name ="DS_AUTO_REFRESH_BUTTON"
-                    Caption ="AUTO"
-                    OnClick ="[Event Procedure]"
-                    GroupTable =4
-                    LeftPadding =0
-                    TopPadding =0
-                    RightPadding =0
-                    BottomPadding =0
-                    GridlineColor =10921638
-                    HorizontalAnchor =1
-                    VerticalAnchor =1
-
-                    CursorOnHover =1
-                    LayoutCachedLeft =2325
-                    LayoutCachedTop =6120
-                    LayoutCachedWidth =3570
-                    LayoutCachedHeight =6480
-                    LayoutGroup =2
-                    ForeThemeColorIndex =1
-                    ForeTint =100.0
-                    Shape =0
-                    Gradient =0
-                    BackThemeColorIndex =8
-                    BackTint =100.0
-                    BorderWidth =1
-                    BorderThemeColorIndex =8
-                    BorderTint =100.0
-                    ThemeFontIndex =-1
-                    HoverThemeColorIndex =8
-                    HoverTint =80.0
-                    PressedThemeColorIndex =8
-                    PressedShade =80.0
-                    HoverForeThemeColorIndex =1
-                    HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
-                    GroupTable =4
-                    QuickStyle =13
-                    QuickStyleMask =-1
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
-                    Overlaps =1
+                    LayoutCachedTop =360
+                    LayoutCachedWidth =705
+                    LayoutCachedHeight =375
+                    BorderThemeColorIndex =1
+                    BorderShade =60.0
                 End
             End
         End
@@ -540,62 +552,86 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
+Option Base 0
+
+Private Declare PtrSafe Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
+
+Public Event OnRowNumberClick(ByVal RowIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
+
+Private pViewport As Form_DS_VIEWPORT
+Private pSelectedRows As ArrayListEx
+
+Private Const pMaxAvailColumns As Long = 1
+Private Const pGridCellSizeX As Long = 690
+Private Const pGridCellSizeY As Long = 375
+
+Private pFirstRowIndex As Long
 
 
-Private pAutoRefresh As Boolean
-Private dX As DictionaryEx
+Public Property Get Viewport() As Form_DS_VIEWPORT: Set Viewport = pViewport: End Property
+Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = Value: End Property
+
+Public Property Get MaxAvailColumns() As Long: MaxAvailColumns = pMaxAvailColumns: End Property
+Public Property Get MaxContentWidthLimit() As Long: MaxContentWidthLimit = pGridCellSizeX * pMaxAvailColumns: End Property
+' Default Cell/Column width
+Public Property Get GridCellSizeX() As Long: GridCellSizeX = pGridCellSizeX: End Property
+Public Property Get GridCellSizeY() As Long: GridCellSizeY = pGridCellSizeY: End Property
 
 
-Private Sub DS_AUTO_REFRESH_BUTTON_Click()
-    pAutoRefresh = Not pAutoRefresh
-End Sub
-
-Private Sub DS_REFRESH_BUTTON_Click()
-    RefreshDisplayValue
-End Sub
+' --- FORM EVENTS ---
 
 Private Sub Form_Load()
-    WindowAlwaysOnTop Me
-    Set dX = DictionaryEx.Create()
-    Me.DS_DISPLAY_VALUE.HorizontalAnchor = acHorizontalAnchorBoth
-    Me.TimerInterval = 1000
+    Set pSelectedRows = ArrayListEx.Create()
 End Sub
 
-Private Sub Form_Timer()
-    
-    If pAutoRefresh Then
-        RefreshDisplayValue
-    End If
-    
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
+Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
-    Me.TimerInterval = 0
-    Set dX = Nothing
+    pViewport.PropagateMouseWheel Page, Count
 End Sub
 
-Private Sub RefreshDisplayValue()
-    Dim v As Variant, t As Variant
-    
-    dX.RemoveAll
-    
-    Set v = InspectMe("DS_GRID")
-    
-    dX("DS_GRID.CurrentFirstColumn") = v.CurrentFirstColumn
-    dX("DS_GRID.NumColumnsInViewport") = v.NumColumnsInViewport
-    dX("DS_GRID.MaxViewportColumns") = v.MaxViewportColumns
-    dX("DS_GRID.NumColumnsOnTheRight") = v.NumColumnsOnTheRight
-    
-    Set v = InspectMe("dsGridController")
-    
-    dX("dsGridController.FirstColumnInViewport") = v.FirstColumnInViewport
-    dX("dsGridController.FixedColumnsOnTheLeft") = v.FixedColumnsOnTheLeft
-    dX("dsGridController.NumColumnsInTable") = v.NumColumnsInTable
-    dX("dsGridController.ScrollIncrement") = v.ScrollIncrement
-    dX("dsGridController.ViewportScrollX") = v.ViewportScrollX
-    dX("dsGridController.VirtualScrollX") = v.VirtualScrollX
-    
-    Me.DS_DISPLAY_VALUE = JSON.Stringify(dX, 2) & vbNewLine
-    
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyDownHandler KeyCode, Shift: End Sub
+Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyUpHandler KeyCode, Shift: End Sub
+
+
+' --- SETUP / BINDING ---
+
+Public Sub Setup(ByVal RowsCount As Long)
+    Set Me.Recordset = CreateBlankRecordset(RowsCount, 0, 1)
 End Sub
+
+Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long, ByRef dsT As dsTable)
+    pFirstRowIndex = FirstRowIndex
+    Me.Recalc
+End Sub
+
+Friend Sub SetSelectedRows(ByRef aX As ArrayListEx)
+    Set pSelectedRows = aX
+    Me.Recalc
+End Sub
+
+
+' --- HELPERS ---
+
+Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
+Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+
+
+' --- MISC ---
+
+Public Function GetPageRowNum() As Long
+    GetPageRowNum = CLng(Me.Bookmark(0)) + pFirstRowIndex
+End Function
+
+Public Function GetRowSelectedValue() As Long
+    On Error GoTo Finally
+    
+    If pSelectedRows.Contains(CLng(Me.Bookmark(0)) + pFirstRowIndex - 1) Then
+        GetRowSelectedValue = 1
+    End If
+Finally:
+End Function
+
+Public Function OnRowHeaderClick()
+    Me.RowHiddenControl.SetFocus
+    RaiseEvent OnRowNumberClick(CLng(Val(Nz(Me.DS_HR_NUMBER, 1))) - 1, GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
+End Function
