@@ -21,12 +21,6 @@ Private pSelectionController As dsGridSelectionController
 
 ' DEPRECATED
 Private pFixedColumnsOnTheLeft As Long
-' ColumnIndex related to the last DS_HC_1_* CommandButton clicked
-'Private pLastClickedColumnIndex As Long
-'Private pSelectedColumnIndexes As New ArrayListEx
-'Private pLastClickedRowIndex As Long
-'Private pSelectedRowIndexes As New ArrayListEx
-'Private pLastEnteredCell As Variant
 
 
 ' --- PROPERTIES ---
@@ -52,17 +46,10 @@ Private Sub Class_Initialize()
     Set pSelectionController = New dsGridSelectionController
     ' DEPRECATED
     pFixedColumnsOnTheLeft = 0
-'    pLastClickedColumnIndex = -1
-'    pLastClickedRowIndex = -1
-'    pLastEnteredCell = Array(0, 0)
 End Sub
 
 
 ' --- EVENTS: Scrollview ---
-
-'Private Sub pScrollview_OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
-'    HandleClickOnColumnHeader ColumnIndex, ShiftKey, CtrlKey
-'End Sub
 
 Private Sub pScrollview_OnColumnNameChange(ByVal ColumnIndex As Long, ByVal FromValue As String, ByVal ToValue As String)
     TaskController().AddTask _
@@ -70,21 +57,9 @@ Private Sub pScrollview_OnColumnNameChange(ByVal ColumnIndex As Long, ByVal From
         Array(, ColumnIndex, ToValue)
 End Sub
 
-'Private Sub pScrollview_OnRowNumberClick(ByVal RowIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
-'    HandleClickOnRowHeader RowIndex, ShiftKey, CtrlKey
-'End Sub
-'
-'Private Sub pScrollview_OnCellEnter(ByVal RowIndex As Long, ByVal ColumnIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
-'    HandleEnterOnCell RowIndex, ColumnIndex, ShiftKey, CtrlKey
-'End Sub
-'
-'Private Sub pScrollview_OnClearSelectionRequest()
-'    SelectionClear
-'    SelectionApply
-'End Sub
-
 Public Sub SelectionClear(): pSelectionController.SelectionClear: End Sub
 Public Sub SelectionApply(): pSelectionController.SelectionApply: End Sub
+
 
 ' --- EVENTS: TaskController ---
 
@@ -102,42 +77,6 @@ Public Function TryGetColumnHeaderAt(ByVal ColumnIndex As Long, ByRef OutColumnH
 Finally:
 End Function
 
-'Public Sub HandleClickOnColumnHeader(ByVal ColumnIndex As Long, ByVal ShiftKey As Boolean, ByVal CtrlKey As Boolean)
-'    If ShiftKey And pLastClickedColumnIndex <> -1 Then
-'        SelectionAddColumns pLastClickedColumnIndex, ColumnIndex
-'    Else
-'        If Not CtrlKey Then SelectionClear
-'        SelectionToggleColumn ColumnIndex
-'        pLastClickedColumnIndex = ColumnIndex
-'    End If
-'    SelectionApply
-'End Sub
-'
-'Public Sub HandleClickOnRowHeader(ByVal RowIndex As Long, ByVal ShiftKey As Boolean, ByVal CtrlKey As Boolean)
-'    If ShiftKey And pLastClickedRowIndex <> -1 Then
-'        SelectionAddRows pLastClickedRowIndex, RowIndex
-'    Else
-'        If Not CtrlKey Then SelectionClear
-'        SelectionToggleRow RowIndex
-'        pLastClickedRowIndex = RowIndex
-'    End If
-'    SelectionApply
-'End Sub
-'
-'Public Sub HandleEnterOnCell(ByVal RowIndex As Long, ByVal ColumnIndex As Long, ByVal ShiftKey As Boolean, ByVal CtrlKey As Boolean)
-'    If Not (ShiftKey Xor CtrlKey) Then SelectionClear
-''    If CtrlKey Then
-'        SelectionToggleRow RowIndex
-'        SelectionToggleColumn ColumnIndex
-''    End If
-'    If ShiftKey Then
-'        SelectionAddRows pLastEnteredCell(0), RowIndex
-'        SelectionAddColumns pLastEnteredCell(1), ColumnIndex
-'    End If
-'    pLastEnteredCell = Array(RowIndex, ColumnIndex)
-'    SelectionApply
-'End Sub
-
 Friend Sub TriggerOnChangeEvent()
     RaiseEvent OnChange
     If pTaskController.IsValidTable Then
@@ -146,72 +85,5 @@ Friend Sub TriggerOnChangeEvent()
         Set pScrollview.Table = CreateBlankTable(100, 0)
     End If
 End Sub
-
-
-' --- SELECTION ---
-
-'Public Sub SelectionClear()
-'    pSelectedColumnIndexes.Clear
-'    pLastClickedColumnIndex = -1
-'    pSelectedRowIndexes.Clear
-'    pLastClickedRowIndex = -1
-'End Sub
-'
-'Public Sub SelectionToggleRow(ByVal RowIndex As Long)
-'    If pSelectedRowIndexes.Contains(RowIndex) Then
-'        pSelectedRowIndexes.Remove RowIndex
-'    Else
-'        pSelectedRowIndexes.Add RowIndex
-'    End If
-'End Sub
-'
-'Public Sub SelectionToggleColumn(ByVal ColumnIndex As Long)
-'    If pSelectedColumnIndexes.Contains(ColumnIndex) Then
-'        pSelectedColumnIndexes.Remove ColumnIndex
-'    Else
-'        pSelectedColumnIndexes.Add ColumnIndex
-'    End If
-'End Sub
-'
-'Public Sub SelectionAddRow(ByVal RowIndex As Long)
-'    pSelectedRowIndexes.Add RowIndex
-'End Sub
-'
-'Public Sub SelectionAddColumn(ByVal ColumnIndex As Long)
-'    pSelectedColumnIndexes.Add ColumnIndex
-'End Sub
-'
-'Public Sub SelectionAddRows(ByVal FromRowIndex As Long, ByVal ToRowIndex As Long)
-'    Dim i As Long, iStep As Long
-'
-'    iStep = IIf(FromRowIndex <= ToRowIndex, 1, -1)
-'    For i = FromRowIndex To ToRowIndex Step iStep
-'        pSelectedRowIndexes.Add i
-'    Next i
-'End Sub
-'
-'Public Sub SelectionAddColumns(ByVal FromColumnIndex As Long, ByVal ToColumnIndex As Long)
-'    Dim i As Long, iStep As Long
-'
-'    iStep = IIf(FromColumnIndex <= ToColumnIndex, 1, -1)
-'    For i = FromColumnIndex To ToColumnIndex Step iStep
-'        pSelectedColumnIndexes.Add i
-'    Next i
-'End Sub
-'
-'Public Sub SelectionApply()
-'    If pSelectedColumnIndexes.Count > 1 Then
-'        pSelectedColumnIndexes.Unique
-'        pSelectedColumnIndexes.Sort
-'    End If
-'    If pSelectedRowIndexes.Count > 1 Then
-'        pSelectedRowIndexes.Unique
-'        pSelectedRowIndexes.Sort
-'    End If
-'    pScrollview.SelectedColumns = pSelectedColumnIndexes.ToArray
-'    pScrollview.SelectedRows = pSelectedRowIndexes.ToArray
-'End Sub
-
-
 
 

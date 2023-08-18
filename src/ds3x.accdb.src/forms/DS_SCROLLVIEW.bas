@@ -23,13 +23,13 @@ Begin Form
     ItemSuffix =1574
     Left =4065
     Top =3030
-    Right =21780
+    Right =28545
     Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
-    Caption ="dsLiveEd - TEST"
+    Caption ="dsLiveEd"
     DatasheetFontName ="Calibri"
     OnKeyDown ="[Event Procedure]"
     OnKeyUp ="[Event Procedure]"
@@ -763,6 +763,7 @@ Public Event OnClearSelectionRequest()
 Public Event OnSelectAllRequest()
 Public Event OnInvertSelectionRequest()
 Public Event OnSelectionControlKeyDown(ByRef KeyCode As Integer, ByRef Shift As Integer)
+Public Event OnWindowClose(ByRef Cancel As Integer)
 
 
 ' --- PRIVATE ---
@@ -866,8 +867,8 @@ Private Sub Form_Load()
     If Not IsSubform Then
         WindowSizeTo Me, 12000, 8000
         WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
-        ' TODO: Remove
-        SetupDevelopmentEnvironment
+        
+        ' SetupDevelopmentEnvironment
     End If
     Me.TimerInterval = 1
 End Sub
@@ -893,8 +894,10 @@ Private Sub Form_Timer()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    On Error Resume Next
+    'On Error Resume Next
     Me.TimerInterval = 0
+    RaiseEvent OnWindowClose(Cancel)
+    If Not CBool(Cancel) Then Dispose
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): OnKeyDownHandler KeyCode, Shift: End Sub
@@ -917,14 +920,18 @@ Private Sub Setup()
 End Sub
 
 Private Sub SetTable(ByRef Value As dsTable)
+    'GlobalVMemAnalysis "@Scrollview.SetTable P0"
     Set pTable = Value
     pInitialized = Not (pTable Is Nothing)
-    
+    'GlobalVMemAnalysis "@Scrollview.SetTable P1"
     If pInitialized Then
         UpdateScrollbarX
+        'GlobalVMemAnalysis "@Scrollview.SetTable P1.1"
         UpdateScrollbarY
     End If
+    'GlobalVMemAnalysis "@Scrollview.SetTable P2"
     Viewport.OnSourceTableChange
+    'GlobalVMemAnalysis "@Scrollview.SetTable P3"
 End Sub
 
 Private Sub SetSelectedColumns(ByVal Value As Variant)
@@ -937,6 +944,23 @@ Private Sub SetSelectedRows(ByVal Value As Variant)
     pSelectedRows.Clear
     pSelectedRows.AddRange Value
     pWorksheetNumbers.SetSelectedRows pSelectedRows
+End Sub
+
+Private Sub Dispose()
+    Set pWorksheetNumbers.Viewport = Nothing
+    Set pWorksheetHeaders.Viewport = Nothing
+    Set pWorksheet.Viewport = Nothing
+    Set pViewportSticky.WorksheetNumbers = Nothing
+    Set pViewportSticky.Scrollview = Nothing
+    Set pViewport.Worksheet = Nothing
+    Set pViewport.WorksheetHeaders = Nothing
+    Set pViewport.WorksheetNumbers = Nothing
+    Set pViewport.Scrollview = Nothing
+    Set pWorksheetNumbers = Nothing
+    Set pWorksheetHeaders = Nothing
+    Set pWorksheet = Nothing
+    Set pViewportSticky = Nothing
+    Set pViewport = Nothing
 End Sub
 
 
@@ -1086,21 +1110,26 @@ Private Sub UpdateScrollbarY()
     If Not Me.SCROLLBAR_Y.Visible Then Exit Sub
     
     Dim yMax As Long, cellSizeY As Long, fullViewportContentSizeY As Long
-    
+    'GlobalVMemAnalysis "@Scrollview.UpdateScrollbarY P0"
     cellSizeY = Worksheet.GridCellSizeY
     pScrollPageSizeY = CLng(Int((Me.InsideHeight - 270) / cellSizeY)) * cellSizeY
+    'GlobalVMemAnalysis "@Scrollview.UpdateScrollbarY P1"
     fullViewportContentSizeY = (pTable.Count - 0) * cellSizeY
+    'GlobalVMemAnalysis "@Scrollview.UpdateScrollbarY P2"
     yMax = Max((fullViewportContentSizeY + OutOfBoundsScrollY) - (Me.InsideHeight - 270), 0)
+    'GlobalVMemAnalysis "@Scrollview.UpdateScrollbarY P3"
     With Me.SCROLLBAR_Y
         .Max = yMax
         .LargeChange = IIf(pScrollPageSizeY > yMax, yMax, pScrollPageSizeY)
         .SmallChange = cellSizeY
+        'GlobalVMemAnalysis "@Scrollview.UpdateScrollbarY P4"
         If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
             Viewport.ScrollTo ScrollbarX, .Value
             pLastScrollY(0) = .Value
             pLastScrollY(1) = .Max
         End If
     End With
+   ' 'GlobalVMemAnalysis "@Scrollview.UpdateScrollbarY P5"
 End Sub
 
 Private Sub UpdateScrollbarX()
@@ -1136,7 +1165,7 @@ End Sub
 Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional ByVal PropagateEvent As Boolean = True)
     Dim X As Long, Y As Long
     
-    Debug.Print Printf("%1 %2 CALLING MoveTo(%3, %4, %5)", TimerSpan, vbTab, RowIndex, ColumnIndex, PropagateEvent)
+'    Debug.Print Printf("%1 %2 CALLING MoveTo(%3, %4, %5)", TimerSpan, vbTab, RowIndex, ColumnIndex, PropagateEvent)
     
     Select Case CLng(0 - 1)
         Case RowIndex
@@ -1151,9 +1180,9 @@ Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional By
     End Select
     
     
-    Debug.Print Printf("%1 %2 CALLING ScrollTo(%3, %4)", TimerSpan, vbTab, X, Y)
+'    Debug.Print Printf("%1 %2 CALLING ScrollTo(%3, %4)", TimerSpan, vbTab, X, Y)
     ScrollTo X, Y
-    Debug.Print Printf("%1 %2 CALL TO ScrollTo(%3, %4) DONE!", TimerSpan, vbTab, X, Y)
+'    Debug.Print Printf("%1 %2 CALL TO ScrollTo(%3, %4) DONE!", TimerSpan, vbTab, X, Y)
     
     If PropagateEvent Then
         Select Case CLng(0 - 1)
@@ -1165,7 +1194,7 @@ Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional By
                 RaiseEvent OnCellEnter(RowIndex, ColumnIndex, False, False)
         End Select
     End If
-    Debug.Print Printf("%1 %2 CALL TO MoveTo(%3, %4, %5) DONE!", TimerSpan, vbTab, RowIndex, ColumnIndex, PropagateEvent)
+'    Debug.Print Printf("%1 %2 CALL TO MoveTo(%3, %4, %5) DONE!", TimerSpan, vbTab, RowIndex, ColumnIndex, PropagateEvent)
 End Sub
 
 Friend Sub TriggerClickOnSelectAll()
@@ -1269,7 +1298,7 @@ Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X,
 
 ' --- TESTING / DEVELOPMENT ---
 
-Private Sub SetupDevelopmentEnvironment()
-    pEnableOutOfRangeScrolling = True
-    Set Table = CreateSampleTable
-End Sub
+'Private Sub SetupDevelopmentEnvironment()
+'    pEnableOutOfRangeScrolling = True
+'    Set Table = CreateSampleTable
+'End Sub

@@ -329,7 +329,7 @@ Public Function SavePreset(Optional ByVal Target As Variant) As Boolean
             Target = TargetPath
         End If
         If Not TryWaitFileWriteAccess(Target, 20) Then Exit Function
-        If Not TryWriteTextToFile(Target, JSON.Stringify(pPresetObject), True) Then Exit Function
+        If Not TryWriteTextToFile(Target, JSON.Stringify(pPresetObject, 2), True) Then Exit Function
         pPresetFile = Target
     End If
     

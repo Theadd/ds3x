@@ -89,12 +89,6 @@ Private Sub pScrollview_OnColumnLetterClick(ByVal ColumnIndex As Long, ByVal Ctr
     SelectionApply
 End Sub
 
-'Private Sub pScrollview_OnColumnNameChange(ByVal ColumnIndex As Long, ByVal FromValue As String, ByVal ToValue As String)
-'    TaskController().AddTask _
-'        "SetColumnName", _
-'        Array(, ColumnIndex, ToValue)
-'End Sub
-
 Private Sub pScrollview_OnRowNumberClick(ByVal RowIndex As Long, ByVal CtrlKey As Boolean, ByVal ShiftKey As Boolean)
     pLastSelectionTrigger = pST_ROW
     If ShiftKey And pLastClickedRowIndex <> -1 Then
@@ -196,7 +190,7 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
     Dim iAux As Long, cIndex As Long, rIndex As Long, sKeyCode As Integer: sKeyCode = KeyCode
     KeyCode = 0
     
-    Debug.Print Printf("%1 %2 CALLING OnSelectionControlKeyDown(%3, %4)", TimerSpan, vbTab, sKeyCode, Shift)
+'    Debug.Print Printf("%1 %2 CALLING OnSelectionControlKeyDown(%3, %4)", TimerSpan, vbTab, sKeyCode, Shift)
     
     ' NOTE: use KeyCode = sKeyCode to avoid "preventing default action"
     With sView
@@ -413,24 +407,6 @@ Private Function GetNextColumnIndexInFullJump(ByRef sView As TScrollviewState) A
         End If
     End With
 End Function
-
-'Private Type TScrollviewState
-'    ' Last row index in table
-'    LastRowIndex As Long
-'    ' Last column index in table
-'    LastColumnIndex As Long
-'    ' Tells if scrolling out of table bounds is enabled
-'    OutOfRangeScrolling As Boolean
-'    ShiftKey As Boolean
-'    CtrlKey As Boolean
-'    AltKey As Boolean
-'    ColumnIndex As Long
-'    RowIndex As Long
-'    Cell As Variant
-'    IsColumnTrigger As Boolean
-'    IsRowTrigger As Boolean
-'    IsCellTrigger As Boolean
-'End Type
 
 Private Function GetScrollviewState(ByVal Shift As Integer) As TScrollviewState
     Dim t As TScrollviewState
