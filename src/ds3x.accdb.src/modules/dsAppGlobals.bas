@@ -11,10 +11,14 @@ Option Base 0
     Private pFailedTask As Variant
     Private pRunnableTasks As ArrayListEx
     Private pLiveEd As dsLiveEd
+    Private pQuitOnRunAll As Boolean
 #End If
 
 Private pCustomVars As DictionaryEx
 
+
+Public Property Get LoadConfig(Optional ByVal ConfigFile As String = "package.json") As DictionaryEx: Set LoadConfig = GetConfigFromFile(ConfigFile): End Property
+Public Property Let Log(ByVal LogLevel As String, ByVal LogMessage As String): AppendToLogFile LogLevel, LogMessage: End Property
 
 Public Property Get CustomVars() As DictionaryEx
     If pCustomVars Is Nothing Then InitializeCustomVars
@@ -61,21 +65,35 @@ End Property
     End Property
     
     Public Property Get RunAll() As Boolean
-        Dim t As Variant, shouldContinue As Boolean, g As Variant
+        Dim t As Variant, shouldContinue As Boolean, g As Variant, sTarget As String
+        On Error GoTo ErrorHandler
         pFailedTask = Empty
         
-        For Each t In RunnableTasks
+        For Each t In RunnableTasks.ToArray()
             pActiveTask = t
             Set pLiveEd = Nothing
             
             Set pLiveEd = New dsLiveEd
-            shouldContinue = pLiveEd.ImportPreset(ApplyCustomVarsOn(CStr(t(0))))
+            sTarget = FileSystemLib.Resolve(ApplyCustomVarsOn(CStr(t(0))))
+            If CStr(t(1)) = "" Then
+                CustomVar("TaskName") = FileSystemLib.FSO.GetBaseName(sTarget)
+            Else
+                CustomVar("TaskName") = ApplyCustomVarsOn(CStr(t(1)))
+            End If
+
+            shouldContinue = pLiveEd.ImportPreset(sTarget)
             If shouldContinue Then
                 shouldContinue = pLiveEd.TryApply(g)
                 If Not shouldContinue Then
-                    If CBool(t(2)) Then shouldContinue = True   ' Where `t(2)` is the `OnErrorResumeNext` (optional) parameter provided to the `AddRunnableTask()` call.
+                    If CBool(t(2)) Then
+                        shouldContinue = True   ' Where `t(2)` is the `OnErrorResumeNext` (optional) parameter provided to the `AddRunnableTask()` call.
+                        dsAppGlobals.Log("warning") = "Resuming execution after an error occurred while running the preset at " & sTarget
+                    End If
                 End If
+            Else
+                dsAppGlobals.Log("error") = "Failed to import preset at " & sTarget
             End If
+            CustomVar("TaskName") = ""
             
             If shouldContinue Then
                 pActiveTask = Empty
@@ -83,12 +101,19 @@ End Property
             Else
                 pFailedTask = pActiveTask
                 pActiveTask = Empty
+                dsAppGlobals.Log("error") = "Error while running the preset at " & sTarget
                 Exit For
             End If
         Next t
         
+Finally:
         Set pLiveEd = Nothing
         RunAll = shouldContinue
+        If pQuitOnRunAll Then Application.Quit acQuitPrompt
+        Exit Property
+ErrorHandler:
+        dsAppGlobals.Log("critical") = "Unhandled error @dsAppGlobals.RunAll() - " & Err.Description
+        GoTo Finally
     End Property
     
     
@@ -124,12 +149,73 @@ End Property
     Public Function NumTasksInQueue() As Long
         NumTasksInQueue = RunnableTasks.Count
     End Function
+    
+    Public Function RunApplicationCommandArgs()
+        Dim sArgs As String, vArgs As Variant, sArg As Variant, vArg As Variant, isAsync As Boolean, isExec As Boolean, isContinue As Boolean
+        Dim aX As ArrayListEx, dX As DictionaryEx
+        
+        sArgs = Trim(VBA.Command$())
+        If sArgs = "" Then Exit Function
+        
+        Set aX = ArrayListEx.Create()
+        Set dX = DictionaryEx.Create()
+        vArgs = CollectionsLib.Tokenize(sArgs)
+        For Each sArg In vArgs
+            vArg = CollectionsLib.ParseToken(CStr(sArg))
+            Select Case vArg(0)
+                Case "--task"
+                    aX.Add Array(vArg(1), "")
+                Case "--exec"
+                    isExec = CBool(vArg(1))
+                Case "--async"
+                    isAsync = CBool(vArg(1))
+                Case "--continue"
+                    isContinue = CBool(vArg(1))
+                Case Else
+                    If Left(vArg(0), 6) = "--var-" Then
+                        dX.Add VBA.Mid$(vArg(0), 7, Len(vArg(0))), vArg(1)
+                    ElseIf Left(vArg(0), 7) = "--task-" Then
+                        aX.Add Array(vArg(1), VBA.Mid$(vArg(0), 8, Len(vArg(0))))
+                    Else
+                        MsgBox "Unknown parameter: " & CStr(vArg(0))
+                        GoTo HandleUnknownParamter
+                    End If
+            End Select
+        Next sArg
+        
+        For Each vArg In dX
+            CustomVar(vArg(0)) = vArg(1)
+        Next vArg
+        
+        For Each vArg In aX
+            AddRunnableTask CStr(vArg(0)), CStr(vArg(1)), isContinue
+        Next vArg
+        
+        If isExec Then
+            pQuitOnRunAll = True
+            If isAsync Then
+                RunAllAsync
+            Else
+                Debug.Print "[INFO] RunAll = " & CStr(dsAppGlobals.RunAll())
+            End If
+        End If
+        
+        Exit Function
+HandleUnknownParamter:
+        ' Abort
+        Application.Quit
+    End Function
 
 #Else
     
     Public Property Get RunAll() As Boolean
         Err.Raise 425
     End Property
+    
+    
+    Public Function RunApplicationCommandArgs()
+        ' Ignore
+    End Function
     
 #End If
 
@@ -142,6 +228,7 @@ End Function
 ' --- CustomVars ---
 
 Private Sub InitializeCustomVars()
+    Dim s As String, dX As DictionaryEx, Item As Variant
     Set pCustomVars = DictionaryEx.Create()
     
     pCustomVars.Add "${Timestamp}", CStr(DateDiff("s", DateValue("1970-01-01"), Now()))
@@ -153,6 +240,19 @@ Private Sub InitializeCustomVars()
     pCustomVars.Add "${Username}", Nz(CreateObject("WScript.Network").UserName, "")
     pCustomVars.Add "${UserProfile}", VBA.Environ$("USERPROFILE")
     pCustomVars.Add "${Temp}", VBA.Environ$("TEMP")
+    pCustomVars.Add "${ApplicationPath}", Application.CurrentProject.Path
+    
+    s = FileSystemLib.PathCombine(Application.CurrentProject.Path, "package.json")
+    If FileSystemLib.TryGetFileInAncestors(s, 3) Then
+        If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
+            On Error GoTo Finally
+            Set dX = DictionaryEx.Create(DictionaryEx.Create(s)("ds3x.CustomVars"))
+            For Each Item In dX
+                dsAppGlobals.CustomVar(CStr(Item(0))) = CStr(Item(1))
+            Next Item
+        End If
+    End If
+Finally:
 End Sub
 
 Private Function ReplaceCustomVars(ByVal Target As Variant) As Variant
@@ -193,7 +293,44 @@ Private Function ReplaceCustomVarsOnString(ByVal Target As String) As String
     ReplaceCustomVarsOnString = Target
 End Function
 
-' ---
+
+' --- Logging ---
+
+Private Sub AppendToLogFile(ByVal LogLevel As String, ByVal LogMessage As String)
+    Static sLogFile As String, isFileMissing As Boolean
+    Dim sItem As String, sFile As Variant
+    
+    sItem = Printf("[%1] %2%3 - %4", UCase(Left(LogLevel, 12)), VBA.Space$(13 - Len(Left(LogLevel, 12))), Time(), LogMessage)
+    Debug.Print sItem
+    If isFileMissing Then Exit Sub
+    
+    On Error GoTo HandleFileMissing
+    If sLogFile = vbNullString Then
+        sFile = dsAppGlobals.LoadConfig("package.json")("ds3x.LogFile")
+        If IsEmpty(sFile) Or Trim(CStr(sFile)) = "" Then GoTo HandleFileMissing
+        sLogFile = FileSystemLib.Resolve(ApplyCustomVarsOn(sFile))
+    End If
+    
+    FileSystemLib.TryAppendTextInFile sLogFile, sItem & vbNewLine, False
+    
+    Exit Sub
+HandleFileMissing:
+    isFileMissing = True
+End Sub
+
+Private Function GetConfigFromFile(Optional ByVal TargetFile As String = "package.json") As DictionaryEx
+    Dim s As String
+    On Error GoTo Finally
+    Set GetConfigFromFile = DictionaryEx.Create()
+    
+    s = FileSystemLib.Resolve(TargetFile)
+    If FileSystemLib.TryGetFileInAncestors(s, 3) Then
+        If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
+            Set GetConfigFromFile = DictionaryEx.Create(s)
+        End If
+    End If
+Finally:
+End Function
 
 
 
