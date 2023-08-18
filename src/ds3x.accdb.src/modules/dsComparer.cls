@@ -14,18 +14,26 @@ Option Base 0
 Implements mscorlib.IComparer
 
 
-'public class SimpleStringComparer : IComparer
-'{
-'    int IComparer.Compare(object x, object y)
-'    {
-'        string cmpstr = (string)x;
-'        return cmpstr.CompareTo((string)y);
-'    }
-'}
-
+Public Function Compare(ByVal X As Variant, ByVal Y As Variant) As Long: Compare = IComparer_Compare(X, Y): End Function
 
 Private Function IComparer_Compare(ByVal X As Variant, ByVal Y As Variant) As Long
-    IComparer_Compare = CLng(CLng(X) - CLng(Y))
+    On Error GoTo Fallback
+    IComparer_Compare = CLng(Math.Sgn(X - Y))
+ExitFunc:
+    Exit Function
+Fallback:
+    On Error GoTo FallbackFail
+    If Not IsObject(X) Then
+        Select Case X
+            Case Is < Y: IComparer_Compare = -1
+            Case Is > Y: IComparer_Compare = 1
+            Case Else: IComparer_Compare = 0
+        End Select
+    Else
+        IComparer_Compare = X.CompareTo(Y)
+    End If
+FallbackFail:
+    Resume ExitFunc
 End Function
 
 
