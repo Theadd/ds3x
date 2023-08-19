@@ -11,6 +11,8 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
+Implements ICollectionEx
+
 Public Instance As Scripting.Dictionary
 
 
@@ -18,6 +20,8 @@ Public Instance As Scripting.Dictionary
 Public Property Get Count() As Variant
     Count = Instance.Count
 End Property
+
+Public Property Get ColumnCount() As Long: ColumnCount = 2: End Property
 
 'Wrapper property that returns the value for the specified key if it exists.
 'If it doesn't exist, it returns the default rather than raising an error.
@@ -64,6 +68,12 @@ End Property
 
 
 ' --- PUBLIC METHODS ---
+Public Function Join(ByVal Target As RecordsetEx) As RecordsetEx
+    Set Join = RecordsetEx.Create()
+    ' TODO: Implement
+    Err.Raise 17, , "Not implemented."
+End Function
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As DictionaryEx: Set CreateBlank = Create(): End Function
 
 Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
     Set Create = New DictionaryEx
@@ -80,6 +90,12 @@ Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
                     Create.Bind JSON.Parse(DictionaryLike, True, True)
                     Exit Function
                 End If
+            ElseIf IsArray(DictionaryLike) Then
+                If Array2dEx.Is2dArray(DictionaryLike) Then
+                    CreateFromIterable ArrayListEx.Create(DictionaryLike).ToArray()
+                Else
+                    CreateFromIterable DictionaryLike
+                End If
             End If
         End If
     End If
@@ -95,6 +111,10 @@ Public Function Bind(ByRef DictionaryLike As Variant) As DictionaryEx
         Set Instance = DictionaryLike.Instance
     ElseIf TypeOf DictionaryLike Is Scripting.Dictionary Then
         Set Instance = DictionaryLike
+    ElseIf TypeOf DictionaryLike Is ArrayListEx Then
+        CreateFromIterable C2ArrayListEx(DictionaryLike).ToArray()
+    ElseIf TypeOf DictionaryLike Is Array2dEx Then
+        CreateFromIterable ArrayListEx.Create(DictionaryLike).ToArray()
     End If
 End Function
 
@@ -116,6 +136,19 @@ Public Function Add(mKey As Variant, mVal As Variant) As DictionaryEx
     End If
     
     Set Add = Me
+End Function
+
+Public Function AddRange(ByVal Target As Variant) As DictionaryEx
+    Set AddRange = Append(Target)
+End Function
+
+Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant) As DictionaryEx
+    Set GetRange = DictionaryEx.Create(ArrayListEx.Create(Entries()).GetRange(Index, GetCount))
+End Function
+
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As DictionaryEx
+    Set CopyToRange = Me
+    dsTable.Create(ArrayListEx.Create(Entries()), False).SetHeaders(Array("Key", "Value")).CopyToRange RangeObject, ApplyUserLocale, WriteHeaders
 End Function
 
 'Appends another dictionary (Scripting.Dictionary or DictionaryEx) to the Scripting.Dictionary
@@ -198,8 +231,14 @@ End Function
 Public Function Unserialize(ByRef Serialized As Variant) As DictionaryEx
     Set Unserialize = New DictionaryEx
     Set Unserialize.Instance = New Scripting.Dictionary
-    Set Unserialize.Instance = JSON.Parse(CStr(Serialized))
+    Set Unserialize.Instance = JSON.Parse(CStr(Serialized), True, True)
 End Function
+
+Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
+    ToCSV = dsTable.Create(ArrayListEx.Create(Entries()), False).SetHeaders(Array("Key", "Value")).ToCSV(Delimiter)
+End Function
+
+Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
 Public Function ToString(Optional mPrettyIndent As Variant) As String
     If IsMissing(mPrettyIndent) Then
@@ -288,7 +327,50 @@ Private Sub Assign(ByRef Target, ByRef Value As Variant)
     End If
 End Sub
 
+Private Sub CreateFromIterable(ByRef Target As Variant)
+    Dim i As Long
+    Set Instance = New Scripting.Dictionary
+    
+    If IsArray(Target(0)) Then
+        For i = 0 To UBound(Target)
+            Add Target(i)(0), Target(i)(1)
+        Next i
+    Else
+        For i = 0 To UBound(Target) Step 2
+            Add Target(i), Target(i + 1)
+        Next i
+    End If
+End Sub
+
 Private Sub Class_Terminate()
     On Error Resume Next
     Set Instance = Nothing
 End Sub
+
+Public Sub Dispose(): Set Instance = Nothing: End Sub
+
+
+' --- TYPE CASTING ---
+
+Private Function C2ArrayListEx(ByRef Value As Variant) As ArrayListEx: Set C2ArrayListEx = Value: End Function
+
+
+' --- ICollectionEx ---
+
+Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
+Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
+Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
+Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function
+Private Function ICollectionEx_Unbind() As ICollectionEx: Set ICollectionEx_Unbind = Unbind(): End Function
+Private Sub ICollectionEx_Dispose(): Dispose: End Sub
+Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
+Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
+Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
+Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
+
+
+
+
