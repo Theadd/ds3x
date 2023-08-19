@@ -69,6 +69,13 @@ Private Sub pTaskController_OnTableChange()
     SelectionApply
 End Sub
 
+Private Sub pTaskController_OnBusyChange(ByVal IsBusy As Boolean)
+    ScreenLib.MouseLoadingCursor = IsBusy
+End Sub
+
+
+' --- OTHER ---
+
 Public Function TryGetColumnHeaderAt(ByVal ColumnIndex As Long, ByRef OutColumnHeader As DictionaryEx) As Boolean
     On Error GoTo Finally
     
