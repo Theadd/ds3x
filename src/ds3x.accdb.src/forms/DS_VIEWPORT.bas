@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =4215
-    Top =3690
-    Right =21210
-    Bottom =13185
+    Left =3840
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -563,37 +563,28 @@ End Function
 
 Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
     Dim sView As TViewportState
-    'GlobalVMemAnalysis "@Viewport.ScrollTo P0"
     sView = GetViewportStateAt(X, Y)
-    'GlobalVMemAnalysis "@Viewport.ScrollTo P1"
+    
     If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
         pWorksheet.Painting = False
         pWorksheetHeaders.Painting = False
         pWorksheetNumbers.Painting = False
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.0"
         WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
         WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
         WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.1"
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.2"
         Set pWorksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.3"
         pWorksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
         pWorksheetHeaders.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
         pWorksheetNumbers.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
         pWorksheetNumbers.Painting = True
         pWorksheetHeaders.Painting = True
         pWorksheet.Painting = True
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P2.4"
     Else
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P3.0"
         WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
         WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
         WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
-        'GlobalVMemAnalysis "@Viewport.ScrollTo P3.1"
     End If
-    'GlobalVMemAnalysis "@Viewport.ScrollTo P4"
     this = sView
 End Sub
 
@@ -632,12 +623,11 @@ Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Long
     Dim targetCellMinX As Long, targetCellMaxX As Long, X As Long
     
     cellWidth = Worksheet.GridCellSizeX
-    viewWidth = Scrollview.ScrollPageSizeX  ' pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
+    viewWidth = Scrollview.ScrollPageSizeX
     
     X = cellWidth * ColumnIndex
     targetCellMinX = Max(X - cellWidth, 0)
-    targetCellMaxX = X + (3 * cellWidth)    ' EDIT: 2 -> 3
-    ' NOT NEEDED: if not pscrollview.EnableOutOfRangeScrolling then targetcellmaxx = min(targetcellmaxx, )
+    targetCellMaxX = X + (3 * cellWidth)
     
     curViewMinX = this.ScrollPosX
     curViewMaxX = curViewMinX + viewWidth
@@ -678,65 +668,52 @@ End Function
 
 Public Sub OnSourceTableChange()
     this.TrackIndex = -1
-    'GlobalVMemAnalysis "@OnSourceTableChange"
-    If Scrollview.KeepScrollPositionOnTableChange Then
+    If pScrollview.KeepScrollPositionOnTableChange Then
         ScrollTo this.ScrollPosX, this.ScrollPosY
     Else
+        On Error GoTo Finally
+        pScrollview.IgnoreScrollingEvents = True
+        pScrollview.ScrollbarX = 0
+        pScrollview.ScrollbarY = 0
         ScrollTo 0, 0
+Finally:
+        pScrollview.IgnoreScrollingEvents = False
     End If
 End Sub
 
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
     Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long, RowStartIndex As Long
 
-    'GlobalVMemAnalysis "@Viewport.GetTrack P0"
     Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
     nCols = Worksheet.MaxAvailColumns
     
-    'GlobalVMemAnalysis "@Viewport.GetTrack P1"
     If ColumnStartIndex >= dsT.ColumnCount Then
         Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
     Else
         
         RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
         nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
-        'GlobalVMemAnalysis "@Viewport.GetTrack P2"
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
-            'GlobalVMemAnalysis "@Viewport.GetTrack P2.1"
             If nRows < PageSize * PageCount Then
-                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.1"
                 Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
-                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.2"
                 Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
-                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.3"
                 Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
-                'GlobalVMemAnalysis "@Viewport.GetTrack P2.1.4"
             Else
-                'GlobalVMemAnalysis "@Viewport.GetTrack P2.2.1"
                 Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
-                'GlobalVMemAnalysis "@Viewport.GetTrack P2.2.2"
             End If
         Else
-            'GlobalVMemAnalysis "@Viewport.GetTrack P3.1"
             Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
-            'GlobalVMemAnalysis "@Viewport.GetTrack P3.2"
             Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
-            'GlobalVMemAnalysis "@Viewport.GetTrack P3.3"
             Set dsT2 = dsT2.Join(dsT3)
-            'GlobalVMemAnalysis "@Viewport.GetTrack P3.4"
             If nRows < PageSize * PageCount Then
                 Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
             End If
-            'GlobalVMemAnalysis "@Viewport.GetTrack P3.5"
             Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
-            'GlobalVMemAnalysis "@Viewport.GetTrack P3.6"
         End If
-        'GlobalVMemAnalysis "@Viewport.GetTrack P4"
     End If
     
     Set GetTrack = rX
-    'GlobalVMemAnalysis "@Viewport.GetTrack P5"
 End Function
 
 
@@ -744,3 +721,10 @@ End Function
 
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+
+
+' --- DEBUG ---
+
+Public Sub Debugger()
+    Stop
+End Sub

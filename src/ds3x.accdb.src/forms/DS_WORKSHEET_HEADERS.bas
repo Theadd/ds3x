@@ -21,7 +21,7 @@ Begin Form
     Width =31636
     DatasheetFontHeight =11
     ItemSuffix =1560
-    Left =4065
+    Left =3840
     Top =3030
     Right =28545
     Bottom =15225
@@ -2258,7 +2258,10 @@ End Function
 
 Public Function OnEnterColumnName()
     pRemoveFocusNeeded = True
-    pViewport.Scrollview.TriggerOnClearSelectionRequest
+    DoEvents
+    With pViewport.Scrollview
+        .TriggerOnClearSelectionRequest
+    End With
 End Function
 
 Public Sub RemoveFocus()

@@ -24,7 +24,7 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =4065
+    Left =3840
     Top =3030
     Right =28545
     Bottom =15225
@@ -461,6 +461,7 @@ Private Sub SetController(ByVal TargetController As dsLiveEd)
     Me.DS_SCROLLVIEW.Visible = True
     Me.DS_SCROLLVIEW.Form.EnableOutOfRangeScrolling = True
     Me.DS_SCROLLVIEW.Form.InvertScrollInputAxis = True
+    Me.DS_SCROLLVIEW.Form.KeepScrollPositionOnTableChange = True
     Rebuild
 End Sub
 

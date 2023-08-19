@@ -5,8 +5,8 @@
   },
   "Items": {
     "MergeBuildDate": null,
-    "FullBuildDate": null,
-    "ExportDate": "18/08/2023 9:36:36",
+    "FullBuildDate": "19/08/2023 3:18:21",
+    "ExportDate": "19/08/2023 4:41:59",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -17,118 +17,134 @@
       },
       "DB Properties": {
         "dbs-properties.json": {
-          "FileHash": "fef01ed",
-          "ExportDate": "09/08/2023 3:48:32",
-          "SourceModified": "09/08/2023 3:48:32",
-          "FilePropertiesHash": "2ed4417"
+          "FileHash": "59b6c86",
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "9e32624",
+          "ImportDate": "19/08/2023 3:18:16"
         }
       },
       "Doc Properties": {
         "documents.json": {
           "FileHash": "e61200c",
-          "ExportDate": "31/07/2023 23:15:04",
-          "SourceModified": "31/07/2023 23:15:04",
-          "FilePropertiesHash": "256e320"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "64267a4",
+          "ImportDate": "19/08/2023 3:18:19"
         }
       },
       "Forms": {
         "DS_ASYNC_RUNNER.bas": {
           "FileHash": "31fea2e",
-          "OtherHash": "7b8e78c",
-          "ExportDate": "01/08/2023 12:56:17",
-          "SourceModified": "01/08/2023 12:56:17",
-          "FilePropertiesHash": "8a2c266"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "e36986e",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "68007cf"
         },
         "DS_CREATE_TASK.bas": {
           "FileHash": "6441d61",
-          "OtherHash": "6cebc2b",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "73619ac"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "5740fb7",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "635fdbe"
         },
         "DS_JSON_TASK_EDITOR.bas": {
           "FileHash": "37527d4",
-          "OtherHash": "ccf1bf0",
-          "ExportDate": "12/08/2023 4:51:12",
-          "SourceModified": "12/08/2023 4:51:12",
-          "FilePropertiesHash": "b904b1c"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "1fb4201",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "71bcf06"
         },
         "DS_LIVE_EDITOR.bas": {
           "FileHash": "bd475c2",
-          "OtherHash": "c7a53f5",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "a75498e"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "f3cbbae",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "20f1d51"
         },
         "DS_LIVE_EDITOR_MAIN_PANEL.bas": {
-          "FileHash": "a667e0d",
-          "OtherHash": "385868b",
-          "ExportDate": "13/08/2023 15:14:14",
-          "SourceModified": "13/08/2023 15:14:14",
-          "FilePropertiesHash": "93c9d85"
+          "FileHash": "d47258b",
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "66f47e0",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "356da0d"
         },
         "DS_LIVE_EDITOR_SIDE_PANEL.bas": {
           "FileHash": "a894490",
-          "OtherHash": "e093bc9",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "c2dd635"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "51db67b",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "e093bc9"
         },
         "DS_REBUILD_SEQUENCE.bas": {
           "FileHash": "90a3275",
-          "OtherHash": "bb49e52",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "37ca50d"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "cb74312",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "fc3115b"
         },
         "DS_RICHTEXT_LIST.bas": {
           "FileHash": "38b63d1",
-          "OtherHash": "4348951",
-          "ExportDate": "12/08/2023 4:51:12",
-          "SourceModified": "12/08/2023 4:51:12",
-          "FilePropertiesHash": "91ce922"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "d2a0812",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "4348951"
         },
         "DS_SCROLLVIEW.bas": {
-          "FileHash": "a5b19ac",
-          "OtherHash": "7519a0e",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "d1bde86"
+          "FileHash": "c16568b",
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "0821b3f",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "36e3149"
         },
         "DS_VIEWPORT.bas": {
-          "FileHash": "f2821d1",
-          "OtherHash": "b6828a6",
-          "ExportDate": "18/08/2023 5:28:22",
-          "SourceModified": "18/08/2023 5:28:22",
-          "FilePropertiesHash": "b212565"
+          "FileHash": "6c5f3ce",
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "7112798",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "dd845d0"
         },
         "DS_VIEWPORT_STICKY.bas": {
           "FileHash": "574aed1",
-          "OtherHash": "ba080ba",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "c9422bc"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "c407a09",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "67d2e5b"
         },
         "DS_WORKSHEET.bas": {
           "FileHash": "4342738",
-          "OtherHash": "c63d3b7",
-          "ExportDate": "13/08/2023 15:14:14",
-          "SourceModified": "13/08/2023 15:14:14",
-          "FilePropertiesHash": "d1e3d45"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "905ed27",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "204e355"
         },
         "DS_WORKSHEET_HEADERS.bas": {
-          "FileHash": "ee9b926",
-          "OtherHash": "4785e0a",
-          "ExportDate": "13/08/2023 15:14:14",
-          "SourceModified": "13/08/2023 15:14:14",
-          "FilePropertiesHash": "9139680"
+          "FileHash": "eae815f",
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "451c553",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "6343eed"
         },
         "DS_WORKSHEET_NUMBERS.bas": {
           "FileHash": "a3bc139",
-          "OtherHash": "4ba0af0",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "3a7056d"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "2120b7d",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "8a97a0e"
         }
       },
       "Hidden Attributes": {
@@ -137,33 +153,37 @@
       },
       "Macros": {
         "AutoEXEC.bas": {
-          "FileHash": "80a8628",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "0875844"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "1b9384c",
+          "ImportDate": "19/08/2023 3:18:18",
+          "FileHash": "80a8628"
         }
       },
       "Modules": {
         "Array2dEx.cls": {
           "FileHash": "49ab7df",
-          "OtherHash": "22ca995",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "e2b6cf6"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "3627dfe",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "22ca995"
         },
         "ArrayListEx.cls": {
           "FileHash": "fc6cea4",
-          "OtherHash": "0ca9d1c",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "a26bc91"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "e1a975c",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "0ca9d1c"
         },
         "Callback.cls": {
           "FileHash": "afa97da",
-          "OtherHash": "88aae2d",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "1161c5d"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "00c8780",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "88aae2d"
         },
         "CHANGELOG.bas": {
           "FileHash": "2c1bbd4",
@@ -174,122 +194,139 @@
         },
         "CollectionsLib.bas": {
           "FileHash": "ec2ca88",
-          "OtherHash": "bf7a725",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "db0d836"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "fe66612",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "bf7a725"
         },
         "dbQuery.cls": {
           "FileHash": "0531f0d",
-          "OtherHash": "713d59b",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "86c6bf0"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "1bddc5d",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "713d59b"
         },
         "DictionaryEx.cls": {
           "FileHash": "4bf0bbb",
-          "OtherHash": "51e59e8",
-          "ExportDate": "16/08/2023 2:49:12",
-          "SourceModified": "16/08/2023 2:49:12",
-          "FilePropertiesHash": "1a7c8d4"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "d86e489",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "51e59e8"
         },
         "dsAppGlobals.bas": {
           "FileHash": "c6816e1",
-          "OtherHash": "8b2b83e",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "80dce08"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "f5eef4c",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "8b2b83e"
         },
         "dsCodeSandbox.bas": {
           "FileHash": "7362f85",
-          "OtherHash": "434369b",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "1b1fbd9"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "fbc76f2",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "434369b"
         },
         "dsCommonLib.bas": {
           "FileHash": "61b0b25",
-          "OtherHash": "b497de4",
-          "ExportDate": "06/08/2023 4:26:51",
-          "SourceModified": "06/08/2023 4:26:51",
-          "FilePropertiesHash": "155262b"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "7b71962",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "b497de4"
         },
         "dsComparer.cls": {
           "FileHash": "f82d4d9",
-          "OtherHash": "e2a1c92",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "186ab58"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "36f6928",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "e2a1c92"
         },
         "dsGridController.cls": {
-          "FileHash": "1328f85",
-          "OtherHash": "778aa69",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "dcceb1a"
+          "FileHash": "bd1e433",
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "80fd61f",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "8513db2"
         },
         "dsGridSelectionController.cls": {
           "FileHash": "810463f",
-          "OtherHash": "91450ae",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "f63405a"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "bb3e2f9",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "91450ae"
         },
         "dsLiveEd.cls": {
           "FileHash": "aca1a2b",
-          "OtherHash": "a05136c",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "b0f2672"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "c53f58d",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "a05136c"
         },
         "dsTable.cls": {
           "FileHash": "14d1219",
-          "OtherHash": "74bca7f",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "455124e"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "21cc29f",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "74bca7f"
         },
         "dsTaskController.cls": {
-          "FileHash": "8eb2564",
-          "OtherHash": "a913310",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "f7a4355"
+          "FileHash": "bb6c67d",
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "70e7470",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "60c49e5"
         },
         "dsTaskDefinitions.cls": {
           "FileHash": "fde7ded",
-          "OtherHash": "b354bba",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "822eaa6"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "de658ac",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "b354bba"
         },
         "FileSystemLib.bas": {
           "FileHash": "94d9362",
-          "OtherHash": "915aa9f",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "22fbcd5"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "ae6e547",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "915aa9f"
         },
         "JSON.cls": {
           "FileHash": "2d11a2d",
-          "OtherHash": "685d3ce",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "ded45d9"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "b168eb1",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "685d3ce"
         },
         "RecordsetEx.cls": {
           "FileHash": "b6adfcd",
-          "OtherHash": "6f0a192",
-          "ExportDate": "18/08/2023 5:28:23",
-          "SourceModified": "18/08/2023 5:28:23",
-          "FilePropertiesHash": "fe68eb7"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "f2741f3",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "6f0a192"
         },
         "ScreenLib.bas": {
-          "FileHash": "fb0a6b3",
-          "OtherHash": "6594935",
-          "ExportDate": "13/08/2023 15:14:14",
-          "SourceModified": "13/08/2023 15:14:14",
-          "FilePropertiesHash": "5df7a87"
+          "FileHash": "be55f62",
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "7b4e9b4",
+          "ImportDate": "19/08/2023 3:18:18",
+          "OtherHash": "4a711e7"
         },
         "SystemLib.bas": {
           "FileHash": "202c772",
@@ -300,18 +337,20 @@
         },
         "xlSheetsEx.cls": {
           "FileHash": "956e48c",
-          "OtherHash": "411976e",
-          "ExportDate": "18/08/2023 9:36:36",
-          "SourceModified": "18/08/2023 9:36:36",
-          "FilePropertiesHash": "81c2379"
+          "ExportDate": "19/08/2023 4:41:58",
+          "SourceModified": "19/08/2023 4:41:58",
+          "FilePropertiesHash": "2e8a49e",
+          "ImportDate": "19/08/2023 3:18:19",
+          "OtherHash": "411976e"
         }
       },
       "Nav Pane Groups": {
         "nav-pane-groups.json": {
           "FileHash": "2ab5bd8",
-          "ExportDate": "31/07/2023 23:15:04",
-          "SourceModified": "31/07/2023 23:15:04",
-          "FilePropertiesHash": "978cdc1"
+          "ExportDate": "19/08/2023 4:41:59",
+          "SourceModified": "19/08/2023 4:41:59",
+          "FilePropertiesHash": "6262f0b",
+          "ImportDate": "19/08/2023 3:18:19"
         }
       },
       "Proj Properties": {
@@ -321,9 +360,10 @@
       "Project": {
         "project.json": {
           "FileHash": "8ca0d00",
-          "ExportDate": "31/07/2023 23:15:01",
-          "SourceModified": "31/07/2023 23:15:01",
-          "FilePropertiesHash": "1eda860"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "a2430c5",
+          "ImportDate": "19/08/2023 3:18:16"
         }
       },
       "Themes": {
@@ -338,17 +378,19 @@
       "VB Project": {
         "vbe-project.json": {
           "FileHash": "48ef1f6",
-          "ExportDate": "01/08/2023 12:56:17",
-          "SourceModified": "01/08/2023 12:56:17",
-          "FilePropertiesHash": "77578a5"
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "7a145ce",
+          "ImportDate": "19/08/2023 3:18:16"
         }
       },
       "VBE References": {
         "vbe-references.json": {
-          "FileHash": "caa9a48",
-          "ExportDate": "01/08/2023 4:09:23",
-          "SourceModified": "01/08/2023 4:09:23",
-          "FilePropertiesHash": "311e11b"
+          "FileHash": "0b77590",
+          "ExportDate": "19/08/2023 4:41:57",
+          "SourceModified": "19/08/2023 4:41:57",
+          "FilePropertiesHash": "6d4bd75",
+          "ImportDate": "19/08/2023 3:18:16"
         }
       }
     }
