@@ -50,7 +50,7 @@ Public Property Get ConnectionString() As String
             pConnectionString = dbQuery.ConnectionString
         Else
             Dim s As String
-            s = FileSystemLib.PathCombine(Application.CurrentProject.Path, "package.json")
+            s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
             If FileSystemLib.TryGetFileInAncestors(s, 3) Then
                 If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
                     pConnectionString = DictionaryEx.Create(s)("ds3x.dbQuery.ConnectionString")

@@ -207,9 +207,9 @@ Private Sub InitializeCustomVars()
     pCustomVars.Add "${Username}", Nz(CreateObject("WScript.Network").UserName, "")
     pCustomVars.Add "${UserProfile}", VBA.Environ$("USERPROFILE")
     pCustomVars.Add "${Temp}", VBA.Environ$("TEMP")
-    pCustomVars.Add "${ApplicationPath}", Application.CurrentProject.Path
+    pCustomVars.Add "${ApplicationPath}", Application.CodeProject.Path
     
-    s = FileSystemLib.PathCombine(Application.CurrentProject.Path, "package.json")
+    s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
     If FileSystemLib.TryGetFileInAncestors(s, 3) Then
         If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
             On Error GoTo Finally
@@ -298,6 +298,34 @@ Private Function GetConfigFromFile(Optional ByVal TargetFile As String = "packag
     End If
 Finally:
 End Function
+
+
+' --- Debugging ---
+
+Public Function TimerSpan() As Single
+    Static cTimer As Single
+    Dim t As Single
+    
+    t = Timer()
+    If cTimer = CSng(0) Then cTimer = t
+    TimerSpan = CSng(CLng((t - cTimer) * 1000) / 1000)
+    cTimer = t
+End Function
+
+Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant)
+    Static LastVMemFree As Long, sVMemCallCount As Long
+    Dim cVMemFree As Long, elapsedTime As String
+    
+    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
+    sVMemCallCount = sVMemCallCount + 1
+    elapsedTime = CStr(TimerSpan())
+    elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
+    
+    If LastVMemFree <> 0 Then
+        Debug.Print Printf("%6 [Global VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
+    End If
+    LastVMemFree = cVMemFree
+End Sub
 
 
 

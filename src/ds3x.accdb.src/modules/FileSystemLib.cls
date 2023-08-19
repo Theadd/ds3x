@@ -506,7 +506,7 @@ End Function
 Private Function PathResolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String
     PathResolve = FSO.GetAbsolutePathName(Path)
     If VBA.Left$(PathResolve, 2) <> VBA.UCase$(VBA.Left$(Path, 2)) Then
-        If IsMissing(RelativeTo) Then RelativeTo = Application.CurrentProject.Path
+        If IsMissing(RelativeTo) Then RelativeTo = Application.CodeProject.Path
         PathResolve = FSO.GetAbsolutePathName(FSO.BuildPath(RelativeTo, Path))
     End If
 End Function

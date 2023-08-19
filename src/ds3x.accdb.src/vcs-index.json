@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "19/08/2023 4:51:19",
-    "ExportDate": "19/08/2023 12:41:58",
+    "ExportDate": "19/08/2023 12:53:22",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -208,12 +208,12 @@
           "FilePropertiesHash": "6d3754e"
         },
         "dbQuery.cls": {
-          "FileHash": "6fd600b",
-          "ExportDate": "19/08/2023 7:21:43",
-          "SourceModified": "19/08/2023 7:21:43",
-          "FilePropertiesHash": "e19c604",
+          "FileHash": "954072f",
+          "ExportDate": "19/08/2023 12:53:22",
+          "SourceModified": "19/08/2023 12:53:22",
+          "FilePropertiesHash": "f7c3b28",
           "ImportDate": "19/08/2023 4:51:16",
-          "OtherHash": "ac58c52"
+          "OtherHash": "cf79f9d"
         },
         "DictionaryEx.cls": {
           "FileHash": "70d90b2",
@@ -231,19 +231,11 @@
           "FilePropertiesHash": "a643631"
         },
         "dsApp.cls": {
-          "FileHash": "bc6ef8a",
-          "OtherHash": "7a2364e",
-          "ExportDate": "19/08/2023 12:41:58",
-          "SourceModified": "19/08/2023 12:41:58",
-          "FilePropertiesHash": "dd8f21b"
-        },
-        "dsCodeSandbox.bas": {
-          "FileHash": "cfd01c1",
-          "ExportDate": "19/08/2023 8:11:53",
-          "SourceModified": "19/08/2023 8:11:53",
-          "FilePropertiesHash": "b6603fc",
-          "ImportDate": "19/08/2023 4:51:15",
-          "OtherHash": "5001110"
+          "FileHash": "99f4518",
+          "OtherHash": "f983465",
+          "ExportDate": "19/08/2023 12:53:22",
+          "SourceModified": "19/08/2023 12:53:22",
+          "FilePropertiesHash": "df61aad"
         },
         "dsComparer.cls": {
           "FileHash": "f645d8d",
@@ -309,11 +301,11 @@
           "ImportDate": "19/08/2023 4:51:15"
         },
         "FileSystemLib.cls": {
-          "FileHash": "d0dfdc0",
-          "OtherHash": "f41c83d",
-          "ExportDate": "19/08/2023 8:11:53",
-          "SourceModified": "19/08/2023 8:11:53",
-          "FilePropertiesHash": "7507584"
+          "FileHash": "1e5711d",
+          "OtherHash": "adb7f50",
+          "ExportDate": "19/08/2023 12:53:22",
+          "SourceModified": "19/08/2023 12:53:22",
+          "FilePropertiesHash": "136cea3"
         },
         "ICollectionEx.cls": {
           "FileHash": "43f47c1",
