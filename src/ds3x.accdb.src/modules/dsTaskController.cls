@@ -39,6 +39,7 @@ Public Event OnDataSourceChange(ByVal dsId As String)
 Public Event OnRebuildSequenceChange()
 Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
 Public Event OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
+Public Event OnBusyChange(ByVal IsBusy As Boolean)
 
 Private pRebuildSequence As New ArrayListEx
 Private pSequenceIndex As Long
@@ -156,6 +157,7 @@ End Sub
 Private Sub Rebuild(ByVal TargetIndex As Long)
     Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx
     
+    RaiseEvent OnBusyChange(True)
     VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
@@ -184,9 +186,8 @@ Private Sub Rebuild(ByVal TargetIndex As Long)
     End If
     
 ExitRebuild:
-    'VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE RaiseEvent OnTableChange"
     RaiseEvent OnTableChange
-    'VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") AFTER RaiseEvent OnTableChange"
+    RaiseEvent OnBusyChange(False)
     Exit Sub
 RebuildTaskFail:
     MakeRebuildSequenceDirtyOn pSequenceIndex
@@ -361,9 +362,7 @@ Private Sub SetActiveSequenceIndex(ByVal Value As Long)
     Rebuild Value
 Finally:
     On Error GoTo 0
-    'VMemAnalysis "@SetActiveSequenceIndex BEFORE RaiseEvent OnActiveSequenceIndexChange"
     RaiseEvent OnActiveSequenceIndexChange(Value)
-    'VMemAnalysis "@SetActiveSequenceIndex AFTER RaiseEvent OnActiveSequenceIndexChange"
 End Sub
 
 Private Function GetNextSequenceId(ByVal IdPrefix As String) As String
@@ -430,7 +429,6 @@ Private Function TryGetSourceWorksheetForSequence(ByVal Index As Long, ByRef Out
     
     Do While True
         If Index <= 0 Then
-            ' EDIT: Set OutWorksheet = Nothing
             Set OutWorksheet = DataSource("XS1")
             Exit Do
         Else
@@ -571,8 +569,6 @@ End Function
 Public Function AddResource(ByRef TargetResource As Object) As Object
     If Not TargetResource Is Nothing Then
         pGarbageCollector.Add CStr(ObjPtr(TargetResource)), TargetResource
-'        Debug.Print Printf("[GARBAGE COLLECTOR] @AddResource %1 (%2)", CStr(ObjPtr(TargetResource)), TypeName(TargetResource))
-'        Debug.Print JSON.Stringify(pGarbageCollector.Keys())
     End If
     Set AddResource = TargetResource
 End Function
@@ -628,7 +624,6 @@ Public Sub FreeUnlinkedResources()
     
     Exit Sub
 StopOnError:
-    ' TODO: remove
     Debug.Print "[ERROR] @dsTaskController.FreeUnlinkedResources() - " & Err.Description
     Resume Next
 End Sub

@@ -647,8 +647,6 @@ Private Function SetCursorType(ByRef TargetCursor As LongPtr, ByVal CursorId As 
             Exit Function
         End If
     End If
-    ' TODO: Remove
-    Debug.Print "FALLBACK TO NORMAL CURSOR"
     Screen.MousePointer = 1
 End Function
 
