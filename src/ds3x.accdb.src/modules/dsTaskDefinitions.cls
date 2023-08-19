@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.LiveEditor"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -762,10 +763,5 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
         End If
     End If
 End Sub
-
-
-
-
-
 
 

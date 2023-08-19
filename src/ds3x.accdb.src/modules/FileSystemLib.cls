@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Libraries"
 Option Compare Database
 Option Explicit
 
@@ -474,10 +475,4 @@ Private Function PathResolve(ByVal Path As String, Optional ByVal RelativeTo As 
         PathResolve = FSO.GetAbsolutePathName(FSO.BuildPath(RelativeTo, Path))
     End If
 End Function
-
-
-
-
-
-
 

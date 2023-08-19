@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.LiveEditor.UI"
 Option Compare Database
 Option Explicit
 Option Base 0

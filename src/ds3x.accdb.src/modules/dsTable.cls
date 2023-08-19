@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -623,8 +624,5 @@ Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2Exce
 Private Function C2ExcelWorksheet(ByVal Value As Variant) As Excel.Worksheet: Set C2ExcelWorksheet = Value: End Function
 Private Function C2xlSheetsEx(ByVal Value As Variant) As xlSheetsEx: Set C2xlSheetsEx = Value: End Function
 Private Function C2Dictionary(ByVal Value As Variant) As Scripting.Dictionary: Set C2Dictionary = Value: End Function
-
-
-
 
 

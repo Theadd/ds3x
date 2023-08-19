@@ -8,6 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "RecordsetEx es una clase ultra-ligera, encadenable (chainable) y accesible globalmente (PredeclaredId = True) que encapsula un objeto ADODB.Recordset."
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
 
@@ -716,6 +717,3 @@ Private Function CreateNumericIndexHeaders() As Variant
     
     CreateNumericIndexHeaders = t
 End Function
-
-
-

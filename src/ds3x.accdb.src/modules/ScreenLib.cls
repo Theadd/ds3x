@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Libraries"
 ' ScreenLib Module
 Option Compare Database
 Option Explicit
@@ -92,8 +93,8 @@ Private Const HWND_BOTTOM As Long = 1        ' Places the window at the bottom o
 ' --- TYPE DEFINITIONS ---
 
 Private Type SIZE
-        cX As Long
-        cY As Long
+    cX As Long
+    cY As Long
 End Type
 
 

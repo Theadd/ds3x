@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -527,8 +528,4 @@ End Function
 '        .NumberFormatLocal = "#.##0,00;-#.##0,00"
 '    End With
 'End Sub
-
-
-
-
 

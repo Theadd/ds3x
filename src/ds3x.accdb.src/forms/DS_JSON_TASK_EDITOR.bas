@@ -24,10 +24,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =4065
-    Top =3030
-    Right =21105
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =7365
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -500,6 +500,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.LiveEditor"
 Option Compare Database
 Option Explicit
 

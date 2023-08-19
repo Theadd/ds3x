@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.LiveEditor"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -649,6 +650,5 @@ Private Sub VMemAnalysis(Optional ByVal Message As Variant)
     End If
     LastVMemFree = cVMemFree
 End Sub
-
 
 

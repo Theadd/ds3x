@@ -23,7 +23,7 @@ Begin Form
     ItemSuffix =1574
     Left =3225
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
@@ -747,6 +747,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Scrollview"
 Option Compare Database
 Option Explicit
 

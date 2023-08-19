@@ -21,10 +21,10 @@ Begin Form
     Width =690
     DatasheetFontHeight =11
     ItemSuffix =1591
-    Left =3570
-    Top =3675
-    Right =4005
-    Bottom =6210
+    Left =3240
+    Top =3045
+    Right =7365
+    Bottom =15210
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -532,6 +532,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Scrollview"
 Option Compare Database
 Option Explicit
 

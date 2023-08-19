@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections.Extras"
 ' dbQuery Class Module
 
 ' --- PUBLIC PROPERTIES ---
@@ -214,5 +215,3 @@ Private Sub OpenConnection()
     pConn.ConnectionTimeout = 10
     pConn.Open
 End Sub
-
-
