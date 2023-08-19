@@ -21,10 +21,10 @@ Begin Form
     Width =690
     DatasheetFontHeight =11
     ItemSuffix =1591
-    Left =4065
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =3570
+    Top =3675
+    Right =4005
+    Bottom =6210
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -561,7 +561,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long
+    Dim r As ds3xGlobals.RECT, b As ds3xGlobals.BOUNDS, t As Long
     
     Set WorksheetNumbers = Me.DS_WORKSHEET_NUMBERS.Form
     

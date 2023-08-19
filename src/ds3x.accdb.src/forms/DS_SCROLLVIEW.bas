@@ -21,7 +21,7 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =3840
+    Left =3225
     Top =3030
     Right =28545
     Bottom =15225
@@ -786,7 +786,7 @@ Private pReady As Boolean
 Private pLastScrollX As Variant
 Private pLastScrollY As Variant
 Private pPointerCapture As Boolean
-Private pCapturedPointerPosition As ScreenLib.POINTAPI
+Private pCapturedPointerPosition As ds3xGlobals.POINTAPI
 Private pScrollSpeedMultiplier As Long
 Private pIgnoreScrollingEvents As Boolean
 
@@ -862,7 +862,7 @@ Friend Property Let IgnoreScrollingEvents(ByVal Value As Boolean): pIgnoreScroll
 ' --- FORM EVENTS ---
 
 Private Sub Form_Load()
-    ScreenLib_Resync
+    ScreenLib.ScreenLib_Resync
     pScrollSpeedMultiplier = 1
     pLastScrollX = Array(0, 0)
     pLastScrollY = Array(0, 0)
@@ -871,8 +871,8 @@ Private Sub Form_Load()
     Setup
     
     If Not IsSubform Then
-        WindowSizeTo Me, 12000, 8000
-        WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
+        ScreenLib.WindowSizeTo Me, 12000, 8000
+        ScreenLib.WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
         
         ' SetupDevelopmentEnvironment
     End If
@@ -1015,7 +1015,7 @@ End Sub
 ' --- SCROLLING ---
 
 Private Sub ScrollUsingLastCapturedPointerPosition()
-    Dim p As ScreenLib.POINTAPI, X As Long, Y As Long
+    Dim p As ds3xGlobals.POINTAPI, X As Long, Y As Long
 
     p = ScreenLib.GetCursorPosition
     X = p.X - pCapturedPointerPosition.X

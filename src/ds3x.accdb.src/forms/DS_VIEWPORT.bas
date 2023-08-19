@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =3840
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =4275
+    Top =3675
+    Right =7455
+    Bottom =6210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -522,7 +522,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long, c As Long
+    Dim r As ds3xGlobals.RECT, b As ds3xGlobals.BOUNDS, t As Long, c As Long
     
     Set Worksheet = Me.DS_WORKSHEET.Form
     Set pWorksheet.Viewport = Me
@@ -569,9 +569,9 @@ Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
         pWorksheet.Painting = False
         pWorksheetHeaders.Painting = False
         pWorksheetNumbers.Painting = False
-        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
-        WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
-        WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
+        ScreenLib.WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
         Set pWorksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
         pWorksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
@@ -581,9 +581,9 @@ Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
         pWorksheetHeaders.Painting = True
         pWorksheet.Painting = True
     Else
-        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
-        WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
-        WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
+        ScreenLib.WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
     End If
     this = sView
 End Sub

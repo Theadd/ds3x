@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =7725
-    Top =4230
-    Right =22380
-    Bottom =14385
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1383,9 +1383,9 @@ Private Sub DS_TASK_PARAM_1_Change()
 End Sub
 
 Private Sub Form_Load()
-    WindowSizeTo Me, 11000, 6000
+    ScreenLib.WindowSizeTo Me, 11000, 6000
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
-    WindowAlwaysOnTop Me
+    ScreenLib.WindowAlwaysOnTop Me
     SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
 End Sub
 
@@ -1672,7 +1672,7 @@ Private Function GetExcelTableStyles() As Variant
 End Function
 
 Private Sub ShowAvailableCustomVars()
-    Dim dsT As dsTable, r As ScreenLib.RECT, rScreen As ScreenLib.RECT
+    Dim dsT As dsTable, r As ds3xGlobals.RECT, rScreen As ds3xGlobals.RECT
     
     If pCVarsScrollview Is Nothing Then
         Set pCVarsScrollview = New Form_DS_SCROLLVIEW
@@ -1681,8 +1681,8 @@ Private Sub ShowAvailableCustomVars()
         pCVarsScrollview.Visible = True
         ScreenLib.WindowSizeTo pCVarsScrollview, 5160, 8000
         ScreenLib.WindowAlwaysOnTop pCVarsScrollview
-        r = GetWindowRect(Me)
-        rScreen = ScreenLib.GetScreenRectOfPoint(PointInRect(r, DirectionType.Center))
+        r = ScreenLib.GetWindowRect(Me)
+        rScreen = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(r, DirectionType.Center))
         If CLng(r.Left) - CLng(rScreen.Left) > 5160 And r.Left > rScreen.Left Then
             ScreenLib.WindowMoveTo pCVarsScrollview, CLng(r.Left) - 5160, CLng(r.Top)
         ElseIf CLng(rScreen.Right) - CLng(r.Right) > 5160 And rScreen.Right > r.Right Then

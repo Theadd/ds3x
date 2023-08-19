@@ -1,4 +1,12 @@
-﻿Attribute VB_Name = "ScreenLib"
+﻿VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "ScreenLib"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
 ' ScreenLib Module
 Option Compare Database
 Option Explicit
@@ -8,7 +16,7 @@ Option Explicit
 
 Private Declare PtrSafe Function SetForegroundWindow Lib "user32" (ByVal hWnd As LongPtr) As Long
 Private Declare PtrSafe Function GetForegroundWindow Lib "user32.dll" () As LongPtr
-Public Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
+Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function GetClassName32 Lib "user32" Alias "GetClassNameA" (ByVal hWnd As LongPtr, ByVal lpClassName As String, ByVal nMaxCount As LongPtr) As Long
 
 Private Declare PtrSafe Function IsZoomed Lib "user32" (ByVal hWnd As LongPtr) As Integer
@@ -17,8 +25,8 @@ Private Declare PtrSafe Function IsIconic Lib "user32" (ByVal hWnd As LongPtr) A
 Private Declare PtrSafe Function GetClientRect Lib "user32" (ByVal hWnd As LongPtr, lpRect As RECT) As Long
 Private Declare PtrSafe Function GetWindowRect32 Lib "user32" Alias "GetWindowRect" (ByVal hWnd As LongPtr, lpRect As RECT) As Long
 
-Public Declare PtrSafe Function ClientToScreen Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
-Public Declare PtrSafe Function ScreenToClient Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
+Private Declare PtrSafe Function ClientToScreen Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
+Private Declare PtrSafe Function ScreenToClient Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
 
 Private Declare PtrSafe Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As Long
 Private Declare PtrSafe Function SetCursorPos Lib "user32" (ByVal X As Long, ByVal Y As Long) As Long
@@ -30,7 +38,7 @@ Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As LongPtr, 
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As LongPtr, ByVal nIndex As Long) As Long
 
 Private Declare PtrSafe Function GetWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal wCmd As Long) As LongPtr
-Public Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
+Private Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
@@ -88,24 +96,7 @@ Private Type SIZE
         cY As Long
 End Type
 
-Public Type POINTAPI
-    X As Long
-    Y As Long
-End Type
 
-Public Type RECT
-    Left As Long
-    Top As Long
-    Right As Long
-    Bottom As Long
-End Type
-
-Public Type BOUNDS
-    X As Long
-    Y As Long
-    W As Long
-    h As Long
-End Type
 
 Public Enum DirectionType
     Center = 0
@@ -130,16 +121,7 @@ Private pMdiHwnd As LongPtr
 Private pDesktopHwnd As LongPtr
 Private pItem As Variant
 
-''''''''''''''''' ACCESS WINDOW HIDE / SHOW '''''''''''''''''''''
 
-
-Global Const SW_HIDE = 0
-Global Const SW_SHOWNORMAL = 1
-Global Const SW_SHOWMINIMIZED = 2
-Global Const SW_SHOWMAXIMIZED = 3
-Global Const SW_SHOW = 5
-'Forces a top-level window onto the taskbar when the window is visible.
-Public Const WS_EX_APPWINDOW As Long = &H40000
 
 ' --- MONITORS ----
 
@@ -706,3 +688,4 @@ End Function
 
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+

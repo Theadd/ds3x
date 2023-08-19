@@ -21,7 +21,7 @@ Begin Form
     Width =14542
     DatasheetFontHeight =11
     ItemSuffix =1572
-    Left =4065
+    Left =3225
     Top =3030
     Right =28545
     Bottom =15225
@@ -506,10 +506,10 @@ Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Propert
 
 
 Private Sub Form_Load()
-    ScreenLib_Resync
+    ScreenLib.ScreenLib_Resync
     
-    WindowSizeTo Me, 22050, 11000
-    WindowCenterTo Me, ScreenLib.PrimaryScreen
+    ScreenLib.WindowSizeTo Me, 22050, 11000
+    ScreenLib.WindowCenterTo Me, ScreenLib.PrimaryScreen
 
     Me.TimerInterval = 1
 End Sub
