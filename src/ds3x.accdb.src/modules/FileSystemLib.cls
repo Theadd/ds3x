@@ -19,7 +19,42 @@ Option Explicit
 
 Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal milliseconds As LongPtr)
 Private Declare PtrSafe Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hWnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+Private Declare PtrSafe Sub CopyMemory Lib "Kernel32.dll" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
 
+#If Win64 Then
+    Private Declare PtrSafe Sub GlobalMemoryStatusEx Lib "kernel32" (lpBuffer As MEMORYSTATUS)
+
+    Private Type LARGE_INTEGER
+        LowPart As Long
+        HighPart As Long
+    End Type
+
+    Private Type MEMORYSTATUS
+       dwLength As Long
+       dwMemoryLoad As Long
+       dwTotalPhys As LARGE_INTEGER
+       dwAvailPhys As LARGE_INTEGER
+       dwTotalPageFile As LARGE_INTEGER
+       dwAvailPageFile As LARGE_INTEGER
+       dwTotalVirtual As LARGE_INTEGER
+       dwAvailVirtual As LARGE_INTEGER
+       dwAvailExtendedVirtual As LARGE_INTEGER
+    End Type
+#Else
+    Private Declare PtrSafe Sub GlobalMemoryStatus Lib "kernel32" (lpBuffer As MEMORYSTATUS)
+    
+    Private Type MEMORYSTATUS
+       dwLength As Long
+       dwMemoryLoad As Long
+       dwTotalPhys As Long
+       dwAvailPhys As Long
+       dwTotalPageFile As Long
+       dwAvailPageFile As Long
+       dwTotalVirtual As Long
+       dwAvailVirtual As Long
+    End Type
+#End If
+    
 Private pFSO As Scripting.FileSystemObject
 
 
@@ -475,4 +510,101 @@ Private Function PathResolve(ByVal Path As String, Optional ByVal RelativeTo As 
         PathResolve = FSO.GetAbsolutePathName(FSO.BuildPath(RelativeTo, Path))
     End If
 End Function
+
+
+' --- Memory Usage ---
+
+#If Win64 Then
+
+    Public Function GetAvailableVirtualMemory() As Long
+        On Error GoTo Finally
+        Dim Mem As MEMORYSTATUS
+    
+        Mem.dwLength = LenB(Mem)
+        GlobalMemoryStatusEx Mem
+    
+        GetAvailableVirtualMemory = BytesToMB(Mem.dwAvailVirtual)
+Finally:
+    End Function
+    
+    Private Function LargeIntToCurrency(liInput As LARGE_INTEGER) As Currency
+        CopyMemory LargeIntToCurrency, liInput, LenB(liInput)
+        LargeIntToCurrency = LargeIntToCurrency * 10000
+    End Function
+
+    Private Function BytesToMB(RawValue As LARGE_INTEGER) As Long
+        Dim Value As Currency
+        Value = LargeIntToCurrency(RawValue)
+        Select Case Value
+            Case Is > (2 ^ 20)
+                BytesToMB = CLng(CStr(Round(Value / (2 ^ 20), 2)))
+            Case Else
+                BytesToMB = 0
+        End Select
+    End Function
+
+#Else
+
+    Public Function GetAvailableVirtualMemory() As Long
+        On Error GoTo Finally
+        Dim Mem As MEMORYSTATUS
+    
+        Mem.dwLength = LenB(Mem)
+        GlobalMemoryStatus Mem
+    
+        GetAvailableVirtualMemory = BytesToMB(Mem.dwAvailVirtual)
+Finally:
+    End Function
+    
+    Private Function BytesToMB(Value As Long) As Long
+        Select Case Value
+            Case Is > (2 ^ 20)
+                BytesToMB = CLng(CStr(Round(Value / (2 ^ 20), 2)))
+            Case Else
+                BytesToMB = 0
+        End Select
+    End Function
+
+#End If
+
+Public Sub ShowMemStats()
+    Dim Mem As MEMORYSTATUS
+    Mem.dwLength = LenB(Mem)
+#If Win64 Then
+    GlobalMemoryStatusEx Mem
+#Else
+    GlobalMemoryStatus Mem
+#End If
+    Debug.Print "Memory load:", , Mem.dwMemoryLoad; "%"
+    Debug.Print
+    Debug.Print "Total physical memory:", BytesToMB(Mem.dwTotalPhys)
+    Debug.Print "Physical memory free: ", BytesToMB(Mem.dwAvailPhys)
+    Debug.Print
+    Debug.Print "Total paging file:", BytesToMB(Mem.dwTotalPageFile)
+    Debug.Print "Paging file  free: ", BytesToMB(Mem.dwAvailPageFile)
+    Debug.Print
+    Debug.Print "Total virtual memory:", BytesToMB(Mem.dwTotalVirtual)
+    Debug.Print "Virtual memory free: ", BytesToMB(Mem.dwAvailVirtual)
+#If Win64 Then
+    Debug.Print "Virtual memory free: ", BytesToMB(Mem.dwAvailExtendedVirtual)
+#End If
+End Sub
+
+
+' --- System Clipboard ---
+
+' Read/Write to Clipboard. Source: ExcelHero.com (Daniel Ferry)
+Public Function SystemClipboard(Optional StoreText As String) As String
+    Dim X As Variant: X = StoreText ' 64-bit support
+
+    With CreateObject("htmlfile")
+        With .parentWindow.clipboardData
+            Select Case True
+                Case Len(StoreText): .SetData "text", X
+                Case Else: SystemClipboard = .GetData("text")
+            End Select
+        End With
+    End With
+End Function
+
 

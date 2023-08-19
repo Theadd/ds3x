@@ -97,8 +97,6 @@ Private Type SIZE
     cY As Long
 End Type
 
-
-
 Public Enum DirectionType
     Center = 0
     North = 1
@@ -123,7 +121,6 @@ Private pDesktopHwnd As LongPtr
 Private pItem As Variant
 
 
-
 ' --- MONITORS ----
 
 Private PrimaryScreenRect As RECT
@@ -131,6 +128,7 @@ Private SecondaryScreenRect As RECT
 Private VirtualScreenRect As RECT
 Private TotalScreenMonitors As Long
 Private SecondaryScreenDirection As DirectionType
+
 
 ' --- MOUSE CURSORS ----
 
@@ -140,6 +138,21 @@ Private pMouseBusyCursor As LongPtr
 Private pMouseLoadingCursor As LongPtr
 Private pMouseUnavailableCursor As LongPtr
 Private pMouseHelpCursor As LongPtr
+
+
+' --- FORM CONTROLS STYLING ---
+
+Private Const SC_GRAYED_COLOR As Long = 15461355
+Private Const SC_GRAYED_SHADE As Long = 92
+Private Const SC_GRAYED_THEME As Long = 1
+Private Const SC_GRAYED_TINT As Long = 100
+
+Private Const SC_WHITE_COLOR As Long = 16777215
+Private Const SC_WHITE_SHADE As Long = 100
+Private Const SC_WHITE_THEME As Long = 1
+Private Const SC_WHITE_TINT As Long = 100
+
+Private Const SC_INVALID_COLOR As Long = 2366701
 
 
 ' --- PROPERTIES ---
@@ -446,17 +459,13 @@ Public Sub WindowHide(f As Access.Form): ShowWindow f.hWnd, SW_HIDE: End Sub
 Public Sub WindowShow(f As Access.Form): ShowWindow f.hWnd, SW_SHOW: End Sub
 
 Public Sub WindowLockFlickering(f As Access.Form)
-    Debug.Print "IN WindowLockFlickering"
     LockWindowUpdate GetTopParentForm(f).hWnd
 End Sub
 
 Public Sub WindowUnlockFlickering()
     LockWindowUpdate 0
-    Debug.Print "IN WindowUnlockFlickering"
 End Sub
 
-
-' TODO: Refactor existing function from AppLib module and move it here. (also other window/screen-related functions too)
 Private Function GetTopParentForm(ByRef TargetForm As Access.Form, Optional ByRef UpToParentHwnd As Long = -1) As Access.Form
     On Error GoTo Finally
     
@@ -501,14 +510,11 @@ End Sub
 ' --- PRIVATE ---
 
 Private Function GetControlRectInForm(t As Access.Control) As RECT
-    ' TODO: @SEE: Control.Section
     Dim p As POINTAPI: p = GetPoint
     Dim f As Access.Form: Set f = GetParentForm(t)
     
-    ' If Not IsControlInFormSection(f, acHeader, t) Then
     If t.Section <> acHeader Then
         p = AddOffsetToPoint(p, GetFormSectionAsOffset(f, acHeader))
-        ' If Not IsControlInFormSection(f, acDetail, t) Then
         If t.Section <> acDetail Then
             p = AddOffsetToPoint(p, GetFormSectionAsOffset(f, acDetail))
         End If
@@ -687,6 +693,98 @@ Private Function GetMonitorDirectionOfPoint(p As POINTAPI) As DirectionType
     End Select
 End Function
 
+
+' --- FORM CONTROLS STYLING ---
+
+Private Function SetGrayedStyle(ByRef TargetControl As Access.Control, ByVal asGrayed As Boolean)
+    Dim TargetLabel As Access.Label, styleLabel As Boolean
+
+    If TargetControl.BackColor <> IIf(asGrayed, SC_WHITE_COLOR, SC_GRAYED_COLOR) Then Exit Function
+    
+    If TryGetAttachedLabel(TargetControl, TargetLabel) Then
+        styleLabel = (TargetLabel.BackColor = TargetControl.BackColor)
+    End If
+    
+    With TargetControl
+        .BackColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+        .BackShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+        .BackThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+        .BackTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+        .BorderColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+        .BorderShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+        .BorderThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+        .BorderTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+    End With
+    
+    If styleLabel Then
+        With TargetLabel
+            .BackColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+            .BackShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+            .BackThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+            .BackTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+            .BorderColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+            .BorderShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+            .BorderThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+            .BorderTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+        End With
+    End If
+End Function
+
+Public Function SetGridlineAsValid(ByRef TargetControl As Access.Control, Optional ByVal esValido As Boolean = True) As Boolean
+    Dim TargetLabel As Access.Label
+    On Error GoTo Finally
+    
+    If Not esValido Then
+        If TargetControl.GridlineColor <> SC_INVALID_COLOR Then
+            TargetControl.Tag = CStr(TargetControl.GridlineColor)
+            TargetControl.GridlineColor = SC_INVALID_COLOR
+            If TryGetAttachedLabel(TargetControl, TargetLabel) Then
+                TargetLabel.GridlineColor = SC_INVALID_COLOR
+            End If
+        End If
+    Else
+        If TargetControl.GridlineColor = SC_INVALID_COLOR Then
+            TargetControl.GridlineColor = CLng(TargetControl.Tag)
+            If TryGetAttachedLabel(TargetControl, TargetLabel) Then
+                TargetLabel.GridlineColor = CLng(TargetControl.Tag)
+            End If
+            TargetControl.Tag = ""
+        End If
+    End If
+    
+Finally:
+    SetGridlineAsValid = esValido
+End Function
+
+Public Function SetControlAsEnabled(ByRef TargetControl As Access.Control, Optional ByVal Enable As Boolean = True) As Boolean
+    SetControlAsEnabled = Enable
+    SetGrayedStyle TargetControl, (Not Enable)
+    On Error GoTo Fallback
+    TargetControl.Locked = (Not Enable)
+    Exit Function
+Fallback:
+    TargetControl.Enabled = Enable
+End Function
+
+Public Function TryGetAttachedLabel(ByRef TargetControl As Access.Control, ByRef AttachedLabel As Access.Label) As Boolean
+    On Error GoTo MissingLabel
+    
+    If TypeName(TargetControl.Controls(0)) = "Label" Then
+        Set AttachedLabel = TargetControl.Controls(0)
+        TryGetAttachedLabel = True
+        Exit Function
+    End If
+
+MissingLabel:
+    TryGetAttachedLabel = False
+End Function
+
+
+' --- UTILITY HELPERS ---
+
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+
+
+
 
