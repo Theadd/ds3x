@@ -35,18 +35,12 @@ Public Property Get SelectedRowIndexes() As ArrayListEx: Set SelectedRowIndexes 
 Public Property Get Scrollview() As Access.Form: Set Scrollview = pScrollview: End Property
 Public Property Set Scrollview(ByRef Value As Access.Form): Set pScrollview = Value: Set pSelectionController.Scrollview = Value: End Property
 
-' BEGIN DEPRECATED
-Public Property Get NumColumnsInTable() As Long: NumColumnsInTable = Table.ColumnCount - IIf(Table.RowNumbers, 1, 0): End Property
-Public Property Get FixedColumnsOnTheLeft() As Long: FixedColumnsOnTheLeft = pFixedColumnsOnTheLeft: End Property
-' END DEPRECATED
 
 ' --- METHODS ---
 
 Private Sub Class_Initialize()
     Set pTaskController = Nothing
     Set pSelectionController = New dsGridSelectionController
-    ' DEPRECATED
-    pFixedColumnsOnTheLeft = 0
 End Sub
 
 
