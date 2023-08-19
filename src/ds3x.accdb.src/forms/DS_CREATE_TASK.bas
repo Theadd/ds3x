@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =6885
+    Top =4230
+    Right =22380
+    Bottom =14385
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1387,7 +1387,7 @@ Private Sub Form_Load()
     ScreenLib.WindowSizeTo Me, 11000, 6000
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
     ScreenLib.WindowAlwaysOnTop Me
-    SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
+    ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
 End Sub
 
 Private Sub Form_Resize()
@@ -1433,7 +1433,7 @@ Private Sub RebuildUIForTask(ByVal TaskName As String)
     Next i
 Finally:
     Me.DS_ADD_TASK_BUTTON.Caption = IIf(EditMode, "EDIT TASK", "ADD TASK")
-    SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, True
+    ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, True
 End Sub
 
 Private Sub MoveTaskTextContentToFit(ByVal NumParams As Long)

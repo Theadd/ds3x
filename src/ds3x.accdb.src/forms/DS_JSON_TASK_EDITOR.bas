@@ -24,10 +24,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =6885
+    Top =4230
+    Right =22380
+    Bottom =14385
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -534,8 +534,6 @@ Private Sub SetExpandedMode(ByVal Value As Boolean)
     If pExpandedMode <> Value Then
         pExpandedMode = Value
         ResizeToFit IIf(pExpandedMode, 6, 1)
-        ' TODO: Propagate event to properly resize parent form/section
-        'On Error Resume Next
         If Not IsSubform Then Exit Sub
         Me.Parent.ResizeFormHeaderToSize Me.Detalle.Height
     End If
@@ -583,7 +581,7 @@ Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
     pSequenceIndex = TargetIndex    ' Controller.SequenceIndex
     pOriginalValue = Encode(JSON.Stringify(Controller.RebuildSequence(pSequenceIndex)))
     Me.DS_JSON_EDITOR = pOriginalValue
-    SetGridlineAsValid Me.DS_JSON_EDITOR, True
+    ScreenLib.SetGridlineAsValid Me.DS_JSON_EDITOR, True
     
     Exit Sub
 Finally:
@@ -602,10 +600,10 @@ Private Sub ApplyChanges()
     If pOriginalValue <> "" And pOriginalValue <> sValue And Trim(sValue) <> "" Then
         Debug.Print sValue
         If TryParseJsonAsTask(sValue, d) Then
-            SetGridlineAsValid Me.DS_JSON_EDITOR, True
+            ScreenLib.SetGridlineAsValid Me.DS_JSON_EDITOR, True
             ReplaceTaskInRebuildSequence d, pSequenceIndex
         Else
-            SetGridlineAsValid Me.DS_JSON_EDITOR, False
+            ScreenLib.SetGridlineAsValid Me.DS_JSON_EDITOR, False
         End If
     End If
 End Sub
@@ -619,9 +617,6 @@ Finally:
 End Function
 
 Private Sub ReplaceTaskInRebuildSequence(ByVal Task As Scripting.Dictionary, ByVal Index As Long)
-    
-    ' TODO: Simple task validation
-    
     Controller.SetTask Task, Index
 End Sub
 

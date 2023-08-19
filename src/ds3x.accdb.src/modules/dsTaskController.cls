@@ -643,7 +643,7 @@ Private Sub VMemAnalysis(Optional ByVal Message As Variant)
     Static LastVMemFree As Long, sVMemCallCount As Long
     Dim cVMemFree As Long
     
-    cVMemFree = GetAvailableVirtualMemory()
+    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
     sVMemCallCount = sVMemCallCount + 1
     If LastVMemFree <> 0 Then
         Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
