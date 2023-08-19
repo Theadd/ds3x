@@ -51,7 +51,7 @@ Miscellaneous.
 
 <ul>
 
-  - <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> __[FileSystemLib](./docs/FileSystemLib.md)__ - *Safe, network<sup><small>(NFS)</small></sup>-load/delay aware, `FileSystemObject`-related utilities.*
+  - <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> __[FileSystemLib](./docs/FileSystemLib.md)__ - *Safe, network<sup><small>(NFS)</small></sup>-load/delay aware, `FileSystemObject`-related, clipboard and memory usage utilities.*
   - <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> __[ScreenLib](./docs/ScreenLib.md)__ - *No more messing with twips to pixels conversion. Everything you'd ever need, speaking in the same language.*
   
 </ul>
