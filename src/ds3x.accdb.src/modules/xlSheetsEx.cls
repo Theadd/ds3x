@@ -132,7 +132,7 @@ Public Function Create(Optional ByVal WorksheetName As String = "Sheet%1", Optio
             Set xWb = LoadWorkbookAt(xlApp, sTarget, Options)
             Set xWs = xWb.Worksheets(1)
         Else
-            ' TODO: Save empty worksheet to file
+            ' TODO: Throw or save empty worksheet to file
         End If
     Else
         Set xWb = xlApp.Workbooks.Add(1)

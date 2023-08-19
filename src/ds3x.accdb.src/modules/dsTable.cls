@@ -131,13 +131,9 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
             If TypeOf TableLike Is RecordsetEx Then
                 Set pTableSource = TableLike    '.Clone
                 If AutoHeaders Then Me.SetHeaders pTableSource
-                ' TODO: Uncomment
-'                Debug.Assert (TypeOf Me.Records Is Array2dEx) = True
             ElseIf TypeOf TableLike Is ADODB.Recordset Then
                 Set pTableSource = RecordsetEx.Create(C2Recordset(TableLike))
                 If AutoHeaders Then Me.SetHeaders pTableSource
-                ' TODO: Uncomment
-'                Debug.Assert (TypeOf Me.Records Is Array2dEx) = True
             ElseIf TypeOf TableLike Is ArrayListEx Then
                 Set pRecordList = TableLike
             ElseIf TypeOf TableLike Is Array2dEx Then

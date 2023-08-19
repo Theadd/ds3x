@@ -414,7 +414,6 @@ Public Function CreateNewExcelApp(Optional ByVal WorksheetName As Variant) As xl
     WorksheetName = GetParam(WorksheetName, "Sheet%1")
     
     Set xlSheet = xlSheetsEx.Create(WorksheetName)
-    'xlSheet.Protected = True
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
     
     Set CreateNewExcelApp = pTaskController.AddResource(xlSheet)
@@ -427,10 +426,8 @@ Public Function CopyToRangeInNewExcelApp(ByRef SourceTable As Variant, Optional 
     
     Set Target = SourceTable
     Set xlSheet = pTaskController.AddResource(xlSheetsEx.Create(WorksheetName))
-    'xlSheet.Protected = True
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
     Set xlRange = xlSheet.Range(RangeAddress)
-    ' TODO: EDIT True -> False
     Target.CopyToRange xlRange, True
     
     Set CopyToRangeInNewExcelApp = xlSheet
@@ -448,7 +445,6 @@ Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As V
     Else
         Set xlRange = xlSheet.Range(RangeAddress)
     End If
-    ' TODO: EDIT True -> False
     Target.CopyToRange xlRange, True, CBool(WriteHeaders)
     
     Set CopyToRange = xlSheet
