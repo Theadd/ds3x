@@ -11,10 +11,10 @@ Begin Form
     GridY =10
     Width =2777
     DatasheetFontHeight =11
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x09f591aa690ae640
@@ -72,5 +72,5 @@ Private Sub Form_Unload(Cancel As Integer)
 End Sub
 
 Private Sub Run()
-    Debug.Print "[INFO] DS_ASYNC_RUNNER.Run = " & CStr(dsAppGlobals.RunAll())
+    Debug.Print "[INFO] DS_ASYNC_RUNNER.Run = " & CStr(dsApp.RunAll())
 End Sub

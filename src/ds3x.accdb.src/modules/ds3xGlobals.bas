@@ -4,7 +4,6 @@ Option Explicit
 Option Base 0
 
 
-
 ' --- ACCESS WINDOW HIDE / SHOW ---
 
 Global Const SW_HIDE = 0
@@ -14,8 +13,6 @@ Global Const SW_SHOWMAXIMIZED = 3
 Global Const SW_SHOW = 5
 'Forces a top-level window onto the taskbar when the window is visible.
 Public Const WS_EX_APPWINDOW As Long = &H40000
-
-
 
 Public Type POINTAPI
     X As Long
@@ -37,6 +34,57 @@ Public Type BOUNDS
 End Type
 
 
+' --- Create() ---
+
+' DEPRECATED
+Public Function CreateDSLiveEd() As dsLiveEd
+    Set CreateDSLiveEd = New dsLiveEd
+End Function
+
+
+' --- Automation ---
+
+Public Function RunApplicationCommandArgs()
+    #If AutomationSupport = 1 Then
+        dsApp.ExecuteAutomationCommandArgs VBA.Command$()
+    #End If
+End Function
+
+#If AutomationSupport = 1 Then
+
+    Public Function IsTaskRunning(Optional ByVal TaskNamePattern As String = "*") As Boolean
+        If IsEmpty(dsApp.ActiveTask) Then Exit Function
+        IsTaskRunning = ((dsApp.ActiveTask(0) Like "*" & TaskNamePattern & "*") Or (dsApp.ActiveTask(1) Like "*" & TaskNamePattern & "*"))
+    End Function
+    
+    Public Function HasFailedToRunAllTasks() As Boolean
+        HasFailedToRunAllTasks = Not (IsEmpty(dsApp.FailedTask))
+    End Function
+    
+    Public Sub SetCustomVar(ByVal VarName As String, ByVal VarValue As Variant)
+        dsApp.CustomVar(VarName) = VarValue
+    End Sub
+    
+    ' Adds a preset file to the runnable tasks queue
+    Public Sub AddRunnableTask(ByVal TargetPath As String, Optional ByVal RunnableTaskName As String = "", Optional ByVal OnErrorResumeNext As Boolean = False)
+        dsApp.RunnableTasks.Add Array(TargetPath, RunnableTaskName, OnErrorResumeNext)
+    End Sub
+    
+    Public Sub ClearAllRunnableTasks()
+        dsApp.RunnableTasks.Clear
+    End Sub
+    
+    ' Sequentially executes all runnable tasks in queue
+    Public Sub RunAllAsync()
+        DoCmd.OpenForm "DS_ASYNC_RUNNER", WindowMode:=acHidden
+        Forms("DS_ASYNC_RUNNER").RunAsync
+    End Sub
+    
+    Public Function NumTasksInQueue() As Long
+        NumTasksInQueue = dsApp.RunnableTasks.Count
+    End Function
+    
+#End If
 
 
 ' --- Utility Functions ---

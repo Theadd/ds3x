@@ -1677,7 +1677,7 @@ Private Sub ShowAvailableCustomVars()
     
     If pCVarsScrollview Is Nothing Then
         Set pCVarsScrollview = New Form_DS_SCROLLVIEW
-        Set dsT = dsTable.Create(dsAppGlobals.CustomVars).SetHeaders(Array("CustomVar", "Value"))
+        Set dsT = dsTable.Create(dsApp.CustomVars).SetHeaders(Array("CustomVar", "Value"))
         
         pCVarsScrollview.Visible = True
         ScreenLib.WindowSizeTo pCVarsScrollview, 5160, 8000
