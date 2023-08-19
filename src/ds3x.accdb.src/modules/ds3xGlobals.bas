@@ -34,14 +34,6 @@ Public Type BOUNDS
 End Type
 
 
-' --- Create() ---
-
-' DEPRECATED
-Public Function CreateDSLiveEd() As dsLiveEd
-    Set CreateDSLiveEd = New dsLiveEd
-End Function
-
-
 ' --- Automation ---
 
 Public Function RunApplicationCommandArgs()

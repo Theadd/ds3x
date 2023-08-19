@@ -21,10 +21,10 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =3225
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =4395
+    Top =3045
+    Right =16575
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -963,6 +963,7 @@ Private Sub SetSelectedRows(ByVal Value As Variant)
 End Sub
 
 Private Sub Dispose()
+    On Error Resume Next
     Set pWorksheetNumbers.Viewport = Nothing
     Set pWorksheetHeaders.Viewport = Nothing
     Set pWorksheet.Viewport = Nothing

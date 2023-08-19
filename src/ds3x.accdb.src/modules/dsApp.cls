@@ -6,7 +6,7 @@ Attribute VB_Name = "dsApp"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 '@Folder("ds3x")
 Option Compare Database
 '@PredeclaredId
@@ -190,6 +190,22 @@ HandleUnknownParamter:
     End Property
 
 #End If
+
+
+' --- Create() ---
+
+Public Function Create(ByVal TargetType As String) As Object
+    Select Case TargetType
+        Case "dsLiveEd": Set Create = New dsLiveEd
+        Case "DS_SCROLLVIEW": Set Create = New Form_DS_SCROLLVIEW
+        Case "DS_LIVE_EDITOR": Set Create = New Form_DS_LIVE_EDITOR
+        Case "dbQuery": Set Create = New dbQuery
+        Case "dsComparer": Set Create = New dsComparer
+        Case "dsGridSelectionController": Set Create = New dsGridSelectionController
+        Case Else
+            Err.Raise 17, , "TargetType " & TargetType & " is invalid in dsApp.Create()."
+    End Select
+End Function
 
 
 ' --- CustomVars ---

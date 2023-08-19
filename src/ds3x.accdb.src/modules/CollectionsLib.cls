@@ -6,7 +6,7 @@ Attribute VB_Name = "CollectionsLib"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 '@Folder("ds3x.Libraries")
 Option Compare Database
 '@PredeclaredId
