@@ -12,7 +12,7 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
-' @SEE: https://github.com/cristianbuse/VBA-MemoryTools/blob/master/src/LibMemory.bas#L574
+Implements ICollectionEx
 
 
 Public Instance As Variant
@@ -29,6 +29,7 @@ Public Property Get ColumnCount() As Long
 End Property
 
 
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx: Set CreateBlank = CreateArray2dEx(RowsCount, ColumnsCount): End Function
 
 Public Function Create(Optional ByRef ArrayLike As Variant) As Array2dEx
     If IsMissing(ArrayLike) Then
@@ -67,31 +68,15 @@ Private Function CreateFromObject(ByVal ArrayLike As Object) As Array2dEx
     End If
 End Function
 
-' WRONG DESCRIPTION: Points this Array2dEx's .Instance (underlying variant array) to reference the provided ArrayLike
-' Currently, copies by value the 2d array found within ArrayLike to this .Instance
 Public Function Bind(Optional ByRef ArrayLike As Variant) As Array2dEx
     Set Bind = Me
-    ' TODO: FIXME: This overwrites the array not a pointer to an array.
-    Instance = Empty
-    
-    If Not IsMissing(ArrayLike) Then
-        If IsArray(ArrayLike) Then
-            If Is2dArray(ArrayLike) Then
-                Err.Raise 17
-                'Instance = CollectionsLib.GetArrayByRef(ArrayLike)
-            ElseIf Is1dArray(ArrayLike) Then
-                Err.Raise 13
-            End If
-        ElseIf IsObject(ArrayLike) Then
-            If TypeOf ArrayLike Is Array2dEx Then
-                Err.Raise 17
-                'Instance = CollectionsLib.GetArrayByRef(ArrayLike.Instance)
-            End If
-        End If
-    End If
+    Err.Raise 17, , "Can't perform requested operation. Binding to an immutable object is not allowed."
 End Function
 
-
+Public Function Unbind() As Array2dEx
+    Set Unbind = Me
+    Err.Raise 17, , "Can't perform requested operation. Unbinding an Array2dEx can't be done."
+End Function
 
 Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
     Set CopyToRange = Me
@@ -250,6 +235,12 @@ Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     Join.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
+Public Function AddRange(ByVal TargetArray As Array2dEx) As Array2dEx
+    Set AddRange = New Array2dEx
+    ' TODO: Implement
+    Err.Raise 17, , "Not implemented."
+End Function
+
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
     Dim t() As Variant, i As Long, c As Variant, c0 As Long
@@ -314,16 +305,8 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
     ToCSV = VBA.Join(t, vbNewLine)
 End Function
 
-Private Function ValueToCSV(ByVal Value As Variant) As String
-    Select Case VarType(Value)
-        Case vbString
-            ValueToCSV = """" & Replace(Replace(CStr(Value), """", """"""), vbCr, "") & """"
-        Case vbNull
-            ValueToCSV = ""
-        Case Else
-            ValueToCSV = CStr(Value)
-    End Select
-End Function
+Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
+
 
 ' --- OTHER ---
 
@@ -340,6 +323,16 @@ Public Sub Dispose()
     ' Instance = Empty
 End Sub
 
+Private Function ValueToCSV(ByVal Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString
+            ValueToCSV = """" & Replace(Replace(CStr(Value), """", """"""), vbCr, "") & """"
+        Case vbNull
+            ValueToCSV = ""
+        Case Else
+            ValueToCSV = CStr(Value)
+    End Select
+End Function
 
 
 ' --- UTILITIES ---
@@ -437,6 +430,7 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     End If
 End Sub
 
+
 ' --- OTHER ---
 
 Private Function CreateNumericIndexHeaders() As Variant
@@ -451,81 +445,36 @@ Private Function CreateNumericIndexHeaders() As Variant
     CreateNumericIndexHeaders = t
 End Function
 
+Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx
+    Dim t() As Variant
+
+    If RowsCount > 0 And ColumnsCount > 0 Then
+        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+    Else
+        t = CreateBlank2DArray()
+    End If
+    
+    Set CreateArray2dEx = New Array2dEx
+    CreateArray2dEx.Instance = CollectionsLib.GetArrayByRef(t)
+End Function
+
+
+' --- ICollectionEx ---
+
+Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
+Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
+Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
+Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function
+Private Function ICollectionEx_Unbind() As ICollectionEx: Set ICollectionEx_Unbind = Unbind(): End Function
+Private Sub ICollectionEx_Dispose(): Dispose: End Sub
+Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
+Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
+Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
+Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale): End Function
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'Private Sub ToDoImHere()
-'    With Range("A1").CurrentRegion.Columns("EF:EJ")
-'        .FormulaR1C1Local = .FormulaR1C1Local
-'        .NumberFormatLocal = "#.##0,00;-#.##0,00"
-'    End With
-'End Sub
-
-'Public Property Get ColumnNames() As Variant()
-'    Dim i As Long, sNames() As Variant
-'    ReDim sNames(Instance.Fields.Count - 1)
-'
-'    For i = 0 To Instance.Fields.Count - 1
-'        sNames(i) = Instance.Fields(i).Name
-'    Next i
-'
-'    ColumnNames = sNames
-'End Property
-
-'Private Function RAWCreateFromRecordset(ByVal RS As ADODB.Recordset) As Array2dEx
-'    Dim r As Long, c As Long, t() As Variant, ubRows As Long, ubCols As Long
-'
-'    ubRows = RS.RecordCount - 1
-'    ubCols = RS.Fields.Count - 1
-'    If ubRows >= 0 Then
-'        t = RS.GetRows(adGetRowsRest, adBookmarkFirst)
-'        ReDim Instance(0 To ubRows, 0 To ubCols)
-'
-'        'On Error Resume Next
-'        RS.MoveFirst
-'        For c = 0 To ubCols
-'            For r = 0 To ubRows
-'                Instance(r, c) = t(c, r)
-'            Next r
-'        Next c
-'    End If
-'
-'    Set RAWCreateFromRecordset = Me
-'End Function
-
-'Public Function RAWCopyToRange(ByVal RangeObject As Range) As Array2dEx
-'    LogMe "IN Array2dEx.RAWCopyToRange()", True
-'    Set RAWCopyToRange = Me
-'    If Not Me.Count > 0 Then Exit Function
-'
-'    With RangeObject.Resize(Me.Count, 1 + (UBound(Instance, 2) - LBound(Instance, 2)))
-'        .Value = Instance
-'        .FormulaR1C1Local = .FormulaR1C1Local
-'    End With
-'    LogMe "OUT ...RAWCopyToRange()", True
-'End Function
-
-'Private Sub ToDoImHere()
-'    With Range("A1").CurrentRegion.Columns("EF:EJ")
-'        .FormulaR1C1Local = .FormulaR1C1Local
-'        .NumberFormatLocal = "#.##0,00;-#.##0,00"
-'    End With
-'End Sub
 
