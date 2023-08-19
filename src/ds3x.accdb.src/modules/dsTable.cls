@@ -282,9 +282,10 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
         Set aX = Nothing
         cRow = cRow + 1
     End If
-    'GlobalVMemAnalysis "@dsTable.CopyToRange P0"
+    
+    ' TODO: Implement chunked copy of table source ranges when source recordset is way too large to be dealt at once in Win32 due to 2GB virtual memory limit.
     If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
-    'GlobalVMemAnalysis "@dsTable.CopyToRange P1"
+
     If pRecordArray Is Nothing Then
         On Error GoTo ErrorHandler
         rCount = pRecordList.Count

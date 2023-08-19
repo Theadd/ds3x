@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "19/08/2023 4:51:19",
-    "ExportDate": "19/08/2023 10:13:50",
+    "ExportDate": "19/08/2023 11:52:19",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -216,12 +216,12 @@
           "OtherHash": "ac58c52"
         },
         "DictionaryEx.cls": {
-          "FileHash": "6f21a3c",
-          "ExportDate": "19/08/2023 7:21:44",
-          "SourceModified": "19/08/2023 7:21:44",
-          "FilePropertiesHash": "655f965",
+          "FileHash": "70d90b2",
+          "ExportDate": "19/08/2023 11:52:19",
+          "SourceModified": "19/08/2023 11:52:19",
+          "FilePropertiesHash": "df2b02c",
           "ImportDate": "19/08/2023 4:51:16",
-          "OtherHash": "dd86394"
+          "OtherHash": "80e5c6f"
         },
         "ds3xGlobals.bas": {
           "FileHash": "24b88c6",
@@ -279,12 +279,12 @@
           "OtherHash": "f0f1adf"
         },
         "dsTable.cls": {
-          "FileHash": "7a3cd3f",
-          "ExportDate": "19/08/2023 10:13:50",
-          "SourceModified": "19/08/2023 10:13:50",
-          "FilePropertiesHash": "e0473b6",
+          "FileHash": "5fc0ba6",
+          "ExportDate": "19/08/2023 11:52:19",
+          "SourceModified": "19/08/2023 11:52:19",
+          "FilePropertiesHash": "7bb1bbe",
           "ImportDate": "19/08/2023 4:51:16",
-          "OtherHash": "8ba48d6"
+          "OtherHash": "99d0063"
         },
         "dsTaskController.cls": {
           "FileHash": "5a7881b",
@@ -332,12 +332,12 @@
           "OtherHash": "1b54f7d"
         },
         "RecordsetEx.cls": {
-          "FileHash": "64f2ca8",
-          "ExportDate": "19/08/2023 8:50:49",
-          "SourceModified": "19/08/2023 8:50:49",
-          "FilePropertiesHash": "702cb2c",
+          "FileHash": "48cf72a",
+          "ExportDate": "19/08/2023 11:52:19",
+          "SourceModified": "19/08/2023 11:52:19",
+          "FilePropertiesHash": "ff06e31",
           "ImportDate": "19/08/2023 4:51:16",
-          "OtherHash": "b1cdfd2"
+          "OtherHash": "25d2459"
         },
         "ScreenLib.bas": {
           "FileHash": "4a711e7",
