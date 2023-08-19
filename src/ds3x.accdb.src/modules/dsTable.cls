@@ -96,9 +96,11 @@ End Property
 
 Public Property Get IndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset: Set IndexRecordset = CreateIndexRecordset(PageSize, PageIndex): End Property
 Public Property Get NamedRecordset() As ADODB.Recordset: Set NamedRecordset = CreateNamedRecordset: End Property
+' DEPRECATED
 Public Property Get RowNumbers() As Boolean: On Error Resume Next: RowNumbers = (GetHeaderNames()(0) = "${#}"): End Property
 
 
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable: Set CreateBlank = CreateTable(RowsCount, ColumnsCount): End Function
 
 Public Function Create(Optional ByRef TableLike As Variant, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Set Create = New dsTable
@@ -436,6 +438,33 @@ Private Sub RebuildRecordsFromTableSource()
         Set pRecordArray = New Array2dEx
     End If
 End Sub
+
+Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
+    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
+    
+    If RowsCount > 0 And ColumnsCount > 0 Then
+        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+        Set dsT = dsTable.Create(Array2dEx.Create(t))
+    Else
+        Set aX = ArrayListEx.Create()
+        If RowsCount > 0 Then
+            For i = 0 To RowsCount - 1
+                aX.Add Array()
+            Next i
+        End If
+        Set dsT = dsTable.Create(aX)
+    End If
+    
+    If ColumnsCount > 0 Then
+        ReDim k(0 To ColumnsCount - 1)
+        For i = 0 To ColumnsCount - 1
+            k(i) = vbNullString
+        Next i
+        Set CreateTable = dsT.SetHeaders(k)
+    Else
+        Set CreateTable = dsT.SetHeaders(Array())
+    End If
+End Function
 
 Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     With xlRange

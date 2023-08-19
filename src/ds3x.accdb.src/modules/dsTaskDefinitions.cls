@@ -100,7 +100,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
     cMax = Target.ColumnCount - 1
     ReDim t(0 To iMax, 0 To cMax)
     If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
-        ColumnIndexes = ArrayRange(0, cMax)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, cMax)
     End If
     For Each v In ColumnIndexes
         colIndexes.Add CLng(v)
@@ -182,7 +182,7 @@ Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes 
     Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant
     Set Target = TargetTable
     
-    Set aX = ArrayListEx.Create(ArrayRange(0, ColumnCount(Target) - 1))
+    Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target) - 1))
     For Each c In ColumnIndexes
         aX.Remove CLng(c)
     Next c
@@ -217,7 +217,7 @@ Public Function MoveColumn(ByRef TargetTable As Variant, ByVal ColumnIndex As Va
     Set Target = TargetTable
     MoveCount = CLng(Val(GetParam(MoveCount, 1)))
 
-    Set aX = ArrayListEx.Create(ArrayRange(0, ColumnCount(Target) - 1))
+    Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target) - 1))
     aX.RemoveAt CLng(ColumnIndex)
     aX.Insert ColumnIndex + MoveCount, CLng(ColumnIndex)
     
@@ -330,7 +330,7 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
         Else
             Set LoadFromRange = pTaskController.AddResource(dsTable _
                 .Create(ArrayListEx.Create(xlRange)) _
-                .SetHeaders(ArrayRange(1, .Columns.Count)))
+                .SetHeaders(CollectionsLib.ArrayRange(1, .Columns.Count)))
         End If
     End With
 End Function

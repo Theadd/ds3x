@@ -200,6 +200,8 @@ End Property
 
 ' --- PUBLIC METHODS ---
 
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As RecordsetEx: Set CreateBlank = RecordsetEx.Create(CreateRecordset(RowsCount, 0, ColumnsCount)): End Function
+
 ' Devuelve una nueva instancia de RecordsetEx vinculada al Recordset proporcionado.
 Public Function Create(Optional ByVal TargetInstance As Variant) As RecordsetEx
     Set Create = New RecordsetEx
@@ -527,14 +529,14 @@ Attribute Search.VB_Description = "Devuelve el Recordset.Bookmark del primer/sig
     Search = -1
     If VarType(SearchCriteria) = vbString Then
         Do
-            If TryMatchSearchCriteriaIn(SearchCriteria, Instance.Fields) Then
+            If CollectionsLib.TryMatchSearchCriteriaIn(SearchCriteria, Instance.Fields) Then
                 Search = Instance.Bookmark
                 Exit Do
             End If
         Loop Until (Not TryMoveIn(SearchDirection))
     Else
         Do
-            If TryMatchSearchDefinitionIn(SearchCriteria, Instance.Fields) Then
+            If CollectionsLib.TryMatchSearchDefinitionIn(SearchCriteria, Instance.Fields) Then
                 Search = Instance.Bookmark
                 Exit Do
             End If
@@ -671,6 +673,31 @@ Private Function TryMoveIn(MoveDirection As SearchDirectionEnum) As Boolean
     TryMoveIn = (Instance.AbsolutePosition >= 0)
 MoveFail:
 End Function
+
+Private Function CreateRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
+    
+    ReDim iRow(0 To ColumnsCount - 1)
+    ReDim rValues(0 To ColumnsCount - 1)
+    
+    With rs
+        For i = LBound(iRow) To UBound(iRow)
+            iRow(i) = CStr(ColumnStartIndex + i)
+            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
+            rValues(i) = ""
+        Next i
+        .Open
+        For i = 0 To RowsCount - 1
+            .AddNew FieldList:=iRow, Values:=rValues
+        Next i
+        .MoveFirst
+    End With
+    
+    Set CreateRecordset = rs
+End Function
+
+
+' --- TYPE CASTING ---
 
 Private Function C2Date(Optional ByVal Value As Variant) As Variant
     If IsMissing(Value) Then Exit Function

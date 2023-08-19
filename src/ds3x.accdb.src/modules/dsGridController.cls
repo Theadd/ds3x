@@ -90,7 +90,7 @@ Friend Sub TriggerOnChangeEvent()
     If pTaskController.IsValidTable Then
         Set pScrollview.Table = pTaskController.Table
     Else
-        Set pScrollview.Table = CreateBlankTable(100, 0)
+        Set pScrollview.Table = dsTable.CreateBlank(100, 0)
     End If
 End Sub
 

@@ -23,7 +23,7 @@ Begin Form
     ItemSuffix =1568
     Left =3240
     Top =3045
-    Right =7365
+    Right =19860
     Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
@@ -690,25 +690,25 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
     nCols = Worksheet.MaxAvailColumns
     
     If ColumnStartIndex >= dsT.ColumnCount Then
-        Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
+        Set rX = RecordsetEx.CreateBlank(PageSize * PageCount, nCols)
     Else
         
         RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
         nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
             If nRows < PageSize * PageCount Then
-                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
-                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
+                Set dsT2 = dsT2.AddRange(dsTable.CreateBlank((PageSize * PageCount) - nRows, nCols))
                 Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
             Else
                 Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
             End If
         Else
-            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
-            Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
+            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            Set dsT3 = dsTable.CreateBlank(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
             Set dsT2 = dsT2.Join(dsT3)
             If nRows < PageSize * PageCount Then
-                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+                Set dsT2 = dsT2.AddRange(dsTable.CreateBlank((PageSize * PageCount) - nRows, nCols))
             End If
             Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
         End If
