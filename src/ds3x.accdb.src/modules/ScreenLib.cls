@@ -39,7 +39,7 @@ Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As LongPtr, 
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As LongPtr, ByVal nIndex As Long) As Long
 
 Private Declare PtrSafe Function GetWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal wCmd As Long) As LongPtr
-Private Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
+Private Declare PtrSafe Function SetShowWindow Lib "user32" Alias "ShowWindow" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
@@ -181,7 +181,7 @@ Public Property Let IsVBEMainWindowVisible(ByVal ShouldBeVisible As Boolean)
     Dim uHwnd As Long: uHwnd = Application.VBE.MainWindow.hWnd
     
     If uHwnd > 0 Then
-        ShowWindow uHwnd, IIf(ShouldBeVisible, SW_SHOW, SW_HIDE)
+        SetShowWindow uHwnd, IIf(ShouldBeVisible, SW_SHOW, SW_HIDE)
     End If
 End Property
 
@@ -339,14 +339,18 @@ End Function
 '
 Public Function SetAccessWindow(nCmdShow As Long) As Boolean
     On Error Resume Next
-    SetAccessWindow = (ShowWindow(Application.hWndAccessApp, nCmdShow) <> 0)
+    SetAccessWindow = (SetShowWindow(Application.hWndAccessApp, nCmdShow) <> 0)
+End Function
+
+Public Function ShowWindow(ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
+    ShowWindow = SetShowWindow(hWnd, nCmdShow)
 End Function
 
 Public Function HideAppWindow(frm As Access.Form)
     On Error Resume Next
     SetWindowLong frm.hWnd, GWL_EXSTYLE, GetWindowLong(frm.hWnd, GWL_EXSTYLE) Or WS_EX_APPWINDOW
-    ShowWindow Application.hWndAccessApp, SW_HIDE
-    ShowWindow frm.hWnd, SW_SHOW
+    SetShowWindow Application.hWndAccessApp, SW_HIDE
+    SetShowWindow frm.hWnd, SW_SHOW
  End Function
 
 Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWindow As Boolean = True)
@@ -363,12 +367,12 @@ Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWind
         End If
     Next i
     
-    If HideMainAccessWindow Then ShowWindow Application.hWndAccessApp, SW_HIDE
+    If HideMainAccessWindow Then SetShowWindow Application.hWndAccessApp, SW_HIDE
     
     For i = Forms.Count - 1 To 0 Step -1
         If i < Forms.Count Then
             If Forms(i).Name <> "F_TIMER" Then
-                ShowWindow Forms(i).hWnd, SW_SHOW
+                SetShowWindow Forms(i).hWnd, SW_SHOW
             End If
         End If
     Next i
@@ -377,7 +381,7 @@ End Sub
 Public Sub WindowAndTaskbarIconAsVisible(ByRef f As Access.Form)
     SetWindowLong f.hWnd, GWL_EXSTYLE, GetWindowLong(f.hWnd, GWL_EXSTYLE) Or WS_EX_APPWINDOW
     DoEvents
-    ShowWindow f.hWnd, SW_SHOW
+    SetShowWindow f.hWnd, SW_SHOW
 End Sub
 
 
@@ -454,9 +458,9 @@ Public Sub WindowCenterTo(f As Access.Form, r As RECT)
     SetWindowPos f.hWnd, HWND_TOP, CLng((c.X - (b.W / 2)) / TwipsPerPixelX), CLng((c.Y - (b.h / 2)) / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
 End Sub
 
-Public Sub WindowMaximize(f As Access.Form): ShowWindow f.hWnd, SW_SHOWMAXIMIZED: End Sub
-Public Sub WindowHide(f As Access.Form): ShowWindow f.hWnd, SW_HIDE: End Sub
-Public Sub WindowShow(f As Access.Form): ShowWindow f.hWnd, SW_SHOW: End Sub
+Public Sub WindowMaximize(f As Access.Form): SetShowWindow f.hWnd, SW_SHOWMAXIMIZED: End Sub
+Public Sub WindowHide(f As Access.Form): SetShowWindow f.hWnd, SW_HIDE: End Sub
+Public Sub WindowShow(f As Access.Form): SetShowWindow f.hWnd, SW_SHOW: End Sub
 
 Public Sub WindowLockFlickering(f As Access.Form)
     LockWindowUpdate GetTopParentForm(f).hWnd
