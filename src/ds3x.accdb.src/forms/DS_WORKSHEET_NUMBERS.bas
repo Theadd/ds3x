@@ -27,10 +27,10 @@ Begin Form
     Width =705
     DatasheetFontHeight =11
     ItemSuffix =2139
-    Left =4065
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =19860
+    Bottom =15210
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -550,6 +550,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Scrollview"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -596,7 +597,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pViewport.Scrollvi
 ' --- SETUP / BINDING ---
 
 Public Sub Setup(ByVal RowsCount As Long)
-    Set Me.Recordset = CreateBlankRecordset(RowsCount, 0, 1)
+    Set Me.Recordset = RecordsetEx.CreateBlank(RowsCount, 1).Instance
 End Sub
 
 Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long, ByRef dsT As dsTable)

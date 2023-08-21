@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Libraries"
 Option Explicit
 
 '**/
@@ -1276,6 +1277,5 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
 End Function
 
 #End If
-
 
 

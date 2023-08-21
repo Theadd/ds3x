@@ -11,10 +11,10 @@ Begin Form
     GridY =10
     Width =2777
     DatasheetFontHeight =11
-    Left =8850
-    Top =4845
-    Right =25890
-    Bottom =12720
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x09f591aa690ae640
@@ -49,6 +49,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Misc"
 Option Compare Database
 Option Explicit
 
@@ -71,5 +72,5 @@ Private Sub Form_Unload(Cancel As Integer)
 End Sub
 
 Private Sub Run()
-    Debug.Print "[INFO] DS_ASYNC_RUNNER.Run = " & CStr(dsAppGlobals.RunAll())
+    Debug.Print "[INFO] DS_ASYNC_RUNNER.Run = " & CStr(dsApp.RunAll())
 End Sub

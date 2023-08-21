@@ -7,9 +7,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
 Option Base 0
+
+Implements ICollectionEx
 
 
 Private pHeaderList As ArrayListEx
@@ -95,9 +98,9 @@ End Property
 
 Public Property Get IndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset: Set IndexRecordset = CreateIndexRecordset(PageSize, PageIndex): End Property
 Public Property Get NamedRecordset() As ADODB.Recordset: Set NamedRecordset = CreateNamedRecordset: End Property
-Public Property Get RowNumbers() As Boolean: On Error Resume Next: RowNumbers = (GetHeaderNames()(0) = "${#}"): End Property
 
 
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable: Set CreateBlank = CreateTable(RowsCount, ColumnsCount): End Function
 
 Public Function Create(Optional ByRef TableLike As Variant, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Set Create = New dsTable
@@ -130,13 +133,9 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
             If TypeOf TableLike Is RecordsetEx Then
                 Set pTableSource = TableLike    '.Clone
                 If AutoHeaders Then Me.SetHeaders pTableSource
-                ' TODO: Uncomment
-'                Debug.Assert (TypeOf Me.Records Is Array2dEx) = True
             ElseIf TypeOf TableLike Is ADODB.Recordset Then
                 Set pTableSource = RecordsetEx.Create(C2Recordset(TableLike))
                 If AutoHeaders Then Me.SetHeaders pTableSource
-                ' TODO: Uncomment
-'                Debug.Assert (TypeOf Me.Records Is Array2dEx) = True
             ElseIf TypeOf TableLike Is ArrayListEx Then
                 Set pRecordList = TableLike
             ElseIf TypeOf TableLike Is Array2dEx Then
@@ -283,9 +282,10 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
         Set aX = Nothing
         cRow = cRow + 1
     End If
-    'GlobalVMemAnalysis "@dsTable.CopyToRange P0"
+    
+    ' TODO: Implement chunked copy of table source ranges when source recordset is way too large to be dealt at once in Win32 due to 2GB virtual memory limit.
     If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
-    'GlobalVMemAnalysis "@dsTable.CopyToRange P1"
+
     If pRecordArray Is Nothing Then
         On Error GoTo ErrorHandler
         rCount = pRecordList.Count
@@ -439,6 +439,33 @@ Private Sub RebuildRecordsFromTableSource()
         Set pRecordArray = New Array2dEx
     End If
 End Sub
+
+Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
+    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
+    
+    If RowsCount > 0 And ColumnsCount > 0 Then
+        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+        Set dsT = dsTable.Create(Array2dEx.Create(t))
+    Else
+        Set aX = ArrayListEx.Create()
+        If RowsCount > 0 Then
+            For i = 0 To RowsCount - 1
+                aX.Add Array()
+            Next i
+        End If
+        Set dsT = dsTable.Create(aX)
+    End If
+    
+    If ColumnsCount > 0 Then
+        ReDim k(0 To ColumnsCount - 1)
+        For i = 0 To ColumnsCount - 1
+            k(i) = vbNullString
+        Next i
+        Set CreateTable = dsT.SetHeaders(k)
+    Else
+        Set CreateTable = dsT.SetHeaders(Array())
+    End If
+End Function
 
 Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     With xlRange
@@ -624,6 +651,22 @@ Private Function C2ExcelWorksheet(ByVal Value As Variant) As Excel.Worksheet: Se
 Private Function C2xlSheetsEx(ByVal Value As Variant) As xlSheetsEx: Set C2xlSheetsEx = Value: End Function
 Private Function C2Dictionary(ByVal Value As Variant) As Scripting.Dictionary: Set C2Dictionary = Value: End Function
 
+
+' --- ICollectionEx ---
+
+Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
+Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
+Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget, True): End Function
+Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function
+Private Function ICollectionEx_Unbind() As ICollectionEx: Set ICollectionEx_Unbind = Unbind(): End Function
+Private Sub ICollectionEx_Dispose(): Dispose: End Sub
+Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
+Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
+Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
+Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
 
 
 

@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.LiveEditor"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -488,10 +489,10 @@ Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As 
             Exit For
         End If
         If IsObject(TaskValues(i)) Then
-            Set vItem = dsAppGlobals.ApplyCustomVarsOn(TaskValues(i))
+            Set vItem = dsApp.ApplyCustomVarsOn(TaskValues(i))
         Else
             If Not IsError(TaskValues(i)) Then
-                vItem = dsAppGlobals.ApplyCustomVarsOn(TaskValues(i))
+                vItem = dsApp.ApplyCustomVarsOn(TaskValues(i))
             Else
                 vItem = TaskValues(i)
             End If
@@ -642,13 +643,12 @@ Private Sub VMemAnalysis(Optional ByVal Message As Variant)
     Static LastVMemFree As Long, sVMemCallCount As Long
     Dim cVMemFree As Long
     
-    cVMemFree = GetAvailableVirtualMemory()
+    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
     sVMemCallCount = sVMemCallCount + 1
     If LastVMemFree <> 0 Then
         Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
     End If
     LastVMemFree = cVMemFree
 End Sub
-
 
 

@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.LiveEditor.UI"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -34,18 +35,12 @@ Public Property Get SelectedRowIndexes() As ArrayListEx: Set SelectedRowIndexes 
 Public Property Get Scrollview() As Access.Form: Set Scrollview = pScrollview: End Property
 Public Property Set Scrollview(ByRef Value As Access.Form): Set pScrollview = Value: Set pSelectionController.Scrollview = Value: End Property
 
-' BEGIN DEPRECATED
-Public Property Get NumColumnsInTable() As Long: NumColumnsInTable = Table.ColumnCount - IIf(Table.RowNumbers, 1, 0): End Property
-Public Property Get FixedColumnsOnTheLeft() As Long: FixedColumnsOnTheLeft = pFixedColumnsOnTheLeft: End Property
-' END DEPRECATED
 
 ' --- METHODS ---
 
 Private Sub Class_Initialize()
     Set pTaskController = Nothing
     Set pSelectionController = New dsGridSelectionController
-    ' DEPRECATED
-    pFixedColumnsOnTheLeft = 0
 End Sub
 
 
@@ -89,7 +84,7 @@ Friend Sub TriggerOnChangeEvent()
     If pTaskController.IsValidTable Then
         Set pScrollview.Table = pTaskController.Table
     Else
-        Set pScrollview.Table = CreateBlankTable(100, 0)
+        Set pScrollview.Table = dsTable.CreateBlank(100, 0)
     End If
 End Sub
 

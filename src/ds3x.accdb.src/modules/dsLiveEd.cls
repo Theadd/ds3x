@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.LiveEditor"
 Option Compare Database
 Option Explicit
 
@@ -53,11 +54,11 @@ Public Property Let Visible(ByVal Value As Boolean)
             Set pLiveEditor = New Form_DS_LIVE_EDITOR
             Set pLiveEditor.Controller = Self
             pLiveEditor.Visible = True
-            WindowAndTaskbarIconAsVisible pLiveEditor
+            ScreenLib.WindowAndTaskbarIconAsVisible pLiveEditor
         End If
     Else
         pLiveEditor.Visible = Value
-        If Value Then WindowAndTaskbarIconAsVisible pLiveEditor
+        If Value Then ScreenLib.WindowAndTaskbarIconAsVisible pLiveEditor
     End If
 End Property
 
@@ -197,7 +198,7 @@ Public Function TryApplyOn(ByRef SourceInput As Variant, ByRef GeneratedOutput A
                 AddSource C2Object(SourceInput)
             Else
                 If VarType(SourceInput) = vbString Then
-                    If TryWaitFileExists(SourceInput, 10) Then
+                    If FileSystemLib.TryWaitFileExists(SourceInput, 10) Then
                         Set xlSheet = xlSheetsEx.Create(, SourceInput)
                         AddSource xlSheet
                     Else
@@ -323,13 +324,13 @@ Public Function SavePreset(Optional ByVal Target As Variant) As Boolean
     
     If IsMissing(Target) Then Target = pPresetFile
     If Trim(Target) <> "" Then
-        If TryWaitFolderExists(Target, 0) Then
+        If FileSystemLib.TryWaitFolderExists(Target, 0) Then
             TargetPath = Target
-            If Not TryWriteAccessOfSaveAsDialog(TargetPath, "*.json", "Save As") Then Exit Function
+            If Not FileSystemLib.TryWriteAccessOfSaveAsDialog(TargetPath, "*.json", "Save As") Then Exit Function
             Target = TargetPath
         End If
-        If Not TryWaitFileWriteAccess(Target, 20) Then Exit Function
-        If Not TryWriteTextToFile(Target, JSON.Stringify(pPresetObject, 2), True) Then Exit Function
+        If Not FileSystemLib.TryWaitFileWriteAccess(Target, 20) Then Exit Function
+        If Not FileSystemLib.TryWriteTextToFile(Target, JSON.Stringify(pPresetObject, 2), True) Then Exit Function
         pPresetFile = Target
     End If
     
@@ -349,13 +350,13 @@ Public Function ImportPreset(Optional ByVal Target As Variant) As Boolean
     
     If Not IsObject(Target) Then
         If Not Left(LTrim(Target), 1) = "{" Then
-            If TryWaitFolderExists(Target, 0) Then
-                If Not TryFileOpenDialog(TargetPath, Target) Then Exit Function
+            If FileSystemLib.TryWaitFolderExists(Target, 0) Then
+                If Not FileSystemLib.TryFileOpenDialog(TargetPath, Target) Then Exit Function
                 Target = TargetPath
             End If
-            If Not TryWaitFileExists(Target, 10) Then Exit Function
+            If Not FileSystemLib.TryWaitFileExists(Target, 10) Then Exit Function
             TargetPath = "" & Target
-            If Not TryReadAllTextInFile(Target, Aux) Then Exit Function
+            If Not FileSystemLib.TryReadAllTextInFile(Target, Aux) Then Exit Function
             Target = Aux
         End If
         If Left(LTrim(Target), 1) = "{" Then
@@ -486,5 +487,4 @@ Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean 
     
     RaiseEvent OnClose
 End Sub
-
 

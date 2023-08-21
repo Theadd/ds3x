@@ -23,7 +23,7 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =7725
+    Left =6885
     Top =4230
     Right =22380
     Bottom =14385
@@ -1191,6 +1191,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.LiveEditor"
 Option Compare Database
 Option Explicit
 
@@ -1383,10 +1384,10 @@ Private Sub DS_TASK_PARAM_1_Change()
 End Sub
 
 Private Sub Form_Load()
-    WindowSizeTo Me, 11000, 6000
+    ScreenLib.WindowSizeTo Me, 11000, 6000
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
-    WindowAlwaysOnTop Me
-    SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
+    ScreenLib.WindowAlwaysOnTop Me
+    ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
 End Sub
 
 Private Sub Form_Resize()
@@ -1432,7 +1433,7 @@ Private Sub RebuildUIForTask(ByVal TaskName As String)
     Next i
 Finally:
     Me.DS_ADD_TASK_BUTTON.Caption = IIf(EditMode, "EDIT TASK", "ADD TASK")
-    SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, True
+    ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, True
 End Sub
 
 Private Sub MoveTaskTextContentToFit(ByVal NumParams As Long)
@@ -1672,17 +1673,17 @@ Private Function GetExcelTableStyles() As Variant
 End Function
 
 Private Sub ShowAvailableCustomVars()
-    Dim dsT As dsTable, r As ScreenLib.RECT, rScreen As ScreenLib.RECT
+    Dim dsT As dsTable, r As ds3xGlobals.RECT, rScreen As ds3xGlobals.RECT
     
     If pCVarsScrollview Is Nothing Then
         Set pCVarsScrollview = New Form_DS_SCROLLVIEW
-        Set dsT = dsTable.Create(dsAppGlobals.CustomVars).SetHeaders(Array("CustomVar", "Value"))
+        Set dsT = dsTable.Create(dsApp.CustomVars).SetHeaders(Array("CustomVar", "Value"))
         
         pCVarsScrollview.Visible = True
         ScreenLib.WindowSizeTo pCVarsScrollview, 5160, 8000
         ScreenLib.WindowAlwaysOnTop pCVarsScrollview
-        r = GetWindowRect(Me)
-        rScreen = ScreenLib.GetScreenRectOfPoint(PointInRect(r, DirectionType.Center))
+        r = ScreenLib.GetWindowRect(Me)
+        rScreen = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(r, DirectionType.Center))
         If CLng(r.Left) - CLng(rScreen.Left) > 5160 And r.Left > rScreen.Left Then
             ScreenLib.WindowMoveTo pCVarsScrollview, CLng(r.Left) - 5160, CLng(r.Top)
         ElseIf CLng(rScreen.Right) - CLng(r.Right) > 5160 And rScreen.Right > r.Right Then

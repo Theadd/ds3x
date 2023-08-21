@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =3840
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =19860
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -433,6 +433,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Scrollview"
 Option Compare Database
 Option Explicit
 
@@ -522,7 +523,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long, c As Long
+    Dim r As ds3xGlobals.RECT, b As ds3xGlobals.BOUNDS, t As Long, c As Long
     
     Set Worksheet = Me.DS_WORKSHEET.Form
     Set pWorksheet.Viewport = Me
@@ -569,9 +570,9 @@ Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
         pWorksheet.Painting = False
         pWorksheetHeaders.Painting = False
         pWorksheetNumbers.Painting = False
-        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
-        WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
-        WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
+        ScreenLib.WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
         pTrackColumnSizesInCache = sView.ColumnsToLargeChangeTrack
         Set pWorksheet.Recordset = GetTrack(sView.TrackIndex, sView.PageIndex).Instance
         pWorksheet.SetupGrid sView.TrackIndex * sView.ColumnsToLargeChangeTrack, sView.PageIndex * PageSize * NumPagesInLargeChangeRows, pScrollview.Table
@@ -581,9 +582,9 @@ Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
         pWorksheetHeaders.Painting = True
         pWorksheet.Painting = True
     Else
-        WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
-        WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
-        WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheet, 0 - sView.TrackPositionModX, 0 - sView.PagePositionModY
+        ScreenLib.WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
+        ScreenLib.WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
     End If
     this = sView
 End Sub
@@ -689,25 +690,25 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
     nCols = Worksheet.MaxAvailColumns
     
     If ColumnStartIndex >= dsT.ColumnCount Then
-        Set rX = RecordsetEx.Create(CreateBlankRecordset(PageSize * PageCount, 0, nCols))
+        Set rX = RecordsetEx.CreateBlank(PageSize * PageCount, nCols)
     Else
         
         RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
         nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
             If nRows < PageSize * PageCount Then
-                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
-                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
+                Set dsT2 = dsT2.AddRange(dsTable.CreateBlank((PageSize * PageCount) - nRows, nCols))
                 Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
             Else
                 Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
             End If
         Else
-            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
-            Set dsT3 = CreateBlankTable(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
+            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            Set dsT3 = dsTable.CreateBlank(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
             Set dsT2 = dsT2.Join(dsT3)
             If nRows < PageSize * PageCount Then
-                Set dsT2 = dsT2.AddRange(CreateBlankTable((PageSize * PageCount) - nRows, nCols))
+                Set dsT2 = dsT2.AddRange(dsTable.CreateBlank((PageSize * PageCount) - nRows, nCols))
             End If
             Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
         End If

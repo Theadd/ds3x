@@ -21,7 +21,7 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =3840
+    Left =3225
     Top =3030
     Right =28545
     Bottom =15225
@@ -747,6 +747,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Scrollview"
 Option Compare Database
 Option Explicit
 
@@ -786,7 +787,7 @@ Private pReady As Boolean
 Private pLastScrollX As Variant
 Private pLastScrollY As Variant
 Private pPointerCapture As Boolean
-Private pCapturedPointerPosition As ScreenLib.POINTAPI
+Private pCapturedPointerPosition As ds3xGlobals.POINTAPI
 Private pScrollSpeedMultiplier As Long
 Private pIgnoreScrollingEvents As Boolean
 
@@ -862,7 +863,7 @@ Friend Property Let IgnoreScrollingEvents(ByVal Value As Boolean): pIgnoreScroll
 ' --- FORM EVENTS ---
 
 Private Sub Form_Load()
-    ScreenLib_Resync
+    ScreenLib.ScreenLib_Resync
     pScrollSpeedMultiplier = 1
     pLastScrollX = Array(0, 0)
     pLastScrollY = Array(0, 0)
@@ -871,8 +872,8 @@ Private Sub Form_Load()
     Setup
     
     If Not IsSubform Then
-        WindowSizeTo Me, 12000, 8000
-        WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
+        ScreenLib.WindowSizeTo Me, 12000, 8000
+        ScreenLib.WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
         
         ' SetupDevelopmentEnvironment
     End If
@@ -962,6 +963,7 @@ Private Sub SetSelectedRows(ByVal Value As Variant)
 End Sub
 
 Private Sub Dispose()
+    On Error Resume Next
     Set pWorksheetNumbers.Viewport = Nothing
     Set pWorksheetHeaders.Viewport = Nothing
     Set pWorksheet.Viewport = Nothing
@@ -1015,7 +1017,7 @@ End Sub
 ' --- SCROLLING ---
 
 Private Sub ScrollUsingLastCapturedPointerPosition()
-    Dim p As ScreenLib.POINTAPI, X As Long, Y As Long
+    Dim p As ds3xGlobals.POINTAPI, X As Long, Y As Long
 
     p = ScreenLib.GetCursorPosition
     X = p.X - pCapturedPointerPosition.X
@@ -1202,7 +1204,7 @@ Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional By
     End If
 End Sub
 
-Friend Sub TriggerClickOnSelectAll()
+Public Sub TriggerClickOnSelectAll()
     RaiseEvent OnSelectAllRequest
 End Sub
 
@@ -1243,11 +1245,10 @@ End Sub
 
 ' --- EVENTS: Internal Event Actions
 
-Friend Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
+Public Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
     Select Case KeyCode
         Case vbKeyUp, vbKeyRight, vbKeyDown, vbKeyLeft, vbKeyPageUp, vbKeyPageDown, vbKeyHome, vbKeyEnd, vbKeyEscape, vbKeyTab, vbKeyReturn
             RaiseEvent OnSelectionControlKeyDown(KeyCode, Shift)
-            Debug.Print Printf("KeyCode AFTER RAISING EVENT: %1", KeyCode)
     End Select
     
     If KeyCode = vbKeyDown Then
@@ -1268,7 +1269,7 @@ Friend Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Friend Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
+Public Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
     If KeyCode = vbKeyShift Then
         pScrollSpeedMultiplier = 1
     ElseIf pPointerCapture Then
@@ -1276,7 +1277,7 @@ Friend Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Friend Sub TriggerOnClearSelectionRequest()
+Public Sub TriggerOnClearSelectionRequest()
     RaiseEvent OnClearSelectionRequest
 End Sub
 

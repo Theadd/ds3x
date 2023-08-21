@@ -21,10 +21,10 @@ Begin Form
     Width =690
     DatasheetFontHeight =11
     ItemSuffix =1591
-    Left =4065
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =7365
+    Bottom =15210
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -532,6 +532,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Scrollview"
 Option Compare Database
 Option Explicit
 
@@ -561,7 +562,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ScreenLib.RECT, b As ScreenLib.BOUNDS, t As Long
+    Dim r As ds3xGlobals.RECT, b As ds3xGlobals.BOUNDS, t As Long
     
     Set WorksheetNumbers = Me.DS_WORKSHEET_NUMBERS.Form
     

@@ -20,10 +20,10 @@ Begin Form
     Width =1361
     DatasheetFontHeight =11
     ItemSuffix =2096
-    Left =4065
-    Top =3030
-    Right =21105
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =7365
+    Bottom =15210
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -652,6 +652,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.Misc"
 Option Compare Database
 Option Explicit
 Option Base 0
