@@ -303,24 +303,24 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
             Stop
     End Select
     
-    Select Case TaskId
-        Case "DS1", "XS1"
-            pTaskResults.RemoveAll
-            pSequenceIndex = -1
-            Set pTable = Nothing
-            Set pWorksheet = Nothing
-            MakeRebuildSequenceDirtyOn 0
-            Set pDataSources(TaskId) = Nothing
-            Select Case sourceType
-                Case "DS"
-                    Set pDataSources(TaskId) = dsT
-                    Set pTable = dsT
-                Case "XS"
-                    Set pDataSources(TaskId) = xlS
-                    Set pWorksheet = xlS
-                Case Else: Stop
-            End Select
-        Case Else
+'    Select Case TaskId
+'        Case "DS1", "XS1"
+'            pTaskResults.RemoveAll
+'            pSequenceIndex = -1
+'            Set pTable = Nothing
+'            Set pWorksheet = Nothing
+'            MakeRebuildSequenceDirtyOn 0
+'            Set pDataSources(TaskId) = Nothing
+'            Select Case sourceType
+'                Case "DS"
+'                    Set pDataSources(TaskId) = dsT
+'                    Set pTable = dsT
+'                Case "XS"
+'                    Set pDataSources(TaskId) = xlS
+'                    Set pWorksheet = xlS
+'                Case Else: Stop
+'            End Select
+'        Case Else
             If TryGetIndexOfTaskId(TaskId, Index) Then
                 MakeRebuildSequenceDirtyOn Index
                 Select Case sourceType
@@ -333,7 +333,7 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
             Else
                 Err.Raise 327, , "DataSource """ & TaskId & """ not found."
             End If
-    End Select
+'    End Select
     
     RaiseEvent OnDataSourceChange(TaskId)
 End Sub
