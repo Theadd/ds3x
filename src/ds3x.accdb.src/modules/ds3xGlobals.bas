@@ -81,39 +81,6 @@ End Function
 
 ' --- Utility Functions ---
 
-Public Function SecondsToHMS(ByVal Value As Long) As String
-    Dim hrs As Long, mins, secs, m As Integer, t As String
-    On Error GoTo Finally
-    
-    hrs = Fix(Value / 3600)
-    mins = Fix(Value / 60) Mod 60
-    secs = Fix((Value Mod 60) / 1)
-    
-    If hrs >= 2 Or (hrs = 1 And mins > 39) Then
-        t = t & " " & hrs & "h"
-        If mins >= 5 Then t = t & " " & mins & "m"
-    Else
-        If (hrs = 1 And mins <= 39) Then mins = mins + 60
-        If mins >= 1 Then
-            t = t & " " & mins & "m"
-            If mins < 15 Then t = t & " " & secs & "s"
-        Else
-            t = t & " " & secs & "s"
-        End If
-    End If
-    
-    SecondsToHMS = VBA.Mid(t, 2)
-Finally:
-End Function
-
-' USAGES: XDaysAgo(15), XDaysAgo("7 days..."), XDaysAgo("-7 in a week")
-Public Function XDaysAgo(ByVal Value As Variant, Optional ByVal DateFormat As String = "dd MMM") As String
-    If VBA.InStr(1, Value, CStr(Val(Value))) > 0 Then
-        Value = UCase(VBA.Format$(DateAdd("d", 0 - Int(Val(Value)), Date), DateFormat, vbMonday))
-    End If
-    XDaysAgo = CStr(Value)
-End Function
-
 ' USAGE: Printf("Name: %1, Age: %2", "John", 32) -> "Name: John, Age: 32"
 Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As String
     Dim parts() As String: parts = Split(mask, "%")
@@ -141,7 +108,38 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
     Printf = Join(parts, vbNullString)
 End Function
 
+'Public Function SecondsToHMS(ByVal Value As Long) As String
+'    Dim hrs As Long, mins, secs, m As Integer, t As String
+'    On Error GoTo Finally
+'
+'    hrs = Fix(Value / 3600)
+'    mins = Fix(Value / 60) Mod 60
+'    secs = Fix((Value Mod 60) / 1)
+'
+'    If hrs >= 2 Or (hrs = 1 And mins > 39) Then
+'        t = t & " " & hrs & "h"
+'        If mins >= 5 Then t = t & " " & mins & "m"
+'    Else
+'        If (hrs = 1 And mins <= 39) Then mins = mins + 60
+'        If mins >= 1 Then
+'            t = t & " " & mins & "m"
+'            If mins < 15 Then t = t & " " & secs & "s"
+'        Else
+'            t = t & " " & secs & "s"
+'        End If
+'    End If
+'
+'    SecondsToHMS = VBA.Mid(t, 2)
+'Finally:
+'End Function
 
+'' USAGES: XDaysAgo(15), XDaysAgo("7 days..."), XDaysAgo("-7 in a week")
+'Public Function XDaysAgo(ByVal Value As Variant, Optional ByVal DateFormat As String = "dd MMM") As String
+'    If VBA.InStr(1, Value, CStr(Val(Value))) > 0 Then
+'        Value = UCase(VBA.Format$(DateAdd("d", 0 - Int(Val(Value)), Date), DateFormat, vbMonday))
+'    End If
+'    XDaysAgo = CStr(Value)
+'End Function
 
 
 

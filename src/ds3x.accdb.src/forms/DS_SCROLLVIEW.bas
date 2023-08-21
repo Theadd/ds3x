@@ -21,10 +21,10 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =4395
-    Top =3045
-    Right =16575
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -1204,7 +1204,7 @@ Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional By
     End If
 End Sub
 
-Friend Sub TriggerClickOnSelectAll()
+Public Sub TriggerClickOnSelectAll()
     RaiseEvent OnSelectAllRequest
 End Sub
 
@@ -1245,11 +1245,10 @@ End Sub
 
 ' --- EVENTS: Internal Event Actions
 
-Friend Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
+Public Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
     Select Case KeyCode
         Case vbKeyUp, vbKeyRight, vbKeyDown, vbKeyLeft, vbKeyPageUp, vbKeyPageDown, vbKeyHome, vbKeyEnd, vbKeyEscape, vbKeyTab, vbKeyReturn
             RaiseEvent OnSelectionControlKeyDown(KeyCode, Shift)
-            Debug.Print Printf("KeyCode AFTER RAISING EVENT: %1", KeyCode)
     End Select
     
     If KeyCode = vbKeyDown Then
@@ -1270,7 +1269,7 @@ Friend Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Friend Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
+Public Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
     If KeyCode = vbKeyShift Then
         pScrollSpeedMultiplier = 1
     ElseIf pPointerCapture Then
@@ -1278,7 +1277,7 @@ Friend Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Friend Sub TriggerOnClearSelectionRequest()
+Public Sub TriggerOnClearSelectionRequest()
     RaiseEvent OnClearSelectionRequest
 End Sub
 

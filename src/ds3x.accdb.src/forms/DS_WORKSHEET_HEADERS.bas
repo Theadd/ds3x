@@ -21,15 +21,17 @@ Begin Form
     Width =31636
     DatasheetFontHeight =11
     ItemSuffix =1560
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =21780
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
     Caption ="dsLiveEd - TEST"
     DatasheetFontName ="Calibri"
+    OnKeyDown ="[Event Procedure]"
+    OnKeyUp ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
     OnMouseWheel ="[Event Procedure]"
@@ -2186,6 +2188,9 @@ Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
     pViewport.PropagateMouseWheel Page, Count
 End Sub
+
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyDownHandler KeyCode, Shift: End Sub
+Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyUpHandler KeyCode, Shift: End Sub
 
 
 ' --- SETUP / BINDING ---

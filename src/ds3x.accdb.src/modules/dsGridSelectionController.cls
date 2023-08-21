@@ -321,7 +321,7 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
                         ElseIf Shift = (acCtrlMask Or acShiftMask) Then ' Ctrl + Shift + ArrowDown
                             iAux = cIndex
                             cIndex = IIf(cIndex > .LastColumnIndex, .LastColumnIndex, 0)
-                            SelectionAddRows iAux, cIndex
+                            SelectionAddColumns iAux, cIndex
                             SelectionApply
                             MoveTo rIndex, cIndex, False
                         ElseIf Shift = acShiftMask Then
