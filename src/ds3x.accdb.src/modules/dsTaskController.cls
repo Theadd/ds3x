@@ -38,7 +38,7 @@ Option Base 0
 Public Event OnTableChange()
 Public Event OnDataSourceChange(ByVal dsId As String)
 Public Event OnRebuildSequenceChange()
-Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
+Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
 Public Event OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
 Public Event OnBusyChange(ByVal IsBusy As Boolean)
 
@@ -155,8 +155,8 @@ Public Sub RebuildAll()
     SequenceIndex = RebuildSequence.Count - 1
 End Sub
 
-Private Sub Rebuild(ByVal TargetIndex As Long)
-    Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx
+Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
+    Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx, bFailed As Boolean
     
     RaiseEvent OnBusyChange(True)
     VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
@@ -189,12 +189,14 @@ Private Sub Rebuild(ByVal TargetIndex As Long)
 ExitRebuild:
     RaiseEvent OnTableChange
     RaiseEvent OnBusyChange(False)
-    Exit Sub
+    Rebuild = Not bFailed
+    Exit Function
 RebuildTaskFail:
+    bFailed = True
     MakeRebuildSequenceDirtyOn pSequenceIndex
     RaiseEvent OnRebuildSequenceFail(pSequenceIndex)
     Resume ExitRebuild
-End Sub
+End Function
 
 Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Static dX As New DictionaryEx
@@ -354,16 +356,17 @@ Finally:
 End Function
 
 Private Sub SetActiveSequenceIndex(ByVal Value As Long)
+    Dim rebuildFail As Boolean
     If Value < 0 Then Exit Sub
     If Value >= RebuildSequence.Count Then Exit Sub
     On Error GoTo Finally
     
     pSequenceIndex = Value
     VMemAnalysis "@SetActiveSequenceIndex"
-    Rebuild Value
+    rebuildFail = Not Rebuild(Value)
 Finally:
     On Error GoTo 0
-    RaiseEvent OnActiveSequenceIndexChange(Value)
+    RaiseEvent OnActiveSequenceIndexChange(Value, rebuildFail)
 End Sub
 
 Private Function GetNextSequenceId(ByVal IdPrefix As String) As String

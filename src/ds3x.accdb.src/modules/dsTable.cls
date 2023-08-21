@@ -195,17 +195,17 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
                 Err.Raise 13
             End If
         ElseIf IsArray(AllHeaders) Then
+            Set colHeaders = New ArrayListEx
             If UBound(AllHeaders) >= 0 Then
                 ' Asuming a plain-text array of column names
-                Set colHeaders = New ArrayListEx
                 For i = 0 To UBound(AllHeaders)
                     colHeaders.Add CreateColumnHeader(CStr(AllHeaders(i)))
                 Next i
-                Aux = colHeaders.ToArray
-                colHeaders.Clear
-                colHeaders.Add Aux
-                Set pHeaderList = colHeaders
             End If
+            Aux = colHeaders.ToArray
+            colHeaders.Clear
+            colHeaders.Add Aux
+            Set pHeaderList = colHeaders
         End If
     End If
     
@@ -461,10 +461,12 @@ Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long
         For i = 0 To ColumnsCount - 1
             k(i) = vbNullString
         Next i
-        Set CreateTable = dsT.SetHeaders(k)
+        dsT.SetHeaders k
     Else
-        Set CreateTable = dsT.SetHeaders(Array())
+        dsT.SetHeaders Array()
     End If
+    
+    Set CreateTable = dsT
 End Function
 
 Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByVal AutoHeaders As Boolean = False) As dsTable
