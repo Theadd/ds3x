@@ -21,10 +21,10 @@ Begin Form
     Width =14542
     DatasheetFontHeight =11
     ItemSuffix =1572
-    Left =4065
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =7365
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -489,6 +489,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.LiveEditor"
 Option Compare Database
 Option Explicit
 
@@ -506,10 +507,10 @@ Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Propert
 
 
 Private Sub Form_Load()
-    ScreenLib_Resync
+    ScreenLib.ScreenLib_Resync
     
-    WindowSizeTo Me, 22050, 11000
-    WindowCenterTo Me, ScreenLib.PrimaryScreen
+    ScreenLib.WindowSizeTo Me, 22050, 11000
+    ScreenLib.WindowCenterTo Me, ScreenLib.PrimaryScreen
 
     Me.TimerInterval = 1
 End Sub

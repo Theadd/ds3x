@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -19,6 +20,7 @@ Option Base 0
 Implements IEnumerable
 Implements ICollection
 Implements IList
+Implements ICollectionEx
 
 Public Instance As ArrayList
 
@@ -60,6 +62,8 @@ Public Property Set Item(ByVal Index As Variant, Value As Variant)
     Set Instance(CLng(Index)) = Value
 End Property
 
+
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ArrayListEx: Set CreateBlank = CreateArrayListEx(RowsCount, ColumnsCount): End Function
 
 ' Returns an ArrayListEx object bound to a new ArrayList instance containing the elements
 ' found in the optional ArrayLike parameter, if specified.
@@ -463,16 +467,8 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
     ToCSV = VBA.Join(t, vbNewLine)
 End Function
 
-Private Function ValueToCSV(ByVal Value As Variant) As String
-    Select Case VarType(Value)
-        Case vbString
-            ValueToCSV = """" & Replace(Replace(CStr(Value), """", """"""), vbCr, "") & """"
-        Case vbNull
-            ValueToCSV = ""
-        Case Else
-            ValueToCSV = CStr(Value)
-    End Select
-End Function
+Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
+
 
 ' --- PRIVATE METHODS ---
 
@@ -493,6 +489,31 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
         End If
     End If
 End Sub
+
+Private Function ValueToCSV(ByVal Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString
+            ValueToCSV = """" & Replace(Replace(CStr(Value), """", """"""), vbCr, "") & """"
+        Case vbNull
+            ValueToCSV = ""
+        Case Else
+            ValueToCSV = CStr(Value)
+    End Select
+End Function
+
+Private Function CreateArrayListEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ArrayListEx
+    Dim aX As ArrayListEx, i As Long
+    Set aX = ArrayListEx.Create()
+    Set CreateArrayListEx = ArrayListEx.Create()
+
+    If ColumnsCount > 0 Then aX(ColumnsCount - 1) = Empty
+    For i = 0 To RowsCount - 1
+        CreateArrayListEx.Add aX.ToArray()
+    Next i
+End Function
+
+
+' --- TYPE CASTING ---
 
 Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
@@ -595,3 +616,25 @@ End Sub
 Private Sub IList_RemoveAt(ByVal Index As Long)
     Instance.RemoveAt Index
 End Sub
+
+
+' --- ICollectionEx ---
+
+Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
+Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
+Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
+Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function
+Private Function ICollectionEx_Unbind() As ICollectionEx: Set ICollectionEx_Unbind = Unbind(): End Function
+Private Sub ICollectionEx_Dispose(): Dispose: End Sub
+Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
+Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
+Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
+Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject): End Function
+
+
+
+
+

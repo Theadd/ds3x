@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections.Extras"
 ' dbQuery Class Module
 
 ' --- PUBLIC PROPERTIES ---
@@ -49,7 +50,7 @@ Public Property Get ConnectionString() As String
             pConnectionString = dbQuery.ConnectionString
         Else
             Dim s As String
-            s = FileSystemLib.PathCombine(Application.CurrentProject.Path, "package.json")
+            s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
             If FileSystemLib.TryGetFileInAncestors(s, 3) Then
                 If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
                     pConnectionString = DictionaryEx.Create(s)("ds3x.dbQuery.ConnectionString")
@@ -214,5 +215,3 @@ Private Sub OpenConnection()
     pConn.ConnectionTimeout = 10
     pConn.Open
 End Sub
-
-

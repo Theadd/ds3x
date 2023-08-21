@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
 
@@ -145,7 +146,7 @@ End Function
 Public Function Filter(ByVal PredicateFunction As String) As Callback
     Dim aList As Object, i As Long, eScript As Object, jsFunc As Variant
     
-    If TryParseAsJScriptFunction(PredicateFunction, "fn", jsFunc) Then
+    If CollectionsLib.TryParseAsJScriptFunction(PredicateFunction, "fn", jsFunc) Then
         Set aList = CreateObject("System.Collections.ArrayList")
         Set eScript = CreateObject("MSScriptControl.ScriptControl")
         eScript.Language = "JScript"
@@ -167,7 +168,7 @@ End Function
 Public Function Map(ByVal SelectorFunction As String) As Callback
     Dim aList As Object, i As Long, eScript As Object, jsFunc As Variant
     
-    If TryParseAsJScriptFunction(SelectorFunction, "fn", jsFunc) Then
+    If CollectionsLib.TryParseAsJScriptFunction(SelectorFunction, "fn", jsFunc) Then
         Set aList = CreateObject("System.Collections.ArrayList")
         Set eScript = CreateObject("MSScriptControl.ScriptControl")
         eScript.Language = "JScript"
@@ -188,7 +189,7 @@ End Function
 Public Function Reduce(ByVal AccumulatorFunction As String, Optional ByVal InitialValue As Variant) As Callback
     Dim aList As Object, i As Long, eScript As Object, jsFunc As Variant, iStart As Long
     
-    If TryParseAsJScriptFunction(AccumulatorFunction, "fn", jsFunc) Then
+    If CollectionsLib.TryParseAsJScriptFunction(AccumulatorFunction, "fn", jsFunc) Then
         Set aList = CreateObject("System.Collections.ArrayList")
         Set eScript = CreateObject("MSScriptControl.ScriptControl")
         eScript.Language = "JScript"

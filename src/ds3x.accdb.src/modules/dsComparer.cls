@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections.Extras"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -35,7 +36,4 @@ Fallback:
 FallbackFail:
     Resume ExitFunc
 End Function
-
-
-
 

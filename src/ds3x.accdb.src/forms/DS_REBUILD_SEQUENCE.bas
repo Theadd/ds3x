@@ -24,10 +24,10 @@ Begin Form
     Width =3248
     DatasheetFontHeight =11
     ItemSuffix =1590
-    Left =4065
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =3240
+    Top =3045
+    Right =7365
+    Bottom =15210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -1139,6 +1139,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'@Folder "ds3x.UI.LiveEditor"
 Option Compare Database
 Option Explicit
 
@@ -1179,12 +1180,12 @@ Private Sub DS_LIST_ITEM_ADD_Click()
     CloseFormIfOpen "DS_CREATE_TASK"
     DoCmd.OpenForm "DS_CREATE_TASK"
     Set frm = Forms("DS_CREATE_TASK")
-    WindowCenterTo frm, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
+    ScreenLib.WindowCenterTo frm, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
     frm.ActiveTaskName = ActiveTaskName
     frm.ActiveTaskIndex = pController.SequenceIndex
     frm.EditMode = False
     Set frm.Controller = pGridController
-    WindowAndTaskbarIconAsVisible frm
+    ScreenLib.WindowAndTaskbarIconAsVisible frm
 End Sub
 
 Private Sub DS_LIST_ITEM_EDIT_Click()
@@ -1202,12 +1203,12 @@ Private Sub ShowCreateTaskFormInEditMode(ByVal TaskIndex As Long)
     CloseFormIfOpen "DS_CREATE_TASK"
     DoCmd.OpenForm "DS_CREATE_TASK"
     Set frm = Forms("DS_CREATE_TASK")
-    WindowCenterTo frm, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
+    ScreenLib.WindowCenterTo frm, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
     frm.ActiveTaskName = ActiveTaskName
     frm.ActiveTaskIndex = TaskIndex
     frm.EditMode = True
     Set frm.Controller = pGridController
-    WindowAndTaskbarIconAsVisible frm
+    ScreenLib.WindowAndTaskbarIconAsVisible frm
 End Sub
 
 Private Sub CloseFormIfOpen(ByVal FormName As String)

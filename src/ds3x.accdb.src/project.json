@@ -1,7 +1,7 @@
 ﻿{
   "Info": {
     "Class": "clsDbProject",
-    "Description": "A lightweight MSAccess (VBA) shared library providing a dead simple abstraction in working with different sources/types of data collections to query, iterate, filter, fix/reformat, transform... Even converting to other collection types (CSV/Excel sheets, ArrayLists, 2D Arrays, Dictionaries, Recordsets, JSON, etc)."
+    "Description": "Project"
   },
   "Items": {
     "FileFormat": 12,

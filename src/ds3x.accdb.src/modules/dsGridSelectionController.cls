@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder "ds3x.LiveEditor.UI"
 Option Compare Database
 Option Explicit
 Option Base 0
@@ -320,7 +321,7 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
                         ElseIf Shift = (acCtrlMask Or acShiftMask) Then ' Ctrl + Shift + ArrowDown
                             iAux = cIndex
                             cIndex = IIf(cIndex > .LastColumnIndex, .LastColumnIndex, 0)
-                            SelectionAddRows iAux, cIndex
+                            SelectionAddColumns iAux, cIndex
                             SelectionApply
                             MoveTo rIndex, cIndex, False
                         ElseIf Shift = acShiftMask Then
@@ -487,8 +488,5 @@ Private Sub AddElementIfNotExists(ByRef aX As ArrayListEx, ByVal Value As Long)
         End If
     End If
 End Sub
-
-
-
 
 

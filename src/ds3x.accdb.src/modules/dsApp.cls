@@ -1,10 +1,18 @@
-﻿Attribute VB_Name = "dsAppGlobals"
+﻿VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "dsApp"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
+'@Folder("ds3x")
 Option Compare Database
+'@PredeclaredId
 Option Explicit
 Option Base 0
 
-
-' --- dsAppGlobals Module ---
 
 #If AutomationSupport = 1 Then
     Private pActiveTask As Variant
@@ -56,9 +64,11 @@ NoCustomVars:
     End If
 End Property
 
-
 #If AutomationSupport = 1 Then
     
+    Public Property Get ActiveTask() As Variant: ActiveTask = pActiveTask: End Property
+    Public Property Get FailedTask() As Variant: FailedTask = pFailedTask: End Property
+
     Public Property Get RunnableTasks() As ArrayListEx
         If pRunnableTasks Is Nothing Then Set pRunnableTasks = ArrayListEx.Create()
         Set RunnableTasks = pRunnableTasks
@@ -87,11 +97,11 @@ End Property
                 If Not shouldContinue Then
                     If CBool(t(2)) Then
                         shouldContinue = True   ' Where `t(2)` is the `OnErrorResumeNext` (optional) parameter provided to the `AddRunnableTask()` call.
-                        dsAppGlobals.Log("warning") = "Resuming execution after an error occurred while running the preset at " & sTarget
+                        dsApp.Log("warning") = "Resuming execution after an error occurred while running the preset at " & sTarget
                     End If
                 End If
             Else
-                dsAppGlobals.Log("error") = "Failed to import preset at " & sTarget
+                dsApp.Log("error") = "Failed to import preset at " & sTarget
             End If
             CustomVar("TaskName") = ""
             
@@ -101,7 +111,7 @@ End Property
             Else
                 pFailedTask = pActiveTask
                 pActiveTask = Empty
-                dsAppGlobals.Log("error") = "Error while running the preset at " & sTarget
+                dsApp.Log("error") = "Error while running the preset at " & sTarget
                 Exit For
             End If
         Next t
@@ -112,50 +122,17 @@ Finally:
         If pQuitOnRunAll Then Application.Quit acQuitPrompt
         Exit Property
 ErrorHandler:
-        dsAppGlobals.Log("critical") = "Unhandled error @dsAppGlobals.RunAll() - " & Err.Description
+        dsApp.Log("critical") = "Unhandled error @dsAppGlobals.RunAll() - " & Err.Description
         GoTo Finally
     End Property
     
     
-    
-    Public Function IsTaskRunning(Optional ByVal TaskNamePattern As String = "*") As Boolean
-        If IsEmpty(pActiveTask) Then Exit Function
-        IsTaskRunning = ((pActiveTask(0) Like "*" & TaskNamePattern & "*") Or (pActiveTask(1) Like "*" & TaskNamePattern & "*"))
-    End Function
-    
-    Public Function HasFailedToRunAllTasks() As Boolean
-        HasFailedToRunAllTasks = Not (IsEmpty(pFailedTask))
-    End Function
-    
-    Public Sub SetCustomVar(ByVal VarName As String, ByVal VarValue As Variant)
-        CustomVar(VarName) = VarValue
-    End Sub
-    
-    ' Adds a preset file to the runnable tasks queue
-    Public Sub AddRunnableTask(ByVal TargetPath As String, Optional ByVal RunnableTaskName As String = "", Optional ByVal OnErrorResumeNext As Boolean = False)
-        RunnableTasks.Add Array(TargetPath, RunnableTaskName, OnErrorResumeNext)
-    End Sub
-    
-    Public Sub ClearAllRunnableTasks()
-        RunnableTasks.Clear
-    End Sub
-    
-    ' Sequentially executes all runnable tasks in queue
-    Public Sub RunAllAsync()
-        DoCmd.OpenForm "DS_ASYNC_RUNNER", WindowMode:=acHidden
-        Forms("DS_ASYNC_RUNNER").RunAsync
-    End Sub
-    
-    Public Function NumTasksInQueue() As Long
-        NumTasksInQueue = RunnableTasks.Count
-    End Function
-    
-    Public Function RunApplicationCommandArgs()
-        Dim sArgs As String, vArgs As Variant, sArg As Variant, vArg As Variant, isAsync As Boolean, isExec As Boolean, isContinue As Boolean
+    Public Sub ExecuteAutomationCommandArgs(ByVal sArgs As String)
+        Dim vArgs As Variant, sArg As Variant, vArg As Variant, isAsync As Boolean, isExec As Boolean, isContinue As Boolean
         Dim aX As ArrayListEx, dX As DictionaryEx
         
-        sArgs = Trim(VBA.Command$())
-        If sArgs = "" Then Exit Function
+        sArgs = Trim(sArgs)
+        If sArgs = "" Then Exit Sub
         
         Set aX = ArrayListEx.Create()
         Set dX = DictionaryEx.Create()
@@ -196,32 +173,38 @@ ErrorHandler:
             If isAsync Then
                 RunAllAsync
             Else
-                Debug.Print "[INFO] RunAll = " & CStr(dsAppGlobals.RunAll())
+                Debug.Print "[INFO] RunAll = " & CStr(dsApp.RunAll())
             End If
         End If
         
-        Exit Function
+        Exit Sub
 HandleUnknownParamter:
         ' Abort
         Application.Quit
-    End Function
+    End Sub
 
 #Else
-    
+
     Public Property Get RunAll() As Boolean
         Err.Raise 425
     End Property
-    
-    
-    Public Function RunApplicationCommandArgs()
-        ' Ignore
-    End Function
-    
+
 #End If
 
 
-Public Function CreateDSLiveEd() As dsLiveEd
-    Set CreateDSLiveEd = New dsLiveEd
+' --- Create() ---
+
+Public Function Create(ByVal TargetType As String) As Object
+    Select Case TargetType
+        Case "dsLiveEd": Set Create = New dsLiveEd
+        Case "DS_SCROLLVIEW": Set Create = New Form_DS_SCROLLVIEW
+        Case "DS_LIVE_EDITOR": Set Create = New Form_DS_LIVE_EDITOR
+        Case "dbQuery": Set Create = New dbQuery
+        Case "dsComparer": Set Create = New dsComparer
+        Case "dsGridSelectionController": Set Create = New dsGridSelectionController
+        Case Else
+            Err.Raise 17, , "TargetType " & TargetType & " is invalid in dsApp.Create()."
+    End Select
 End Function
 
 
@@ -240,15 +223,15 @@ Private Sub InitializeCustomVars()
     pCustomVars.Add "${Username}", Nz(CreateObject("WScript.Network").UserName, "")
     pCustomVars.Add "${UserProfile}", VBA.Environ$("USERPROFILE")
     pCustomVars.Add "${Temp}", VBA.Environ$("TEMP")
-    pCustomVars.Add "${ApplicationPath}", Application.CurrentProject.Path
+    pCustomVars.Add "${ApplicationPath}", Application.CodeProject.Path
     
-    s = FileSystemLib.PathCombine(Application.CurrentProject.Path, "package.json")
+    s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
     If FileSystemLib.TryGetFileInAncestors(s, 3) Then
         If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
             On Error GoTo Finally
             Set dX = DictionaryEx.Create(DictionaryEx.Create(s)("ds3x.CustomVars"))
             For Each Item In dX
-                dsAppGlobals.CustomVar(CStr(Item(0))) = CStr(Item(1))
+                dsApp.CustomVar(CStr(Item(0))) = CStr(Item(1))
             Next Item
         End If
     End If
@@ -306,7 +289,7 @@ Private Sub AppendToLogFile(ByVal LogLevel As String, ByVal LogMessage As String
     
     On Error GoTo HandleFileMissing
     If sLogFile = vbNullString Then
-        sFile = dsAppGlobals.LoadConfig("package.json")("ds3x.LogFile")
+        sFile = dsApp.LoadConfig("package.json")("ds3x.LogFile")
         If IsEmpty(sFile) Or Trim(CStr(sFile)) = "" Then GoTo HandleFileMissing
         sLogFile = FileSystemLib.Resolve(ApplyCustomVarsOn(sFile))
     End If
@@ -331,6 +314,35 @@ Private Function GetConfigFromFile(Optional ByVal TargetFile As String = "packag
     End If
 Finally:
 End Function
+
+
+' --- Debugging ---
+
+Public Function TimerSpan() As Single
+    Static cTimer As Single
+    Dim t As Single
+    
+    t = Timer()
+    If cTimer = CSng(0) Then cTimer = t
+    TimerSpan = CSng(CLng((t - cTimer) * 1000) / 1000)
+    cTimer = t
+End Function
+
+Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant)
+    Static LastVMemFree As Long, sVMemCallCount As Long
+    Dim cVMemFree As Long, elapsedTime As String
+    
+    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
+    sVMemCallCount = sVMemCallCount + 1
+    elapsedTime = CStr(TimerSpan())
+    elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
+    
+    If LastVMemFree <> 0 Then
+        Debug.Print Printf("%6 [Global VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
+    End If
+    LastVMemFree = cVMemFree
+End Sub
+
 
 
 

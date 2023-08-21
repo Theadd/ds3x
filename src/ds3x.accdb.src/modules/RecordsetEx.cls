@@ -8,8 +8,11 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "RecordsetEx es una clase ultra-ligera, encadenable (chainable) y accesible globalmente (PredeclaredId = True) que encapsula un objeto ADODB.Recordset."
+'@Folder "ds3x.Collections"
 Option Compare Database
 Option Explicit
+
+Implements ICollectionEx
 
 ' RecordsetEx Class Module
 '
@@ -199,6 +202,8 @@ End Property
 
 ' --- PUBLIC METHODS ---
 
+Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As RecordsetEx: Set CreateBlank = RecordsetEx.Create(CreateRecordset(RowsCount, 0, ColumnsCount)): End Function
+
 ' Devuelve una nueva instancia de RecordsetEx vinculada al Recordset proporcionado.
 Public Function Create(Optional ByVal TargetInstance As Variant) As RecordsetEx
     Set Create = New RecordsetEx
@@ -211,10 +216,10 @@ Public Function Create(Optional ByVal TargetInstance As Variant) As RecordsetEx
             Set Create.Instance = CreateFromArrayList(TargetInstance.Instance)
         ElseIf TypeOf TargetInstance Is ArrayList Then
             Set Create.Instance = CreateFromArrayList(C2ArrayList(TargetInstance))
+        ' TODO: Create from: Array2dEx, dsTable, JSON
         Else
-            Debug.Print "FALLBACK in RecordsetEx.Create()"
+            ' Dirty patch
             If TypeName(TargetInstance) = "ArrayListEx" Then
-                Debug.Print "Fallback to ArrayListEx"
                 Set Create.Instance = CreateFromArrayList(TargetInstance.Instance)
             End If
         End If
@@ -305,6 +310,20 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
 Finally:
     Set GetRange = New Array2dEx
     GetRange.Instance = CollectionsLib.GetArrayByRef(t)
+End Function
+
+' NOTICE: Returns a new RecordsetEx.
+Public Function AddRange(ByVal Target As Variant) As RecordsetEx
+    Dim dsT As dsTable, dsT2 As dsTable
+    
+    Set dsT = dsTable.Create(Me, True)
+    Set dsT2 = dsTable.Create(Target, False).SetHeaders(Me)
+    Set AddRange = RecordsetEx.Create(dsT.AddRange(dsT2).NamedRecordset)
+End Function
+
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As RecordsetEx
+    Set CopyToRange = Me
+    dsTable.Create(Me, True).CopyToRange RangeObject, ApplyUserLocale, WriteHeaders
 End Function
 
 ' Devuelve un Array() de Scripting.Dictionary (@SEE: RecordsetEx.AsIterableString).
@@ -474,6 +493,12 @@ Finally:
     MoveFirst
 End Function
 
+Public Function Join(ByVal Target As RecordsetEx) As RecordsetEx
+    Set Join = RecordsetEx.Create()
+    ' TODO: Implement
+    Err.Raise 17, , "Not implemented."
+End Function
+
 ' Devuelve una nueva instancia de RecordsetEx vinculada a un Recordset.Clone() de esta Instance.
 Public Function Clone() As RecordsetEx
 Attribute Clone.VB_Description = "Devuelve una nueva instancia de RecordsetEx vinculada a un Recordset.Clone() de esta Instance."
@@ -526,14 +551,14 @@ Attribute Search.VB_Description = "Devuelve el Recordset.Bookmark del primer/sig
     Search = -1
     If VarType(SearchCriteria) = vbString Then
         Do
-            If TryMatchSearchCriteriaIn(SearchCriteria, Instance.Fields) Then
+            If CollectionsLib.TryMatchSearchCriteriaIn(SearchCriteria, Instance.Fields) Then
                 Search = Instance.Bookmark
                 Exit Do
             End If
         Loop Until (Not TryMoveIn(SearchDirection))
     Else
         Do
-            If TryMatchSearchDefinitionIn(SearchCriteria, Instance.Fields) Then
+            If CollectionsLib.TryMatchSearchDefinitionIn(SearchCriteria, Instance.Fields) Then
                 Search = Instance.Bookmark
                 Exit Do
             End If
@@ -546,7 +571,13 @@ SearchFailedToMatch:
 End Function
 
 
-' --- .ToString() & .PrintAll() ---
+' --- .ToCSV(), .ToJSON(), .ToString() & .PrintAll() ---
+
+Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
+    ToCSV = dsTable.Create(Me, True).ToCSV(Delimiter)
+End Function
+
+Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
 Public Function ToString(Optional ByVal ColumnDelimiter As String = vbTab, Optional ByVal LimitRows As Long = -1) As String
 Attribute ToString.VB_Description = "Similar al método Recordset.GetString()."
@@ -642,8 +673,10 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
-    Set Instance = Nothing
+    Dispose
 End Sub
+
+Public Sub Dispose(): Set Instance = Nothing: End Sub
 
 Private Sub MoveToShallowRecord()
     If pIsShallowCopy Then
@@ -671,15 +704,26 @@ Private Function TryMoveIn(MoveDirection As SearchDirectionEnum) As Boolean
 MoveFail:
 End Function
 
-Private Function C2Date(Optional ByVal Value As Variant) As Variant
-    If IsMissing(Value) Then Exit Function
-    On Error Resume Next
-    C2Date = Value
-    C2Date = DateValue(Value)
-End Function
-
-Private Function C2ArrayList(ByRef Value As Variant) As ArrayList
-    Set C2ArrayList = Value
+Private Function CreateRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
+    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
+    
+    ReDim iRow(0 To ColumnsCount - 1)
+    ReDim rValues(0 To ColumnsCount - 1)
+    
+    With rs
+        For i = LBound(iRow) To UBound(iRow)
+            iRow(i) = CStr(ColumnStartIndex + i)
+            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
+            rValues(i) = ""
+        Next i
+        .Open
+        For i = 0 To RowsCount - 1
+            .AddNew FieldList:=iRow, Values:=rValues
+        Next i
+        .MoveFirst
+    End With
+    
+    Set CreateRecordset = rs
 End Function
 
 Private Function CreateFromArrayList(ByRef ArrayLike As ArrayList) As ADODB.Recordset
@@ -716,6 +760,38 @@ Private Function CreateNumericIndexHeaders() As Variant
     
     CreateNumericIndexHeaders = t
 End Function
+
+
+' --- TYPE CASTING ---
+
+Private Function C2Date(Optional ByVal Value As Variant) As Variant
+    If IsMissing(Value) Then Exit Function
+    On Error Resume Next
+    C2Date = Value
+    C2Date = DateValue(Value)
+End Function
+
+Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
+Private Function C2Recordset(ByRef Value As Variant) As ADODB.Recordset: Set C2Recordset = Value: End Function
+
+
+' --- ICollectionEx ---
+
+Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
+Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
+Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
+Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(C2Recordset(Target)): End Function
+Private Function ICollectionEx_Unbind() As ICollectionEx: Set ICollectionEx_Unbind = Unbind(): End Function
+Private Sub ICollectionEx_Dispose(): Dispose: End Sub
+Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
+Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
+Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
+Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
+
+
 
 
 

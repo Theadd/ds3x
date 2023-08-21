@@ -1,12 +1,21 @@
-﻿Attribute VB_Name = "CollectionsLib"
+﻿VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "CollectionsLib"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
+'@Folder("ds3x.Libraries")
 Option Compare Database
+'@PredeclaredId
 Option Explicit
 
 '
 ' @REQUIRES:
 '   1. A reference to "Microsoft VBScript Regular Expressions 5.5"
 '
-
 
 Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
 
@@ -387,54 +396,56 @@ Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal
     ArrayRange = t
 End Function
 
-Public Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
-    
-    ReDim iRow(0 To ColumnsCount - 1)
-    ReDim rValues(0 To ColumnsCount - 1)
-    
-    With rs
-        For i = LBound(iRow) To UBound(iRow)
-            iRow(i) = CStr(ColumnStartIndex + i)
-            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
-            rValues(i) = ""
-        Next i
-        .Open
-        For i = 0 To RowsCount - 1
-            .AddNew FieldList:=iRow, Values:=rValues
-        Next i
-        .MoveFirst
-    End With
-    
-    Set CreateBlankRecordset = rs
-End Function
+'Public Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
+'    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
+'
+'    ReDim iRow(0 To ColumnsCount - 1)
+'    ReDim rValues(0 To ColumnsCount - 1)
+'
+'    With rs
+'        For i = LBound(iRow) To UBound(iRow)
+'            iRow(i) = CStr(ColumnStartIndex + i)
+'            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
+'            rValues(i) = ""
+'        Next i
+'        .Open
+'        For i = 0 To RowsCount - 1
+'            .AddNew FieldList:=iRow, Values:=rValues
+'        Next i
+'        .MoveFirst
+'    End With
+'
+'    Set CreateBlankRecordset = rs
+'End Function
 
-Public Function CreateBlankTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
-    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
-    
-    If RowsCount > 0 And ColumnsCount > 0 Then
-        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
-        Set dsT = dsTable.Create(Array2dEx.Create(t))
-    Else
-        Set aX = ArrayListEx.Create()
-        If RowsCount > 0 Then
-            For i = 0 To RowsCount - 1
-                aX.Add Array()
-            Next i
-        End If
-        Set dsT = dsTable.Create(aX)
-    End If
-    
-    If ColumnsCount > 0 Then
-        ReDim k(0 To ColumnsCount - 1)
-        For i = 0 To ColumnsCount - 1
-            k(i) = vbNullString
-        Next i
-        Set CreateBlankTable = dsT.SetHeaders(k)
-    Else
-        Set CreateBlankTable = dsT.SetHeaders(Array())
-    End If
-End Function
+'Public Function dsTable.CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
+'    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
+'
+'    If RowsCount > 0 And ColumnsCount > 0 Then
+'        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+'        Set dsT = dsTable.Create(Array2dEx.Create(t))
+'    Else
+'        Set aX = ArrayListEx.Create()
+'        If RowsCount > 0 Then
+'            For i = 0 To RowsCount - 1
+'                aX.Add Array()
+'            Next i
+'        End If
+'        Set dsT = dsTable.Create(aX)
+'    End If
+'
+'    If ColumnsCount > 0 Then
+'        ReDim k(0 To ColumnsCount - 1)
+'        For i = 0 To ColumnsCount - 1
+'            k(i) = vbNullString
+'        Next i
+'        Set dsTable.CreateBlank = dsT.SetHeaders(k)
+'    Else
+'        Set dsTable.CreateBlank = dsT.SetHeaders(Array())
+'    End If
+'End Function
+
+
 
 
 

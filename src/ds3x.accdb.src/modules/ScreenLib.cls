@@ -1,4 +1,13 @@
-﻿Attribute VB_Name = "ScreenLib"
+﻿VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "ScreenLib"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
+'@Folder "ds3x.Libraries"
 ' ScreenLib Module
 Option Compare Database
 Option Explicit
@@ -8,7 +17,7 @@ Option Explicit
 
 Private Declare PtrSafe Function SetForegroundWindow Lib "user32" (ByVal hWnd As LongPtr) As Long
 Private Declare PtrSafe Function GetForegroundWindow Lib "user32.dll" () As LongPtr
-Public Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
+Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function GetClassName32 Lib "user32" Alias "GetClassNameA" (ByVal hWnd As LongPtr, ByVal lpClassName As String, ByVal nMaxCount As LongPtr) As Long
 
 Private Declare PtrSafe Function IsZoomed Lib "user32" (ByVal hWnd As LongPtr) As Integer
@@ -17,8 +26,8 @@ Private Declare PtrSafe Function IsIconic Lib "user32" (ByVal hWnd As LongPtr) A
 Private Declare PtrSafe Function GetClientRect Lib "user32" (ByVal hWnd As LongPtr, lpRect As RECT) As Long
 Private Declare PtrSafe Function GetWindowRect32 Lib "user32" Alias "GetWindowRect" (ByVal hWnd As LongPtr, lpRect As RECT) As Long
 
-Public Declare PtrSafe Function ClientToScreen Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
-Public Declare PtrSafe Function ScreenToClient Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
+Private Declare PtrSafe Function ClientToScreen Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
+Private Declare PtrSafe Function ScreenToClient Lib "user32" (ByVal hWnd As LongPtr, lpPoint As POINTAPI) As Long
 
 Private Declare PtrSafe Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As Long
 Private Declare PtrSafe Function SetCursorPos Lib "user32" (ByVal X As Long, ByVal Y As Long) As Long
@@ -30,7 +39,7 @@ Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As LongPtr, 
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As LongPtr, ByVal nIndex As Long) As Long
 
 Private Declare PtrSafe Function GetWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal wCmd As Long) As LongPtr
-Public Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
+Private Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
@@ -84,27 +93,8 @@ Private Const HWND_BOTTOM As Long = 1        ' Places the window at the bottom o
 ' --- TYPE DEFINITIONS ---
 
 Private Type SIZE
-        cX As Long
-        cY As Long
-End Type
-
-Public Type POINTAPI
-    X As Long
-    Y As Long
-End Type
-
-Public Type RECT
-    Left As Long
-    Top As Long
-    Right As Long
-    Bottom As Long
-End Type
-
-Public Type BOUNDS
-    X As Long
-    Y As Long
-    W As Long
-    h As Long
+    cX As Long
+    cY As Long
 End Type
 
 Public Enum DirectionType
@@ -130,16 +120,6 @@ Private pMdiHwnd As LongPtr
 Private pDesktopHwnd As LongPtr
 Private pItem As Variant
 
-''''''''''''''''' ACCESS WINDOW HIDE / SHOW '''''''''''''''''''''
-
-
-Global Const SW_HIDE = 0
-Global Const SW_SHOWNORMAL = 1
-Global Const SW_SHOWMINIMIZED = 2
-Global Const SW_SHOWMAXIMIZED = 3
-Global Const SW_SHOW = 5
-'Forces a top-level window onto the taskbar when the window is visible.
-Public Const WS_EX_APPWINDOW As Long = &H40000
 
 ' --- MONITORS ----
 
@@ -149,6 +129,7 @@ Private VirtualScreenRect As RECT
 Private TotalScreenMonitors As Long
 Private SecondaryScreenDirection As DirectionType
 
+
 ' --- MOUSE CURSORS ----
 
 Private pMouseMoveCursor As LongPtr
@@ -157,6 +138,21 @@ Private pMouseBusyCursor As LongPtr
 Private pMouseLoadingCursor As LongPtr
 Private pMouseUnavailableCursor As LongPtr
 Private pMouseHelpCursor As LongPtr
+
+
+' --- FORM CONTROLS STYLING ---
+
+Private Const SC_GRAYED_COLOR As Long = 15461355
+Private Const SC_GRAYED_SHADE As Long = 92
+Private Const SC_GRAYED_THEME As Long = 1
+Private Const SC_GRAYED_TINT As Long = 100
+
+Private Const SC_WHITE_COLOR As Long = 16777215
+Private Const SC_WHITE_SHADE As Long = 100
+Private Const SC_WHITE_THEME As Long = 1
+Private Const SC_WHITE_TINT As Long = 100
+
+Private Const SC_INVALID_COLOR As Long = 2366701
 
 
 ' --- PROPERTIES ---
@@ -463,17 +459,13 @@ Public Sub WindowHide(f As Access.Form): ShowWindow f.hWnd, SW_HIDE: End Sub
 Public Sub WindowShow(f As Access.Form): ShowWindow f.hWnd, SW_SHOW: End Sub
 
 Public Sub WindowLockFlickering(f As Access.Form)
-    Debug.Print "IN WindowLockFlickering"
     LockWindowUpdate GetTopParentForm(f).hWnd
 End Sub
 
 Public Sub WindowUnlockFlickering()
     LockWindowUpdate 0
-    Debug.Print "IN WindowUnlockFlickering"
 End Sub
 
-
-' TODO: Refactor existing function from AppLib module and move it here. (also other window/screen-related functions too)
 Private Function GetTopParentForm(ByRef TargetForm As Access.Form, Optional ByRef UpToParentHwnd As Long = -1) As Access.Form
     On Error GoTo Finally
     
@@ -518,14 +510,11 @@ End Sub
 ' --- PRIVATE ---
 
 Private Function GetControlRectInForm(t As Access.Control) As RECT
-    ' TODO: @SEE: Control.Section
     Dim p As POINTAPI: p = GetPoint
     Dim f As Access.Form: Set f = GetParentForm(t)
     
-    ' If Not IsControlInFormSection(f, acHeader, t) Then
     If t.Section <> acHeader Then
         p = AddOffsetToPoint(p, GetFormSectionAsOffset(f, acHeader))
-        ' If Not IsControlInFormSection(f, acDetail, t) Then
         If t.Section <> acDetail Then
             p = AddOffsetToPoint(p, GetFormSectionAsOffset(f, acDetail))
         End If
@@ -704,5 +693,98 @@ Private Function GetMonitorDirectionOfPoint(p As POINTAPI) As DirectionType
     End Select
 End Function
 
+
+' --- FORM CONTROLS STYLING ---
+
+Private Function SetGrayedStyle(ByRef TargetControl As Access.Control, ByVal asGrayed As Boolean)
+    Dim TargetLabel As Access.Label, styleLabel As Boolean
+
+    If TargetControl.BackColor <> IIf(asGrayed, SC_WHITE_COLOR, SC_GRAYED_COLOR) Then Exit Function
+    
+    If TryGetAttachedLabel(TargetControl, TargetLabel) Then
+        styleLabel = (TargetLabel.BackColor = TargetControl.BackColor)
+    End If
+    
+    With TargetControl
+        .BackColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+        .BackShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+        .BackThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+        .BackTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+        .BorderColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+        .BorderShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+        .BorderThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+        .BorderTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+    End With
+    
+    If styleLabel Then
+        With TargetLabel
+            .BackColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+            .BackShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+            .BackThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+            .BackTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+            .BorderColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
+            .BorderShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
+            .BorderThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
+            .BorderTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
+        End With
+    End If
+End Function
+
+Public Function SetGridlineAsValid(ByRef TargetControl As Access.Control, Optional ByVal esValido As Boolean = True) As Boolean
+    Dim TargetLabel As Access.Label
+    On Error GoTo Finally
+    
+    If Not esValido Then
+        If TargetControl.GridlineColor <> SC_INVALID_COLOR Then
+            TargetControl.Tag = CStr(TargetControl.GridlineColor)
+            TargetControl.GridlineColor = SC_INVALID_COLOR
+            If TryGetAttachedLabel(TargetControl, TargetLabel) Then
+                TargetLabel.GridlineColor = SC_INVALID_COLOR
+            End If
+        End If
+    Else
+        If TargetControl.GridlineColor = SC_INVALID_COLOR Then
+            TargetControl.GridlineColor = CLng(TargetControl.Tag)
+            If TryGetAttachedLabel(TargetControl, TargetLabel) Then
+                TargetLabel.GridlineColor = CLng(TargetControl.Tag)
+            End If
+            TargetControl.Tag = ""
+        End If
+    End If
+    
+Finally:
+    SetGridlineAsValid = esValido
+End Function
+
+Public Function SetControlAsEnabled(ByRef TargetControl As Access.Control, Optional ByVal Enable As Boolean = True) As Boolean
+    SetControlAsEnabled = Enable
+    SetGrayedStyle TargetControl, (Not Enable)
+    On Error GoTo Fallback
+    TargetControl.Locked = (Not Enable)
+    Exit Function
+Fallback:
+    TargetControl.Enabled = Enable
+End Function
+
+Public Function TryGetAttachedLabel(ByRef TargetControl As Access.Control, ByRef AttachedLabel As Access.Label) As Boolean
+    On Error GoTo MissingLabel
+    
+    If TypeName(TargetControl.Controls(0)) = "Label" Then
+        Set AttachedLabel = TargetControl.Controls(0)
+        TryGetAttachedLabel = True
+        Exit Function
+    End If
+
+MissingLabel:
+    TryGetAttachedLabel = False
+End Function
+
+
+' --- UTILITY HELPERS ---
+
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+
+
+
+
