@@ -33,20 +33,25 @@ Public Function AddRowNumbers(ByRef TargetTable As Variant, Optional ByVal UseAs
     
     Set AddRowNumbers = dsTable _
                             .Create(Array2dEx.Create(t)) _
-                            .SetHeaders(ArrayListEx.Create(Array(Array(dsTable.CreateColumnHeader("${#}"))))) _
+                            .SetHeaders(ArrayListEx.Create(Array(Array(dsTable.CreateColumnHeader("#"))))) _
                             .Join(Target)
 End Function
 
-Public Function SetColumnName(ByRef TargetTable As Variant, ByVal ColumnIndex As Long, ByVal ColumnName As String) As dsTable
-    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary
+Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal ColumnName As Variant) As dsTable
+    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, e As Long, colIndexes As ArrayListEx
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    ColumnName = GetParam(ColumnName, "%1")
+    
     Set Target = TargetTable
     cH = Target.HeaderList(0)
+    Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
     
     For i = 0 To Target.ColumnCount - 1
-        If i = ColumnIndex Then
+        If colIndexes.Contains(i) Then
             Set d = cH(i)
-            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", ColumnName).Instance
+            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", dsApp.ApplyCustomVarsOn(Printf(ColumnName, i, e, i + 1, e + 1))).Instance
+            e = e + 1
         Else
             Set d = cH(i)
             Set t(0, i) = d
@@ -54,6 +59,30 @@ Public Function SetColumnName(ByRef TargetTable As Variant, ByVal ColumnIndex As
     Next i
     
     Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
+End Function
+
+Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal NumberFormat As Variant) As dsTable
+    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, colIndexes As ArrayListEx, e As Long
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    NumberFormat = GetParam(NumberFormat, "General")
+    
+    Set Target = TargetTable
+    cH = Target.HeaderList(0)
+    Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
+    ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
+    
+    For i = 0 To Target.ColumnCount - 1
+        If colIndexes.Contains(i) Then
+            Set d = cH(i)
+            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("NumberFormat", dsApp.ApplyCustomVarsOn(Printf(NumberFormat, i, e, i + 1, e + 1))).Instance
+            e = e + 1
+        Else
+            Set d = cH(i)
+            Set t(0, i) = d
+        End If
+    Next i
+    
+    Set SetNumberFormat = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
 End Function
 
 'RecordsetEx.Filter("REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'")
@@ -605,8 +634,26 @@ Private Sub AddAllTasks()
 
     AddTask "AddRowNumbers", "[Source]: Table, [FirstNumber = 1]: Long"
     
-    AddTask "SetColumnName", "[Source]: Table, ColumnIndex: Long, ColumnName: String"
+    AddTask "SetColumnName", "[Source]: Table, [ColumnIndexes]: Long|Array(), [ColumnName]: String", _
+            Description:=StringLines( _
+                "@param [ColumnIndexes] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
+                "@param [ColumnName] - The string to use for renaming that/those column/s. Supports custom vars and %1 to %4, being:", _
+                "    %1: The column index.", _
+                "    %2: the column index within the ColumnIndexes array.", _
+                "    %3 and %4: Position instead of index for %1 and %2 respectively.")
     
+    AddTask "SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
+            Description:=StringLines( _
+                "Select a single Column before picking this task to see it's current .NumberFormat value.", _
+                "", _
+                "@param [ColumnIndexes] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
+                "@param [NumberFormat] - Excel's .NumberFormat string. Supports custom vars and %1 to %4, being:", _
+                "    %1: The column index.", _
+                "    %2: the column index within the ColumnIndexes array.", _
+                "    %3 and %4: Position instead of index for %1 and %2 respectively.", _
+                "", _
+                "NOTE: This task will <u>only</u> apply <b>.NumberFormat</b> to corresponding columns in an <b>Excel.Worksheet</b> <u>just before</u> copying the data to the specified <b>Excel.Range</b>.")
+                    
     AddTask "Filter", "[Source]: Table, QueryFilter: String", _
             Usage:="{...TaskName: 'Filter', Values: [, ""REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'""]}"
     
@@ -725,6 +772,29 @@ Public Function GetRangeInWorksheet(ByRef SourceSheet As Variant, Optional ByVal
     If xlRange Is Nothing Then Set xlRange = xlSheet.UsedRange
     
     Set GetRangeInWorksheet = xlRange
+End Function
+
+Private Function AsListOfColumnIndexes(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant) As ArrayListEx
+    Dim Target As dsTable, colIndexes As ArrayListEx, v As Variant
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    Set Target = TargetTable
+    Set colIndexes = ArrayListEx.Create()
+    
+    If Not IsArray(ColumnIndexes) Then
+        If CStr(ColumnIndexes) = "" Then
+            ColumnIndexes = Array()
+        Else
+            ColumnIndexes = Array(CLng(ColumnIndexes))
+        End If
+    End If
+    If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+    End If
+    For Each v In ColumnIndexes
+        colIndexes.Add CLng(v)
+    Next v
+    
+    Set AsListOfColumnIndexes = colIndexes
 End Function
 
 Private Function GetParam(Optional ByVal Value As Variant, Optional ByVal DefaultValue As Variant) As Variant

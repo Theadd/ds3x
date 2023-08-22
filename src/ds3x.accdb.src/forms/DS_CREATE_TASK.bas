@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =6885
-    Top =4230
-    Right =22380
-    Bottom =14385
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1384,6 +1384,7 @@ Private Sub DS_TASK_PARAM_1_Change()
 End Sub
 
 Private Sub Form_Load()
+    ScreenLib.ScreenLib_Resync
     ScreenLib.WindowSizeTo Me, 11000, 6000
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
     ScreenLib.WindowAlwaysOnTop Me
@@ -1480,24 +1481,30 @@ Private Sub RefillExistingParamValues(ByVal TaskName As String, ByVal ParamIndex
 End Sub
 
 Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex As Long, ByVal TaskParams As Variant)
-    Dim Item As Variant, isRequired As Boolean
+    Dim Item As Variant, isRequired As Boolean, ParamName As String
     
     With Me.Controls("DS_TASK_PARAM_" & CStr(ParamIndex))
         .RowSourceType = "Value List"
         .RowSource = vbNullString
         .ColumnCount = 1
         .Visible = True
-        isRequired = Not (VBA.Mid$(TaskParams(ParamIndex)(0), 1, 1) = "[")
+        ParamName = TaskParams(ParamIndex)(0)
+        isRequired = Not (VBA.Mid$(ParamName, 1, 1) = "[")
         
-        If TaskParams(ParamIndex)(0) Like "*ColumnIndexes*" Then
+        '"SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
+
+        If ParamName Like "*ColumnIndexes*" Then
             If pController.SelectedColumnIndexes.Count >= 1 Then
                 .Value = JSON.Stringify(pController.SelectedColumnIndexes)
             Else
                 .Value = ""
             End If
-        ElseIf TaskParams(ParamIndex)(0) Like "*TargetFile*" Then
+        ElseIf ParamName Like "*TargetFile*" Then
             .AddItem ""
             .AddItem "< Select... >"
+        ElseIf ParamName Like "*NumberFormat*" Then
+            AddDefaultNumberFormatItems Me.Controls("DS_TASK_PARAM_" & CStr(ParamIndex))
+            .Value = GetSelectedColumnNumberFormat()
         Else
             ' Select by PARAM TYPE
             Select Case TaskParams(ParamIndex)(1)
@@ -1700,3 +1707,44 @@ End Sub
 Private Sub pCVarsScrollview_OnWindowClose(Cancel As Integer)
     Set pCVarsScrollview = Nothing
 End Sub
+
+Private Sub AddDefaultNumberFormatItems(ByVal TargetControl As Access.ComboBox)
+    With TargetControl
+        .AddItem ""
+        .AddItem "General"
+        .AddItem "@"
+        .AddItem "0"
+        .AddItem "0%"
+        .AddItem "0.00%"
+        .AddItem "#,##0.00;-#,##0.00"
+        .AddItem "m/d/yyyy"
+        .AddItem "mm/dd/yyyy"
+        .AddItem "h:mm"
+        .AddItem "h:mm:ss"
+        .AddItem "[h]:mm:ss"
+        .AddItem "mm:ss"
+        .AddItem "hh:mm"
+        .AddItem "hh:mm:ss"
+        .AddItem "m/d/yyyy h:mm"
+        .AddItem "m/d/yyyy h:mm:ss"
+        .AddItem "mm/dd/yyyy hh:mm"
+        .AddItem "mm/dd/yyyy hh:mm:ss"
+    End With
+End Sub
+
+Private Function GetSelectedColumnNumberFormat() As String
+    Dim cIndex As Long, cIndexValid As Boolean
+    On Error GoTo Finally
+    
+    With pController.SelectedColumnIndexes
+        If .Count > 0 Then
+            cIndex = CLng(.Item(0))
+            cIndexValid = True
+        End If
+    End With
+    
+    If cIndexValid Then
+        GetSelectedColumnNumberFormat = pController.Table.HeaderList(0)(cIndex)("NumberFormat")
+    End If
+Finally:
+End Function
