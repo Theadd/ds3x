@@ -191,6 +191,8 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
                 Set pHeaderList = AllHeaders
             ElseIf TypeOf AllHeaders Is Array2dEx Then
                 Set pHeaderArray = AllHeaders
+            ElseIf TypeOf AllHeaders Is Excel.Range Then
+                Set pHeaderArray = CreateColumnHeadersFromExcelRange(C2ExcelRange(AllHeaders))
             Else
                 Err.Raise 13
             End If
@@ -211,19 +213,6 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
     
     Set SetHeaders = Me
 End Function
-
-Private Function CreateColumnHeadersFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx
-    Dim i As Long, t() As Variant
-    ReDim t(0 To 0, 0 To AllFields.Count - 1)
-    
-    For i = 0 To AllFields.Count - 1
-        Set t(0, i) = CreateColumnHeaderFromRecordsetField(AllFields(i))
-    Next i
-
-    Set CreateColumnHeadersFromRecordsetFields = New Array2dEx
-    CreateColumnHeadersFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
-End Function
-
 
 
 ' Concatenate all elements of dsTable as additional columns into a new dsTable
@@ -272,6 +261,25 @@ End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
+Private Sub ApplyFormatToExcelRange(ByVal RangeObject As Excel.Range, ByVal RangeHasHeaders As Boolean)
+    Dim r As Excel.Range, i As Long, iX As Variant, dX As DictionaryEx
+    
+    If RangeHasHeaders Then
+        Set r = RangeObject.Range("A2").Resize(Me.Count, Me.ColumnCount)
+    Else
+        Set r = RangeObject.Range("A1").Resize(Me.Count, Me.ColumnCount)
+    End If
+    
+    Set dX = DictionaryEx.Create()
+    iX = Me.HeaderList(0)
+    For i = 0 To UBound(iX)
+        dX.Bind iX(i)
+        If dX("NumberFormat") <> "General" Then
+            r.Columns(i + 1).NumberFormat = dX("NumberFormat")
+        End If
+    Next i
+End Sub
+
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
     Dim aX As ArrayListEx, cRow As Long, cRange As Excel.Range, i As Long, iMax As Long, rCount As Long, bX As ArrayListEx, a2dX As Array2dEx, iNumRows As Long
     
@@ -282,6 +290,7 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
         Set aX = Nothing
         cRow = cRow + 1
     End If
+    ApplyFormatToExcelRange RangeObject, WriteHeaders
     
     ' TODO: Implement chunked copy of table source ranges when source recordset is way too large to be dealt at once in Win32 due to 2GB virtual memory limit.
     If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
@@ -473,7 +482,7 @@ Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByV
     With xlRange
         If AutoHeaders Then
             Set pRecordList = ArrayListEx.Create(.Range(.Cells(2, 1), .Cells(.Rows.Count, .Columns.Count)))
-            Me.SetHeaders ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0)
+            Me.SetHeaders xlRange
         Else
             Set pRecordList = ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(.Rows.Count, .Columns.Count)))
         End If
@@ -641,6 +650,49 @@ Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Opti
     Next c
     
     GetColumnNames = t
+End Function
+
+
+' --- Create Column Headers ---
+
+Private Function CreateColumnHeadersFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx
+    Dim i As Long, t() As Variant
+    ReDim t(0 To 0, 0 To AllFields.Count - 1)
+    
+    For i = 0 To AllFields.Count - 1
+        Set t(0, i) = CreateColumnHeaderFromRecordsetField(AllFields(i))
+    Next i
+
+    Set CreateColumnHeadersFromRecordsetFields = New Array2dEx
+    CreateColumnHeadersFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
+End Function
+
+Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
+    Dim i As Long, t() As Variant, cFormats As Variant, cNames As Variant
+    
+    With TargetRange
+        ReDim t(0 To 0, 0 To .Columns.Count - 1)
+        cNames = ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0)
+    End With
+    cFormats = xlSheetsEx.GetColumnsAutoNumberFormats(TargetRange)
+    
+    For i = 0 To UBound(cFormats)
+        Select Case UCase(Left(CStr(cFormats(i)(0)), 1))
+            Case "G"
+                Set t(0, i) = CreateColumnHeader(cNames(i))
+            Case "0", "#"
+                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Numeric")
+            Case "@"
+                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Text")
+            Case "D", "M", "Y", "H"
+                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Date")
+            Case Else
+                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0))
+        End Select
+    Next i
+
+    Set CreateColumnHeadersFromExcelRange = New Array2dEx
+    CreateColumnHeadersFromExcelRange.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
 
