@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "21/08/2023 18:29:04",
-    "ExportDate": "22/08/2023 3:04:49",
+    "ExportDate": "23/08/2023 2:41:28",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -43,12 +43,12 @@
           "OtherHash": "6c69b0c"
         },
         "DS_CREATE_TASK.bas": {
-          "FileHash": "ca025b3",
-          "ExportDate": "22/08/2023 3:04:48",
-          "SourceModified": "22/08/2023 3:04:48",
-          "FilePropertiesHash": "4d16c36",
+          "FileHash": "fa62a7e",
+          "ExportDate": "23/08/2023 2:34:43",
+          "SourceModified": "23/08/2023 2:34:43",
+          "FilePropertiesHash": "524f677",
           "ImportDate": "21/08/2023 18:29:02",
-          "OtherHash": "102c161"
+          "OtherHash": "2834f32"
         },
         "DS_JSON_TASK_EDITOR.bas": {
           "FileHash": "964b062",
@@ -75,12 +75,12 @@
           "OtherHash": "70cad79"
         },
         "DS_LIVE_EDITOR_SIDE_PANEL.bas": {
-          "FileHash": "c260a98",
-          "ExportDate": "22/08/2023 3:04:48",
-          "SourceModified": "22/08/2023 3:04:48",
-          "FilePropertiesHash": "d7bfac8",
+          "FileHash": "760016d",
+          "ExportDate": "23/08/2023 2:34:43",
+          "SourceModified": "23/08/2023 2:34:43",
+          "FilePropertiesHash": "ec20177",
           "ImportDate": "21/08/2023 18:29:02",
-          "OtherHash": "61a384c"
+          "OtherHash": "0529298"
         },
         "DS_REBUILD_SEQUENCE.bas": {
           "FileHash": "1359fc5",
@@ -99,12 +99,12 @@
           "OtherHash": "17bb42a"
         },
         "DS_SCROLLVIEW.bas": {
-          "FileHash": "28b043b",
-          "ExportDate": "22/08/2023 3:04:48",
-          "SourceModified": "22/08/2023 3:04:48",
-          "FilePropertiesHash": "51a2ec5",
+          "FileHash": "b17c0ac",
+          "ExportDate": "23/08/2023 2:41:28",
+          "SourceModified": "23/08/2023 2:41:28",
+          "FilePropertiesHash": "06270fd",
           "ImportDate": "21/08/2023 18:29:02",
-          "OtherHash": "32d9806"
+          "OtherHash": "b881ead"
         },
         "DS_VIEWPORT.bas": {
           "FileHash": "11603b6",
@@ -131,12 +131,12 @@
           "OtherHash": "6fb28cd"
         },
         "DS_WORKSHEET_HEADERS.bas": {
-          "FileHash": "634e641",
-          "ExportDate": "22/08/2023 3:04:48",
-          "SourceModified": "22/08/2023 3:04:48",
-          "FilePropertiesHash": "e5b2a77",
+          "FileHash": "4417d10",
+          "ExportDate": "23/08/2023 2:34:43",
+          "SourceModified": "23/08/2023 2:34:43",
+          "FilePropertiesHash": "552b06c",
           "ImportDate": "21/08/2023 18:29:02",
-          "OtherHash": "64ecc89"
+          "OtherHash": "88ddd7e"
         },
         "DS_WORKSHEET_NUMBERS.bas": {
           "FileHash": "9000ac5",
@@ -201,12 +201,12 @@
           "OtherHash": "bf7a725"
         },
         "CollectionsLib.cls": {
-          "FileHash": "1db28da",
-          "ExportDate": "22/08/2023 3:04:48",
-          "SourceModified": "22/08/2023 3:04:48",
-          "FilePropertiesHash": "9d575a1",
+          "FileHash": "133f656",
+          "ExportDate": "23/08/2023 2:34:43",
+          "SourceModified": "23/08/2023 2:34:43",
+          "FilePropertiesHash": "389e66b",
           "ImportDate": "21/08/2023 18:29:01",
-          "OtherHash": "1b706c5"
+          "OtherHash": "da0ab60"
         },
         "dbQuery.cls": {
           "FileHash": "954072f",
@@ -289,12 +289,12 @@
           "OtherHash": "5af646a"
         },
         "dsTaskDefinitions.cls": {
-          "FileHash": "cd052a7",
-          "ExportDate": "22/08/2023 3:04:48",
-          "SourceModified": "22/08/2023 3:04:48",
-          "FilePropertiesHash": "4a3f7a9",
+          "FileHash": "6a05619",
+          "ExportDate": "23/08/2023 2:34:43",
+          "SourceModified": "23/08/2023 2:34:43",
+          "FilePropertiesHash": "0938134",
           "ImportDate": "21/08/2023 18:29:01",
-          "OtherHash": "253ddac"
+          "OtherHash": "a22f5f1"
         },
         "FileSystemLib.bas": {
           "FileHash": "915aa9f",

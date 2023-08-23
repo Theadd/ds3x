@@ -875,7 +875,7 @@ Private Sub Form_Load()
         ScreenLib.WindowSizeTo Me, 12000, 8000
         ScreenLib.WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
         
-        ' SetupDevelopmentEnvironment
+        SetupDevelopmentEnvironment
     End If
     Me.TimerInterval = 1
 End Sub
@@ -885,8 +885,9 @@ Private Sub Form_Resize()
     If pInitialized Then
         On Error GoTo Finally
         pIgnoreScrollingEvents = True
-        UpdateScrollbarX
-        UpdateScrollbarY True
+        UpdateScrollbarX False
+        UpdateScrollbarY False
+        Viewport.ScrollTo ScrollbarX, ScrollbarY
 Finally:
         On Error Resume Next
         pIgnoreScrollingEvents = False
@@ -897,7 +898,7 @@ Private Sub Form_Timer()
     Me.TimerInterval = 0
     If pPointerCapture Then
         ScrollUsingLastCapturedPointerPosition
-        If pPointerCapture Then Me.TimerInterval = 100
+        If pPointerCapture Then Me.TimerInterval = 10
     End If
     If Not pReady Then
         pReady = True
@@ -1018,7 +1019,8 @@ End Sub
 
 Private Sub ScrollUsingLastCapturedPointerPosition()
     Dim p As ds3xGlobals.POINTAPI, X As Long, Y As Long
-
+    
+    ScreenLib.MouseMoveCursor = True
     p = ScreenLib.GetCursorPosition
     X = p.X - pCapturedPointerPosition.X
     Y = p.Y - pCapturedPointerPosition.Y
@@ -1079,8 +1081,10 @@ Public Sub ApplyScrollbarY(Optional ByVal yVal As Variant, Optional ByVal Explic
                 UpdateScrollbarY ExplicitCall
             Else
                 If .Value <> yVal Then .Value = yVal
-                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo ScrollbarX, yVal
-                pLastScrollY(0) = yVal
+                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+                    Viewport.ScrollTo ScrollbarX, yVal
+                    pLastScrollY(0) = yVal
+                End If
             End If
         End If
     End With
@@ -1111,8 +1115,10 @@ Public Sub ApplyScrollbarX(Optional ByVal xVal As Variant, Optional ByVal Explic
                 UpdateScrollbarX ExplicitCall
             Else
                 If .Value <> xVal Then .Value = xVal
-                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo xVal, ScrollbarY
-                pLastScrollX(0) = xVal
+                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+                    Viewport.ScrollTo xVal, ScrollbarY
+                    pLastScrollX(0) = xVal
+                End If
             End If
         End If
     End With
@@ -1137,10 +1143,12 @@ Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)
         .Max = yMax
         .LargeChange = IIf(pScrollPageSizeY > yMax, yMax, pScrollPageSizeY)
         .SmallChange = cellSizeY
-        If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
-            If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo ScrollbarX, .Value
-            pLastScrollY(0) = .Value
-            pLastScrollY(1) = .Max
+        If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+            If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
+                Viewport.ScrollTo ScrollbarX, .Value
+                pLastScrollY(0) = .Value
+                pLastScrollY(1) = .Max
+            End If
         End If
     End With
 End Sub
@@ -1164,10 +1172,12 @@ Private Sub UpdateScrollbarX(Optional ByVal ExplicitCall As Boolean = False)
         .Max = xMax
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
         .SmallChange = CLng(cellSizeX / 5)
-        If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
-            If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo .Value, ScrollbarY
-            pLastScrollX(0) = .Value
-            pLastScrollX(1) = .Max
+        If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+            If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
+                Viewport.ScrollTo .Value, ScrollbarY
+                pLastScrollX(0) = .Value
+                pLastScrollX(1) = .Max
+            End If
         End If
     End With
 End Sub
@@ -1300,7 +1310,7 @@ Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X,
 
 ' --- TESTING / DEVELOPMENT ---
 
-'Private Sub SetupDevelopmentEnvironment()
-'    pEnableOutOfRangeScrolling = True
-'    Set Table = CreateSampleTable
-'End Sub
+Private Sub SetupDevelopmentEnvironment()
+    pEnableOutOfRangeScrolling = True
+    Set Table = dsTable.CreateBlank(10, 0)
+End Sub
