@@ -281,6 +281,31 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     GetRange.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
+' Returns an Array2dEx containing only those rows specified in the RowIndexes array.
+' Can also be used for: Reordering, cutting rows, duplicate, etc.
+'
+' @param RowIndexes - An array of row indices.
+' @param [ModIndex] - A signed integer to shift values in the RowIndexes array.
+Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As Long = 0) As Array2dEx
+    Dim t() As Variant, aX As ArrayListEx, rIndex As Variant, nRows As Long, nCols As Long, i As Long, c As Long
+    nRows = Me.Count
+    nCols = Me.ColumnCount
+    Set aX = ArrayListEx.Create()
+    ReDim t(0 To nCols - 1)
+    
+    For Each rIndex In RowIndexes
+        i = CLng(rIndex) + ModIndex
+        If i >= 0 And i < nRows Then
+            For c = 0 To nCols - 1
+                t(c) = Instance(i, c)
+            Next c
+            aX.Add t
+        End If
+    Next rIndex
+    
+    Set GetRows = Array2dEx.Create(aX)
+End Function
+
 Public Function Clone() As Array2dEx
     Dim t() As Variant
     t = Instance
