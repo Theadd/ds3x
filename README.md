@@ -10,7 +10,7 @@ _A **lightweight MSAccess (VBA) shared library** providing a dead simple <u>abst
 
 `CSV`, `Excel`, `ADODB.Recordset`, `2D Array`, `Jagged Array`, `JSON`.
 
-<strong>MINIMUM GLOBAL SCOPE POLLUTION</strong>
+<strong>MINIMUM GLOBAL SCOPE POLLUTION</strong> - Except a few public types and some externally accessible automation calls, everything is contained it's own class module.
 
 <strong>WIN32/WIN64 SUPPORT</strong>
 
