@@ -355,7 +355,6 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     TextFormat =1
-                    VerticalAnchor =2
                     ShowDatePicker =0
 
                     LayoutCachedLeft =2910
@@ -1385,7 +1384,7 @@ End Sub
 
 Private Sub Form_Load()
     ScreenLib.ScreenLib_Resync
-    ScreenLib.WindowSizeTo Me, 11000, 6000
+    ScreenLib.WindowSizeTo Me, 12300, 6500
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
     ScreenLib.WindowAlwaysOnTop Me
     ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
@@ -1395,6 +1394,7 @@ Private Sub Form_Resize()
     Me.DS_FOOTER_BG.HorizontalAnchor = acHorizontalAnchorBoth
     Me.DS_TASK_DEFINITION_SYNTAX.HorizontalAnchor = acHorizontalAnchorBoth
     Me.DS_TASK_TEXT_CONTENT.HorizontalAnchor = acHorizontalAnchorBoth
+    Me.DS_TASK_TEXT_CONTENT.Height = (Me.InsideHeight - Me.DS_CREATE_TASK_LIST.Top - Me.DS_FOOTER_BG.Height - Me.DS_TASK_TEXT_CONTENT.Top)
 End Sub
 
 Private Function GetReturnTypeOf(ByVal TaskName As String) As String
@@ -1438,7 +1438,11 @@ Finally:
 End Sub
 
 Private Sub MoveTaskTextContentToFit(ByVal NumParams As Long)
-    Me.DS_TASK_TEXT_CONTENT.Top = 3000 - ((5 - NumParams) * 450)
+    With Me.DS_TASK_TEXT_CONTENT
+        .Height = 270
+        .Top = 3000 - ((5 - NumParams) * 450)
+        .Height = (Me.InsideHeight - Me.DS_CREATE_TASK_LIST.Top - Me.DS_FOOTER_BG.Height - .Top)
+    End With
 End Sub
 
 Private Sub ResetAllTaskParamTextFields()
