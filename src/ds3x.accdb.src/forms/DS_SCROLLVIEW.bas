@@ -1261,22 +1261,15 @@ Public Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
             RaiseEvent OnSelectionControlKeyDown(KeyCode, Shift)
     End Select
     
-    If KeyCode = vbKeyDown Then
-        If Shift = 2 Then
-            Debug.Print "Stop default action for Ctrl + Down"
-            KeyCode = 0
-        End If
-    End If
-    If KeyCode = vbKeyP Then
-        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-            Stop
-        End If
-    End If
-    If KeyCode = vbKeyShift Then
-        pScrollSpeedMultiplier = 3
-    Else
-        SetPointerCapture (KeyCode = vbKeySpace And (Shift = 2 Or Shift = 3))
-    End If
+    Select Case True
+        Case (KeyCode = 0): ' Ignore
+        Case (KeyCode = vbKeyDown And Shift = 2): KeyCode = 0
+        Case (KeyCode = vbKeyP And Shift = 3): Stop
+        Case (KeyCode = vbKeyShift): pScrollSpeedMultiplier = 3
+        Case (KeyCode = vbKeyC And Shift = 2): CopySelectionToClipboard
+        Case Else
+            SetPointerCapture (KeyCode = vbKeySpace And (Shift = 2 Or Shift = 3))
+    End Select
 End Sub
 
 Public Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
@@ -1299,6 +1292,41 @@ Private Sub SetPointerCapture(ByVal Value As Boolean)
         pCapturedPointerPosition = ScreenLib.GetCursorPosition
         Me.TimerInterval = 100
     End If
+End Sub
+
+' TODO: IncludeHeaders
+Private Sub CopySelectionToClipboard(Optional ByVal IncludeHeaders As Boolean = False)
+    Const dsChunkSize As Long = 1000
+    Dim i As Long, iMax As Long, nRows As Long, rStart As Long, rEnd As Long, rTake As Long, rTakeFrom As Long, aX As Variant, sCols As Variant, sValues As String
+    On Error GoTo Finally
+    pSelectedColumns.Sort
+    sCols = Empty
+    If pSelectedColumns.Count > 0 Then sCols = pSelectedColumns.ToArray()
+    
+    If pSelectedRows.Count > 0 Then
+        pSelectedRows.Sort
+        rStart = pSelectedRows(0)
+        rEnd = pSelectedRows(pSelectedRows.Count - 1)
+        nRows = 1 + rEnd - rStart
+    Else
+        rStart = 0
+        nRows = pTable.Count
+        rEnd = 0
+    End If
+    iMax = Int(CLng(nRows - 1) / dsChunkSize)
+    
+    For i = 0 To iMax
+        rTake = IIf(i = iMax, nRows - (dsChunkSize * i), dsChunkSize)
+        rTakeFrom = rStart + (i * dsChunkSize)
+        Set aX = pTable.GetRangeOfRecords(rTakeFrom, rTake, sCols)
+        If rEnd = 0 Then
+            sValues = sValues & aX.ToExcel()
+        Else
+            sValues = sValues & aX.GetRows(pSelectedRows, 0 - rTakeFrom).ToExcel()
+        End If
+    Next i
+Finally:
+    FileSystemLib.SystemClipboard sValues
 End Sub
 
 
