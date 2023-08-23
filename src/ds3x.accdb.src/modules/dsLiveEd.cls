@@ -53,12 +53,10 @@ Public Property Let Visible(ByVal Value As Boolean)
             Set Self = Me
             Set pLiveEditor = New Form_DS_LIVE_EDITOR
             Set pLiveEditor.Controller = Self
-            pLiveEditor.Visible = True
-            ScreenLib.WindowAndTaskbarIconAsVisible pLiveEditor
+            pLiveEditor.WindowVisibility = True
         End If
     Else
-        pLiveEditor.Visible = Value
-        If Value Then ScreenLib.WindowAndTaskbarIconAsVisible pLiveEditor
+        pLiveEditor.WindowVisibility = Value
     End If
 End Property
 

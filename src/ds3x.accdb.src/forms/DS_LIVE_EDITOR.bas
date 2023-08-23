@@ -21,10 +21,10 @@ Begin Form
     Width =14542
     DatasheetFontHeight =11
     ItemSuffix =1572
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -504,6 +504,10 @@ End Property
 Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property
 Public Property Set Controller(ByRef Value As dsLiveEd): Bind Value: End Property
 
+Public Property Let WindowVisibility(ByVal Value As Boolean)
+    Me.Visible = Value
+    If Value Then ScreenLib.WindowAndTaskbarIconAsVisible Me
+End Property
 
 
 Private Sub Form_Load()

@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "23/08/2023 2:43:16",
-    "ExportDate": "23/08/2023 6:50:39",
+    "ExportDate": "23/08/2023 11:58:38",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -59,12 +59,12 @@
           "OtherHash": "7cde68f"
         },
         "DS_LIVE_EDITOR.bas": {
-          "FileHash": "07d9459",
-          "ExportDate": "23/08/2023 5:06:05",
-          "SourceModified": "23/08/2023 5:06:05",
-          "FilePropertiesHash": "be1e1ec",
+          "FileHash": "a4289ed",
+          "ExportDate": "23/08/2023 11:58:38",
+          "SourceModified": "23/08/2023 11:58:38",
+          "FilePropertiesHash": "e33acd5",
           "ImportDate": "23/08/2023 2:43:13",
-          "OtherHash": "ce58360"
+          "OtherHash": "13fa603"
         },
         "DS_LIVE_EDITOR_MAIN_PANEL.bas": {
           "FileHash": "c3e0811",
@@ -265,12 +265,12 @@
           "OtherHash": "17c3de8"
         },
         "dsLiveEd.cls": {
-          "FileHash": "7f337a7",
-          "ExportDate": "23/08/2023 5:06:05",
-          "SourceModified": "23/08/2023 5:06:05",
-          "FilePropertiesHash": "cfec37b",
+          "FileHash": "8c3f2e5",
+          "ExportDate": "23/08/2023 11:58:38",
+          "SourceModified": "23/08/2023 11:58:38",
+          "FilePropertiesHash": "177d356",
           "ImportDate": "23/08/2023 2:43:13",
-          "OtherHash": "f0f1adf"
+          "OtherHash": "3c55f0d"
         },
         "dsTable.cls": {
           "FileHash": "9507b3b",
