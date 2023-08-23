@@ -594,7 +594,10 @@ Private Sub Class_Initialize()
     AddAllTasks
 End Sub
 
-Private Function StringLines(ParamArray Lines() As Variant) As String: StringLines = VBA.Join(Lines, " " & vbNewLine): End Function
+Private Function StringLines(ParamArray Lines() As Variant) As String
+    StringLines = VBA.Join(Lines, " " & vbNewLine)
+    StringLines = Replace(StringLines, "@param ", "<font face=""Consolas"" size=1 color=""#33CC33"">@param</font> ")
+End Function
 
 Private Sub AddTask(ByVal TaskName As String, _
                     ByVal TaskParameters As String, _
@@ -636,23 +639,23 @@ Private Sub AddAllTasks()
     
     AddTask "SetColumnName", "[Source]: Table, [ColumnIndexes]: Long|Array(), [ColumnName]: String", _
             Description:=StringLines( _
-                "@param [ColumnIndexes] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
-                "@param [ColumnName] - The string to use for renaming that/those column/s. Supports custom vars and %1 to %4, being:", _
-                "    %1: The column index.", _
-                "    %2: the column index within the ColumnIndexes array.", _
-                "    %3 and %4: Position instead of index for %1 and %2 respectively.")
+                "@param [<b>ColumnIndexes</b>] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
+                "@param [<b>ColumnName</b>] - The string to use for renaming that/those column/s. Supports <b>CustomVar</b>s and from <b>%1</b> to <b>%4</b>, being:", _
+                "    <b>%1</b>: The column index.", _
+                "    <b>%2</b>: the column index within the <b>ColumnIndexes</b> array.", _
+                "    <b>%3</b> and <b>%4</b>: Position instead of index for <b>%1</b> and <b>%2</b> respectively.")
     
     AddTask "SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
             Description:=StringLines( _
-                "Select a single Column before picking this task to see it's current .NumberFormat value.", _
+                "Select a single Column before picking this task to see it's current <b>NumberFormat</b>.", _
                 "", _
-                "@param [ColumnIndexes] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
-                "@param [NumberFormat] - Excel's .NumberFormat string. Supports custom vars and %1 to %4, being:", _
-                "    %1: The column index.", _
-                "    %2: the column index within the ColumnIndexes array.", _
-                "    %3 and %4: Position instead of index for %1 and %2 respectively.", _
+                "@param [<b>ColumnIndexes</b>] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
+                "@param [<b>NumberFormat</b>] - Excel's <b>NumberFormat</b> string. Supports <b>CustomVar</b>s and from <b>%1</b> to <b>%4</b>, being:", _
+                "    <b>%1</b>: The column index.", _
+                "    <b>%2</b>: the column index within the <b>ColumnIndexes</b> array.", _
+                "    <b>%3</b> and <b>%4</b>: Position instead of index for <b>%1</b> and <b>%2</b> respectively.", _
                 "", _
-                "NOTE: This task will <u>only</u> apply <b>.NumberFormat</b> to corresponding columns in an <b>Excel.Worksheet</b> <u>just before</u> copying the data to the specified <b>Excel.Range</b>.")
+                "NOTE: This task will&nbsp;<u>only</u> apply <b>NumberFormat</b> to corresponding columns in an <b>Excel.Worksheet</b> <u>just before</u> copying the data to the specified <b>Excel.Range</b>.")
                     
     AddTask "Filter", "[Source]: Table, QueryFilter: String", _
             Usage:="{...TaskName: 'Filter', Values: [, ""REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'""]}"
