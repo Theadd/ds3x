@@ -49,5 +49,8 @@ End Function
 Public Function ToJSON() As String
 End Function
 
+Public Function ToExcel() As String
+End Function
+
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx
 End Function

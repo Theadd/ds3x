@@ -240,6 +240,8 @@ End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
+Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
+
 Public Function ToString(Optional mPrettyIndent As Variant) As String
     If IsMissing(mPrettyIndent) Then
         ToString = JSON.Stringify(Instance)
@@ -369,6 +371,7 @@ Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As IColle
 Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount): End Function
 Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
+Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
 
 
