@@ -337,7 +337,7 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
                         MoveTo .RowIndex, 0, True
                 End Select
             Case Else
-                ' TODO
+                KeyCode = sKeyCode
         End Select
     End With
     

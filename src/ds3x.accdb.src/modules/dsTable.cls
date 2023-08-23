@@ -243,7 +243,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
                      .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count, ColumnIndexes))
 End Function
 
-Private Function GetRangeOfRecords(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Variant
+Friend Function GetRangeOfRecords(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Variant
     If (pRecordList Is Nothing) And (pRecordArray Is Nothing) And (TypeOf pTableSource Is RecordsetEx) Then
         Set GetRangeOfRecords = C2RecordsetEx(pTableSource).GetRange(Index, GetCount, ColumnIndexes)
     Else
