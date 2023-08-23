@@ -369,6 +369,26 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
 End Function
 
+' Returns an ArrayListEx containing only those rows specified in the RowIndexes array.
+' Can also be used for: Reordering, cutting rows, duplicate, etc.
+'
+' @param RowIndexes - An array of row indices.
+' @param [ModIndex] - A signed integer to shift values in the RowIndexes array.
+Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As Long = 0) As ArrayListEx
+    Dim aX As ArrayListEx, rIndex As Variant, nRows As Long, i As Long
+    nRows = Me.Count
+    Set aX = ArrayListEx.Create()
+    
+    For Each rIndex In RowIndexes
+        i = CLng(rIndex) + ModIndex
+        If i >= 0 And i < nRows Then
+            aX.Add Instance(i)
+        End If
+    Next rIndex
+    
+    Set GetRows = aX
+End Function
+
 ' Concatenate all elements of TargetArray as additional columns into a new ArrayListEx
 Public Function Join(ByVal TargetArray As ArrayListEx) As ArrayListEx
     Dim i As Long, c As Long, cMax As Long, cMax2 As Long, aX As ArrayListEx, Aux As ArrayListEx
