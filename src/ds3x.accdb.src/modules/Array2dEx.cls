@@ -28,6 +28,19 @@ Public Property Get ColumnCount() As Long
     ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2))
 End Property
 
+Public Property Get Row(ByVal Index As Long) As Variant
+    Dim t() As Variant, i As Long
+    ReDim t(0 To UBound(Instance, 2))
+    For i = 0 To UBound(Instance, 2)
+        If IsObject(Instance(Index, i)) Then
+            Set t(i) = Instance(Index, i)
+        Else
+            t(i) = Instance(Index, i)
+        End If
+    Next i
+    Row = t
+End Property
+
 
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx: Set CreateBlank = CreateArray2dEx(RowsCount, ColumnsCount): End Function
 
@@ -489,6 +502,7 @@ End Function
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
 Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function

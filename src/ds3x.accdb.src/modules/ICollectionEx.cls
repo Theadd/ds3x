@@ -19,6 +19,9 @@ End Property
 Public Property Get ColumnCount() As Long
 End Property
 
+Public Property Get Row(ByVal Index As Long) As Variant
+End Property
+
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx
 End Function
 

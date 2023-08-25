@@ -62,6 +62,10 @@ Public Property Set Item(ByVal Index As Variant, Value As Variant)
     Set Instance(CLng(Index)) = Value
 End Property
 
+Public Property Get Row(ByVal Index As Long) As Variant
+    Row = Instance(Index)
+End Property
+
 
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ArrayListEx: Set CreateBlank = CreateArrayListEx(RowsCount, ColumnsCount): End Function
 
@@ -644,6 +648,7 @@ End Sub
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
 Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function

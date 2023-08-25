@@ -148,6 +148,19 @@ Attribute Item.VB_UserMemId = 0
     End If
 End Property
 
+Public Property Get Row(ByVal Index As Long) As Variant
+    Dim aX As ArrayListEx, t As ADODB.Fields, i As Long
+    
+    Set aX = ArrayListEx.Create()
+    Set t = CreateShallowCopy(Index + 1).Fields
+    
+    For i = 0 To ColumnCount - 1
+        aX.Add t.Item(i).Value
+    Next i
+    
+    Row = aX.ToArray()
+End Property
+
 ' Equivalente a Recordset.Fields
 Public Property Get Fields() As ADODB.Fields
 Attribute Fields.VB_Description = "Equivalente a Recordset.Fields"
@@ -781,6 +794,7 @@ Private Function C2Recordset(ByRef Value As Variant) As ADODB.Recordset: Set C2R
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
 Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(C2Recordset(Target)): End Function

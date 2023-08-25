@@ -66,13 +66,21 @@ Public Property Let Key(mKey As Variant, mNewKey As Variant)
     Instance.Key(mKey) = mNewKey
 End Property
 
+Public Property Get Row(ByVal Index As Long) As Variant
+    Dim dKey As Variant
+    dKey = Instance.Keys()(Index)
+    Row = Array(dKey, Instance.Item(dKey))
+End Property
+
 
 ' --- PUBLIC METHODS ---
+
 Public Function Join(ByVal Target As RecordsetEx) As RecordsetEx
     Set Join = RecordsetEx.Create()
     ' TODO: Implement
     Err.Raise 17, , "Not implemented."
 End Function
+
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As DictionaryEx: Set CreateBlank = Create(): End Function
 
 Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
@@ -361,6 +369,7 @@ Private Function C2ArrayListEx(ByRef Value As Variant) As ArrayListEx: Set C2Arr
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
 Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function
