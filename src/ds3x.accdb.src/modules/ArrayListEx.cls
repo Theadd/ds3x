@@ -43,8 +43,8 @@ End Property
 ' Sets or gets the element at the specified index. It's the default class member. When used as getter, a negative Index is applied to .Count, being -1 the last element.
 '@DefaultMember
 Public Property Get Item(ByVal Index As Variant) As Variant
-Attribute Item.VB_UserMemId = 0
 Attribute Item.VB_Description = "Sets or gets the element at the specified index. It's the default class member. When used as getter, a negative Index is applied to .Count, being -1 the last element."
+Attribute Item.VB_UserMemId = 0
     Index = CLng(Index)
     Select Case Index
         Case Is < 0
