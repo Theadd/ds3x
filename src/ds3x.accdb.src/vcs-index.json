@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "23/08/2023 2:43:16",
-    "ExportDate": "23/08/2023 11:58:38",
+    "ExportDate": "25/08/2023 17:41:22",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -162,20 +162,20 @@
       },
       "Modules": {
         "Array2dEx.cls": {
-          "FileHash": "bfe9856",
-          "ExportDate": "23/08/2023 6:50:39",
-          "SourceModified": "23/08/2023 6:50:39",
-          "FilePropertiesHash": "173fc98",
+          "FileHash": "f496bf8",
+          "ExportDate": "25/08/2023 17:41:21",
+          "SourceModified": "25/08/2023 17:41:21",
+          "FilePropertiesHash": "907e795",
           "ImportDate": "23/08/2023 2:43:12",
-          "OtherHash": "2c3b4ac"
+          "OtherHash": "6d2f459"
         },
         "ArrayListEx.cls": {
-          "FileHash": "4754fcc",
-          "ExportDate": "23/08/2023 6:50:39",
-          "SourceModified": "23/08/2023 6:50:39",
-          "FilePropertiesHash": "584ffac",
+          "FileHash": "24066bd",
+          "ExportDate": "25/08/2023 17:41:21",
+          "SourceModified": "25/08/2023 17:41:21",
+          "FilePropertiesHash": "9a24720",
           "ImportDate": "23/08/2023 2:43:12",
-          "OtherHash": "b5b40f5"
+          "OtherHash": "eb6dcce"
         },
         "Callback.cls": {
           "FileHash": "8226320",
@@ -217,12 +217,12 @@
           "OtherHash": "cf79f9d"
         },
         "DictionaryEx.cls": {
-          "FileHash": "ae67995",
-          "ExportDate": "23/08/2023 5:06:05",
-          "SourceModified": "23/08/2023 5:06:05",
-          "FilePropertiesHash": "24f47bc",
+          "FileHash": "9e2d64d",
+          "ExportDate": "25/08/2023 17:41:21",
+          "SourceModified": "25/08/2023 17:41:21",
+          "FilePropertiesHash": "6af68a1",
           "ImportDate": "23/08/2023 2:43:13",
-          "OtherHash": "53c423f"
+          "OtherHash": "a1781c7"
         },
         "ds3xGlobals.bas": {
           "FileHash": "0968caa",
@@ -273,12 +273,12 @@
           "OtherHash": "3c55f0d"
         },
         "dsTable.cls": {
-          "FileHash": "9507b3b",
-          "ExportDate": "23/08/2023 6:50:39",
-          "SourceModified": "23/08/2023 6:50:39",
-          "FilePropertiesHash": "193050c",
+          "FileHash": "4c3c15e",
+          "ExportDate": "25/08/2023 17:41:22",
+          "SourceModified": "25/08/2023 17:41:22",
+          "FilePropertiesHash": "d03e7af",
           "ImportDate": "23/08/2023 2:43:13",
-          "OtherHash": "6283b71"
+          "OtherHash": "9ba082d"
         },
         "dsTaskController.cls": {
           "FileHash": "30130e1",
@@ -312,12 +312,12 @@
           "OtherHash": "adb7f50"
         },
         "ICollectionEx.cls": {
-          "FileHash": "c5902dc",
-          "ExportDate": "23/08/2023 5:06:05",
-          "SourceModified": "23/08/2023 5:06:05",
-          "FilePropertiesHash": "e3a056a",
+          "FileHash": "d8330c8",
+          "ExportDate": "25/08/2023 17:41:22",
+          "SourceModified": "25/08/2023 17:41:22",
+          "FilePropertiesHash": "da561d2",
           "ImportDate": "23/08/2023 2:43:13",
-          "OtherHash": "c097359"
+          "OtherHash": "1a32ea4"
         },
         "JSON.cls": {
           "FileHash": "64d9aa3",
@@ -328,12 +328,12 @@
           "OtherHash": "1b54f7d"
         },
         "RecordsetEx.cls": {
-          "FileHash": "f33f4cf",
-          "ExportDate": "23/08/2023 5:06:06",
-          "SourceModified": "23/08/2023 5:06:06",
-          "FilePropertiesHash": "61d8536",
+          "FileHash": "d71fbc9",
+          "ExportDate": "25/08/2023 17:41:22",
+          "SourceModified": "25/08/2023 17:41:22",
+          "FilePropertiesHash": "14e2f27",
           "ImportDate": "23/08/2023 2:43:13",
-          "OtherHash": "54910f3"
+          "OtherHash": "bc7659b"
         },
         "ScreenLib.bas": {
           "FileHash": "4a711e7",

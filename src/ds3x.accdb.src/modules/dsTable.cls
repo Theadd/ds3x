@@ -51,6 +51,10 @@ Public Property Get ColumnCount() As Long
     End If
 End Property
 
+Public Property Get Row(ByVal Index As Long) As Variant
+    Row = SourceRecords.Row(Index)
+End Property
+
 Public Property Get Instance() As Scripting.Dictionary
     Set Instance = DictionaryEx.Create() _
         .Add("dsTable", DictionaryEx.Create() _
@@ -94,6 +98,14 @@ Public Property Get Records() As Variant
     Else
         Set Records = pRecordList
     End If
+End Property
+
+Public Property Get SourceRecords() As ICollectionEx
+    Select Case True
+        Case (Not pRecordList Is Nothing): Set SourceRecords = pRecordList
+        Case (Not pRecordArray Is Nothing): Set SourceRecords = pRecordArray
+        Case (TypeOf pTableSource Is RecordsetEx): Set SourceRecords = pTableSource
+    End Select
 End Property
 
 Public Property Get IndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset: Set IndexRecordset = CreateIndexRecordset(PageSize, PageIndex): End Property
@@ -214,7 +226,6 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
     Set SetHeaders = Me
 End Function
 
-
 ' Concatenate all elements of dsTable as additional columns into a new dsTable
 Public Function Join(ByVal TargetTable As dsTable) As dsTable
     Dim dsT As dsTable
@@ -235,8 +246,6 @@ Public Function AddRange(ByVal TargetTable As dsTable) As dsTable
                 .SetHeaders(Me.Headers.GetRange(0, Me.Headers.Count))
 End Function
 
-'
-'
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
     Set GetRange = Me.Create(GetRangeOfRecords(Index, GetCount, ColumnIndexes)) _
@@ -262,6 +271,56 @@ End Function
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
 Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
+
+Public Function ToMarkdownTable() As String
+    On Error GoTo Finally
+    Dim nCols As Long, nRows As Long, i As Long, k As Long, itemStr As String, itemLen As Long, vRow As Variant, sValue As String
+    Dim cNamesX As ArrayListEx, cSizes As ArrayListEx, aX As ArrayListEx, cX As ICollectionEx
+
+    Set aX = ArrayListEx.Create()
+    Set cNamesX = ArrayListEx.Create(GetColumnNames())
+    Set cSizes = ArrayListEx.Create()
+    Set cX = SourceRecords
+    
+    nCols = ColumnCount
+    nRows = Count
+
+    For i = 0 To nCols - 1
+        itemLen = Len(CStr(cNamesX(i)))
+        cSizes(i) = CLng(itemLen + (4 - (itemLen Mod 4)))
+    Next i
+
+    For k = 0 To nRows - 1
+        vRow = cX.Row(k)
+        For i = 0 To nCols - 1
+            itemLen = Len(CStr(Nz(vRow(i), vbNullString)))
+            itemLen = itemLen + (4 - (itemLen Mod 4))
+            If CLng(cSizes(i)) < itemLen Then cSizes(i) = itemLen
+        Next i
+    Next k
+    
+    ' PRINTING HEADERS
+    itemStr = vbNullString
+    For k = 0 To nCols - 1
+        itemStr = itemStr & " | " & cNamesX(k) & Space(cSizes(k) - Len(cNamesX(k)))
+    Next k
+    aX.Add Mid$(itemStr, 4, Len(itemStr))
+    aX.Add String(Len(aX(0)), "-")
+    
+    ' PRINTING TABLE ROWS
+    For k = 0 To nRows - 1
+        vRow = cX.Row(k)
+        itemStr = vbNullString
+        For i = 0 To nCols - 1
+            sValue = CStr(Nz(vRow(i), vbNullString))
+            itemStr = itemStr & " | " & sValue & Space(cSizes(i) - Len(sValue))
+        Next i
+        aX.Add Mid$(itemStr, 4, Len(itemStr))
+    Next k
+
+Finally:
+    ToMarkdownTable = VBA.Join(aX.ToArray(), vbNewLine)
+End Function
 
 Private Sub ApplyFormatToExcelRange(ByVal RangeObject As Excel.Range, ByVal RangeHasHeaders As Boolean)
     Dim r As Excel.Range, i As Long, iX As Variant, dX As DictionaryEx
@@ -712,6 +771,7 @@ Private Function C2Dictionary(ByVal Value As Variant) As Scripting.Dictionary: S
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget, True): End Function
 Private Function ICollectionEx_Bind(Optional ByRef Target As Variant) As ICollectionEx: Set ICollectionEx_Bind = Bind(Target): End Function
