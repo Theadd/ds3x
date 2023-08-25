@@ -40,11 +40,11 @@ _A **lightweight MSAccess (VBA) shared library** providing a dead simple <u>abst
 Ultra-lightweight chainable wrappers.
 
   - __[ArrayListEx](./docs/ArrayListEx.md)__ - *`.NET Framework v3.5`'s `ArrayList` wrapper.*
-  - <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> __[Array2dEx](./docs/Array2dEx.md)__ - *`VBA`'s built-in `2D Array` wrapper.*
+  - __[Array2dEx](./docs/Array2dEx.md)__ <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> - *`VBA`'s built-in `2D Array` wrapper.*
   - __[DictionaryEx](./docs/DictionaryEx.md)__ - *`Scripting.Dictionary` wrapper.*
   - __[RecordsetEx](./docs/RecordsetEx.md)__ - *`ADODB.Recordset` wrapper.*
   - __[xlSheetsEx](./docs/xlSheetsEx.md)__ - *`CSV`/`Excel` wrapper.*
-  - <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> __[dsTable](./docs/dsTable.md)__ - *Greatly simplifies working w/ table-like collections (holding column-related info, not just data).*
+  - __[dsTable](./docs/dsTable.md)__ <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> - *Greatly simplifies working w/ table-like collections (holding column-related info, not just data).*
 
 
 </ul>
@@ -52,7 +52,7 @@ Ultra-lightweight chainable wrappers.
 Miscellaneous.
 
   - __[Callback](./docs/Callback.md)__ - *A <kbd>`pass function as parameter`</kbd>-like feature on steroids with additional support for executing `javascript` code and `Filter`/`Map`/`Reduce` calls on callback's results (`Where`/`Select`/`Aggregate` equivalents on `.NET`).*
-  - <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> __[dbQuery](./docs/dbQuery.md)__ - *Not a fan of your current `ADODB` connector? Just try this one.*
+  - __[dbQuery](./docs/dbQuery.md)__ <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> - *Not a fan of your current `ADODB` connector? Just try this one.*
 
 </ul>
 
@@ -62,7 +62,7 @@ Miscellaneous.
 
   - __[JSON](./docs/JSON.md)__ - *Backwards-compatible custom version of [Tim Hall](https://github.com/VBA-tools/VBA-JSON)'s `JSON` utilities.*
   - __[FileSystemLib](./docs/FileSystemLib.md)__ - *Safe, network<sup><small>(NFS)</small></sup>-load/delay aware, `FileSystemObject`-related, clipboard and memory usage utilities.*
-  - <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> __[ScreenLib](./docs/ScreenLib.md)__ - *No more messing with twips to pixels conversion. Everything you'd ever need, speaking in the same language.*
+  - __[ScreenLib](./docs/ScreenLib.md)__ <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> - *No more messing with twips to pixels conversion. Everything you'd ever need, speaking in the same language.*
   
 </ul>
 
