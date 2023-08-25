@@ -27,20 +27,24 @@ Public Instance As ArrayList
 Private Const dsChunkSize As Long = 1000
 
 
-'Gets the key count of the underlying Scripting.Dictionary.
+' Gets the count of elements in the underlying mscorlib.ArrayList.
 Public Property Get Count() As Variant
+Attribute Count.VB_Description = "Gets the count of elements in the underlying mscorlib.ArrayList."
     Count = Instance.Count
 End Property
 
+' In table-like instances, gets the number of columns (the count of elements within the first element, which is expected to be an array).
 Public Property Get ColumnCount() As Long
+Attribute ColumnCount.VB_Description = "In table-like instances, gets the number of columns (the count of elements within the first element, which is expected to be an array)."
     On Error Resume Next
     ColumnCount = CountElementsIn(Instance(0))
 End Property
 
-'Sets or returns an item for a specified key.
+' Sets or gets the element at the specified index. It's the default class member. When used as getter, a negative Index is applied to .Count, being -1 the last element.
 '@DefaultMember
 Public Property Get Item(ByVal Index As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
+Attribute Item.VB_Description = "Sets or gets the element at the specified index. It's the default class member. When used as getter, a negative Index is applied to .Count, being -1 the last element."
     Index = CLng(Index)
     Select Case Index
         Case Is < 0
@@ -80,6 +84,7 @@ Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long)
 '   - Any other class instance with support for enumeration (VB_UserMemId = -4) and default value (VB_UserMemId = 0).
 '   - A Range, being converted as an ArrayList (rows) of Variant arrays (columns).
 Public Function Create(Optional ByRef ArrayLike As Variant) As ArrayListEx
+Attribute Create.VB_Description = "Returns an ArrayListEx object bound to a new ArrayList instance containing the elements found in the optional ArrayLike parameter, if specified."
     Set Create = New ArrayListEx
     If Not IsMissing(ArrayLike) Then Create.AddRange ArrayLike
 End Function
@@ -109,8 +114,9 @@ Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = enumerator
 End Function
 
-'Adds an item to the ArrayList instance
+' Adds an item to the ArrayList instance.
 Public Function Add(Value As Variant) As ArrayListEx
+Attribute Add.VB_Description = "Adds an item to the ArrayList instance."
     Instance.Add Value
     Set Add = Me
 End Function
@@ -152,88 +158,14 @@ Public Function AddRange(Optional ByRef ArrayLike As Variant) As ArrayListEx
     End If
 End Function
 
-Private Sub AddFromExcelRange(ByRef r As Excel.Range)
-    Dim Items As Variant, i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
-    Dim g As Long, gNumRows As Long, rCount As Long, rng2 As Excel.Range, rBase As Long
-
-    rCount = r.Rows.Count
-    gNumRows = rCount - (g * dsChunkSize)
-    If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
-    If Not (gNumRows > 0) Then Exit Sub
-    rBase = GetBaseRowIndexOfRange(r)
-    
-    Do While (gNumRows > 0)
-        Set rng2 = r.Range(r.Cells(rBase + (g * dsChunkSize), 1), r.Cells((rBase + (g * dsChunkSize)) + (gNumRows - 1), r.Columns.Count))
-        Items = Empty
-        Items = rng2.Value
-        lc = LBound(Items, 2)
-        uc = UBound(Items, 2)
-        ui = UBound(Items, 1)
-        ReDim vRow(0 To (uc - lc))
-
-        For i = LBound(Items, 1) To ui
-            For c = lc To uc - 1
-                vRow(c - lc) = Items(i, c)
-            Next c
-            If VarType(Items(i, uc)) = vbString Then
-                vRow(uc - lc) = Trim(Items(i, uc))
-            Else
-                vRow(uc - lc) = Items(i, uc)
-            End If
-            Instance.Add vRow
-        Next i
-
-        g = g + 1
-        gNumRows = rCount - (g * dsChunkSize)
-        If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
-    Loop
-    Items = Empty
-End Sub
-
-Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
-    On Error GoTo Fallback
-    
-    GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
-    Exit Function
-Fallback:
-    GetBaseRowIndexOfRange = 1
-End Function
-
-Private Function AddFrom2dArray(ByRef Items As Variant) As ArrayListEx
-    Dim i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
-    
-    lc = LBound(Items, 2)
-    uc = UBound(Items, 2)
-    ui = UBound(Items, 1)
-    ReDim vRow(0 To (uc - lc))
-    
-    For i = LBound(Items, 1) To ui
-        For c = lc To uc
-            If IsObject(Items(i, c)) Then
-                Set vRow(c - lc) = Items(i, c)
-            Else
-                vRow(c - lc) = Items(i, c)
-            End If
-        Next c
-        Instance.Add vRow
-    Next i
-    
-    Set AddFrom2dArray = Me
-End Function
-
-
 Public Function Insert(ByVal Index As Long, ByVal Value As Variant) As ArrayListEx
     Instance.Insert Index, Value
     Set Insert = Me
 End Function
 
-
-
 Public Function ToArray() As Variant
     ToArray = Instance.ToArray
 End Function
-
-
 
 Static Function IsArrayLike(Optional ByVal ArrayLike As Variant) As Boolean
     If IsMissing(ArrayLike) Then Exit Function
@@ -251,23 +183,23 @@ Static Function CountElementsIn(ByVal ArrayLike As Variant) As Long
     If IsArray(ArrayLike) Then CountElementsIn = UBound(ArrayLike) + 1
 End Function
 
-
-
-
 ' Removes an element by value from the ArrayList.
 Public Function Remove(Item As Variant) As ArrayListEx
+Attribute Remove.VB_Description = "Removes an element by value from the ArrayList."
     Instance.Remove Item
     Set Remove = Me
 End Function
 
 ' Removes a range of elements from the ArrayList.
 Public Function RemoveRange(ByVal Index As Long, ByVal RemoveCount As Long) As ArrayListEx
+Attribute RemoveRange.VB_Description = "Removes a range of elements from the ArrayList."
     Instance.RemoveRange Index, RemoveCount
     Set RemoveRange = Me
 End Function
 
 ' Removes each element found in ArrayLike from the ArrayList.
 Public Function RemoveFrom(Optional ByVal ArrayLike As Variant) As ArrayListEx
+Attribute RemoveFrom.VB_Description = "Removes each element found in ArrayLike from the ArrayList."
     Dim Item As Variant
     Set RemoveFrom = Me
     
@@ -286,12 +218,14 @@ End Function
 
 ' Removes all elements from the ArrayList.
 Public Function RemoveAll() As ArrayListEx
+Attribute RemoveAll.VB_Description = "Removes all elements from the ArrayList. @see ArrayListEx.Clear()"
     Instance.Clear
     Set RemoveAll = Me
 End Function
 
 ' Removes all duplicated elements from the ArrayList.
 Public Function Unique() As ArrayListEx
+Attribute Unique.VB_Description = "Removes all duplicated elements from the ArrayList."
     Dim oArray As ArrayListEx, Item As Variant
     
     Set Unique = Me
@@ -305,14 +239,16 @@ Public Function Unique() As ArrayListEx
     Next Item
 End Function
 
+' Removes the element at Index from the ArrayList.
 Public Function RemoveAt(ByVal Index As Long) As ArrayListEx
+Attribute RemoveAt.VB_Description = "Removes the element at Index from the ArrayList."
     Instance.RemoveAt Index
     Set RemoveAt = Me
 End Function
 
-' Copies all elements from the ArrayList to the specified Range object.
+' Copies all elements from the ArrayList to the specified Range object. The Array2dEx.CopyToRange implementation is vastly more efficient than this one.
 Public Function CopyToRange(ByRef RangeObject As Range) As ArrayListEx
-    ' TODO: On Error Resume Next
+Attribute CopyToRange.VB_Description = "Copies all elements from the ArrayList to the specified Range object. The Array2dEx.CopyToRange implementation is vastly more efficient than this one."
     Dim Entry As Variant, i As Long, c As Long
 
     For i = 0 To Instance.Count - 1
@@ -339,6 +275,7 @@ End Function
 ' @param [GetCount] - The number of rows or elements in the range.
 ' @param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, no columns are excluded.
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ArrayListEx
+Attribute GetRange.VB_Description = "Returns an ArrayListEx which represents a subset of the elements in this instance."
     Dim Aux As ArrayList, xRange As ArrayListEx, Entry As Variant, i As Long
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
@@ -379,6 +316,7 @@ End Function
 ' @param RowIndexes - An array of row indices.
 ' @param [ModIndex] - A signed integer to shift values in the RowIndexes array.
 Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As Long = 0) As ArrayListEx
+Attribute GetRows.VB_Description = "Returns an ArrayListEx containing only those rows specified in the RowIndexes array."
     Dim aX As ArrayListEx, rIndex As Variant, nRows As Long, i As Long
     nRows = Me.Count
     Set aX = ArrayListEx.Create()
@@ -395,6 +333,7 @@ End Function
 
 ' Concatenate all elements of TargetArray as additional columns into a new ArrayListEx
 Public Function Join(ByVal TargetArray As ArrayListEx) As ArrayListEx
+Attribute Join.VB_Description = "Concatenate all elements of TargetArray as additional columns into a new ArrayListEx"
     Dim i As Long, c As Long, cMax As Long, cMax2 As Long, aX As ArrayListEx, Aux As ArrayListEx
     
     Set aX = ArrayListEx.Create()
@@ -415,16 +354,16 @@ Public Function Join(ByVal TargetArray As ArrayListEx) As ArrayListEx
     Set Join = aX
 End Function
 
-
-
 ' Removes all elements from the ArrayList.
 Public Function Clear() As ArrayListEx
+Attribute Clear.VB_Description = "Removes all elements from the ArrayList."
     Instance.Clear
     Set Clear = Me
 End Function
 
-' FIXME: Unexpected return value, returning False when there is a match. (NOTE: Double != Long)
+' Whether a Value is contained in this ArrayListEx or not, using a STRICT equality comparer, which compares by value and value type. (Double !== Long)
 Public Function Contains(ByVal Value As Variant) As Boolean
+Attribute Contains.VB_Description = "Whether a Value is contained in this ArrayListEx or not, using a STRICT equality comparer, which compares by value and value type."
     Contains = Instance.Contains(Value)
 End Function
 
@@ -441,8 +380,6 @@ End Function
 Public Function Clone() As ArrayListEx
     Set Clone = ArrayListEx.Create(Me)
 End Function
-
-
 
 Public Function Sort(Optional ByVal Comparer As mscorlib.IComparer = Nothing) As ArrayListEx
     If Comparer Is Nothing Then
@@ -461,8 +398,6 @@ Public Function BinarySearch(ByVal Value As Variant, Optional ByVal StartIndex A
         BinarySearch = Instance.BinarySearch(StartIndex, SearchCount, Value, Comparer)
     End If
 End Function
-
-
 
 Public Function PrintAll() As ArrayListEx
     Debug.Print JSON.Stringify(Instance, 2)
@@ -538,6 +473,75 @@ Private Function CreateArrayListEx(ByVal RowsCount As Long, ByVal ColumnsCount A
     Next i
 End Function
 
+Private Sub AddFromExcelRange(ByRef r As Excel.Range)
+    Dim Items As Variant, i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
+    Dim g As Long, gNumRows As Long, rCount As Long, rng2 As Excel.Range, rBase As Long
+
+    rCount = r.Rows.Count
+    gNumRows = rCount - (g * dsChunkSize)
+    If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
+    If Not (gNumRows > 0) Then Exit Sub
+    rBase = GetBaseRowIndexOfRange(r)
+    
+    Do While (gNumRows > 0)
+        Set rng2 = r.Range(r.Cells(rBase + (g * dsChunkSize), 1), r.Cells((rBase + (g * dsChunkSize)) + (gNumRows - 1), r.Columns.Count))
+        Items = Empty
+        Items = rng2.Value
+        lc = LBound(Items, 2)
+        uc = UBound(Items, 2)
+        ui = UBound(Items, 1)
+        ReDim vRow(0 To (uc - lc))
+
+        For i = LBound(Items, 1) To ui
+            For c = lc To uc - 1
+                vRow(c - lc) = Items(i, c)
+            Next c
+            If VarType(Items(i, uc)) = vbString Then
+                vRow(uc - lc) = Trim(Items(i, uc))
+            Else
+                vRow(uc - lc) = Items(i, uc)
+            End If
+            Instance.Add vRow
+        Next i
+
+        g = g + 1
+        gNumRows = rCount - (g * dsChunkSize)
+        If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
+    Loop
+    Items = Empty
+End Sub
+
+Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
+    On Error GoTo Fallback
+    
+    GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
+    Exit Function
+Fallback:
+    GetBaseRowIndexOfRange = 1
+End Function
+
+Private Function AddFrom2dArray(ByRef Items As Variant) As ArrayListEx
+    Dim i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
+    
+    lc = LBound(Items, 2)
+    uc = UBound(Items, 2)
+    ui = UBound(Items, 1)
+    ReDim vRow(0 To (uc - lc))
+    
+    For i = LBound(Items, 1) To ui
+        For c = lc To uc
+            If IsObject(Items(i, c)) Then
+                Set vRow(c - lc) = Items(i, c)
+            Else
+                vRow(c - lc) = Items(i, c)
+            End If
+        Next c
+        Instance.Add vRow
+    Next i
+    
+    Set AddFrom2dArray = Me
+End Function
+
 
 ' --- TYPE CASTING ---
 
@@ -577,7 +581,7 @@ Finally:
 End Function
 
 
-
+' --- Interfaces ---
 
 Private Sub ICollection_CopyTo(ByVal Array_ As mscorlib.Array, ByVal Index As Long)
     Instance.CopyTo Array_, Index
