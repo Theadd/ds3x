@@ -19,6 +19,49 @@ Implements __[ICollectionEx](./ICollectionEx.md)__ <sup>(also implements [IList]
 
 ---
 
+### **API Overview**
+
+```vb
+' Fields
+Public Instance As ArrayList
+' Properties
+Property Get Count() As Long
+Property Get ColumnCount() As Long
+Property Get Item(Index As Variant) As Variant
+Property Get Row(Index As Long) As Variant
+' Functions
+Function Create(Optional ArrayLike As Variant) As ArrayListEx
+Function Add(Value As Variant) As ArrayListEx
+Function AddRange(ArrayLike As Varriant) As ArrayListEx
+Function Insert(Index As Long, Value As Variant) As ArrayListEx
+Function Join(Target As Array2dEx) As ArrayListEx
+Function GetRange(Optional Index As Long, Optional GetCount As Long, Optional ColumnIndexes As Variant) As ArrayListEx
+Function GetRows(RowIndexes As Variant, Optional ModIndex As Long) As ArrayListEx
+Function CopyToRange(RangeObject As Excel.Range) As ArrayListEx
+Function Remove(Item As Variant) As ArrayListEx
+Function RemoveAt(Index As Long) As ArrayListEx
+Function RemoveRange(Index As Long, RemoveCount As Long) As ArrayListEx
+Function RemoveFrom(ArrayLike As Variant) As ArrayListEx
+Function Clear() As ArrayListEx
+Function Unique() As ArrayListEx
+Function Contains(Value As Variant) As Boolean
+Function IndexOf(Value As Variant, Optional StartIndex As Long) As Long
+Function Reverse() As ArrayListEx
+Function Clone() As ArrayListEx
+Function Sort(Optional Comparer As IComparer) As ArrayListEx
+Function BinarySearch(Value As Variant, Optional StartIndex As Long, Optional SearchCount As Long, Optional Comparer As IComparer) As Long
+Function BinaryAdd(Value As Variant, Optional StartIndex As Long, Optional Comparer As IComparer) As Long
+Function BinaryToggle(Value As Variant, Optional StartIndex As Long, Optional Comparer As IComparer) As Long
+Function ToCSV(Optional Delimiter As String) As String
+Function ToJSON() As String
+Function ToExcel() As String
+Function ToArray() As Variant
+' Static
+Function CreateBlank(RowsCount As Long, ColumnsCount As Long) As ArrayListEx
+Function CountElementsIn(ArrayLike As Variant) As Long
+```
+
+
 <table width="100%"><caption>
 
 ### **`ArrayListEx` API**  
@@ -142,16 +185,6 @@ Inserts an item to the <code>ArrayList</code> instance at specified <code>Index<
 <tr><td align="left" valign="top">
 
 ```vb
-ToArray() As Variant
-```
-</td><td align="left" valign="top">
-Returns the <code>ArrayList</code> as a plain <code>Array</code>.
-</td></tr>
-
-
-<tr><td align="left" valign="top">
-
-```vb
 Join(Target As Array2dEx) As ArrayListEx
 ```
 </td><td align="left" valign="top">
@@ -189,40 +222,6 @@ Returns a new <code>ArrayListEx</code> instance containing only those rows speci
 <li><kbd>ModIndex</kbd> → A signed integer to shift values in the <code>RowIndexes</code> array.
 <br/>Default value: <code>0</code></li>
 </ul></details>
-</td></tr>
-
-
-<tr><td align="left" valign="top">
-
-```vb
-ToCSV(Optional Delimiter As String) As String
-```
-</td><td align="left" valign="top">
-Returns a <code>String</code> representing this instance in <code>CSV</code>-style format.
-<details><summary><code>PARAMETERS</code></summary><ul>
-<li><kbd>Delimiter</kbd> → Character <code>String</code> used as delimiter between values within each row.<br/>Default value: <code>","</code></li>
-</ul></details>
-</td></tr>
-
-
-<tr><td align="left" valign="top">
-
-```vb
-ToJSON() As String
-```
-</td><td align="left" valign="top">
-Returns a <code>String</code> representing this instance in <code>JSON</code> format.
-</td></tr>
-
-
-<tr><td align="left" valign="top">
-
-```vb
-ToExcel() As String
-```
-</td><td align="left" valign="top">
-Provides a simple way of direct copy-paste to an <code>Excel</code> document. <em>@see: <code>FileSystemLib.SystemClipboard</code>.</em>
-<br/>Same as <code>.ToCSV(vbTab)</code>.
 </td></tr>
 
 
@@ -394,7 +393,7 @@ ToCSV(Optional Delimiter As String) As String
 </td><td align="left" valign="top">
 Returns a <code>String</code> representing this instance in <code>CSV</code>-style format.
 <details><summary><code>PARAMETERS</code></summary><ul>
-<li><kbd>Delimiter</kbd> → Character <code>String</code> used as delimiter between row values.<br/>Default value: <code>","</code></li>
+<li><kbd>Delimiter</kbd> → Character <code>String</code> used as delimiter between values within each row.<br/>Default value: <code>","</code></li>
 </ul></details>
 </td></tr>
 
@@ -417,6 +416,16 @@ ToExcel() As String
 </td><td align="left" valign="top">
 Provides a simple way of direct copy-paste to an <code>Excel</code> document. <em>@see: <code>FileSystemLib.SystemClipboard</code>.</em>
 <br/>Same as <code>.ToCSV(vbTab)</code>.
+</td></tr>
+
+
+<tr><td align="left" valign="top">
+
+```vb
+ToArray() As Variant
+```
+</td><td align="left" valign="top">
+Returns the <code>ArrayList</code> as a plain <code>Array</code>.
 </td></tr>
 
 
