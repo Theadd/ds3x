@@ -1,4 +1,4 @@
-# **`ICollectionEx` Interface**
+## **`ICollectionEx` Interface**
 
 A shared interface providing common members for other collection-like class modules.
 
@@ -125,8 +125,8 @@ Returns a new <code>ICollectionEx</code> instance which represents a subset of e
 <li><kbd>Index</kbd> → Index of the first element or row to include in the subset.
 <br/>Default value: <code>0</code></li>
 <li><kbd>GetCount</kbd> → The number of elements or rows to include in the subset.
-<br/>Default value: Count of remaining elements or rows when starting at <code>Index</code>.</li>
-<li><kbd>ColumnIndexes</kbd> → An <code>Array</code> of column indices to include in the subset (must be a table-like collection) or <code>Empty</code>.
+<br/>Default value: Count of remaining elements or rows, starting at <code>Index</code>.</li>
+<li><kbd>ColumnIndexes</kbd> → An <code>Array</code> of column indices to include in the subset (must be a table-like collection), or <code>Empty</code>.
 <br/>Default value: <code>Empty</code> (All columns)</li>
 </ul></details>
 </td></tr>

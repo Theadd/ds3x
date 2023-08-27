@@ -7,6 +7,7 @@ Implements __[ICollectionEx](./ICollectionEx.md)__.
 ---
 
 - `Array2dEx` instances can hold items of any type, like objects or arrays, not only value-types.
+- Uses the same `2D Array` format as **Excel**, taking advantage of direct in-memory copying to and from `Excel.Range`.
 - `Array2dEx` instances are __immutable__.
   - Any call that could transform the array, returns a new instance instead.
   - It's inner `2D Array` is stored as a `Variant` instead of an actual array, forcing it to be a value-type so that direct manipulation has no effect.
@@ -86,16 +87,6 @@ Gets an <code>Array</code> containing all the values at the specified row <code>
 <tr><td align="left" valign="top">
 
 ```vb
-CreateBlank(RowsCount As Long, ColumnsCount As Long) As Array2dEx
-```
-</td><td align="left" valign="top">
-Returns a new table-like <code>ICollectionEx</code> instance with the specified number of rows and columns, containing <code>Empty</code> values.
-</td></tr>
-
-
-<tr><td align="left" valign="top">
-
-```vb
 Create(Optional ArrayLike As Variant) As Array2dEx
 ```
 </td><td align="left" valign="top">
@@ -126,8 +117,8 @@ Returns a new <code>Array2dEx</code> instance which represents a subset of rows 
 <li><kbd>Index</kbd> → Index of the first row to include in the subset.
 <br/>Default value: <code>0</code></li>
 <li><kbd>GetCount</kbd> → The number of rows to include in the subset.
-<br/>Default value: Count of remaining rows when starting at <code>Index</code>.</li>
-<li><kbd>ColumnIndexes</kbd> → An <code>Array</code> of column indices to include in the subset or <code>Empty</code>.
+<br/>Default value: Count of remaining rows, starting at <code>Index</code>.</li>
+<li><kbd>ColumnIndexes</kbd> → An <code>Array</code> of column indices to include in the subset, or <code>Empty</code>.
 <br/>Default value: <code>Empty</code> (All columns)</li>
 </ul></details>
 </td></tr>
@@ -207,6 +198,42 @@ Returns the transposed values in a new <code>Array2dEx</code> instance. Rows bec
 </td></tr>
 
 
+</tbody>
+
+
+<thead><tr><th colspan="2">PROCEDURES</th></tr></thead>
+<tbody>
+
+
+<tr><td align="left" valign="top">
+
+```vb
+Dispose()
+```
+</td><td align="left" valign="top">
+Tells <code>Array2dEx</code> that this instance won't be needed anymore and it can be safely disposed.
+<br/>
+<em>This shouldn't be necessary in most cases since all objects are automatically destroyed when there's nothing referencing them.</em>
+</td></tr>
+
+
+</tbody>
+
+
+<thead><tr><th colspan="2">STATIC</th></tr></thead>
+<tbody>
+
+
+<tr><td align="left" valign="top">
+
+```vb
+CreateBlank(RowsCount As Long, ColumnsCount As Long) As Array2dEx
+```
+</td><td align="left" valign="top">
+Returns a new <code>Array2dEx</code> instance with the specified number of rows and columns, containing <code>Empty</code> values.
+</td></tr>
+
+
 <tr><td align="left" valign="top">
 
 ```vb
@@ -224,25 +251,6 @@ Is1dArray(ArrayLike As Variant) As Boolean
 ```
 </td><td align="left" valign="top">
 Returns whether the provided <code>ArrayLike</code> is a plain <code>1D Array</code> or not.
-</td></tr>
-
-
-</tbody>
-
-
-<thead><tr><th colspan="2">PROCEDURES</th></tr></thead>
-<tbody>
-
-
-<tr><td align="left" valign="top">
-
-```vb
-Dispose()
-```
-</td><td align="left" valign="top">
-Tells <code>Array2dEx</code> that this instance won't be needed anymore and it can be safely disposed.
-<br/>
-<em>This shouldn't be necessary in most cases since all objects are automatically destroyed when there's nothing referencing them.</em>
 </td></tr>
 
 
