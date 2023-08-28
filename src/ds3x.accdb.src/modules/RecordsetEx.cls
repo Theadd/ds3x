@@ -218,22 +218,22 @@ End Property
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As RecordsetEx: Set CreateBlank = RecordsetEx.Create(CreateRecordset(RowsCount, 0, ColumnsCount)): End Function
 
 ' Devuelve una nueva instancia de RecordsetEx vinculada al Recordset proporcionado.
-Public Function Create(Optional ByVal TargetInstance As Variant) As RecordsetEx
+Public Function Create(Optional ByVal RecordsetLike As Variant) As RecordsetEx
     Set Create = New RecordsetEx
     Set Create.Instance = Nothing
     
-    If Not IsMissing(TargetInstance) Then
-        If TypeOf TargetInstance Is ADODB.Recordset Then
-            Set Create.Instance = TargetInstance
-        ElseIf TypeOf TargetInstance Is ArrayListEx Then
-            Set Create.Instance = CreateFromArrayList(TargetInstance.Instance)
-        ElseIf TypeOf TargetInstance Is ArrayList Then
-            Set Create.Instance = CreateFromArrayList(C2ArrayList(TargetInstance))
+    If Not IsMissing(RecordsetLike) Then
+        If TypeOf RecordsetLike Is ADODB.Recordset Then
+            Set Create.Instance = RecordsetLike
+        ElseIf TypeOf RecordsetLike Is ArrayListEx Then
+            Set Create.Instance = CreateFromArrayList(RecordsetLike.Instance)
+        ElseIf TypeOf RecordsetLike Is ArrayList Then
+            Set Create.Instance = CreateFromArrayList(C2ArrayList(RecordsetLike))
         ' TODO: Create from: Array2dEx, dsTable, JSON
         Else
             ' Dirty patch
-            If TypeName(TargetInstance) = "ArrayListEx" Then
-                Set Create.Instance = CreateFromArrayList(TargetInstance.Instance)
+            If TypeName(RecordsetLike) = "ArrayListEx" Then
+                Set Create.Instance = CreateFromArrayList(RecordsetLike.Instance)
             End If
         End If
     End If

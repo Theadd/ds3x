@@ -211,10 +211,10 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     If TryRebuildTaskValues(t, TaskParams, dX.GetValue("Values", Array())) Then
         Select Case GetReturnTypeOf(dX("TaskName"))
             Case "Table"
-                Set pTable = cb.ExecuteOnArray(t).result
+                Set pTable = cb.ExecuteOnArray(t).Result
                 Set pTaskResults(dX("Id")) = pTable
             Case "Worksheet"
-                Set pWorksheet = cb.ExecuteOnArray(t).result
+                Set pWorksheet = cb.ExecuteOnArray(t).Result
                 Set pTaskResults(dX("Id")) = pWorksheet
             Case Else
                 Err.Raise 13

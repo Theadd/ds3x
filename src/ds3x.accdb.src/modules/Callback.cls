@@ -18,7 +18,7 @@ Private pCallType As VBA.VbCallType
 
 ' --- PUBLIC ---
 
-Public result As Variant
+Public Result As Variant
 Public Event ExecuteComplete(TargetCallable As Callback)
 
 
@@ -31,12 +31,12 @@ Public Event ExecuteComplete(TargetCallable As Callback)
 
 ' --- PUBLIC FUNCTIONS ---
 
-Public Function Create(Optional ByRef ObjectInstance As Object = Nothing, Optional ByVal CallableName As String = "", Optional ByVal CallableType As VBA.VbCallType = VBA.VbCallType.VbMethod) As Callback
+Public Function Create(Optional ByRef ObjectInstance As Object = Nothing, Optional ByVal CallableName As String = vbNullString, Optional ByVal CallableType As VBA.VbCallType = VBA.VbCallType.VbMethod) As Callback
     Set Create = New Callback
     Create.Bind ObjectInstance, CallableName, CallableType
 End Function
 
-Public Function Bind(Optional ByRef ObjectInstance As Object = Nothing, Optional ByVal CallableName As String = "", Optional ByVal CallableType As VBA.VbCallType = VBA.VbCallType.VbMethod) As Callback
+Public Function Bind(Optional ByRef ObjectInstance As Object = Nothing, Optional ByVal CallableName As String = vbNullString, Optional ByVal CallableType As VBA.VbCallType = VBA.VbCallType.VbMethod) As Callback
     Set pInstance = ObjectInstance
     pName = CallableName
     pCallType = CallableType
@@ -45,7 +45,7 @@ End Function
 
 Public Function Unbind() As Callback
     Set pInstance = Nothing
-    pName = ""
+    pName = vbNullString
     pCallType = VBA.VbCallType.VbMethod
     Set Unbind = Me
 End Function
@@ -58,75 +58,82 @@ Attribute Execute.VB_UserMemId = 0
     If Not pInstance Is Nothing Then
         ' CallByName
         Select Case UBound(vArgs)
-            Case -1: Assign result, CallByName(pInstance, pName, VbMethod)
-            Case 0: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0))
-            Case 1: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1))
-            Case 2: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2))
-            Case 3: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
-            Case 4: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
+            Case -1: Assign Result, CallByName(pInstance, pName, VbMethod)
+            Case 0: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0))
+            Case 1: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1))
+            Case 2: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2))
+            Case 3: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
+            Case 4: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
+            Case 5: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5))
+            Case 6: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6))
+            Case 7: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7))
+            Case 8: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8))
+            Case 9: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8), vArgs(9))
         End Select
     ElseIf pInstance Is Nothing And pName <> "" Then
         ' Application.Run
         Select Case UBound(vArgs)
-            Case -1: Assign result, Application.Run(pName)
-            Case 0: Assign result, Application.Run(pName, vArgs(0))
-            Case 1: Assign result, Application.Run(pName, vArgs(0), vArgs(1))
-            Case 2: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2))
-            Case 3: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
-            Case 4: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
+            Case -1: Assign Result, Application.Run(pName)
+            Case 0: Assign Result, Application.Run(pName, vArgs(0))
+            Case 1: Assign Result, Application.Run(pName, vArgs(0), vArgs(1))
+            Case 2: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2))
+            Case 3: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
+            Case 4: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
+            Case 5: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5))
+            Case 6: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6))
+            Case 7: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7))
+            Case 8: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8))
+            Case 9: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8), vArgs(9))
         End Select
     Else
         Select Case UBound(vArgs)
-            Case -1: Assign result, Empty
-            Case 0: Assign result, vArgs(0)
-            Case Else: Assign result, CArray(vArgs)
+            Case -1: Assign Result, Empty
+            Case 0: Assign Result, vArgs(0)
+            Case Else: Assign Result, CArray(vArgs)
         End Select
     End If
     
     Set Execute = Me
     RaiseEvent ExecuteComplete(Execute)
-'    Set Execute = Me
-'    ExecuteOnArray vArgs
 End Function
 
-'Public Function ExecuteOnArray(ByVal vArgs As Variant) As Callback
+
 Public Function ExecuteOnArray(ByRef vArgs() As Variant) As Callback
-    'If Not IsArray(vArgs) Then vArgs = Array(vArgs)
     If Not pInstance Is Nothing Then
         ' CallByName
         Select Case UBound(vArgs)
-            Case -1: Assign result, CallByName(pInstance, pName, VbMethod)
-            Case 0: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0))
-            Case 1: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1))
-            Case 2: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2))
-            Case 3: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
-            Case 4: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
-            Case 5: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5))
-            Case 6: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6))
-            Case 7: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7))
-            Case 8: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8))
-            Case 9: Assign result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8), vArgs(9))
+            Case -1: Assign Result, CallByName(pInstance, pName, VbMethod)
+            Case 0: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0))
+            Case 1: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1))
+            Case 2: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2))
+            Case 3: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
+            Case 4: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
+            Case 5: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5))
+            Case 6: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6))
+            Case 7: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7))
+            Case 8: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8))
+            Case 9: Assign Result, CallByName(pInstance, pName, VbMethod, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8), vArgs(9))
         End Select
     ElseIf pInstance Is Nothing And pName <> "" Then
         ' Application.Run
         Select Case UBound(vArgs)
-            Case -1: Assign result, Application.Run(pName)
-            Case 0: Assign result, Application.Run(pName, vArgs(0))
-            Case 1: Assign result, Application.Run(pName, vArgs(0), vArgs(1))
-            Case 2: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2))
-            Case 3: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
-            Case 4: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
-            Case 5: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5))
-            Case 6: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6))
-            Case 7: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7))
-            Case 8: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8))
-            Case 9: Assign result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8), vArgs(9))
+            Case -1: Assign Result, Application.Run(pName)
+            Case 0: Assign Result, Application.Run(pName, vArgs(0))
+            Case 1: Assign Result, Application.Run(pName, vArgs(0), vArgs(1))
+            Case 2: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2))
+            Case 3: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3))
+            Case 4: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4))
+            Case 5: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5))
+            Case 6: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6))
+            Case 7: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7))
+            Case 8: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8))
+            Case 9: Assign Result, Application.Run(pName, vArgs(0), vArgs(1), vArgs(2), vArgs(3), vArgs(4), vArgs(5), vArgs(6), vArgs(7), vArgs(8), vArgs(9))
         End Select
     Else
         Select Case UBound(vArgs)
-            Case -1: Assign result, Empty
-            Case 0: Assign result, vArgs(0)
-            Case Else: Assign result, CArray(vArgs)
+            Case -1: Assign Result, Empty
+            Case 0: Assign Result, vArgs(0)
+            Case Else: Assign Result, CArray(vArgs)
         End Select
     End If
     
@@ -150,16 +157,16 @@ Public Function Filter(ByVal PredicateFunction As String) As Callback
         Set aList = CreateObject("System.Collections.ArrayList")
         Set eScript = CreateObject("MSScriptControl.ScriptControl")
         eScript.Language = "JScript"
-        eScript.ExecuteStatement "var Result = eval(" & JSON.Stringify(result) & ");"
+        eScript.ExecuteStatement "var Result = eval(" & JSON.Stringify(Result) & ");"
         eScript.AddCode jsFunc(0)
         
-        For i = 0 To UBound(result)
+        For i = 0 To UBound(Result)
             If CBool(eScript.Eval("fn(Result[" & i & "], " & i & ", Result);")) Then
-                aList.Add result(i)
+                aList.Add Result(i)
             End If
         Next i
     
-        result = aList.ToArray
+        Result = aList.ToArray
     End If
     
     Set Filter = Me
@@ -173,14 +180,14 @@ Public Function Map(ByVal SelectorFunction As String) As Callback
         Set eScript = CreateObject("MSScriptControl.ScriptControl")
         eScript.Language = "JScript"
         eScript.AddCode CollectionsLib.JScriptCode("JSON.serialize")
-        eScript.ExecuteStatement "var Result = eval(" & JSON.Stringify(result) & ");"
+        eScript.ExecuteStatement "var Result = eval(" & JSON.Stringify(Result) & ");"
         eScript.AddCode jsFunc(0)
         
-        For i = 0 To UBound(result)
+        For i = 0 To UBound(Result)
             aList.Add JSON.Parse(eScript.Eval("JSON.serialize(fn(Result[" & i & "], " & i & ", Result));"))
         Next i
         
-        result = aList.ToArray
+        Result = aList.ToArray
     End If
 
     Set Map = Me
@@ -194,18 +201,18 @@ Public Function Reduce(ByVal AccumulatorFunction As String, Optional ByVal Initi
         Set eScript = CreateObject("MSScriptControl.ScriptControl")
         eScript.Language = "JScript"
         eScript.AddCode CollectionsLib.JScriptCode("JSON.serialize")
-        eScript.ExecuteStatement "var Result = eval(" & JSON.Stringify(result) & ");"
-        iStart = LBound(result)
+        eScript.ExecuteStatement "var Result = eval(" & JSON.Stringify(Result) & ");"
+        iStart = LBound(Result)
         If IsMissing(InitialValue) Then
-            InitialValue = result(LBound(result))
-            iStart = LBound(result) + 1
+            InitialValue = Result(LBound(Result))
+            iStart = LBound(Result) + 1
         End If
         eScript.ExecuteStatement "var __Acc = eval(" & JSON.Stringify(InitialValue) & ");"
         eScript.AddCode jsFunc(0)
         
-        For i = iStart To UBound(result)
-            If i = UBound(result) Then
-                Assign result, JSON.Parse(eScript.Eval("JSON.serialize(fn(__Acc, Result[" & i & "], " & i & ", Result))"))
+        For i = iStart To UBound(Result)
+            If i = UBound(Result) Then
+                Assign Result, JSON.Parse(eScript.Eval("JSON.serialize(fn(__Acc, Result[" & i & "], " & i & ", Result))"))
             Else
                 eScript.ExecuteStatement "__Acc = fn(__Acc, Result[" & i & "], " & i & ", Result);"
             End If
@@ -217,7 +224,7 @@ End Function
 
 
 Public Function PrintAll() As Callback
-    Debug.Print JSON.Stringify(result, 2)
+    Debug.Print JSON.Stringify(Result, 2)
     Set PrintAll = Me
 End Function
 

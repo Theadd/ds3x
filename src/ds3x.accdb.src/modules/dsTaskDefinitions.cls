@@ -161,7 +161,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
                     For i = 0 To iMax
                         v = .Instance(i, c)
                         If Not IsNull(v) Then
-                            t(i, c) = cb.Execute(v).result
+                            t(i, c) = cb.Execute(v).Result
                         End If
                     Next i
                 Else
@@ -199,7 +199,7 @@ Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer 
             Set d = cH(i)
             Set dX = DictionaryEx.Bind(d).Clone()
     
-            dX.Add "ColumnName", cb.Execute(dX.Item("ColumnName")).result
+            dX.Add "ColumnName", cb.Execute(dX.Item("ColumnName")).Result
             Set t(0, i) = dX.Instance
         Next i
     End If
