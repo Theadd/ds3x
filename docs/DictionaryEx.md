@@ -90,7 +90,7 @@ The <code>Scripting.Dictionary</code> object wrapped by this <code>DictionaryEx<
 
 </tbody>
 
-</caption>
+
 <thead><tr><th colspan="2">PROPERTIES</th></tr></thead>
 <tbody>
 

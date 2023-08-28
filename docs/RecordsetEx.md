@@ -79,7 +79,7 @@ The <code>ADODB.Recordset</code> object wrapped by this <code>RecordsetEx</code>
 
 </tbody>
 
-</caption>
+
 <thead><tr><th colspan="2">PROPERTIES</th></tr></thead>
 <tbody>
 

@@ -41,7 +41,7 @@ The <code>2D Array</code> wrapped by this <code>Array2dEx</code> instance.<br/>
 
 </tbody>
 
-</caption>
+
 <thead><tr><th colspan="2">PROPERTIES</th></tr></thead>
 <tbody>
 

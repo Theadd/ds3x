@@ -81,7 +81,7 @@ The <code>ArrayList</code> object wrapped by this <code>ArrayListEx</code> insta
 
 </tbody>
 
-</caption>
+
 <thead><tr><th colspan="2">PROPERTIES</th></tr></thead>
 <tbody>
 
