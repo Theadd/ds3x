@@ -54,10 +54,16 @@ End Property
 
 
 Public Property Let Item(mKey As Variant, mVal As Variant)
+    If VarType(mKey) = vbString Then
+        If TrySetNestedItem(mKey, mVal) Then Exit Property
+    End If
     Instance.Item(mKey) = mVal
 End Property
 
 Public Property Set Item(mKey As Variant, mVal As Variant)
+    If VarType(mKey) = vbString Then
+        If TrySetNestedItem(mKey, mVal) Then Exit Property
+    End If
     Set Instance.Item(mKey) = mVal
 End Property
 
@@ -75,10 +81,13 @@ End Property
 
 ' --- PUBLIC METHODS ---
 
-Public Function Join(ByVal Target As RecordsetEx) As RecordsetEx
-    Set Join = RecordsetEx.Create()
-    ' TODO: Implement
-    Err.Raise 17, , "Not implemented."
+Public Function SetValue(mKey As Variant, ByRef Value As Variant) As DictionaryEx
+    Set SetValue = Me
+    If IsObject(Value) Then
+        Set Item(mKey) = Value
+    Else
+        Item(mKey) = Value
+    End If
 End Function
 
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As DictionaryEx: Set CreateBlank = Create(): End Function
@@ -123,6 +132,8 @@ Public Function Bind(ByRef DictionaryLike As Variant) As DictionaryEx
         CreateFromIterable C2ArrayListEx(DictionaryLike).ToArray()
     ElseIf TypeOf DictionaryLike Is Array2dEx Then
         CreateFromIterable ArrayListEx.Create(DictionaryLike).ToArray()
+    ElseIf TypeOf DictionaryLike Is ArrayList Then
+        CreateFromIterable C2ArrayList(DictionaryLike).ToArray()
     End If
 End Function
 
@@ -172,16 +183,28 @@ Public Function Append(Optional ByRef mOther As Variant) As DictionaryEx
     Set Append = Me
 End Function
 
-'Removes a key/item pair from the Scripting.Dictionary.
+Public Function Join(ByVal Target As RecordsetEx) As DictionaryEx
+    Set Join = DictionaryEx.Create()
+    ' TODO: Implement
+    Err.Raise 17, , "Not implemented."
+End Function
+
+' Removes a key-value pair from the Scripting.Dictionary.
 Public Function Remove(mKey As Variant) As DictionaryEx
     Instance.Remove mKey
     Set Remove = Me
 End Function
 
-'The RemoveAll method removes all key, item pairs from the Scripting.Dictionary.
+' Removes all key-value pairs from the Scripting.Dictionary.
 Public Function RemoveAll() As DictionaryEx
     Instance.RemoveAll
     Set RemoveAll = Me
+End Function
+
+' Removes all key-value pairs from the Scripting.Dictionary.
+Public Function Clear() As DictionaryEx
+    Instance.RemoveAll
+    Set Clear = Me
 End Function
 
 'Returns True if a specified key exists in the Scripting.Dictionary, false otherwise.
@@ -277,8 +300,24 @@ Private Function ShallowCopyDictionary(ByVal d As Scripting.Dictionary) As Scrip
     Set ShallowCopyDictionary = s
 End Function
 
+Private Function TrySetNestedItem(ByVal mKey As String, ByRef Value As Variant) As Boolean
+    Dim t As Long, v As Variant, sAux As String
+    
+    t = InStrRev(mKey, ".")
+    If t = 0 Then Exit Function
+    
+    Assign v, Item(VBA.Left$(mKey, t - 1))
+    sAux = VBA.Mid$(mKey, t + 1, Len(mKey))
+    If IsObject(Value) Then
+        Set v(sAux) = Value
+    Else
+        v(sAux) = Value
+    End If
+    TrySetNestedItem = True
+End Function
+
 Private Function GetNestedItem(ByVal mKey As String) As Variant
-    Dim t As Long, c As Long, c2 As Long, v As Variant, tEnd As Boolean, cEnd As Boolean
+    Dim t As Long, c As Long, c2 As Long, v As Variant, v2 As Variant, tEnd As Boolean, cEnd As Boolean
     On Error GoTo Finally
     
     Do
@@ -293,12 +332,14 @@ Private Function GetNestedItem(ByVal mKey As String) As Variant
                     v = VBA.Mid$(mKey, 1 + c, c2 - c - 1)
                     If CStr(Val(v)) = CStr(v) Then
                         c2 = CLng(Val(v))
-                        Assign v, Instance.Item(VBA.Mid$(mKey, 1, c - 1))
-                        Assign v, v(c2)
+                        Assign v2, Instance.Item(VBA.Mid$(mKey, 1, c - 1))
+                        Assign v, v2(c2)
                         If Len(mKey) = (c + Len(CStr(c2)) + 1) Then
                             Assign GetNestedItem, v
                         Else
-                            Assign GetNestedItem, ContinueNestedItem(v, VBA.Mid$(mKey, 1 + c + Len(CStr(c2)) + 1, Len(mKey)))
+                            v2 = VBA.Mid$(mKey, 1 + c + Len(CStr(c2)) + 1, Len(mKey))
+                            v2 = IIf(VBA.Left$(v2, 1) = ".", VBA.Mid$(v2, 2, Len(v2)), v2)
+                            Assign GetNestedItem, ContinueNestedItem(v, v2)
                         End If
                         Exit Do
                     End If
@@ -363,6 +404,7 @@ Public Sub Dispose(): Set Instance = Nothing: End Sub
 ' --- TYPE CASTING ---
 
 Private Function C2ArrayListEx(ByRef Value As Variant) As ArrayListEx: Set C2ArrayListEx = Value: End Function
+Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
 
 
 ' --- ICollectionEx ---
