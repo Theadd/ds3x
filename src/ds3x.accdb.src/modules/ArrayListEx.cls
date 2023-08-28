@@ -114,7 +114,7 @@ Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = enumerator
 End Function
 
-' Adds an item to the ArrayList instance.
+' Adds an element to the ArrayList (@see also: ArrayListEx.BinaryAdd).
 Public Function Add(Value As Variant) As ArrayListEx
 Attribute Add.VB_Description = "Adds an item to the ArrayList instance."
     Instance.Add Value
@@ -167,7 +167,7 @@ Public Function ToArray() As Variant
     ToArray = Instance.ToArray
 End Function
 
-Static Function IsArrayLike(Optional ByVal ArrayLike As Variant) As Boolean
+Static Function IsArrayLike(Optional ByRef ArrayLike As Variant) As Boolean
     If IsMissing(ArrayLike) Then Exit Function
     If IsObject(ArrayLike) Then
         If ArrayLike Is Nothing Then Exit Function
@@ -176,7 +176,7 @@ Static Function IsArrayLike(Optional ByVal ArrayLike As Variant) As Boolean
     IsArrayLike = (IsObject(ArrayLike) Or IsArray(ArrayLike))
 End Function
 
-Static Function CountElementsIn(ByVal ArrayLike As Variant) As Long
+Static Function CountElementsIn(ByRef ArrayLike As Variant) As Long
     On Error Resume Next
     
     If IsObject(ArrayLike) Then CountElementsIn = ArrayLike.Count
@@ -184,9 +184,9 @@ Static Function CountElementsIn(ByVal ArrayLike As Variant) As Long
 End Function
 
 ' Removes an element by value from the ArrayList.
-Public Function Remove(Item As Variant) As ArrayListEx
+Public Function Remove(Value As Variant) As ArrayListEx
 Attribute Remove.VB_Description = "Removes an element by value from the ArrayList."
-    Instance.Remove Item
+    Instance.Remove Value
     Set Remove = Me
 End Function
 
@@ -381,6 +381,9 @@ Public Function Clone() As ArrayListEx
     Set Clone = ArrayListEx.Create(Me)
 End Function
 
+
+' --- IComparer ---
+
 Public Function Sort(Optional ByVal Comparer As mscorlib.IComparer = Nothing) As ArrayListEx
     If Comparer Is Nothing Then
         Instance.Sort
@@ -398,6 +401,51 @@ Public Function BinarySearch(ByVal Value As Variant, Optional ByVal StartIndex A
         BinarySearch = Instance.BinarySearch(StartIndex, SearchCount, Value, Comparer)
     End If
 End Function
+
+Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal StartIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+    Dim r As Long
+
+    If Comparer Is Nothing Then
+        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, dsComparer)
+    Else
+        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, Comparer)
+    End If
+    If r < 0 Then
+        r = (Not r)
+        If r = Instance.Count Then
+            Add Value
+        Else
+            Insert r, Value
+        End If
+    End If
+    
+    BinaryAdd = r
+End Function
+
+Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal StartIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+    Dim r As Long
+    
+    If Comparer Is Nothing Then
+        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, dsComparer)
+    Else
+        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, Comparer)
+    End If
+    If r < 0 Then
+        r = (Not r)
+        If r = Instance.Count Then
+            Add Value
+        Else
+            Insert r, Value
+        End If
+    Else
+        RemoveAt r
+    End If
+    
+    BinaryToggle = r
+End Function
+
+
+' --- To String ---
 
 Public Function PrintAll() As ArrayListEx
     Debug.Print JSON.Stringify(Instance, 2)
