@@ -68,6 +68,7 @@ End Property
 Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
 Public Property Get Resolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String: Resolve = PathResolve(Path, RelativeTo): End Property
 Public Property Get ReadAllTextInFile(ByVal TargetFile As String, Optional ByVal asUnicode As Boolean = True) As String: Dim s As String: FileSystemLib.TryReadAllTextInFile TargetFile, s, asUnicode: ReadAllTextInFile = s: End Property
+Public Property Get FileInAncestors(ByVal TargetFile As String, Optional ByVal BackwardMovesLimit As Long = -1) As String: FileInAncestors = IIf(TryGetFileInAncestors(TargetFile, BackwardMovesLimit), TargetFile, ""): End Property
 
 
 ' --- FILE SYSTEM UTILITIES ---
