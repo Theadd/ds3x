@@ -14,7 +14,7 @@ Implements __[ICollectionEx](./ICollectionEx.md)__.
 - `DictionaryEx.Create()` supports creating new instances by directly converting from:
   - **Scripting.Dictionary** and **DictionaryEx**.
   - Plain **2D Arrays** and **Jagged Arrays** (array of arrays).
-  - **Scripting.Dictionary**, **DictionaryEx**.
+  - **ArrayList** and **ArrayListEx**.
   - **Array2dEx**.
   - **JSON** string.
 
