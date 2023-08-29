@@ -117,7 +117,8 @@ End Property
         Next t
         
 Finally:
-        Set pLiveEd = Nothing
+        On Error Resume Next
+        If Not pLiveEd Is Nothing Then pLiveEd.Dispose
         RunAll = shouldContinue
         If pQuitOnRunAll Then Application.Quit acQuitPrompt
         Exit Property
