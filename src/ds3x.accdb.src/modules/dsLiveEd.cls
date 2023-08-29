@@ -220,15 +220,19 @@ Fallback:
 End Function
 
 ' Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated.
-Public Function TryApply(ByRef GeneratedOutput As Variant) As Boolean
+Public Function TryApply(Optional ByRef GeneratedOutput As Variant) As Boolean
     On Error GoTo Fallback
     
     If TryRebuildAll Then
-        Assign GeneratedOutput, TaskController.GeneratedValue
-        If IsObject(GeneratedOutput) Then
-            If Not GeneratedOutput Is Nothing Then
-                TryApply = True
+        If Not IsMissing(GeneratedOutput) Then
+            Assign GeneratedOutput, TaskController.GeneratedValue
+            If IsObject(GeneratedOutput) Then
+                If Not GeneratedOutput Is Nothing Then
+                    TryApply = True
+                End If
             End If
+        Else
+            TryApply = True
         End If
     End If
     

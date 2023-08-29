@@ -75,13 +75,13 @@ End Property
     End Property
     
     Public Property Get RunAll() As Boolean
-        Dim t As Variant, shouldContinue As Boolean, g As Variant, sTarget As String
+        Dim t As Variant, shouldContinue As Boolean, sTarget As String
         On Error GoTo ErrorHandler
         pFailedTask = Empty
         
         For Each t In RunnableTasks.ToArray()
             pActiveTask = t
-            Set pLiveEd = Nothing
+            If Not pLiveEd Is Nothing Then pLiveEd.Dispose
             
             Set pLiveEd = New dsLiveEd
             sTarget = FileSystemLib.Resolve(ApplyCustomVarsOn(CStr(t(0))))
@@ -93,7 +93,7 @@ End Property
 
             shouldContinue = pLiveEd.ImportPreset(sTarget)
             If shouldContinue Then
-                shouldContinue = pLiveEd.TryApply(g)
+                shouldContinue = pLiveEd.TryApply()
                 If Not shouldContinue Then
                     If CBool(t(2)) Then
                         shouldContinue = True   ' Where `t(2)` is the `OnErrorResumeNext` (optional) parameter provided to the `AddRunnableTask()` call.
