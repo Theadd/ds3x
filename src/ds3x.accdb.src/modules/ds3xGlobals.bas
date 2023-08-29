@@ -141,7 +141,3 @@ End Function
 '    XDaysAgo = CStr(Value)
 'End Function
 
-
-
-
-
