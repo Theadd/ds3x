@@ -14,6 +14,17 @@ Option Base 0
 
 Implements ICollectionEx
 
+' EDIT: CopyMemory
+'Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+'
+'#If Win64 Then
+'    Const PTR_SIZE As Long = 8
+'    Const VARIANT_SIZE As Long = 24
+'#Else
+'    Const PTR_SIZE As Long = 4
+'    Const VARIANT_SIZE As Long = 16
+'#End If
+
 
 Public Instance As Variant
 
@@ -31,6 +42,8 @@ End Property
 Public Property Get Row(ByVal Index As Long) As Variant
     Dim t() As Variant, i As Long
     ReDim t(0 To UBound(Instance, 2))
+    ' EDIT: CopyMemory
+    ' CopyMemory ByVal VBA.VarPtr(t(0)), ByVal VBA.VarPtr(Instance(Index, 0)), VARIANT_SIZE * (UBound(Instance, 2) + 1)
     For i = 0 To UBound(Instance, 2)
         If IsObject(Instance(Index, i)) Then
             Set t(i) = Instance(Index, i)
@@ -257,6 +270,8 @@ End Function
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
     Dim t() As Variant, i As Long, c As Variant, c0 As Long
+    ' EDIT: CopyMemory
+    ' Dim j() As Variant, k As Long, e As Long, kMax As Long
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If Index >= Me.Count Then
@@ -273,7 +288,16 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
     
     If GetCount > 0 Then
+        ' EDIT: CopyMemory
+'        kMax = UBound(ColumnIndexes)
+'        ReDim t(0 To GetCount - 1, 0 To kMax)
         ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes) - LBound(ColumnIndexes))
+        
+        ' EDIT: CopyMemory
+'        For k = 0 To kMax
+'            e = CLng(ColumnIndexes(k))
+'            MemoryLib.MemCopy VBA.VarPtr(t(0, k)), VBA.VarPtr(Instance(Index, e)), VARIANT_SIZE * CLng(GetCount)
+'        Next k
     
         For i = Index To Index + GetCount - 1
             c0 = 0

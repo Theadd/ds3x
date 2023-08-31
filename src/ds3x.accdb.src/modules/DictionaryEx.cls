@@ -108,11 +108,13 @@ Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
                     Exit Function
                 End If
             ElseIf IsArray(DictionaryLike) Then
-                If Array2dEx.Is2dArray(DictionaryLike) Then
-                    CreateFromIterable ArrayListEx.Create(DictionaryLike).ToArray()
-                Else
-                    CreateFromIterable DictionaryLike
-                End If
+                Create.Bind ArrayListEx.Create(DictionaryLike)
+                Exit Function
+'                If Array2dEx.Is2dArray(DictionaryLike) Then
+'                    CreateFromIterable ArrayListEx.Create(DictionaryLike).ToArray()
+'                Else
+'                    CreateFromIterable DictionaryLike
+'                End If
             End If
         End If
     End If

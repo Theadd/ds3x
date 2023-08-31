@@ -344,6 +344,9 @@ End Sub
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
     Dim aX As ArrayListEx, cRow As Long, cRange As Excel.Range, i As Long, iMax As Long, rCount As Long, bX As ArrayListEx, a2dX As Array2dEx, iNumRows As Long
     
+#If Win64 Then
+    CopyToRangeNonChunked RangeObject, ApplyUserLocale, WriteHeaders
+#Else
     If WriteHeaders Then
         Set aX = ArrayListEx.Create(Array(GetColumnNames()))
         Array2dEx.Create(aX).CopyToRange RangeObject, False
@@ -356,14 +359,14 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
     ' TODO: Implement chunked copy of table source ranges when source recordset is way too large to be dealt at once in Win32 due to 2GB virtual memory limit.
     If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
 
+    On Error GoTo ErrorHandler
     If pRecordArray Is Nothing Then
-        On Error GoTo ErrorHandler
         rCount = pRecordList.Count
         
         iNumRows = rCount - (i * dsChunkSize)
         If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
 
-        While (iNumRows > 0)
+        Do While (iNumRows > 0)
             ' TODO: To ~one-liner
             Set bX = pRecordList.GetRange(i * dsChunkSize, iNumRows)
             Set a2dX = Array2dEx.Create(bX)
@@ -374,14 +377,26 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
             cRow = cRow + iNumRows
             iNumRows = rCount - (i * dsChunkSize)
             If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
-        Wend
-        'GlobalVMemAnalysis "@dsTable.CopyToRange P2A"
+        Loop
     Else
-        pRecordArray.CopyToRange RangeObject.Range("A" & CStr(1 + cRow)), ApplyUserLocale
-        'GlobalVMemAnalysis "@dsTable.CopyToRange P2B"
+        ' pRecordArray.CopyToRange RangeObject.Range("A" & CStr(1 + cRow)), ApplyUserLocale
+        rCount = pRecordArray.Count
+        
+        iNumRows = rCount - (i * dsChunkSize)
+        If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
+
+        Do While (iNumRows > 0)
+            ' TODO: To ~one-liner
+            Set a2dX = pRecordArray.GetRange(i * dsChunkSize, iNumRows)
+            a2dX.CopyToRange RangeObject.Range("A" & CStr(1 + cRow)), ApplyUserLocale
+            a2dX.Dispose
+            i = i + 1
+            cRow = cRow + iNumRows
+            iNumRows = rCount - (i * dsChunkSize)
+            If iNumRows > dsChunkSize Then iNumRows = dsChunkSize
+        Loop
     End If
-    
-    ' Me.RecordArray.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
+#End If
     
 ExitFunc:
     Set CopyToRange = Me
@@ -392,12 +407,18 @@ ErrorHandler:
     Resume Next
 End Function
 
-Friend Function CopyToRangeNonChunked(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As dsTable
+Private Function CopyToRangeNonChunked(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
     Dim hList As New ArrayListEx
     
-    hList.Add GetHeaderNames
-    Array2dEx.Create(hList).CopyToRange RangeObject, False
-    Me.RecordArray.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
+    If pRecordArray Is Nothing And pRecordList Is Nothing Then RebuildRecordsFromTableSource
+    If WriteHeaders Then
+        hList.Add GetColumnNames
+        Array2dEx.Create(hList).CopyToRange RangeObject, False
+        Me.RecordArray.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
+    Else
+        Me.RecordArray.CopyToRange RangeObject, ApplyUserLocale
+    End If
+    ApplyFormatToExcelRange RangeObject, WriteHeaders
     
     Set CopyToRangeNonChunked = Me
 End Function
