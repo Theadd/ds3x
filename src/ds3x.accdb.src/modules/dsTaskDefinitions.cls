@@ -176,6 +176,58 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
     Set ReplaceValues = pTaskController.AddResource(dsTable.Create(Array2dEx.Create(t)).SetHeaders(Target.Headers))
 End Function
 
+Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
+    Dim t() As Variant, i As Long, iMax As Long, c As Long, k As Long, kMax As Long, Target As dsTable, a2X As Array2dEx
+    Set Target = TargetTable
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    iMax = Target.Count - 1
+    If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+    End If
+    kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
+    t = Target.RecordArray.Instance
+    
+    For k = 0 To kMax
+        c = CLng(ColumnIndexes(k))
+        For i = 0 To iMax
+            If VarType(t(i, c)) = vbString Then
+                t(i, c) = AsciiToHex(t(i, c))
+            End If
+        Next i
+    Next k
+    
+    Set a2X = New Array2dEx
+    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    
+    Set StringValuesToHex = pTaskController.AddResource(dsTable.Create(a2X, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
+End Function
+
+Public Function HexToStringValues(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
+    Dim t() As Variant, i As Long, iMax As Long, c As Long, k As Long, kMax As Long, Target As dsTable, a2X As Array2dEx
+    Set Target = TargetTable
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    iMax = Target.Count - 1
+    If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+    End If
+    kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
+    t = Target.RecordArray.Instance
+    
+    For k = 0 To kMax
+        c = CLng(ColumnIndexes(k))
+        For i = 0 To iMax
+            If VarType(t(i, c)) = vbString Then
+                t(i, c) = HexToAscii(t(i, c))
+            End If
+        Next i
+    Next k
+    
+    Set a2X = New Array2dEx
+    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    
+    Set HexToStringValues = pTaskController.AddResource(dsTable.Create(a2X, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
+End Function
+
 Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer As Variant) As dsTable
     Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, dX As New DictionaryEx
     Dim cb As Callback, dRepl As DictionaryEx
@@ -679,6 +731,18 @@ Private Sub AddAllTasks()
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included."), _
             Usage:="{...TaskName: 'ReplaceValues', Values: [, 'SecondsToHMS']}"
             
+    AddTask "StringValuesToHex", "[Source]: Table, [ColumnIndexes]: Array()", _
+            Description:=StringLines( _
+                "Returns a copy of the provided Source Table with the <b>string</b> values within the provided ColumnIndexes being replaced by it's corresponding hex string.", _
+                "", _
+                "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
+    
+    AddTask "HexToStringValues", "[Source]: Table, [ColumnIndexes]: Array()", _
+            Description:=StringLines( _
+                "Returns a copy of the provided Source Table with the <b>hex</b> values within the provided ColumnIndexes being replaced by it's corresponding <b>ascii</b> string.", _
+                "", _
+                "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
+            
     AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
     
     AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()"
@@ -832,5 +896,30 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
         End If
     End If
 End Sub
+
+Private Function AsciiToHex(ByVal Value As String) As String
+    Dim i As Long, iMax As Long, t() As String
+    iMax = Len(Value)
+    ReDim t(1 To iMax)
+    
+    For i = 1 To iMax
+        t(i) = Right("0" & VBA.Hex$(VBA.AscW(VBA.Mid$(Value, i, 1))), 2)
+    Next i
+    
+    AsciiToHex = VBA.Join(t, "")
+End Function
+
+Private Function HexToAscii(ByVal Value As String) As String
+    Dim i As Long, iMax As Long, t() As String
+    iMax = CLng(Len(Value) / 2) - 1
+    ReDim t(0 To iMax)
+    
+    For i = 0 To iMax
+        t(i) = VBA.ChrW(CLng("&H" & VBA.Mid$(Value, 1 + (2 * i), 2)))
+    Next i
+    
+    HexToAscii = VBA.Join(t, "")
+End Function
+
 
 
