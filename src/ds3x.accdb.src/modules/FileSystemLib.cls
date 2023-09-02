@@ -67,7 +67,7 @@ End Property
 
 Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
 Public Property Get Resolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String: Resolve = PathResolve(Path, RelativeTo): End Property
-Public Property Get ReadAllTextInFile(ByVal TargetFile As String, Optional ByVal asUnicode As Boolean = True) As String: Dim s As String: FileSystemLib.TryReadAllTextInFile TargetFile, s, asUnicode: ReadAllTextInFile = s: End Property
+Public Property Get ReadAllTextInFile(ByVal TargetFile As String, Optional ByVal AsUnicode As Boolean = True) As String: Dim s As String: FileSystemLib.TryReadAllTextInFile TargetFile, s, AsUnicode: ReadAllTextInFile = s: End Property
 Public Property Get FileInAncestors(ByVal TargetFile As String, Optional ByVal BackwardMovesLimit As Long = -1) As String: FileInAncestors = IIf(TryGetFileInAncestors(TargetFile, BackwardMovesLimit), TargetFile, ""): End Property
 
 
@@ -433,11 +433,11 @@ Public Function TryGetFileInAncestors(ByRef TargetFile As String, Optional ByVal
 End Function
 
 
-Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal overwriteIfAlreadyExists As Boolean = True, Optional ByVal asUnicode As Boolean = True) As Boolean
+Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal overwriteIfAlreadyExists As Boolean = True, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
     Dim stream As TextStream
     
-    Set stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, asUnicode)
+    Set stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
     stream.Write (Content)
     stream.Close
     
@@ -450,11 +450,11 @@ ErrorHandler:
     If Not (stream Is Nothing) Then stream.Close
 End Function
 
-Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal asUnicode As Boolean = True) As Boolean
+Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
     Dim stream As TextStream
     
-    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, IIf(asUnicode, TristateTrue, TristateFalse))
+    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, IIf(AsUnicode, TristateTrue, TristateFalse))
     Content = stream.ReadAll
     stream.Close
     
@@ -467,11 +467,11 @@ ErrorHandler:
     If Not (stream Is Nothing) Then stream.Close
 End Function
 
-Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As String, Optional ByVal asUnicode As Boolean = True) As Boolean
+Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As String, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
     Dim stream As TextStream
     
-    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(asUnicode, TristateTrue, TristateFalse))
+    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(AsUnicode, TristateTrue, TristateFalse))
     stream.Write Content
     stream.Close
     

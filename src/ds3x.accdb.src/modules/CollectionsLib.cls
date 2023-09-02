@@ -338,7 +338,7 @@ Fallback:
 End Function
 
 ' USAGE: sArgv() = Split(TokenizeArgs("one ""two twoB twoC"" three ""four fourB"" five"), Chr$(0))
-Private Function TokenizeArgs(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As String
+Public Function TokenizeArgs(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As String
    Dim sArgs As String, sChar As String, nCount As Long, bQuotes As Boolean
    
    For nCount = 1 To Len(SearchString)
@@ -408,6 +408,55 @@ Public Function ColumnLetter(ByVal ColumnIndex As Long) As String
         i = i + 1
     Loop Until ((26 ^ i) + (26 * (1 - (0 ^ (i - 1)))) > ColumnIndex)
 End Function
+
+'Public Function MveNF(ByVal Val As String, Optional ByVal n As Long = 13) As String
+'    Dim i As Long, res As String, lMax As Long, cCode As Long, cMod As Long
+'    lMax = Len(Val)
+'    res = ""
+'
+'    For i = 1 To lMax
+'        cCode = VBA.AscW(VBA.Mid(Val, i, 1))
+'        cCode = cCode + n
+'        If cCode < 32 Then
+'            cCode = 127 - (32 - cCode)
+'        ElseIf cCode > 126 Then
+'            cCode = 31 + (cCode - 126)
+'        End If
+'        res = res & VBA.ChrW(cCode)
+'    Next i
+'
+'    MveNF = res
+'End Function
+'
+'Public Function MveNB(ByVal Val As String, Optional ByVal n As Long = 13) As String
+'    MveNB = MveNF(Val, n * (-1))
+'End Function
+'
+'Public Function AsciiToHex(ByVal Value As String) As String
+'    Dim i As Long, iMax As Long, t() As String
+'    iMax = Len(Value)
+'    ReDim t(1 To iMax)
+'
+'    For i = 1 To iMax
+'        t(i) = Right("0" & VBA.Hex$(VBA.AscW(VBA.Mid$(Value, i, 1))), 2)
+'    Next i
+'
+'    AsciiToHex = VBA.Join(t, "")
+'End Function
+'
+'Public Function HexToAscii(ByVal Value As String) As String
+'    Dim i As Long, iMax As Long, t() As String
+'    iMax = CLng(Len(Value) / 2) - 1
+'    ReDim t(0 To iMax)
+'
+'    For i = 0 To iMax
+'        t(i) = VBA.ChrW(CLng("&H" & VBA.Mid$(Value, 1 + (2 * i), 2)))
+'    Next i
+'
+'    HexToAscii = VBA.Join(t, "")
+'End Function
+
+
 
 
 
