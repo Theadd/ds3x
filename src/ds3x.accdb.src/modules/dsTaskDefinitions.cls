@@ -405,6 +405,7 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
         Set xlRange = GetRangeInWorksheet(xlSheet, RangeAddress)
     End If
 
+    dsApp.GlobalVMemAnalysis "Excel.Range -> dsTable - Begin!"
     With xlRange
         If FirstRowHasHeaders Then
             Set LoadFromRange = pTaskController.AddResource(dsTable.Create(xlRange, True))
@@ -414,6 +415,7 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
                 .SetHeaders(CollectionsLib.ArrayRange(1, .Columns.Count)))
         End If
     End With
+    dsApp.GlobalVMemAnalysis "Excel.Range -> dsTable - Done!"
 End Function
 
 Public Function LoadFromFileAsJSON(ByVal TargetFile As Variant, Optional ByVal DisableCache As Variant) As dsTable
@@ -443,6 +445,43 @@ LoadFromFileAsJSONFallback:
     End If
 
     Set LoadFromFileAsJSON = pTaskController.AddResource(dsT)
+End Function
+
+Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Options As Variant, Optional ByVal DisableCache As Variant) As dsTable
+    Dim dsT As dsTable, sContent As String, sTarget As String, dX As DictionaryEx
+    DisableCache = GetParam(DisableCache, False)
+    Set Options = GetParamAsDictionaryEx(Options)
+    
+    ' {"Delimiter": ";", "AsUnicode": false, "InLocalFormat": true, "AutoHeaders": true}
+    Set dX = DictionaryEx.Create() _
+        .Add("Delimiter", Options.GetValue("Delimiter", ";")) _
+        .Add("AsUnicode", Options.GetValue("AsUnicode", False)) _
+        .Add("InLocalFormat", Options.GetValue("InLocalFormat", True)) _
+        .Add("AutoHeaders", Options.GetValue("AutoHeaders", True))
+    
+    If Not DisableCache Then
+        On Error GoTo LoadFromFileAsCSVFallback
+        Set dsT = TaskController().DataSource(ActiveTaskId())
+        If IsObject(dsT) And Not (dsT Is Nothing) Then
+            Set LoadFromFileAsCSV = dsT
+            Exit Function
+        End If
+    End If
+    
+LoadFromFileAsCSVFallback:
+    On Error GoTo 0
+    TargetFile = GetParam(TargetFile, "")
+    sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
+    
+    If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent, CBool(dX("AsUnicode"))) Then
+        Err.Raise 17, , "Unable to read text from provided file"
+    End If
+    Set dsT = LoadFromCSV(sContent, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
+
+    Set LoadFromFileAsCSV = pTaskController.AddResource(dsT)
 End Function
 
 Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal ConnectionString As Variant, Optional ByVal DisableCache As Variant) As dsTable
@@ -479,12 +518,25 @@ End Function
 Public Function SaveToFileAsJSON(ByRef SourceTable As Variant, ByVal FilePath As Variant) As dsTable
     Dim Target As dsTable
     FilePath = GetParam(FilePath, "")
-    
     Set Target = SourceTable
+
     If Not FileSystemLib.TryWriteTextToFile(FileSystemLib.Resolve(FilePath), JSON.Stringify(Target, 2), True, False) Then
         Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
     End If
     Set SaveToFileAsJSON = Target
+End Function
+
+Public Function SaveToFileAsCSV(ByRef SourceTable As Variant, ByVal FilePath As Variant, Optional ByVal Delimiter As Variant, Optional ByVal AsUnicode As Variant) As dsTable
+    Dim Target As dsTable
+    FilePath = GetParam(FilePath, "")
+    Delimiter = GetParam(Delimiter, ";")
+    AsUnicode = GetParam(AsUnicode, False)
+    Set Target = SourceTable
+
+    If Not FileSystemLib.TryWriteTextToFile(FileSystemLib.Resolve(FilePath), Target.ToCSV(Delimiter), True, CBool(AsUnicode)) Then
+        Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
+    End If
+    Set SaveToFileAsCSV = Target
 End Function
 
 
@@ -765,12 +817,16 @@ Private Sub AddAllTasks()
                                  "[Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
                                  
     AddTask "LoadFromFileAsJSON", "TargetFile: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+
+    AddTask "LoadFromFileAsCSV", "TargetFile: String, [Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
     
     AddTask "LoadFromSQL", "QueryString: String, [ConnectionString]: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
     
     ' --- GENERATION TASKS ---
     
     AddTask "SaveToFileAsJSON", "[Source]: Table, TargetFile: String", TaskType:="DSG"
+    
+    AddTask "SaveToFileAsCSV", "[Source]: Table, TargetFile: String, [Delimiter = ';']: String, [AsUnicode = False]: Boolean", TaskType:="DSG"
     
     ' --- XL GENERATION TASKS ---
     
@@ -919,6 +975,48 @@ Private Function HexToAscii(ByVal Value As String) As String
     Next i
     
     HexToAscii = VBA.Join(t, "")
+End Function
+
+Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long, rStart As Long
+    Dim cNull As String, rTSplitter As String, colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable
+    cNull = VBA.Chr$(0): rTSplitter = vbCr & cNull
+    
+    t0 = Split(CollectionsLib.TokenizeArgs(ContentString, vbLf), rTSplitter)
+    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(t0(0), Delimiter), cNull))
+    nRows = IIf(t0(UBound(t0)) = vbNullString, UBound(t0) - 1, UBound(t0)) + 1
+    nCols = colHeaders.Count
+    rStart = IIf(AutoHeaders, 1, 0)
+    ReDim t(0 To nRows - (1 + rStart), 0 To nCols - 1)
+    
+    For r = 0 To nRows - (1 + rStart)
+        t2 = Split(CollectionsLib.TokenizeArgs(t0(r + rStart), Delimiter), cNull)
+        For c = 0 To nCols - 1
+            sCell = Replace(Replace(Replace(t2(c), """""", cNull), """", ""), cNull, """")
+            If Len(sCell) <> Len(t2(c)) Then
+                t(r, c) = sCell
+            Else
+                Select Case True
+                    Case sCell = vbNullString: t(r, c) = Empty
+                    Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+                    Case IsDate(sCell): t(r, c) = CDate(sCell)
+                    Case Else: t(r, c) = sCell
+                End Select
+            End If
+        Next c
+    Next r
+    
+    Set a2X = Array2dEx.Create()
+    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    Set dsT = dsTable.Create(a2X, False)
+    If AutoHeaders Then
+        For c = 0 To nCols - 1
+            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), """""", cNull), """", ""), cNull, """")
+        Next c
+        dsT.SetHeaders colHeaders.ToArray()
+    End If
+    
+    Set LoadFromCSV = dsT
 End Function
 
 

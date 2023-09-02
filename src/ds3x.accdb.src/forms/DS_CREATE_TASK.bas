@@ -1371,6 +1371,8 @@ Private Sub DS_TASK_PARAM_1_Change()
     If GetControlText(Me.DS_TASK_PARAM_1) = "< Select... >" Then
         If pSelectedTask Like "*JSON*" Then
             sExtension = "*.json"
+        ElseIf pSelectedTask Like "*CSV*" Then
+            sExtension = "*.csv"
         Else
             sExtension = "*.xlsx"
         End If
@@ -1522,6 +1524,11 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                     Select Case TaskName
                         Case "LoadFromExcelFile", "OpenWorksheetFromFile"
                             Item = "{""UpdateLinks"": false, ""ReadOnly"": true, ""Local"": true, ""UTF8"": false, ""NoTextQualifier"": true}"
+                            .AddItem ""
+                            .AddItem Item
+                            .Value = Item
+                        Case "LoadFromFileAsCSV"
+                            Item = "{""Delimiter"": "";"", ""AsUnicode"": false, ""InLocalFormat"": true, ""AutoHeaders"": true}"
                             .AddItem ""
                             .AddItem Item
                             .Value = Item
