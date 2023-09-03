@@ -18,6 +18,13 @@ Implements ICollectionEx
 Private pGroups As ArrayListEx
 
 
+#If Win64 Then
+    Const VARIANT_SIZE As Long = 24
+#Else
+    Const VARIANT_SIZE As Long = 16
+#End If
+
+
 Public Property Get Count() As Long
     On Error Resume Next
     Count = pGroups(0).Count
@@ -49,6 +56,39 @@ End Property
 
 Public Property Get SliceAt(ByVal ColumnIndex As Long) As ArraySlice
     Set SliceAt = pGroups(ColumnIndex)
+End Property
+
+Public Property Get Instance() As Array2dEx
+    Dim t() As Variant, nRows As Long, nCols As Long, r As Long, c As Long, a2X As Array2dEx, aX As ArrayListEx
+    Dim vAux As Variant, vAux2() As Variant, wAux As Variant, wAux2() As Variant, wAux3() As Variant, rAux5() As Variant
+    nRows = Count: nCols = ColumnCount
+    If nRows = 0 Then
+        Set Instance = Array2dEx.CreateBlank(0, 0)
+        Exit Property
+    End If
+    ReDim t(0 To nRows - 1, 0 To nCols - 1)
+    Set aX = ArrayListEx.Create()
+    
+    For c = 0 To nCols - 1
+        Set a2X = SliceAt(c).Instance
+        Stop
+        Debug.Print JSON.Stringify(a2X, 2)
+        aX.Add a2X
+        'MemoryLib.MemCopy VBA.VarPtr(t(0, c)), VBA.VarPtr(a2X.Instance(0, 0)), VARIANT_SIZE * nRows
+        SliceAt(c).SlicedArray rAux5
+        Stop
+        MemoryLib.MemCopy VBA.VarPtr(t(0, c)), VBA.VarPtr(rAux5(0, 0)), VARIANT_SIZE * nRows
+        Stop
+    Next c
+    vAux = t
+    vAux2 = t
+    MemoryLib.FixVariantArray t, nRows * nCols, 2
+    wAux = t
+    wAux2 = t
+    Stop
+    Set a2X = New Array2dEx
+    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    Set Instance = a2X
 End Property
 
 
