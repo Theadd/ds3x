@@ -423,7 +423,7 @@ End Function
 'End Sub
 
 Public Sub TestArraySlicingStuff()
-    Dim t() As Variant, sgX As ArraySliceGroup, a2dX As Array2dEx, sg2 As ArraySliceGroup
+    Dim t() As Variant, sgX As ArraySliceGroup, a2dX As Array2dEx, sg2 As ArraySliceGroup, sl3x As ArraySlice, vReverse As Variant, b2dX As Array2dEx, c2dX As Array2dEx
     ReDim t(0 To 5, 0 To 3)
     
     t(0, 0) = "not zero":    t(0, 1) = 300:  t(0, 2) = "ZERO":   t(0, 3) = 130
@@ -434,14 +434,34 @@ Public Sub TestArraySlicingStuff()
     t(5, 0) = "It's -5":   t(5, 1) = 350:  t(5, 2) = "FIVE":   t(5, 3) = 135
 
     Set a2dX = Array2dEx.Create()
-    a2dX.Instance = CollectionsLib.GetArrayByRef(t)
+    'a2dX.Instance = CollectionsLib.GetArrayByRef(t)
+    a2dX.Instance = t
     
     Set sgX = ArraySliceGroup.Create(a2dX)
-    Set sg2 = sgX.GetRange(1, 3, Array(0, 1))
+    Set sg2 = sgX.GetRange(1, 3, Array(0, 1, 2))
     
-    Debug.Print JSON.Stringify(sg2.SliceAt(0).Instance, 2)
+    Set sl3x = sg2.SliceAt(0)
     
-    Stop
+    'Stop
+    
+    Set c2dX = New Array2dEx
+    
+    'c2dX.Instance = CollectionsLib.GetArrayByRef(sl3x.Instance)
+    c2dX.Instance = sl3x.Instance
+    'vReverse = sl3x.Instance
+    'vReverse = CollectionsLib.GetArrayByRef(sl3x.Instance)
+'    Stop
+    'Debug.Print JSON.Stringify(a2dX, 2)
+    
+'    Stop
+    
+    Debug.Print JSON.Stringify(c2dX)
+    
+'    Stop
+'    Set b2dX = Array2dEx.Create(vReverse)
+'    Stop
+'    Debug.Print JSON.Stringify(b2dX, 2)
+'    Stop
 End Sub
 
 

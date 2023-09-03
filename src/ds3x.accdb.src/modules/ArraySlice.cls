@@ -96,8 +96,8 @@ Public Property Get Slice(Optional ByVal Index As Long = 0, Optional ByVal GetCo
     Slice.Slices = aX.ToArray()
 End Property
 
-Public Property Get Instance() As Variant
-    Dim t() As Variant, v As Variant, r As Long, i As Long, k() As Variant
+Public Property Get Instance() As Variant()
+    Dim t() As Variant, v As Variant, r As Long, i As Long, k() As Variant, a2dX As Array2dEx
     If pCount = 0 Then
         Instance = Array2dEx.CreateBlank(0, 0).Instance
         Exit Property
@@ -107,7 +107,8 @@ Public Property Get Instance() As Variant
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx
-                MemoryLib.MemCopy VBA.VarPtr(t(r, 0)), VBA.VarPtr(C2Array2dEx(v(0)).Instance(v(2), v(1))), VARIANT_SIZE * v(3)
+                Set a2dX = C2Array2dEx(v(0))
+                MemoryLib.MemCopy VBA.VarPtr(t(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
             Case TypeOf v(0) Is RecordsetEx
                 With C2RecordsetEx(v(0))
                     i = CLng(.Instance.AbsolutePosition)
@@ -121,8 +122,9 @@ Public Property Get Instance() As Variant
         End Select
         r = r + v(3)
     Next v
-    MemoryLib.FixVariantArray t, pCount
-    Instance = CollectionsLib.GetArrayByRef(t)
+    MemoryLib.FixVariantArray t, pCount, 2
+    'Instance = CollectionsLib.GetArrayByRef(t)
+    Instance = t
 End Property
 
 
