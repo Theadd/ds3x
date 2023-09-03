@@ -261,15 +261,25 @@ End Sub
 ' --- PRIVATE ---
 
 Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
-    Dim aX As ArrayListEx, nRows As Long, c As Long
+    Dim aX As ArrayListEx, nRows As Long, c As Long, iAux As Long
     
     If IsObject(ArrayLike) Then
+        Set aX = ArrayListEx.Create()
         If TypeOf ArrayLike Is ICollectionEx Then
-            Set aX = ArrayListEx.Create()
             nRows = C2ICollectionEx(ArrayLike).Count
             For c = 0 To C2ICollectionEx(ArrayLike).ColumnCount - 1
                 aX.Add ArraySlice.Create(ArrayLike, Index:=0, GetCount:=nRows, ColumnIndex:=c)
             Next c
+            Set CreateSliceGroups = aX
+            Exit Function
+        ElseIf TypeOf ArrayLike Is Excel.Range Then
+            With C2ExcelRange(ArrayLike)
+                nRows = .Rows.Count
+                iAux = GetBaseRowIndexOfRange(C2ExcelRange(ArrayLike))
+                For c = 0 To .Columns.Count
+                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 0, nRows - 1)
+                Next c
+            End With
             Set CreateSliceGroups = aX
             Exit Function
         End If
@@ -285,11 +295,18 @@ Private Function ValueToCSV(ByVal Value As Variant) As String
     End Select
 End Function
 
+Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
+    On Error Resume Next
+    GetBaseRowIndexOfRange = 1
+    GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
+End Function
+
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ICollectionEx(ByRef Value As Variant) As ICollectionEx: Set C2ICollectionEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
+Private Function C2ExcelRange(ByRef Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
 
 
 ' --- ICollectionEx ---
