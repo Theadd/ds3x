@@ -978,21 +978,29 @@ Private Function HexToAscii(ByVal Value As String) As String
 End Function
 
 Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
-    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long, rStart As Long
-    Dim cNull As String, rTSplitter As String, colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable
-    cNull = VBA.Chr$(0): rTSplitter = vbCr & cNull
+    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
+    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+    cQuote = """": cDblQuote = """"""
+    'rTSplitter = vbCr & vbNullChar
     
-    t0 = Split(CollectionsLib.TokenizeArgs(ContentString, vbLf), rTSplitter)
-    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(t0(0), Delimiter), cNull))
-    nRows = IIf(t0(UBound(t0)) = vbNullString, UBound(t0) - 1, UBound(t0)) + 1
+    ' t0 = Split(CollectionsLib.TokenizeArgs(ContentString, vbLf), rTSplitter)
+    Set sLines = CollectionsLib.StringLineSlices(ContentString)
+    ' Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(t0(0), Delimiter), cNull))
+    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+    If AutoHeaders Then
+        sLines.RemoveAt 0
+    End If
+    ' nRows = IIf(t0(UBound(t0)) = vbNullString, UBound(t0) - 1, UBound(t0)) + 1
+    nRows = sLines.Count
     nCols = colHeaders.Count
-    rStart = IIf(AutoHeaders, 1, 0)
-    ReDim t(0 To nRows - (1 + rStart), 0 To nCols - 1)
+    'rStart = IIf(AutoHeaders, 1, 0)
+    ReDim t(0 To nRows - 1, 0 To nCols - 1)
     
-    For r = 0 To nRows - (1 + rStart)
-        t2 = Split(CollectionsLib.TokenizeArgs(t0(r + rStart), Delimiter), cNull)
+    'For r = 0 To nRows - (1 + rStart)
+    For Each t0 In sLines
+        t2 = Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, t0(0), t0(1)), Delimiter), vbNullChar)
         For c = 0 To nCols - 1
-            sCell = Replace(Replace(Replace(t2(c), """""", cNull), """", ""), cNull, """")
+            sCell = Replace(Replace(Replace(t2(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
             If Len(sCell) <> Len(t2(c)) Then
                 t(r, c) = sCell
             Else
@@ -1004,14 +1012,16 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
                 End Select
             End If
         Next c
-    Next r
+        r = r + 1
+    Next t0
+    'Next r
     
     Set a2X = Array2dEx.Create()
     a2X.Instance = CollectionsLib.GetArrayByRef(t)
     Set dsT = dsTable.Create(a2X, False)
     If AutoHeaders Then
         For c = 0 To nCols - 1
-            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), """""", cNull), """", ""), cNull, """")
+            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
         Next c
         dsT.SetHeaders colHeaders.ToArray()
     End If

@@ -338,7 +338,7 @@ Fallback:
 End Function
 
 ' USAGE: sArgv() = Split(TokenizeArgs("one ""two twoB twoC"" three ""four fourB"" five"), Chr$(0))
-Public Function TokenizeArgs(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As String
+Public Function TokenizeArgs(ByRef SearchString As String, Optional ByVal Tokenizer As String = " ") As String
    Dim sArgs As String, sChar As String, nCount As Long, bQuotes As Boolean
    
    For nCount = 1 To Len(SearchString)
@@ -379,6 +379,35 @@ Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitte
     End If
     
     ParseTokenizedArg = t
+End Function
+
+Public Function StringLineSlices(ByRef SearchString As String) As ArrayListEx
+    Dim aX As ArrayListEx, i As Long, iMax As Long, bQuotes As Boolean, r As Long
+    Const cQuote As String = """"
+    Set aX = ArrayListEx.Create()
+    iMax = Len(SearchString)
+    r = 1
+    
+    For i = 1 To iMax
+        Select Case VBA.Mid$(SearchString, i, 1)
+            Case cQuote: bQuotes = Not bQuotes
+            Case vbLf
+                If Not bQuotes Then
+                    If VBA.Mid$(SearchString, i - 1, 1) = vbCr Then
+                        aX.Add Array(r, i - (r + 1))
+                    Else
+                        aX.Add Array(r, i - r)
+                    End If
+                    r = i + 1
+                End If
+        End Select
+    Next i
+    
+    If r < iMax Then
+        aX.Add Array(r, iMax - r)
+    End If
+    
+    Set StringLineSlices = aX
 End Function
 
 
