@@ -14,17 +14,6 @@ Option Base 0
 
 Implements ICollectionEx
 
-' EDIT: CopyMemory
-'Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
-'
-'#If Win64 Then
-'    Const PTR_SIZE As Long = 8
-'    Const VARIANT_SIZE As Long = 24
-'#Else
-'    Const PTR_SIZE As Long = 4
-'    Const VARIANT_SIZE As Long = 16
-'#End If
-
 
 Public Instance As Variant
 

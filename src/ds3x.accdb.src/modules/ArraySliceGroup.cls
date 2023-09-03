@@ -18,13 +18,6 @@ Implements ICollectionEx
 Private pGroups As ArrayListEx
 
 
-#If Win64 Then
-    Const VARIANT_SIZE As Long = 24
-#Else
-    Const VARIANT_SIZE As Long = 16
-#End If
-
-
 Public Property Get Count() As Long
     On Error Resume Next
     Count = pGroups(0).Count
@@ -36,7 +29,12 @@ Public Property Get ColumnCount() As Long
 End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
-    ' TODO
+    Dim t() As Variant, c As Long
+    ReDim t(0 To ColumnCount - 1)
+    For c = 0 To ColumnCount - 1
+        t(c) = SliceAt(c).Item(Index)
+    Next c
+    Row = t
 End Property
 
 Public Property Get SliceGroups() As Variant
@@ -59,36 +57,10 @@ Public Property Get SliceAt(ByVal ColumnIndex As Long) As ArraySlice
 End Property
 
 Public Property Get Instance() As Array2dEx
-    Dim t() As Variant, nRows As Long, nCols As Long, r As Long, c As Long, a2X As Array2dEx, aX As ArrayListEx
-    Dim vAux As Variant, vAux2() As Variant, wAux As Variant, wAux2() As Variant, wAux3() As Variant, rAux5() As Variant
-    nRows = Count: nCols = ColumnCount
-    If nRows = 0 Then
-        Set Instance = Array2dEx.CreateBlank(0, 0)
-        Exit Property
-    End If
-    ReDim t(0 To nRows - 1, 0 To nCols - 1)
-    Set aX = ArrayListEx.Create()
-    
-    For c = 0 To nCols - 1
-        Set a2X = SliceAt(c).Instance
-        Stop
-        Debug.Print JSON.Stringify(a2X, 2)
-        aX.Add a2X
-        'MemoryLib.MemCopy VBA.VarPtr(t(0, c)), VBA.VarPtr(a2X.Instance(0, 0)), VARIANT_SIZE * nRows
-        SliceAt(c).SlicedArray rAux5
-        Stop
-        MemoryLib.MemCopy VBA.VarPtr(t(0, c)), VBA.VarPtr(rAux5(0, 0)), VARIANT_SIZE * nRows
-        Stop
-    Next c
-    vAux = t
-    vAux2 = t
-    MemoryLib.FixVariantArray t, nRows * nCols, 2
-    wAux = t
-    wAux2 = t
-    Stop
-    Set a2X = New Array2dEx
-    a2X.Instance = CollectionsLib.GetArrayByRef(t)
-    Set Instance = a2X
+    Dim t() As Variant
+    SlicedArray t
+    Set Instance = New Array2dEx
+    Instance.Instance = CollectionsLib.GetArrayByRef(t)
 End Property
 
 
@@ -223,6 +195,25 @@ UserLocaleFail:
     Resume Next
 End Function
 
+Public Sub SlicedArray(ByRef Out2dArray() As Variant)
+    Dim nRows As Long, nCols As Long, r As Long, c As Long, vSliced() As Variant
+    nRows = Count: nCols = ColumnCount
+    If nRows = 0 Then
+        Out2dArray = Array2dEx.CreateBlank(0, 0).Instance
+        Exit Sub
+    End If
+    ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
+
+    For c = 0 To nCols - 1
+        SliceAt(c).SlicedArray vSliced
+        For r = 0 To UBound(vSliced, 1)
+            Out2dArray(r, c) = vSliced(r, 0)
+        Next r
+    Next c
+    
+    Out2dArray = vSliced
+End Sub
+
 ' Practically there's no point in cloning an immutable object, it's just exposed to share some common API with the other collection class modules.
 Public Function Clone() As ArraySliceGroup
     Set Clone = New ArraySliceGroup
@@ -230,21 +221,21 @@ Public Function Clone() As ArraySliceGroup
 End Function
 
 Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
-'    Dim t() As String, s() As String, i As Long, c As Long, uc As Long
-'    uc = Me.ColumnCount - 1
-'    ReDim t(0 To Me.Count)
-'    ReDim s(0 To uc)
-'
-'    For i = 0 To Me.Count - 1
-'        For c = 0 To uc
-'            s(c) = ValueToCSV(Instance(i, c))
-'        Next c
-'
-'        t(i) = VBA.Join(s, Delimiter)
-'    Next i
-'
-'    t(Me.Count) = ""
-'    ToCSV = VBA.Join(t, vbNewLine)
+    Dim t() As String, s() As String, i As Long, c As Long, uc As Long, vSliced() As Variant
+    SlicedArray vSliced
+    uc = ColumnCount - 1
+    ReDim t(0 To Count)
+    ReDim s(0 To uc)
+
+    For i = 0 To Count - 1
+        For c = 0 To uc
+            s(c) = ValueToCSV(vSliced(i, c))
+        Next c
+        t(i) = VBA.Join(s, Delimiter)
+    Next i
+
+    t(Count) = ""
+    ToCSV = VBA.Join(t, vbNewLine)
 End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
@@ -252,6 +243,22 @@ Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
 
 
+Public Function Bind(Optional ByRef ArrayLike As Variant) As ArraySliceGroup
+    Set Bind = Me
+    Err.Raise 17, , "Can't perform requested operation. Binding to an immutable object is not allowed."
+End Function
+
+Public Function Unbind() As ArraySliceGroup
+    Set Unbind = Me
+    Err.Raise 17, , "Can't perform requested operation."
+End Function
+
+Public Sub Dispose()
+
+End Sub
+
+
+' --- PRIVATE ---
 
 Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
     Dim aX As ArrayListEx, nRows As Long, c As Long
@@ -270,20 +277,13 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
     Set CreateSliceGroups = CreateSliceGroups(Array2dEx.Create(ArrayLike))
 End Function
 
-
-Public Function Bind(Optional ByRef ArrayLike As Variant) As ArraySliceGroup
-    Set Bind = Me
-    Err.Raise 17, , "Can't perform requested operation. Binding to an immutable object is not allowed."
+Private Function ValueToCSV(ByVal Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString: ValueToCSV = """" & Replace(CStr(Value), """", """""") & """"
+        Case vbNull: ValueToCSV = vbNullString
+        Case Else: ValueToCSV = CStr(Value)
+    End Select
 End Function
-
-Public Function Unbind() As ArraySliceGroup
-    Set Unbind = Me
-    Err.Raise 17, , "Can't perform requested operation."
-End Function
-
-Public Sub Dispose()
-
-End Sub
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
