@@ -15,6 +15,7 @@ Option Base 0
 
 Private pSlices As Variant
 Private pCount As Long
+Private pSliced() As Variant
 
 #If Win64 Then
     Const VARIANT_SIZE As Long = 24
@@ -53,84 +54,18 @@ Attribute Item.VB_UserMemId = 0
 End Property
 
 Public Property Get Slice(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndex As Long = 0) As ArraySlice
-    Dim aX As New ArrayListEx, v As Variant, rMin As Long, rMax As Long, iMin As Long, iMax As Long, sMod As Long
     If IsMissing(GetCount) Then GetCount = pCount - Index
-    iMin = Index: iMax = Index + (GetCount - 1)
-    Set Slice = New ArraySlice
-
-    For Each v In pSlices
-        rMax = rMin + (v(3) - 1)
-        
-        If iMin <= rMax And iMax <= rMax Then
-            '    #rMin                  #rMax
-            ' ---|---------|------|-----|--------
-            '              #iMin  #iMax
-            sMod = iMin - rMin
-            aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod - (rMax - iMax))
-            Exit For
-            
-        ElseIf iMin <= rMax And iMax > rMax Then
-            '    #rMin             #rMax
-            ' ---|---------|-------|-------|----
-            '              #iMin           #iMax
-            sMod = iMin - rMin
-            aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod)
-        
-        ElseIf iMin <= rMin And iMax <= rMax Then
-            '           #rMin                  #rMax
-            ' ---|------|-------------|--------|-----
-            '    #iMin                #iMax
-            aX.Add Array(v(0), v(1), v(2), v(3) - (rMax - iMax))
-            Exit For
-            
-        ElseIf iMin <= rMin And iMax > rMax Then
-            '           #rMin         #rMax
-            ' ---|------|-------------|--------|-----
-            '    #iMin                         #iMax
-            aX.Add Array(v(0), v(1), v(2), v(3))
-            
-        End If
-        rMin = rMin + v(3)
-    Next v
-    
-    Slice.Slices = aX.ToArray()
+    Set Slice = SliceAllRanges(ArrayListEx.Create().Add(Array(Index, GetCount)))
 End Property
 
-Public Property Get Instance() As Variant()
-    Dim t() As Variant, v As Variant, r As Long, i As Long, k() As Variant, a2dX As Array2dEx
-    If pCount = 0 Then
-        Instance = Array2dEx.CreateBlank(0, 0).Instance
-        Exit Property
-    End If
-    ReDim t(0 To pCount - 1, 0 To 0)
-    
-    For Each v In pSlices
-        Select Case True
-            Case TypeOf v(0) Is Array2dEx
-                Set a2dX = C2Array2dEx(v(0))
-                MemoryLib.MemCopy VBA.VarPtr(t(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
-            Case TypeOf v(0) Is RecordsetEx
-                With C2RecordsetEx(v(0))
-                    i = CLng(.Instance.AbsolutePosition)
-                    .Instance.AbsolutePosition = v(2) + 1
-                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.MemCopy VBA.VarPtr(t(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
-                    .Instance.AbsolutePosition = i
-                End With
-            Case Else
-                Err.Raise 17
-        End Select
-        r = r + v(3)
-    Next v
-    MemoryLib.FixVariantArray t, pCount, 2
-    'Instance = CollectionsLib.GetArrayByRef(t)
-    Instance = t
+Public Property Get Instance() As Array2dEx
+    If UBound(pSliced) < 0 Then SliceArray
+    Set Instance = New Array2dEx
+    Instance.Instance = CollectionsLib.GetArrayByRef(pSliced)
 End Property
 
 
-
-
-
+' --- METHODS ---
 
 Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndex As Long = 0) As ArraySlice
     If Not IsMissing(ArrayLike) Then
@@ -209,6 +144,14 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
     SliceAllRanges.Slices = aX.ToArray()
 End Function
 
+Public Sub SlicedArray(ByRef Out2dArray() As Variant)
+    If UBound(pSliced) < 0 Then SliceArray
+    Out2dArray = pSliced
+End Sub
+
+Public Sub Dispose()
+    pSliced = Array()
+End Sub
 
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
@@ -216,9 +159,36 @@ Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2d
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
 
+Private Sub SliceArray()
+    Dim v As Variant, r As Long, i As Long, k() As Variant, a2dX As Array2dEx
+    If pCount = 0 Then
+        pSliced = Array2dEx.CreateBlank(0, 0).Instance
+        Exit Sub
+    End If
+    ReDim pSliced(0 To pCount - 1, 0 To 0)
+    
+    For Each v In pSlices
+        Select Case True
+            Case TypeOf v(0) Is Array2dEx
+                Set a2dX = C2Array2dEx(v(0))
+                MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
+            Case TypeOf v(0) Is RecordsetEx
+                With C2RecordsetEx(v(0))
+                    i = CLng(.Instance.AbsolutePosition)
+                    .Instance.AbsolutePosition = v(2) + 1
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
+                    MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
+                    .Instance.AbsolutePosition = i
+                End With
+            Case Else
+                Err.Raise 17
+        End Select
+        r = r + v(3)
+    Next v
+    MemoryLib.FixVariantArray pSliced, pCount, 2
+End Sub
 
 
-
-
-
-
+Private Sub Class_Initialize()
+    pSliced = Array()
+End Sub
