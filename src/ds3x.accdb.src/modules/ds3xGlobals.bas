@@ -14,6 +14,9 @@ Global Const SW_SHOW = 5
 'Forces a top-level window onto the taskbar when the window is visible.
 Public Const WS_EX_APPWINDOW As Long = &H40000
 
+
+' --- ScreenLib Types ---
+
 Public Type POINTAPI
     X As Long
     Y As Long
@@ -33,11 +36,13 @@ Public Type BOUNDS
     h As Long
 End Type
 
-' EDIT: CopyMemory
+
+' --- MemoryLib Types ---
+
 Public Type REMOTE_MEMORY
     memValue As Variant
-    remoteVT As Variant 'Will be linked to the first 2 bytes of 'memValue' - see 'InitRemoteMemory'
-    isInitialized As Boolean 'In case state is lost
+    remoteVT As Variant
+    isInitialized As Boolean
 End Type
 
 Public Type SAFEARRAYBOUND
@@ -134,293 +139,8 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
     Printf = Join(parts, vbNullString)
 End Function
 
-'Public Function SecondsToHMS(ByVal Value As Long) As String
-'    Dim hrs As Long, mins, secs, m As Integer, t As String
-'    On Error GoTo Finally
-'
-'    hrs = Fix(Value / 3600)
-'    mins = Fix(Value / 60) Mod 60
-'    secs = Fix((Value Mod 60) / 1)
-'
-'    If hrs >= 2 Or (hrs = 1 And mins > 39) Then
-'        t = t & " " & hrs & "h"
-'        If mins >= 5 Then t = t & " " & mins & "m"
-'    Else
-'        If (hrs = 1 And mins <= 39) Then mins = mins + 60
-'        If mins >= 1 Then
-'            t = t & " " & mins & "m"
-'            If mins < 15 Then t = t & " " & secs & "s"
-'        Else
-'            t = t & " " & secs & "s"
-'        End If
-'    End If
-'
-'    SecondsToHMS = VBA.Mid(t, 2)
-'Finally:
-'End Function
 
-'' USAGES: XDaysAgo(15), XDaysAgo("7 days..."), XDaysAgo("-7 in a week")
-'Public Function XDaysAgo(ByVal Value As Variant, Optional ByVal DateFormat As String = "dd MMM") As String
-'    If VBA.InStr(1, Value, CStr(Val(Value))) > 0 Then
-'        Value = UCase(VBA.Format$(DateAdd("d", 0 - Int(Val(Value)), Date), DateFormat, vbMonday))
-'    End If
-'    XDaysAgo = CStr(Value)
-'End Function
-
-''*******************************************************************************
-''Alternative for CopyMemory - not affected by API speed issues on Windows
-''--------------------------
-''Mac - wrapper around CopyMemory/memmove
-''Win - bytesCount 1 to 2147483647 - no API calls. Uses a combination of
-''      REMOTE_MEMORY/SAFEARRAY_1D structs as well as native Strings and Arrays
-''      to manipulate memory. Works within size limitation of Strings in VBA
-''      For some smaller sizes (<=5) optimizes via MemLong, MemInt, MemByte etc.
-''    - bytesCount < 0 or > 2147483647 - wrapper around CopyMemory/RtlMoveMemory
-''*******************************************************************************
-'Public Sub MemCopy(ByVal destinationPtr As LongPtr _
-'                 , ByVal sourcePtr As LongPtr _
-'                 , ByVal bytesCount As LongPtr)
-
-'Public Sub TestA2dCopy()
-'#If Win64 Then
-'    Const PTR_SIZE As Long = 8
-'    Const VARIANT_SIZE As Long = 24
-'#Else
-'    Const PTR_SIZE As Long = 4
-'    Const VARIANT_SIZE As Long = 16
-'#End If
-'    Dim aX As Array2dEx, bX As Array2dEx, srcX As ArrayListEx, t() As Variant, nX As ArrayListEx, bbX As ArrayListEx
-'    Dim oCol As New Collection, oDic As New Scripting.Dictionary
-'
-'    oCol.Add 15
-'    oCol.Add 72
-'    oCol.Add 33
-'
-'    oDic("First") = 15
-'    oDic("Second") = 72
-'    oDic("Third") = 33
-'
-''    Set nX = ArrayListEx.Create(Array(10, 20, 30))
-'''            Array(-1, 310, nX, 131), _
-'''            Array(2, 320, ArrayListEx.Create(Array("ArrayList", nX, "SomeString", "You there!", "SomeNumber", -44)), 132), _
-'''            Array(-1, 310, "Hello World!ONE", 131), _
-'''            Array(2, 320, "Hello World!TWO", 132), _
-'''''            Array(-1, 310, oCol, 131), _
-'''''            Array(2, 320, oDic, 132), _
-'''
-''
-''    Set bbX = ArrayListEx.Create(Array("ArrayList", nX, "SomeString", "You there!", "SomeNumber", -44))
-'''            Array(0, 300, "Hello World!ZERO", 130), _
-'''            Array(-1, 310, nX, 131), _
-'''            Array(2, 320, bbX, 132), _
-'''
-'    Set srcX = ArrayListEx.Create(Array( _
-'            Array(-1, 310, "Hello World!ONE", 131), _
-'            Array(2, 320, "Hello World!TWO", 132), _
-'            Array(-3, 330, "Hello World!THREE", 133), _
-'            Array(4, 340, "Hello World!FOUR", 134), _
-'            Array(-5, 350, "Hello World!FIVE", 135) _
-'        ))
-'    Set aX = Array2dEx.Create(srcX)
-'
-''    ReDim t(0 To 5, 0 To 3)
-''    Stop
-'    'MemoryLib.MemCopy VBA.VarPtr(t(0, 0)), VBA.VarPtr(aX.Instance(0, 0)), VARIANT_SIZE * (6 * 4)
-''    CopyMemory ByVal VBA.VarPtr(t(0, 0)), ByVal VBA.VarPtr(aX.Instance(0, 0)), VARIANT_SIZE * (6 * 4)
-''    CopyMemory ByVal VBA.VarPtr(t(0, 0)), ByVal VBA.VarPtr(aX.Instance(1, 0)), VARIANT_SIZE * 4
-''    CopyMemory ByVal VBA.VarPtr(t(0, 1)), ByVal VBA.VarPtr(aX.Instance(1, 1)), VARIANT_SIZE * 4
-''    CopyMemory ByVal VBA.VarPtr(t(0, 2)), ByVal VBA.VarPtr(aX.Instance(1, 2)), VARIANT_SIZE * 4
-''    Stop
-'    Set bX = aX.GetRange(1, 3, Array(0, 2, 3))
-'    Debug.Print JSON.Stringify(bX)
-'    'Debug.Print "Columns: " & CStr(bX.ColumnCount)
-''    Stop
-'End Sub
-
-''*******************************************************************************
-''Copy a param array to another array of Variants while preserving ByRef elements
-''*******************************************************************************
-'Public Sub CloneParamArray(ByRef firstElem As Variant _
-'                         , ByVal elemCount As Long _
-'                         , ByRef outArray() As Variant)
-'    ReDim outArray(0 To elemCount - 1)
-'    MemCopy VarPtr(outArray(0)), VarPtr(firstElem), VARIANT_SIZE * elemCount
-'    '
-'    Static sArr As SAFEARRAY_1D 'Fake array of VarTypes (Integers)
-'    Static rmArr As REMOTE_MEMORY
-'    '
-'    If Not rmArr.isInitialized Then
-'        With sArr
-'            .cDims = 1
-'            .fFeatures = FADF_HAVEVARTYPE
-'            .cbElements = INT_SIZE
-'        End With
-'        InitRemoteMemory rmArr
-'        rmArr.memValue = VarPtr(sArr)
-'    End If
-'    sArr.rgsabound0.cElements = elemCount * VT_SPACING
-'    sArr.pvData = VarPtr(outArray(0))
-'    '
-'    FixByValElements outArray, rmArr, rmArr.remoteVT
-'End Sub
-'
-''*******************************************************************************
-''Utility for 'CloneParamArray' - avoid deallocation on elements passed ByVal
-''e.g. if original ParamArray has a pointer to a BSTR then safely clear the copy
-''*******************************************************************************
-'Private Sub FixByValElements(ByRef arr() As Variant _
-'                           , ByRef rmArr As REMOTE_MEMORY _
-'                           , ByRef vtArr As Variant)
-'    Dim i As Long
-'    Dim v As Variant
-'    Dim vtIndex As Long: vtIndex = 0
-'    Dim vt As VbVarType
-'    '
-'    vtArr = vbArray + vbInteger
-'    For i = 0 To UBound(arr)
-'        vt = rmArr.memValue(vtIndex)
-'        If (vt And VT_BYREF) = 0 Then
-'            If (vt And vbArray) = vbArray Or vt = vbObject Or vt = vbString _
-'            Or vt = vbDataObject Or vt = vbUserDefinedType Then
-'                If vt = vbObject Then Set v = arr(i) Else v = arr(i)
-'                rmArr.memValue(vtIndex) = vbEmpty 'Avoid deallocation
-'                If vt = vbObject Then Set arr(i) = v Else arr(i) = v
-'            End If
-'        End If
-'        vtIndex = vtIndex + VT_SPACING
-'    Next i
-'    vtArr = vbEmpty
-'End Sub
-
-'' USAGE: CollectionsLib.Tokenize("--task=..\Tasks\Entry.json --name=""Initial task"" --exec")   => ['--task=..\Tasks\Entry.json', '--name="Initial task"', '--exec']
-'Public Function G3Tokenize(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As Variant
-'    G3Tokenize = Split(G3TokenizeArgs(SearchString, Tokenizer), VBA.Chr$(0))
-'End Function
-'
-'Public Function G3ParseToken(ByVal Target As String, Optional ByVal Splitter As String = "=") As Variant
-'    G3ParseToken = G3ParseTokenizedArg(Target, Splitter)
-'End Function
-'
-'
-'' USAGE: sArgv() = Split(G3TokenizeArgs("one ""two twoB twoC"" three ""four fourB"" five"), Chr$(0))
-'Public Function G3TokenizeArgs(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As String
-'   Dim sArgs As String, sChar As String, nCount As Long, bQuotes As Boolean
-'
-'   For nCount = 1 To Len(SearchString)
-'      sChar = Mid$(SearchString, nCount, 1)
-'      If sChar = Chr$(34) Then
-'         bQuotes = Not bQuotes
-'      End If
-'      If sChar = Tokenizer Then
-'         If bQuotes Then
-'            sArgs = sArgs & sChar
-'         Else
-'            sArgs = sArgs & Chr$(0)
-'         End If
-'      Else
-'         sArgs = sArgs & sChar
-'      End If
-'   Next
-'   G3TokenizeArgs = sArgs
-'End Function
-'
-'Public Function G3ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitter As String = "=") As Variant
-'    Dim t(0 To 1) As Variant, r As Variant
-'
-'    r = VBA.Split(Target, Splitter, 2)
-'    t(0) = r(0)
-'    If UBound(r) = 1 Then
-'        If (Left(r(1), 1) = """" Or Left(r(1), 1) = "'") And (Left(r(1), 1) = Right(r(1), 1)) Then
-'            t(1) = VBA.Mid$(r(1), 2, Len(r(1)) - 2)
-'        Else
-'            If r(1) = "true" Or r(1) = "false" Then
-'                t(1) = CBool(r(1))
-'            Else
-'                t(1) = r(1)
-'            End If
-'        End If
-'    Else
-'        t(1) = True
-'    End If
-'
-'    G3ParseTokenizedArg = t
-'End Function
-'
-'Public Sub TestLoadFromFileAsCSV()
-'    Dim t0 As Variant, t2 As Variant, sContent As String, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long, rStart As Long
-'    Dim cNull As String, rTSplitter As String, vDelimiter As String, InLocalFormat As Boolean, AutoHeaders As Boolean, colHeaders As ArrayListEx
-'    cNull = VBA.Chr$(0): rTSplitter = vbCr & cNull: vDelimiter = ";": InLocalFormat = True: AutoHeaders = True
-'
-'    sContent = FileSystemLib.ReadAllTextInFile("C:\dev\samples\TEST_LoadFromFileAsCSV_v2.csv", False)
-'    t0 = Split(G3TokenizeArgs(sContent, vbLf), rTSplitter)
-'    Set colHeaders = ArrayListEx.Create(Split(G3TokenizeArgs(t0(0), vDelimiter), cNull))
-'    nRows = IIf(t0(UBound(t0)) = vbNullString, UBound(t0) - 1, UBound(t0)) + 1  ' TODO: AutoHeaders
-'    nCols = colHeaders.Count
-'    rStart = IIf(AutoHeaders, 1, 0)
-'    ReDim t(0 To nRows - (1 + rStart), 0 To nCols - 1)
-'
-'    For r = 0 To nRows - (1 + rStart)
-'        t2 = Split(G3TokenizeArgs(t0(r + rStart), vDelimiter), cNull)
-'        For c = 0 To nCols - 1
-'            sCell = Replace(Replace(Replace(t2(c), """""", cNull), """", ""), cNull, """")
-'            If Len(sCell) <> Len(t2(c)) Then
-'                t(r, c) = sCell
-'            Else
-'                Select Case True
-'                    Case sCell = vbNullString: t(r, c) = Empty
-'                    Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
-'                    Case IsDate(sCell): t(r, c) = CDate(sCell)
-'                    Case Else: t(r, c) = sCell
-'                End Select
-'            End If
-'        Next c
-'    Next r
-'
-'    Dim a2X As Array2dEx
-'    Dim dsT As dsTable
-'
-'    Set a2X = Array2dEx.Create()
-'    a2X.Instance = CollectionsLib.GetArrayByRef(t)
-'
-'    Set dsT = dsTable.Create(a2X, False)
-'
-'    If AutoHeaders Then
-'        For c = 0 To nCols - 1
-'            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), """""", cNull), """", ""), cNull, """")
-'        Next c
-'        dsT.SetHeaders colHeaders.ToArray()
-'    End If
-'
-'    Debug.Print dsT.ToJSON()
-'End Sub
-'
-
-'Public Sub TestStringLineSlicer()
-'    Dim sContent As String, aX As ArrayListEx, i As Long, v As Variant, bX As ArrayListEx
-'
-'    sContent = VBA.Join(Array("First line", "Second one", "Third" & vbLf & "Another one", "... And last one!"), vbNewLine)
-'    Set aX = StringLineSlices(sContent)
-'
-'    Debug.Print JSON.Stringify(aX)
-'    Set bX = ArrayListEx.Create()
-'
-'    For Each v In aX
-'        bX.Add VBA.Mid$(sContent, v(0), v(1))
-'    Next v
-'
-'    Debug.Print JSON.Stringify(bX, 2)
-'End Sub
-'
-'Public Sub SecondTestStringLineSlicer()
-'    Dim sContent As String, aX As ArrayListEx
-'
-'    Stop
-'    sContent = FileSystemLib.ReadAllTextInFile("C:\dev\samples\PDM_INSYSAN_v3.csv", False)
-'    Stop
-'    Set aX = StringLineSlices(sContent)
-'    Stop
-'    Debug.Print "LINES: " & CStr(aX.Count)
-'End Sub
+' --- TO REMOVE ---
 
 Public Sub TestArraySlicingStuff()
     Dim t() As Variant, sgX As ArraySliceGroup, a2dX As Array2dEx, sg2 As ArraySliceGroup, sl3x As ArraySlice, vReverse As Variant, b2dX As Array2dEx, c2dX As Array2dEx
@@ -439,31 +159,10 @@ Public Sub TestArraySlicingStuff()
     
     Set sgX = ArraySliceGroup.Create(a2dX)
     Set sg2 = sgX.GetRange(1, 3, Array(0, 1, 2))
-    
-    Set sl3x = sg2.SliceAt(0)
-    
-    'Stop
-    
-    Set c2dX = New Array2dEx
-    
-    'c2dX.Instance = CollectionsLib.GetArrayByRef(sl3x.Instance)
-    c2dX.Instance = sl3x.Instance
-    'vReverse = sl3x.Instance
-    'vReverse = CollectionsLib.GetArrayByRef(sl3x.Instance)
-'    Stop
-    'Debug.Print JSON.Stringify(a2dX, 2)
-    
-'    Stop
-    
+
+    Set c2dX = sg2.Instance
+
     Debug.Print JSON.Stringify(c2dX)
-    
-'    Stop
-'    Set b2dX = Array2dEx.Create(vReverse)
-'    Stop
-'    Debug.Print JSON.Stringify(b2dX, 2)
-'    Stop
 End Sub
-
-
 
 
