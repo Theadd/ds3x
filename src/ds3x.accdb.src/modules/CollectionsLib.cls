@@ -70,10 +70,10 @@ End Property
 '       t2(1) = "bar"
 '       Debug.Print JSON.Stringify(t)
 '
-Public Function GetArrayByRef(ByRef Arr As Variant) As Variant
-    If IsArray(Arr) Then
-        GetArrayByRef = VarPtrArr(Arr)
-        Dim vt As VbVarType: vt = VarType(Arr) Or VT_BYREF
+Public Function GetArrayByRef(ByRef arr As Variant) As Variant
+    If IsArray(arr) Then
+        GetArrayByRef = VarPtrArr(arr)
+        Dim vt As VbVarType: vt = VarType(arr) Or VT_BYREF
         CopyMemory GetArrayByRef, vt, 2
     Else
         Err.Raise 5, "GetArrayByRef", "Array required"
@@ -81,16 +81,16 @@ Public Function GetArrayByRef(ByRef Arr As Variant) As Variant
 End Function
 
 #If Win64 Then
-Public Function VarPtrArr(ByRef Arr As Variant) As LongLong
+Public Function VarPtrArr(ByRef arr As Variant) As LongLong
 #Else
-Public Function VarPtrArr(ByRef Arr As Variant) As Long
+Public Function VarPtrArr(ByRef arr As Variant) As Long
 #End If
     Const vtArrByRef As Long = vbArray + VT_BYREF
     Dim vt As VbVarType
-    CopyMemory vt, Arr, 2
+    CopyMemory vt, arr, 2
     If (vt And vtArrByRef) = vtArrByRef Then
         Const pArrayOffset As Long = 8
-        CopyMemory VarPtrArr, ByVal VarPtr(Arr) + pArrayOffset, PTR_SIZE
+        CopyMemory VarPtrArr, ByVal VarPtr(arr) + pArrayOffset, PTR_SIZE
     Else
         Err.Raise 5, "VarPtrArr", "Array required"
     End If

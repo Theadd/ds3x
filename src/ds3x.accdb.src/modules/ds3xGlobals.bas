@@ -34,30 +34,30 @@ Public Type BOUNDS
 End Type
 
 ' EDIT: CopyMemory
-'Public Type REMOTE_MEMORY
-'    memValue As Variant
-'    remoteVT As Variant 'Will be linked to the first 2 bytes of 'memValue' - see 'InitRemoteMemory'
-'    isInitialized As Boolean 'In case state is lost
-'End Type
-'
-'Public Type SAFEARRAYBOUND
-'    cElements As Long
-'    lLbound As Long
-'End Type
-'
-'Public Type SAFEARRAY_1D
-'    cDims As Integer
-'    fFeatures As Integer
-'    cbElements As Long
-'    cLocks As Long
-'    #If Win64 Then
-'        dummyPadding As Long
-'        pvData As LongLong
-'    #Else
-'        pvData As Long
-'    #End If
-'    rgsabound0 As SAFEARRAYBOUND
-'End Type
+Public Type REMOTE_MEMORY
+    memValue As Variant
+    remoteVT As Variant 'Will be linked to the first 2 bytes of 'memValue' - see 'InitRemoteMemory'
+    isInitialized As Boolean 'In case state is lost
+End Type
+
+Public Type SAFEARRAYBOUND
+    cElements As Long
+    lLbound As Long
+End Type
+
+Public Type SAFEARRAY_1D
+    cDims As Integer
+    fFeatures As Integer
+    cbElements As Long
+    cLocks As Long
+    #If Win64 Then
+        dummyPadding As Long
+        pvData As LongLong
+    #Else
+        pvData As Long
+    #End If
+    rgsabound0 As SAFEARRAYBOUND
+End Type
 
 
 ' --- Automation ---
@@ -422,8 +422,27 @@ End Function
 '    Debug.Print "LINES: " & CStr(aX.Count)
 'End Sub
 
+Public Sub TestArraySlicingStuff()
+    Dim t() As Variant, sgX As ArraySliceGroup, a2dX As Array2dEx, sg2 As ArraySliceGroup
+    ReDim t(0 To 5, 0 To 3)
+    
+    t(0, 0) = "not zero":    t(0, 1) = 300:  t(0, 2) = "ZERO":   t(0, 3) = 130
+    t(1, 0) = "-1":   t(1, 1) = 310:  t(1, 2) = "ONE":    t(1, 3) = 131
+    t(2, 0) = "2ac":    t(2, 1) = 320:  t(2, 2) = "TWO":    t(2, 3) = 132
+    t(3, 0) = "f -3a":   t(3, 1) = 330:  t(3, 2) = "THREE":  t(3, 3) = 133
+    t(4, 0) = 4:    t(4, 1) = 340:  t(4, 2) = "FOUR":   t(4, 3) = 134
+    t(5, 0) = "It's -5":   t(5, 1) = 350:  t(5, 2) = "FIVE":   t(5, 3) = 135
 
-
+    Set a2dX = Array2dEx.Create()
+    a2dX.Instance = CollectionsLib.GetArrayByRef(t)
+    
+    Set sgX = ArraySliceGroup.Create(a2dX)
+    Set sg2 = sgX.GetRange(1, 3, Array(0, 1))
+    
+    Debug.Print JSON.Stringify(sg2.SliceAt(0).Instance, 2)
+    
+    Stop
+End Sub
 
 
 

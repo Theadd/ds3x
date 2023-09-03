@@ -143,7 +143,7 @@ Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index
                 Set Create = C2ArraySlice(ArrayLike).Slice(Index, GetCount, ColumnIndex)
             Else
                 Set Create = New ArraySlice
-                Create.Slices = ArrayListEx.Create(Array(C2Array2dEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
+                Create.Slices = ArrayListEx.Create().Add(Array(C2Array2dEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
             End If
         Else
             Err.Raise 17, , "Not implemented."

@@ -42,8 +42,7 @@ End Property
 Public Property Get Row(ByVal Index As Long) As Variant
     Dim t() As Variant, i As Long
     ReDim t(0 To UBound(Instance, 2))
-    ' EDIT: CopyMemory
-    ' CopyMemory ByVal VBA.VarPtr(t(0)), ByVal VBA.VarPtr(Instance(Index, 0)), VARIANT_SIZE * (UBound(Instance, 2) + 1)
+
     For i = 0 To UBound(Instance, 2)
         If IsObject(Instance(Index, i)) Then
             Set t(i) = Instance(Index, i)

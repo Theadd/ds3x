@@ -367,9 +367,9 @@ Attribute Contains.VB_Description = "Whether a Value is contained in this ArrayL
     Contains = Instance.Contains(Value)
 End Function
 
-Public Function IndexOf(ByVal Value As Variant, Optional ByVal StartIndex As Variant) As Long
-    If IsMissing(StartIndex) Then StartIndex = 0
-    IndexOf = Instance.IndexOf(Value, StartIndex)
+Public Function IndexOf(ByVal Value As Variant, Optional ByVal startIndex As Variant) As Long
+    If IsMissing(startIndex) Then startIndex = 0
+    IndexOf = Instance.IndexOf(Value, startIndex)
 End Function
 
 Public Function Reverse() As ArrayListEx
@@ -393,22 +393,22 @@ Public Function Sort(Optional ByVal Comparer As mscorlib.IComparer = Nothing) As
     Set Sort = Me
 End Function
 
-Public Function BinarySearch(ByVal Value As Variant, Optional ByVal StartIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
-    If IsMissing(SearchCount) Then SearchCount = Instance.Count - StartIndex
+Public Function BinarySearch(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+    If IsMissing(SearchCount) Then SearchCount = Instance.Count - startIndex
     If Comparer Is Nothing Then
-        BinarySearch = Instance.BinarySearch(StartIndex, SearchCount, Value, dsComparer)
+        BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, dsComparer)
     Else
-        BinarySearch = Instance.BinarySearch(StartIndex, SearchCount, Value, Comparer)
+        BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, Comparer)
     End If
 End Function
 
-Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal StartIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
     Dim r As Long
 
     If Comparer Is Nothing Then
-        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, dsComparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, dsComparer)
     Else
-        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, Comparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     End If
     If r < 0 Then
         r = (Not r)
@@ -422,13 +422,13 @@ Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal StartIndex As L
     BinaryAdd = r
 End Function
 
-Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal StartIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
     Dim r As Long
     
     If Comparer Is Nothing Then
-        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, dsComparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, dsComparer)
     Else
-        r = Instance.BinarySearch(StartIndex, Instance.Count - StartIndex, Value, Comparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     End If
     If r < 0 Then
         r = (Not r)
