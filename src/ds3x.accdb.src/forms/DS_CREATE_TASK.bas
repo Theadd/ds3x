@@ -1755,7 +1755,7 @@ Private Function GetSelectedColumnNumberFormat() As String
     End With
     
     If cIndexValid Then
-        GetSelectedColumnNumberFormat = pController.Table.HeaderList(0)(cIndex)("NumberFormat")
+        GetSelectedColumnNumberFormat = pController.Table.Headers.Row(0)(cIndex)("NumberFormat")
     End If
 Finally:
 End Function

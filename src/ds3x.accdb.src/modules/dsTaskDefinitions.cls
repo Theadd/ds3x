@@ -43,7 +43,7 @@ Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal Colum
     ColumnName = GetParam(ColumnName, "%1")
     
     Set Target = TargetTable
-    cH = Target.HeaderList(0)
+    cH = Target.Headers.Row(0)
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
     
@@ -67,7 +67,7 @@ Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal Col
     NumberFormat = GetParam(NumberFormat, "General")
     
     Set Target = TargetTable
-    cH = Target.HeaderList(0)
+    cH = Target.Headers.Row(0)
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
     
@@ -137,7 +137,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
     
     If TypeName(Replacer) Like "*Dictionary*" Then
         Set dRepl = DictionaryEx.Create(Replacer)
-        With Target.RecordArray
+        With CollectionsLib.AsArray2dEx(Target.Records)
             For c = 0 To cMax
                 If colIndexes.Contains(c) Then
                     For i = 0 To iMax
@@ -155,7 +155,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
         End With
     Else
         Set cb = Replacer
-        With Target.RecordArray
+        With CollectionsLib.AsArray2dEx(Target.Records)
             For c = 0 To cMax
                 If colIndexes.Contains(c) Then
                     For i = 0 To iMax
@@ -233,7 +233,7 @@ Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer 
     Dim cb As Callback, dRepl As DictionaryEx
     Set Target = TargetTable
     
-    cH = Target.HeaderList(0)
+    cH = Target.Headers.Row(0)
     ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
     
     If TypeName(Replacer) Like "*Dictionary*" Then
