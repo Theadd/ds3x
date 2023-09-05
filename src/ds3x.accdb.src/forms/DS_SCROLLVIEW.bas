@@ -1297,7 +1297,7 @@ End Sub
 ' TODO: IncludeHeaders
 Private Sub CopySelectionToClipboard(Optional ByVal IncludeHeaders As Boolean = False)
     Const dsChunkSize As Long = 1000
-    Dim i As Long, iMax As Long, nRows As Long, rStart As Long, rEnd As Long, rTake As Long, rTakeFrom As Long, aX As ICollectionEx, sCols As Variant, sValues As String
+    Dim i As Long, iMax As Long, nRows As Long, rStart As Long, rEnd As Long, rTake As Long, rTakeFrom As Long, aX As ArraySliceGroup, sCols As Variant, sValues As String
     On Error GoTo Finally
     pSelectedColumns.Sort
     sCols = Empty
@@ -1318,7 +1318,7 @@ Private Sub CopySelectionToClipboard(Optional ByVal IncludeHeaders As Boolean = 
     For i = 0 To iMax
         rTake = IIf(i = iMax, nRows - (dsChunkSize * i), dsChunkSize)
         rTakeFrom = rStart + (i * dsChunkSize)
-        Set aX = pTable.Records.GetRange(rTakeFrom, rTake, sCols)
+        Set aX = CollectionsLib.AsArraySliceGroup(pTable.Records.GetRange(rTakeFrom, rTake, sCols))
         If rEnd = 0 Then
             sValues = sValues & aX.ToExcel()
         Else

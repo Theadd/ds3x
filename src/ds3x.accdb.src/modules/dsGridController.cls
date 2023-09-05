@@ -74,7 +74,7 @@ End Sub
 Public Function TryGetColumnHeaderAt(ByVal ColumnIndex As Long, ByRef OutColumnHeader As DictionaryEx) As Boolean
     On Error GoTo Finally
     
-    Set OutColumnHeader = DictionaryEx.Bind(Table().HeaderList(0)(ColumnIndex)).Clone()
+    Set OutColumnHeader = DictionaryEx.Bind(Table().Headers.Row(0)(ColumnIndex)).Clone()
     TryGetColumnHeaderAt = True
 Finally:
 End Function
