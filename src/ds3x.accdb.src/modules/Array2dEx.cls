@@ -80,7 +80,11 @@ Private Function CreateFromObject(ByVal ArrayLike As Object) As Array2dEx
     ElseIf TypeOf ArrayLike Is ADODB.Fields Then
         Set CreateFromObject = CreateFromRecordsetFields(C2RecordsetFields(ArrayLike))
     ElseIf TypeOf ArrayLike Is ArrayListEx Then
-        Set CreateFromObject = CreateFromArrayList(ArrayLike.Instance)
+        If C2ArrayListEx(ArrayLike).ColumnCount = 0 Then
+            Set CreateFromObject = CreateFromSingleColumnArrayListEx(C2ArrayListEx(ArrayLike))
+        Else
+            Set CreateFromObject = CreateFromArrayList(ArrayLike.Instance)
+        End If
     ElseIf TypeOf ArrayLike Is ArrayList Then
         Set CreateFromObject = CreateFromArrayList(C2ArrayList(ArrayLike))
     Else
@@ -191,8 +195,25 @@ Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dE
     CreateFromArrayList.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
+Private Function CreateFromSingleColumnArrayListEx(ByVal TargetArray As ArrayListEx) As Array2dEx
+    Dim t() As Variant, i As Long, v As Variant
+    If TargetArray.Count = 0 Then Exit Function
+    ReDim t(0 To TargetArray.Count - 1, 0 To 0)
+    
+    For Each v In TargetArray.ToArray()
+        If IsObject(v) Then
+            Set t(i, 0) = v
+        Else
+            t(i, 0) = v
+        End If
+        i = i + 1
+    Next v
+    
+    Set CreateFromSingleColumnArrayListEx = New Array2dEx
+    CreateFromSingleColumnArrayListEx.Instance = CollectionsLib.GetArrayByRef(t)
+End Function
 
-Private Function CreateFromJaggedArray(ByVal TargetArray As Variant) As Array2dEx
+Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dEx
     Dim Entry As Variant, i As Long, c As Long, lc As Long, uc As Long, t() As Variant
     Set CreateFromJaggedArray = New Array2dEx
     If UBound(TargetArray) < 0 Then Exit Function
@@ -428,25 +449,12 @@ Private Function C2Date(Optional ByVal Value As Variant) As Variant
     C2Date = DateValue(Value)
 End Function
 
-Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset
-    Set C2Recordset = Value
-End Function
-
-Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range
-    Set C2ExcelRange = Value
-End Function
-
-Private Function C2RecordsetFields(ByVal Value As Variant) As ADODB.Fields
-    Set C2RecordsetFields = Value
-End Function
-
-Private Function C2ArrayList(ByVal Value As Variant) As ArrayList
-    Set C2ArrayList = Value
-End Function
-
-Private Function C2Object(ByRef Value As Variant) As Object
-    Set C2Object = Value
-End Function
+Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2Recordset = Value: End Function
+Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
+Private Function C2RecordsetFields(ByVal Value As Variant) As ADODB.Fields: Set C2RecordsetFields = Value: End Function
+Private Function C2ArrayList(ByVal Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
+Private Function C2ArrayListEx(ByVal Value As Variant) As ArrayListEx: Set C2ArrayListEx = Value: End Function
+Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
 
 Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Finally
