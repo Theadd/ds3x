@@ -16,6 +16,7 @@ Implements ICollectionEx
 
 
 Public Instance As Variant
+Private pColumnCountMod As Long
 
 
 Public Property Get Count() As Long
@@ -25,8 +26,10 @@ End Property
 
 Public Property Get ColumnCount() As Long
     On Error Resume Next
-    ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2))
+    ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2)) + pColumnCountMod
 End Property
+
+Public Property Let ColumnCount(ByVal Value As Long): pColumnCountMod = IIf(IsEmpty(Instance), Value, pColumnCountMod): End Property
 
 '@DefaultMember
 Public Property Get Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0) As Variant
@@ -113,11 +116,6 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     If Not Me.Count > 0 Then Exit Function
 
     With RangeObject.Resize(Me.Count, 1 + (UBound(Instance, 2) - LBound(Instance, 2)))
-'        .Value = Instance
-'        If ApplyUserLocale Then
-'            On Error GoTo UserLocaleFail
-'            .FormulaR1C1Local = .FormulaR1C1Local
-'        End If
         If ApplyUserLocale Then
             On Error GoTo UserLocaleFail
             .FormulaR1C1Local = Instance
@@ -255,10 +253,8 @@ End Function
 ' Concatenate all elements of TargetArray as additional columns into a new Array2dEx
 Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     Dim t() As Variant, i As Long, c As Long, c2 As Long, uc1 As Long, uc2 As Long
-    
     uc1 = Me.ColumnCount - 1
     uc2 = TargetArray.ColumnCount - 1
-    ' ReDim t(0 To Me.Count - 1, 0 To (Me.ColumnCount - 1) + TargetArray.ColumnCount)
     ReDim t(0 To Me.Count - 1, 0 To (uc1 + uc2 + 1))
     
     For i = 0 To Me.Count - 1
@@ -291,8 +287,7 @@ End Function
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
     Dim t() As Variant, i As Long, c As Variant, c0 As Long
-    ' EDIT: CopyMemory
-    ' Dim j() As Variant, k As Long, e As Long, kMax As Long
+    Set GetRange = New Array2dEx
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If Index >= Me.Count Then
@@ -309,17 +304,8 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
     
     If GetCount > 0 Then
-        ' EDIT: CopyMemory
-'        kMax = UBound(ColumnIndexes)
-'        ReDim t(0 To GetCount - 1, 0 To kMax)
         ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes) - LBound(ColumnIndexes))
-        
-        ' EDIT: CopyMemory
-'        For k = 0 To kMax
-'            e = CLng(ColumnIndexes(k))
-'            MemoryLib.MemCopy VBA.VarPtr(t(0, k)), VBA.VarPtr(Instance(Index, e)), VARIANT_SIZE * CLng(GetCount)
-'        Next k
-    
+
         For i = Index To Index + GetCount - 1
             c0 = 0
             For Each c In ColumnIndexes
@@ -333,9 +319,9 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         Next i
     Else
         t = CreateBlank2DArray()
+        GetRange.ColumnCount = -1
     End If
     
-    Set GetRange = New Array2dEx
     GetRange.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
@@ -403,8 +389,7 @@ Private Sub Class_Terminate()
 End Sub
 
 Public Sub Dispose()
-    ' EDIT: DISPOSE
-    ' Instance = Empty
+    ' TODO
 End Sub
 
 Private Function ValueToCSV(ByVal Value As Variant) As String
@@ -485,13 +470,18 @@ Fallback:
 End Function
 
 Private Function CreateBlank2DArray(Optional ByVal NumRows As Long = 0) As Variant
-    Dim aX As ArrayListEx, i As Long
-    Set aX = ArrayListEx.Create()
-    For i = 0 To NumRows - 1
-        aX.Add Array()
-    Next i
+    Dim Miss As Variant, t() As Variant, i As Long
     With CreateObject("Forms.ComboBox.1")
-        .List = aX.ToArray()
+        If NumRows = 0 Then
+            .List = Array()
+        Else
+            Miss = Array(, Null)(0)
+            ReDim t(0 To NumRows - 1)
+            For i = 0 To NumRows - 1
+                t(i) = Miss
+            Next i
+            .List = t
+        End If
         CreateBlank2DArray = .List
     End With
 End Function
@@ -524,13 +514,14 @@ End Function
 Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx
     Dim t() As Variant
 
-    If ColumnsCount > 0 Then
+    Set CreateArray2dEx = New Array2dEx
+    If RowsCount > 0 And ColumnsCount > 0 Then
         ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
     Else
         t = CreateBlank2DArray(RowsCount)
+        CreateArray2dEx.ColumnCount = -1
     End If
     
-    Set CreateArray2dEx = New Array2dEx
     CreateArray2dEx.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
