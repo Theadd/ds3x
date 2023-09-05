@@ -947,7 +947,7 @@ Finally:
         On Error Resume Next
         pIgnoreScrollingEvents = False
     End If
-
+    On Error Resume Next
     Viewport.OnSourceTableChange
 End Sub
 

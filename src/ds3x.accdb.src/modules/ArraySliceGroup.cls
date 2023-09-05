@@ -304,8 +304,8 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
             With C2ExcelRange(ArrayLike)
                 nRows = .Rows.Count
                 iAux = GetBaseRowIndexOfRange(C2ExcelRange(ArrayLike))
-                For c = 0 To .Columns.Count
-                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 0, nRows - 1)
+                For c = 0 To .Columns.Count - 1
+                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 1, nRows, 1)
                 Next c
             End With
             Set CreateSliceGroups = aX
