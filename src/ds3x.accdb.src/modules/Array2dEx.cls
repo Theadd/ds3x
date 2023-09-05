@@ -80,11 +80,17 @@ Private Function CreateFromObject(ByVal ArrayLike As Object) As Array2dEx
     ElseIf TypeOf ArrayLike Is ADODB.Fields Then
         Set CreateFromObject = CreateFromRecordsetFields(C2RecordsetFields(ArrayLike))
     ElseIf TypeOf ArrayLike Is ArrayListEx Then
-        If C2ArrayListEx(ArrayLike).ColumnCount = 0 Then
-            Set CreateFromObject = CreateFromSingleColumnArrayListEx(C2ArrayListEx(ArrayLike))
-        Else
-            Set CreateFromObject = CreateFromArrayList(ArrayLike.Instance)
-        End If
+        With C2ArrayListEx(ArrayLike)
+            If .ColumnCount = 0 Then
+                If .Count = 0 Then
+                    Set CreateFromObject = CreateArray2dEx(0, 0)
+                Else
+                    Set CreateFromObject = CreateFromSingleColumnArrayListEx(C2ArrayListEx(ArrayLike))
+                End If
+            Else
+                Set CreateFromObject = CreateFromArrayList(.Instance)
+            End If
+        End With
     ElseIf TypeOf ArrayLike Is ArrayList Then
         Set CreateFromObject = CreateFromArrayList(C2ArrayList(ArrayLike))
     Else
@@ -478,9 +484,14 @@ Fallback:
     Is1dArray = IsArray(ArrayLike)
 End Function
 
-Private Function CreateBlank2DArray() As Variant
+Private Function CreateBlank2DArray(Optional ByVal NumRows As Long = 0) As Variant
+    Dim aX As ArrayListEx, i As Long
+    Set aX = ArrayListEx.Create()
+    For i = 0 To NumRows - 1
+        aX.Add Array()
+    Next i
     With CreateObject("Forms.ComboBox.1")
-        .List = Array()
+        .List = aX.ToArray()
         CreateBlank2DArray = .List
     End With
 End Function
@@ -513,10 +524,10 @@ End Function
 Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx
     Dim t() As Variant
 
-    If RowsCount > 0 And ColumnsCount > 0 Then
+    If ColumnsCount > 0 Then
         ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
     Else
-        t = CreateBlank2DArray()
+        t = CreateBlank2DArray(RowsCount)
     End If
     
     Set CreateArray2dEx = New Array2dEx

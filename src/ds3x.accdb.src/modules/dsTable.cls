@@ -550,18 +550,19 @@ End Sub
 Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
     Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
     
-    If RowsCount > 0 And ColumnsCount > 0 Then
-        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
-        Set dsT = dsTable.Create(Array2dEx.Create(t))
-    Else
-        Set aX = ArrayListEx.Create()
-        If RowsCount > 0 Then
-            For i = 0 To RowsCount - 1
-                aX.Add Array()
-            Next i
-        End If
-        Set dsT = dsTable.Create(aX)
-    End If
+    Set dsT = dsTable.Create(Array2dEx.CreateBlank(RowsCount, ColumnsCount), False)
+'    If RowsCount > 0 And ColumnsCount > 0 Then
+'        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
+'        Set dsT = dsTable.Create(Array2dEx.Create(t))
+'    Else
+'        Set aX = ArrayListEx.Create()
+'        If RowsCount > 0 Then
+'            For i = 0 To RowsCount - 1
+'                aX.Add Array()
+'            Next i
+'        End If
+'        Set dsT = dsTable.Create(aX)
+'    End If
     
     If ColumnsCount > 0 Then
         ReDim k(0 To ColumnsCount - 1)
