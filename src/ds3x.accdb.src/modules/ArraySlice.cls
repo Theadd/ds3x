@@ -83,7 +83,9 @@ Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index
                 Create.Slices = ArrayListEx.Create().Add(Array(C2Array2dEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
             End If
         Else
-            Err.Raise 17, , "Not implemented."
+            If Not IsArray(ArrayLike) Then Err.Raise 17, , "Not implemented."
+            Set Create = New ArraySlice
+            Create.Slices = ArrayListEx.Create().Add(Array(Array2dEx.Create(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
         End If
     End If
 End Function
@@ -148,6 +150,9 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     If UBound(pSliced) < 0 Then SliceArray
     Out2dArray = pSliced
 End Sub
+
+Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
+
 
 Public Sub Dispose()
     pSliced = Array()
