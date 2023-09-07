@@ -67,7 +67,7 @@ Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index
         If IsObject(ArrayLike) Then
             If TypeOf ArrayLike Is RecordsetEx Then
                 Set Create = New ArraySlice
-                Create.Slices = ArrayListEx.Create(Array(C2RecordsetEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
+                Create.Slices = ArrayListEx.Create().Add(Array(C2RecordsetEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
             ElseIf TypeOf ArrayLike Is ArraySliceGroup Then
                 Set Create = C2ArraySliceGroup(ArrayLike).SliceAt(ColumnIndex).Slice(Index, GetCount)
             ElseIf TypeOf ArrayLike Is ArraySlice Then

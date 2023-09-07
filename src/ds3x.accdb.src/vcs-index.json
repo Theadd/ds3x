@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "06/09/2023 5:42:32",
-    "ExportDate": "06/09/2023 7:25:36",
+    "ExportDate": "07/09/2023 15:02:44",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -178,12 +178,12 @@
           "OtherHash": "1552335"
         },
         "ArraySlice.cls": {
-          "FileHash": "1e439a6",
-          "ExportDate": "06/09/2023 7:25:35",
-          "SourceModified": "06/09/2023 7:25:35",
-          "FilePropertiesHash": "f607654",
+          "FileHash": "6c139c2",
+          "ExportDate": "07/09/2023 15:02:44",
+          "SourceModified": "07/09/2023 15:02:44",
+          "FilePropertiesHash": "f7d0e24",
           "ImportDate": "06/09/2023 5:42:29",
-          "OtherHash": "dc88cbb"
+          "OtherHash": "53355da"
         },
         "ArraySliceGroup.cls": {
           "FileHash": "3fd8dd9",
@@ -241,12 +241,12 @@
           "OtherHash": "23cd3b0"
         },
         "ds3xGlobals.bas": {
-          "FileHash": "f09bbc3",
-          "ExportDate": "06/09/2023 7:25:35",
-          "SourceModified": "06/09/2023 7:25:35",
-          "FilePropertiesHash": "97e2a88",
+          "FileHash": "c41dc6d",
+          "ExportDate": "07/09/2023 15:02:44",
+          "SourceModified": "07/09/2023 15:02:44",
+          "FilePropertiesHash": "2f91af5",
           "ImportDate": "06/09/2023 5:42:29",
-          "OtherHash": "8c8b6e1"
+          "OtherHash": "a47a587"
         },
         "dsApp.cls": {
           "FileHash": "b801115",
