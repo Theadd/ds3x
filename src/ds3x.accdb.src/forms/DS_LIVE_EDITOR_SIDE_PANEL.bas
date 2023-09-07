@@ -26,7 +26,7 @@ Begin Form
     ItemSuffix =1594
     Left =3225
     Top =3030
-    Right =21780
+    Right =28545
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -924,8 +924,10 @@ Public Property Set Controller(ByRef Value As dsLiveEd): SetController Value: En
 
 Private Sub DS_CLOSE_BUTTON_Click()
     RemoveFocus
-    pController.TaskController.FreeUnlinkedResources
-    pController.TriggerLiveEditorWindowClose
+'    pController.TaskController.FreeUnlinkedResources
+'    pController.TriggerLiveEditorWindowClose
+    On Error Resume Next
+    Me.Parent.Dispose
 End Sub
 
 Private Sub DS_EDIT_BUTTON_Click()
