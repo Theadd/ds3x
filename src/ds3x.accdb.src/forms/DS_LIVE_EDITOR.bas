@@ -538,12 +538,10 @@ Private Sub Bind(ByVal TargetController As dsLiveEd)
 
     Me.DS_MAIN_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_MAIN_PANEL"
     Me.DS_SIDE_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_SIDE_PANEL"
-    Set Me.DS_SIDE_PANEL.Form.Controller = pController
     Set Me.DS_MAIN_PANEL.Form.Controller = pController
+    Set Me.DS_SIDE_PANEL.Form.Controller = pController
     Me.DS_SIDE_PANEL.Visible = True
-'    If pController.TaskController.Initialized Then
-        Me.DS_MAIN_PANEL.Visible = True
-'    End If
+    Me.DS_MAIN_PANEL.Visible = True
 End Sub
 
 Private Sub Form_Resize()
@@ -574,7 +572,6 @@ Public Sub Dispose()
     Me.SetFocus
     DoCmd.Close
 End Sub
-
 
 Private Sub ResizeToFitAllControls()
     Dim parentWidth As Long, pSize As Long

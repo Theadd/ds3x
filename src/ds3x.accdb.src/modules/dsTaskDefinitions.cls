@@ -178,7 +178,6 @@ Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal C
         ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
     End If
     kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
-    't = Target.RecordArray.Instance
     Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
     
     For k = 0 To kMax
@@ -192,9 +191,6 @@ Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal C
         Next i
         Set sgX = sgX.Replace(ArraySlice.Create(t), c)
     Next k
-    
-'    Set a2X = New Array2dEx
-'    a2X.Instance = CollectionsLib.GetArrayByRef(t)
     
     Set StringValuesToHex = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
 End Function

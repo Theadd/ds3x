@@ -924,8 +924,6 @@ Public Property Set Controller(ByRef Value As dsLiveEd): SetController Value: En
 
 Private Sub DS_CLOSE_BUTTON_Click()
     RemoveFocus
-'    pController.TaskController.FreeUnlinkedResources
-'    pController.TriggerLiveEditorWindowClose
     On Error Resume Next
     Me.Parent.Dispose
 End Sub
@@ -955,23 +953,17 @@ End Sub
 
 Private Sub DS_OPEN_BUTTON_Click()
     RemoveFocus
-    If Not Controller.ImportPreset() Then
-'        MsgBox "FAILED TO OPEN THAT PRESET FILE"
-    End If
+    Controller.ImportPreset
 End Sub
 
 Private Sub DS_SAVE_AS_BUTTON_Click()
     RemoveFocus
-    If Not Controller.SavePreset(VBA.Environ$("USERPROFILE")) Then
-'        MsgBox "SAVE AS... FAILED!"
-    End If
+    Controller.SavePreset VBA.Environ$("USERPROFILE")
 End Sub
 
 Private Sub DS_SAVE_BUTTON_Click()
     RemoveFocus
-    If Not Controller.SavePreset Then
-'        MsgBox "SAVE FAILED!"
-    End If
+    Controller.SavePreset
 End Sub
 
 Private Sub Form_Load()

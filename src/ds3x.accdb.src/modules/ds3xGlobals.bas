@@ -3,10 +3,6 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
-Public GLOBAL_TIMER_ACC As Single
-Public GLOBAL_rX As RecordsetEx
-Public GLOBAL_dsT As dsTable
-Public GLOBAL_GC_dbQ As ArrayListEx
 
 ' --- ACCESS WINDOW HIDE / SHOW ---
 
@@ -142,89 +138,4 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
     
     Printf = Join(parts, vbNullString)
 End Function
-
-
-' --- DEBUG ---
-
-Public Sub AllTestsRecordsetEx()
-    dsApp.GlobalVMemAnalysis "INIT"
-'    PreTestCreateArrayList
-'    PreTestCreateFirstTable
-    TestRecordsetExVMemAlloc
-    SecondTestRecordsetEx
-    ThirdTestRecordsetEx
-End Sub
-
-Public Sub PreTestCreateArrayList()
-    dsApp.GlobalVMemAnalysis "BEGIN PRE aList TEST"
-    Dim aList As ArrayList
-    dsApp.GlobalVMemAnalysis "PRE aList - 0"
-    Set aList = New ArrayList
-    dsApp.GlobalVMemAnalysis "PRE aList - 1"
-    aList.Add "Hello"
-    dsApp.GlobalVMemAnalysis "PRE aList - 2"
-    
-End Sub
-
-
-Public Sub PreTestCreateFirstTable()
-    dsApp.GlobalVMemAnalysis "BEGIN PRE TEST"
-    
-    Dim dsT As dsTable, aX As ArrayListEx
-    
-    dsApp.GlobalVMemAnalysis "PRE - 0"
-    
-    Set aX = ArrayListEx.Create() _
-        .Add(Array(0, "Hello AA", 1113)) _
-        .Add(Array(1, "Hello AA2", 22433)) _
-        .Add(Array(2, "Hello AA3", 33)) _
-        .Add(Array(3, "Hello AA4 44", 4444)) _
-        .Add(Array(4, "Hello AA5.# DONE!", 55055))
-        
-    dsApp.GlobalVMemAnalysis "PRE - 1"
-        
-    Set dsT = dsTable.Create(aX, False)
-    dsApp.GlobalVMemAnalysis "PRE - 2"
-    dsT.SetHeaders (Array("ID", "TEXT", "VALUE"))
-    dsApp.GlobalVMemAnalysis "PRE - 3"
-    
-End Sub
-
-Public Sub TestRecordsetExVMemAlloc()
-    Dim dbQ As New dbQuery, rX As RecordsetEx
-    
-'    dbQ.CloseOnTerminate = False
-    
-    dsApp.GlobalVMemAnalysis "BEGIN"
-    Set GLOBAL_rX = RecordsetEx.Create(dbQ.Create("SELECT TOP (1000000) * FROM [dbo].[T_ATM_TEST_CUSTOMERS]"))
-    dsApp.GlobalVMemAnalysis "GLOBAL_rX CREATED"
-    Set GLOBAL_dsT = dsTable.Create(GLOBAL_rX, True)
-    dsApp.GlobalVMemAnalysis "GLOBAL_dsT CREATED"
-    
-    Set GLOBAL_GC_dbQ = ArrayListEx.Create()
-    GLOBAL_GC_dbQ.Add dbQ
-End Sub
-
-Public Sub SecondTestRecordsetEx()
-    dsApp.GlobalVMemAnalysis "BEGIN SECOND TEST"
-    
-    Set GLOBAL_dsT = Nothing
-    dsApp.GlobalVMemAnalysis "GLOBAL_dsT = Nothing"
-    
-'    GLOBAL_rX.Instance.ActiveConnection.Close
-    Set GLOBAL_rX.Instance.ActiveConnection = Nothing
-    Set GLOBAL_rX.Instance = Nothing
-    Set GLOBAL_rX = Nothing
-    dsApp.GlobalVMemAnalysis "GLOBAL_rX = Nothing"
-    
-End Sub
-
-Public Sub ThirdTestRecordsetEx()
-    dsApp.GlobalVMemAnalysis "BEGIN THIRD TEST"
-    GLOBAL_GC_dbQ(0).Connection.Close
-    GLOBAL_GC_dbQ.Clear
-    dsApp.GlobalVMemAnalysis "THIRD - 0"
-    Set GLOBAL_GC_dbQ = Nothing
-    dsApp.GlobalVMemAnalysis "THIRD - 1"
-End Sub
 

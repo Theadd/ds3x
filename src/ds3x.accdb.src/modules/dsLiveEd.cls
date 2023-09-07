@@ -52,8 +52,8 @@ Public Property Let Visible(ByVal Value As Boolean)
             Dim Self As dsLiveEd
             Set Self = Me
             Set pLiveEditor = New Form_DS_LIVE_EDITOR
-            Set pLiveEditor.Controller = Self
             pLiveEditor.WindowVisibility = True
+            Set pLiveEditor.Controller = Self
         End If
     Else
         pLiveEditor.WindowVisibility = Value
@@ -253,14 +253,11 @@ Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Valu
 
 
 Private Sub Class_Initialize()
-'    Set pSourceRecordsetEx = Nothing
     Set pGridController = Nothing
     Set pTaskController = Nothing
-    ' Set GridController.TaskController = TaskController
 End Sub
 
 Private Sub Class_Terminate()
-'    Debug.Print "[INFO] dsLiveEd.Terminate()"
     Destroy
 End Sub
 
@@ -483,9 +480,10 @@ Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean 
     On Error Resume Next
     
     If Not SkipAutoClose Then
-        Me.Visible = False
-        Set pLiveEditor = Nothing
+        pLiveEditor.Dispose
     End If
+    Set pLiveEditor = Nothing
+    Set pGridController = Nothing
     
     RaiseEvent OnClose
 End Sub

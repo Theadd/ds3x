@@ -685,7 +685,6 @@ End Sub
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
     Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long, RowStartIndex As Long
 
-    'dsApp.GlobalVMemAnalysis "", False
     Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
     nCols = Worksheet.MaxAvailColumns
@@ -715,7 +714,6 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
     End If
     
     Set GetTrack = rX
-    dsApp.GlobalVMemAnalysis "@Viewport.GetTrack(" & CStr(TrackIndex) & ", " & CStr(PageIndex) & ") done."
 End Function
 
 

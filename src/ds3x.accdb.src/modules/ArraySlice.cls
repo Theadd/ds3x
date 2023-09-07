@@ -247,7 +247,6 @@ End Function
 
 Private Sub SliceArray()
     Dim t() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
-    Dim nTimer As Single
     If pCount = 0 Then
         t = Array2dEx.CreateBlank(0, 0).Instance
         Exit Sub
@@ -259,9 +258,7 @@ Private Sub SliceArray()
         Select Case True
             Case TypeOf v(0) Is Array2dEx
                 Set a2dX = C2Array2dEx(v(0))
-                nTimer = Timer()
                 MemoryLib.CloneParamArray a2dX.Instance(v(2), v(1)), v(3), t
-                GLOBAL_TIMER_ACC = GLOBAL_TIMER_ACC + (Timer() - nTimer)
                 For i = 0 To v(3) - 1
                     pSliced(r + i, 0) = t(i)
                 Next i
