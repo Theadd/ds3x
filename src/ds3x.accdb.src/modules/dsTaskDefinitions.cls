@@ -476,7 +476,7 @@ LoadFromSQLFallback:
     Set dbQ = New dbQuery
     If Trim(CStr(ConnectionString)) <> "" Then dbQ.ConnectionString = CStr(ConnectionString)
     dbQ.CloseOnTerminate = False
-    
+    pTaskController.AddResource dbQ
     Set dsT = dsTable.Create(dbQ.Create(CStr(QueryString)), True)
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
