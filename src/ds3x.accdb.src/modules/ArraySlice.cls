@@ -17,12 +17,6 @@ Private pSlices As Variant
 Private pCount As Long
 Private pSliced() As Variant
 
-#If Win64 Then
-    Const VARIANT_SIZE As Long = 24
-#Else
-    Const VARIANT_SIZE As Long = 16
-#End If
-
 
 Public Property Get Count() As Long: Count = pCount: End Property
 Public Property Get ColumnCount() As Long: ColumnCount = 1: End Property
@@ -73,14 +67,16 @@ Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index
         If IsObject(ArrayLike) Then
             If TypeOf ArrayLike Is RecordsetEx Then
                 Set Create = New ArraySlice
-                Create.Slices = ArrayListEx.Create(Array(C2RecordsetEx(ArrayLike).Clone(), ColumnIndex, Index, GetCount)).ToArray()
+                Create.Slices = ArrayListEx.Create(Array(C2RecordsetEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
             ElseIf TypeOf ArrayLike Is ArraySliceGroup Then
                 Set Create = C2ArraySliceGroup(ArrayLike).SliceAt(ColumnIndex).Slice(Index, GetCount)
             ElseIf TypeOf ArrayLike Is ArraySlice Then
                 Set Create = C2ArraySlice(ArrayLike).Slice(Index, GetCount, ColumnIndex)
-            Else
+            ElseIf TypeOf ArrayLike Is Array2dEx Then
                 Set Create = New ArraySlice
                 Create.Slices = ArrayListEx.Create().Add(Array(C2Array2dEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
+            Else
+                Err.Raise 17, , "Not implemented. @ArraySlice.Create() " & TypeName(ArrayLike)
             End If
         Else
             If Not IsArray(ArrayLike) Then Err.Raise 17, , "Not implemented."
@@ -164,35 +160,130 @@ Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2d
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
 
+#If IterateSliceCopy = 1 Then
+
 Private Sub SliceArray()
-    Dim v As Variant, r As Long, i As Long, k() As Variant, a2dX As Array2dEx
+    Dim v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
     If pCount = 0 Then
         pSliced = Array2dEx.CreateBlank(0, 0).Instance
         Exit Sub
     End If
     ReDim pSliced(0 To pCount - 1, 0 To 0)
-    
+
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx
                 Set a2dX = C2Array2dEx(v(0))
-                MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
+                iMod = v(2)
+                c = v(1)
+                For i = 0 To v(3) - 1
+                    pSliced(r + i, 0) = a2dX.Instance(iMod + i, c)
+                Next i
+                ' MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
             Case TypeOf v(0) Is RecordsetEx
                 With C2RecordsetEx(v(0))
-                    i = CLng(.Instance.AbsolutePosition)
+                    iAux = CLng(.Instance.AbsolutePosition)
                     .Instance.AbsolutePosition = v(2) + 1
-                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
-                    .Instance.AbsolutePosition = i
+                    c = v(1)
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(c))
+                    For i = 0 To v(3) - 1
+                        pSliced(r + i, 0) = k(0, i)
+                    Next i
+                    ' MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
+                    .Instance.AbsolutePosition = iAux
                 End With
             Case Else
                 Err.Raise 17
         End Select
         r = r + v(3)
     Next v
-    MemoryLib.FixVariantArray pSliced, pCount, 2
+    ' MemoryLib.FixVariantArray pSliced, pCount, 2
 End Sub
 
+#Else
+
+'Private Sub SliceArray()
+'    Dim v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
+'    If pCount = 0 Then
+'        pSliced = Array2dEx.CreateBlank(0, 0).Instance
+'        Exit Sub
+'    End If
+'    ReDim pSliced(0 To pCount - 1, 0 To 0)
+'
+'    For Each v In pSlices
+'        Select Case True
+'            Case TypeOf v(0) Is Array2dEx
+'                Set a2dX = C2Array2dEx(v(0))
+'                MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
+'            Case TypeOf v(0) Is RecordsetEx
+'                With C2RecordsetEx(v(0))
+'                    iAux = CLng(.Instance.AbsolutePosition)
+'                    .Instance.AbsolutePosition = v(2) + 1
+'                    c = v(1)
+'                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(c))
+''                    For i = 0 To v(3) - 1
+''                        pSliced(r + i, 0) = k(0, i)
+''                    Next i
+'                    MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
+'                    .Instance.AbsolutePosition = iAux
+'                End With
+'            Case Else
+'                Err.Raise 17
+'        End Select
+'        r = r + v(3)
+'    Next v
+'    MemoryLib.FixVariantArray pSliced, pCount, 2
+'End Sub
+
+Private Function TimerSpanX() As Single
+    Static cTimer As Single
+    Dim t As Single
+    
+    t = Timer()
+    If cTimer = CSng(0) Then cTimer = t
+    TimerSpanX = CSng(CLng((t - cTimer) * 1000) / 1000)
+    cTimer = t
+End Function
+
+Private Sub SliceArray()
+    Dim t() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
+    Dim nTimer As Single
+    If pCount = 0 Then
+        t = Array2dEx.CreateBlank(0, 0).Instance
+        Exit Sub
+    End If
+    ReDim pSliced(0 To pCount - 1, 0 To 0)
+    r = 0
+    
+    For Each v In pSlices
+        Select Case True
+            Case TypeOf v(0) Is Array2dEx
+                Set a2dX = C2Array2dEx(v(0))
+                nTimer = Timer()
+                MemoryLib.CloneParamArray a2dX.Instance(v(2), v(1)), v(3), t
+                GLOBAL_TIMER_ACC = GLOBAL_TIMER_ACC + (Timer() - nTimer)
+                For i = 0 To v(3) - 1
+                    pSliced(r + i, 0) = t(i)
+                Next i
+            Case TypeOf v(0) Is RecordsetEx
+                With C2RecordsetEx(v(0))
+                    iAux = CLng(.Instance.AbsolutePosition)
+                    .Instance.AbsolutePosition = v(2) + 1
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
+                    MemoryLib.CloneParamArray k(0, 0), v(3), t
+                    For i = 0 To v(3) - 1
+                        pSliced(r + i, 0) = t(i)
+                    Next i
+                    .Instance.AbsolutePosition = iAux
+                End With
+            Case Else
+                Err.Raise 17
+        End Select
+        r = r + v(3)
+    Next v
+End Sub
+
+#End If
 
 Private Sub Class_Initialize()
     pSliced = Array()

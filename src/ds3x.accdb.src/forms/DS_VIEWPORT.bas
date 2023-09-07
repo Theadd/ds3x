@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =3240
-    Top =3045
-    Right =19860
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -685,6 +685,7 @@ End Sub
 Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As RecordsetEx
     Dim dsT As dsTable, rX As RecordsetEx, ColumnStartIndex As Long, nCols As Long, dsT2 As dsTable, dsT3 As dsTable, nRows As Long, RowStartIndex As Long
 
+    'dsApp.GlobalVMemAnalysis "", False
     Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
     nCols = Worksheet.MaxAvailColumns
@@ -692,7 +693,6 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
     If ColumnStartIndex >= dsT.ColumnCount Then
         Set rX = RecordsetEx.CreateBlank(PageSize * PageCount, nCols)
     Else
-        
         RowStartIndex = Min(PageSize * PageIndex * NumPagesInLargeChangeRows, dsT.Count)
         nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
@@ -715,6 +715,7 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
     End If
     
     Set GetTrack = rX
+    dsApp.GlobalVMemAnalysis "@Viewport.GetTrack(" & CStr(TrackIndex) & ", " & CStr(PageIndex) & ") done."
 End Function
 
 

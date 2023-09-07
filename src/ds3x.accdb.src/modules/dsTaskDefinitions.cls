@@ -972,9 +972,115 @@ Private Function HexToAscii(ByVal Value As String) As String
     HexToAscii = VBA.Join(t, "")
 End Function
 
+'Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+'    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
+'    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+'    cQuote = """": cDblQuote = """"""
+'
+'    Set sLines = CollectionsLib.StringLineSlices(ContentString)
+'    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+'    If AutoHeaders Then sLines.RemoveAt 0
+'    nRows = sLines.Count
+'    nCols = colHeaders.Count
+'    ReDim t(0 To nRows - 1, 0 To nCols - 1)
+'
+'    For Each t0 In sLines
+'        t2 = Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, t0(0), t0(1)), Delimiter), vbNullChar)
+'        For c = 0 To nCols - 1
+'            sCell = Replace(Replace(Replace(t2(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+'            If Len(sCell) <> Len(t2(c)) Then
+'                t(r, c) = sCell
+'            Else
+'                Select Case True
+'                    Case sCell = vbNullString: t(r, c) = Empty
+'                    Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+'                    Case IsDate(sCell): t(r, c) = CDate(sCell)
+'                    Case Else: t(r, c) = sCell
+'                End Select
+'            End If
+'        Next c
+'        r = r + 1
+'    Next t0
+'
+'    Set a2X = Array2dEx.Create()
+'    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+'    Set dsT = dsTable.Create(a2X, False)
+'    If AutoHeaders Then
+'        For c = 0 To nCols - 1
+'            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+'        Next c
+'        dsT.SetHeaders colHeaders.ToArray()
+'    End If
+'
+'    Set LoadFromCSV = dsT
+'End Function
+
+'Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+'    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
+'    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+'    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean
+'    cQuote = """": cDblQuote = """"""
+'
+'    Set sLines = CollectionsLib.StringLineSlices(ContentString)
+'    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+'    If AutoHeaders Then sLines.RemoveAt 0
+'    nRows = sLines.Count
+'    nCols = colHeaders.Count
+'    ReDim t(0 To nRows - 1, 0 To nCols - 1)
+'
+'    r = 0
+'    For Each t0 In sLines
+'        s = VBA.Mid$(ContentString, t0(0), t0(1))
+'        bQuotes = False: bQuoted = False: c = 0: Idx = 0
+'        For i = 1 To VBA.Len(s)
+'            Select Case VBA.Mid$(s, i, 1)
+'                 Case cQuote: bQuotes = Not bQuotes: bQuoted = True
+'                 Case Delimiter
+'                     If Not bQuotes Then
+'                        If bQuoted Then
+'                            t(r, c) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 1, i - Idx - 1), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+'                        Else
+'                            sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
+'                            Select Case True
+'                                Case sCell = vbNullString: t(r, c) = Empty
+'                                Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+'                                Case IsDate(sCell): t(r, c) = CDate(sCell)
+'                                Case Else: t(r, c) = sCell
+'                            End Select
+'                        End If
+'                        Idx = i
+'                        bQuoted = False
+'                        c = c + 1
+'                     End If
+'             End Select
+'        Next i
+'        ' TODO: parse substring after last delimiter
+'        r = r + 1
+'    Next t0
+'    Debug.Print "' TODO: parse substring after last delimiter"
+'    Debug.Print "' TODO: parse substring after last delimiter"
+'    Debug.Print "' TODO: parse substring after last delimiter"
+'    Debug.Print "' TODO: parse substring after last delimiter"
+'    Debug.Print "' TODO: parse substring after last delimiter"
+'    Debug.Print "' TODO: parse substring after last delimiter"
+'    Set a2X = Array2dEx.Create()
+'    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+'    Set dsT = dsTable.Create(a2X, False)
+'    If AutoHeaders Then
+'        For c = 0 To nCols - 1
+'            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+'        Next c
+'        dsT.SetHeaders colHeaders.ToArray()
+'    End If
+'
+'    Set LoadFromCSV = dsT
+'End Function
+
 Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
     Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
     Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean
+    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long
     cQuote = """": cDblQuote = """"""
 
     Set sLines = CollectionsLib.StringLineSlices(ContentString)
@@ -983,25 +1089,42 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
     nRows = sLines.Count
     nCols = colHeaders.Count
     ReDim t(0 To nRows - 1, 0 To nCols - 1)
-    
+
+    r = 0
     For Each t0 In sLines
-        t2 = Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, t0(0), t0(1)), Delimiter), vbNullChar)
-        For c = 0 To nCols - 1
-            sCell = Replace(Replace(Replace(t2(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
-            If Len(sCell) <> Len(t2(c)) Then
-                t(r, c) = sCell
-            Else
-                Select Case True
-                    Case sCell = vbNullString: t(r, c) = Empty
-                    Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
-                    Case IsDate(sCell): t(r, c) = CDate(sCell)
-                    Case Else: t(r, c) = sCell
-                End Select
-            End If
-        Next c
+        s = VBA.Mid$(ContentString, t0(0), t0(1))
+        bQuotes = False: bQuoted = False: c = 0: Idx = 0
+        For i = 1 To VBA.Len(s)
+            Select Case VBA.Mid$(s, i, 1)
+                 Case cQuote: bQuotes = Not bQuotes: bQuoted = True
+                 Case Delimiter
+                     If Not bQuotes Then
+                        If bQuoted Then
+                            t(r, c) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 1, i - Idx - 1), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+                        Else
+                            sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
+                            Select Case True
+                                Case sCell = vbNullString: t(r, c) = Empty
+                                Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+                                Case IsDate(sCell): t(r, c) = CDate(sCell)
+                                Case Else: t(r, c) = sCell
+                            End Select
+                        End If
+                        Idx = i
+                        bQuoted = False
+                        c = c + 1
+                     End If
+             End Select
+        Next i
+        ' TODO: parse substring after last delimiter
         r = r + 1
     Next t0
-    
+    Debug.Print "' TODO: parse substring after last delimiter"
+    Debug.Print "' TODO: parse substring after last delimiter"
+    Debug.Print "' TODO: parse substring after last delimiter"
+    Debug.Print "' TODO: parse substring after last delimiter"
+    Debug.Print "' TODO: parse substring after last delimiter"
+    Debug.Print "' TODO: parse substring after last delimiter"
     Set a2X = Array2dEx.Create()
     a2X.Instance = CollectionsLib.GetArrayByRef(t)
     Set dsT = dsTable.Create(a2X, False)
@@ -1011,9 +1134,25 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
         Next c
         dsT.SetHeaders colHeaders.ToArray()
     End If
-    
+
     Set LoadFromCSV = dsT
 End Function
 
-
+'Public Function TokenizeArgs(ByRef SearchString As String, Optional ByVal Tokenizer As String = " ") As String
+'   Dim sArgs As String, i As Long, Idx As Long, bQuotes As Boolean
+'   Const cQuote As String = """"
+'
+'   For i = 1 To VBA.Len(SearchString)
+'        Select Case VBA.Mid$(SearchString, i, 1)
+'            Case cQuote: bQuotes = Not bQuotes
+'            Case Tokenizer
+'                If Not bQuotes Then
+'                    sArgs = sArgs & vbNullChar & VBA.Mid$(SearchString, Idx + 1, i - Idx - 1)
+'                    Idx = i
+'                End If
+'        End Select
+'   Next i
+'   If Idx + 1 < i Then sArgs = sArgs & vbNullChar & VBA.Mid$(SearchString, Idx + 1, i - Idx - 2)
+'   TokenizeArgs = VBA.Mid$(sArgs, 2, VBA.Len(sArgs))
+'End Function
 

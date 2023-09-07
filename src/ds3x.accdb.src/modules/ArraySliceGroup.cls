@@ -232,12 +232,17 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     End If
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
+    dsApp.GlobalVMemAnalysis "    -> PRE"
+    GLOBAL_TIMER_ACC = CSng(0)
     For c = 0 To nCols - 1
         SliceAt(c).SlicedArray vSliced
+'        Debug.Print JSON.Stringify(vSliced)
         For r = 0 To UBound(vSliced, 1)
             Out2dArray(r, c) = vSliced(r, 0)
         Next r
     Next c
+    Debug.Print "GLOBAL_TIMER_ACC: " & CStr(CSng(CLng(GLOBAL_TIMER_ACC * 1000) / 1000))
+    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
 End Sub
 
 ' Practically there's no point in cloning an immutable object, it's just exposed to share some common API with the other collection class modules.

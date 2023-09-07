@@ -367,7 +367,7 @@ End Function
 ' USAGE: sArgv() = Split(TokenizeArgs("one ""two twoB twoC"" three ""four fourB"" five"), Chr$(0))
 Public Function TokenizeArgs(ByRef SearchString As String, Optional ByVal Tokenizer As String = " ") As String
    Dim sArgs As String, sChar As String, nCount As Long, bQuotes As Boolean
-   
+
    For nCount = 1 To Len(SearchString)
       sChar = Mid$(SearchString, nCount, 1)
       If sChar = Chr$(34) Then

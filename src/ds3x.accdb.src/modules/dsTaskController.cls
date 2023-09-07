@@ -159,7 +159,7 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx, bFailed As Boolean
     
     RaiseEvent OnBusyChange(True)
-    VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
+    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
         If TryGetSourceTableForSequence(pDirtyRebuildIndex, oTable) Then
@@ -187,7 +187,9 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     End If
     
 ExitRebuild:
+    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
     RaiseEvent OnTableChange
+    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
     RaiseEvent OnBusyChange(False)
     Rebuild = Not bFailed
     Exit Function

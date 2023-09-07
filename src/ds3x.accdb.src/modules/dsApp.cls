@@ -329,7 +329,7 @@ Public Function TimerSpan() As Single
     cTimer = t
 End Function
 
-Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant)
+Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant, Optional ShowMessage As Boolean = True)
     Static LastVMemFree As Long, sVMemCallCount As Long
     Dim cVMemFree As Long, elapsedTime As String
     
@@ -338,7 +338,7 @@ Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant)
     elapsedTime = CStr(TimerSpan())
     elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
     
-    If LastVMemFree <> 0 Then
+    If LastVMemFree <> 0 And ShowMessage Then
         Debug.Print Printf("%6 [Global VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
     End If
     LastVMemFree = cVMemFree
