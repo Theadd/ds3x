@@ -21,6 +21,8 @@ Public Property Get Tasks() As DictionaryEx: Set Tasks = pTasks: End Property
 Public Property Get AppExcelVisibilityAuto() As Boolean: AppExcelVisibilityAuto = False: End Property
 
 
+' --- DEBUG / DEV ---
+
 Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
     Dim Target As dsTable, rX As RecordsetEx
     Set Target = TargetTable
@@ -28,6 +30,32 @@ Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
     Set rX = RecordsetEx.Create(Target.NamedRecordset)
     Set AsRecordsetTable = pTaskController.AddResource(dsTable.Create(rX, True))
 End Function
+
+Public Function CreateMassiveTable() As dsTable
+    Dim dsT As dsTable, t() As Variant, a2X As Array2dEx, i As Long, sX As ArraySlice, aX As ArrayListEx, v As Variant, sgX As ArraySliceGroup
+    
+    ReDim t(0 To 999, 0 To 0)
+    For i = 0 To 999
+        t(i, 0) = i
+    Next i
+    
+    Set a2X = New Array2dEx
+    a2X.Instance = MemoryLib.GetArrayByRef(t)
+    Set sX = ArraySlice.Create(a2X)
+    Set aX = New ArrayListEx
+    v = Array(0, 1000)
+    For i = 0 To 9999
+        aX.Add v
+    Next i
+    Set sX = sX.SliceAllRanges(aX)
+    Set sgX = New ArraySliceGroup
+    sgX.SliceGroups = Array(sX)
+    Set dsT = dsTable.Create(sgX)
+    
+    Set CreateMassiveTable = pTaskController.AddResource(dsT.SetHeaders(Array(1)))
+End Function
+
+' ---
 
 Public Function EnumerateRows(ByRef TargetTable As Variant, Optional ByVal FromNumber As Variant, Optional ByVal ToNumber As Variant) As dsTable
     Dim t() As Variant, i As Long, n As Long, Target As dsTable, FromNum As Long, ToNum As Long
@@ -858,6 +886,8 @@ Private Sub AddAllTasks()
     ' --- DEV / DEBUG ---
     
     AddTask "AsRecordsetTable", "[Source]: Table", Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>"
+    
+    AddTask "CreateMassiveTable", "", TaskType:="DS", Requires:="*"
     
 End Sub
 
