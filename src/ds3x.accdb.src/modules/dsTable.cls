@@ -14,20 +14,8 @@ Option Base 0
 
 Implements ICollectionEx
 
-
-' # REFACTORING NOTES:
-'   * @dsTable.Create() -> CreateFromExcelRange() is being created by ArrayListEx-chunks instead of
-'     Array2dEx's direct in-memory copy of 2d array at once since was running out-of-memory in 32-bit.
-'   * Creating a dsTable from ArrayListEx currently converts it before to Array2dEx and stores it
-'     wrapped in an ArraySliceGroup instance, it's cos ArraySliceGroup still doesn't have the ArrayListEx
-'     wrapper implemented.
-'   * TODO: @JSON.Stringify an ArraySliceGroup, provide the sliced array to support dsTable.Instance calls.
-'   * TODO: Add support for 0-rows or 0-columns in ArraySliceGroup/ArraySlice.
-'
-
 Private pRecords As ICollectionEx
 Private pHeaders As ICollectionEx
-
 
 
 Public Property Get Count() As Long
@@ -584,7 +572,4 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") A
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
-
-
-
 

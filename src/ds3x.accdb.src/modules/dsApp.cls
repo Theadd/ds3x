@@ -331,7 +331,7 @@ End Function
 
 Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant, Optional ShowMessage As Boolean = True)
     Static LastVMemFree As Long, sVMemCallCount As Long
-    Dim cVMemFree As Long, elapsedTime As String
+    Dim cVMemFree As Long, elapsedTime As String, sAux As String
     
     cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
     sVMemCallCount = sVMemCallCount + 1
@@ -339,7 +339,8 @@ Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant, Optional ShowMe
     elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
     
     If LastVMemFree <> 0 And ShowMessage Then
-        Debug.Print Printf("%6 [VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
+        If LastVMemFree - cVMemFree <> 0 Then sAux = " (" & CStr(0 - (LastVMemFree - cVMemFree)) & " MB)"
+        Debug.Print Printf("%6 [Avail. VMem]%3 %2 MB %5", LastVMemFree, cVMemFree, sAux, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
     End If
     LastVMemFree = cVMemFree
 End Sub

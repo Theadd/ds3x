@@ -149,7 +149,6 @@ End Sub
 
 Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
 
-
 Public Sub Dispose()
     pSliced = Array()
 End Sub
@@ -159,91 +158,6 @@ Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2Array
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
-
-#If IterateSliceCopy = 1 Then
-
-Private Sub SliceArray()
-    Dim v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
-    If pCount = 0 Then
-        pSliced = Array2dEx.CreateBlank(0, 0).Instance
-        Exit Sub
-    End If
-    ReDim pSliced(0 To pCount - 1, 0 To 0)
-
-    For Each v In pSlices
-        Select Case True
-            Case TypeOf v(0) Is Array2dEx
-                Set a2dX = C2Array2dEx(v(0))
-                iMod = v(2)
-                c = v(1)
-                For i = 0 To v(3) - 1
-                    pSliced(r + i, 0) = a2dX.Instance(iMod + i, c)
-                Next i
-                ' MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
-            Case TypeOf v(0) Is RecordsetEx
-                With C2RecordsetEx(v(0))
-                    iAux = CLng(.Instance.AbsolutePosition)
-                    .Instance.AbsolutePosition = v(2) + 1
-                    c = v(1)
-                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(c))
-                    For i = 0 To v(3) - 1
-                        pSliced(r + i, 0) = k(0, i)
-                    Next i
-                    ' MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
-                    .Instance.AbsolutePosition = iAux
-                End With
-            Case Else
-                Err.Raise 17
-        End Select
-        r = r + v(3)
-    Next v
-    ' MemoryLib.FixVariantArray pSliced, pCount, 2
-End Sub
-
-#Else
-
-'Private Sub SliceArray()
-'    Dim v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
-'    If pCount = 0 Then
-'        pSliced = Array2dEx.CreateBlank(0, 0).Instance
-'        Exit Sub
-'    End If
-'    ReDim pSliced(0 To pCount - 1, 0 To 0)
-'
-'    For Each v In pSlices
-'        Select Case True
-'            Case TypeOf v(0) Is Array2dEx
-'                Set a2dX = C2Array2dEx(v(0))
-'                MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(a2dX.Instance(v(2), v(1))), VARIANT_SIZE * v(3)
-'            Case TypeOf v(0) Is RecordsetEx
-'                With C2RecordsetEx(v(0))
-'                    iAux = CLng(.Instance.AbsolutePosition)
-'                    .Instance.AbsolutePosition = v(2) + 1
-'                    c = v(1)
-'                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(c))
-''                    For i = 0 To v(3) - 1
-''                        pSliced(r + i, 0) = k(0, i)
-''                    Next i
-'                    MemoryLib.MemCopy VBA.VarPtr(pSliced(r, 0)), VBA.VarPtr(k(0, 0)), VARIANT_SIZE * v(3)
-'                    .Instance.AbsolutePosition = iAux
-'                End With
-'            Case Else
-'                Err.Raise 17
-'        End Select
-'        r = r + v(3)
-'    Next v
-'    MemoryLib.FixVariantArray pSliced, pCount, 2
-'End Sub
-
-Private Function TimerSpanX() As Single
-    Static cTimer As Single
-    Dim t As Single
-    
-    t = Timer()
-    If cTimer = CSng(0) Then cTimer = t
-    TimerSpanX = CSng(CLng((t - cTimer) * 1000) / 1000)
-    cTimer = t
-End Function
 
 Private Sub SliceArray()
     Dim t() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
@@ -271,6 +185,9 @@ Private Sub SliceArray()
                     For i = 0 To v(3) - 1
                         pSliced(r + i, 0) = t(i)
                     Next i
+                    ' NOTE: No difference in performance observed by using the following line instead of the "CloneParamArray" one and the "For i" following it.
+                    '   For i = 0 To v(3) - 1: pSliced(r + i, 0) = k(0, i): Next i
+                    ' But this same technique applied to the previous case (Case Typeof v(0) Is Array2dEx) performs 100x times slower than the CloneParamArray one.
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else
@@ -279,8 +196,6 @@ Private Sub SliceArray()
         r = r + v(3)
     Next v
 End Sub
-
-#End If
 
 Private Sub Class_Initialize()
     pSliced = Array()
