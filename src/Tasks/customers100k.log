@@ -1,0 +1,66 @@
+DS1
+       0 [Avail. VMem] 132114065 MB - @ArraySliceGroup.SlicedArray()
+  24,581 [Avail. VMem] (-157 MB) 132113908 MB - @RebuildTask(DS1 LoadFromFileAsCSV)
+   2,255 [Avail. VMem] (-16 MB) 132113892 MB - @ArraySliceGroup.SlicedArray()
+   0,001 [Avail. VMem] 132113876 MB - @ArraySliceGroup.SlicedArray()
+
+T1
+   0,001 [Avail. VMem] 132113885 MB - @RebuildTask(T1 SetNumberFormat)
+   2,017 [Avail. VMem] (17 MB) 132113902 MB - @ArraySliceGroup.SlicedArray()
+   0,001 [Avail. VMem] 132113886 MB - @ArraySliceGroup.SlicedArray()
+
+T2
+   2,759 [Avail. VMem] (-140 MB) 132113718 MB - @ArraySliceGroup.SlicedArray()
+   5,213 [Avail. VMem] (-68 MB) 132113650 MB - @RebuildTask(T2 AsRecordsetTable)
+   0,006 [Avail. VMem] 132113650 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113635 MB - @ArraySliceGroup.SlicedArray()
+
+XLG1
+   1,683 [Avail. VMem] 132113649 MB - @RebuildTask(XLG1 CreateNewExcelApp)
+   0,004 [Avail. VMem] 132113649 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113634 MB - @ArraySliceGroup.SlicedArray()
+
+XLG2
+   8,264 [Avail. VMem] (24 MB) 132113656 MB - @RebuildTask(XLG2 CopyToRange)
+   0,004 [Avail. VMem] 132113656 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113641 MB - @ArraySliceGroup.SlicedArray()
+
+DS2
+   2,873 [Avail. VMem] (-10 MB) 132113622 MB - @RebuildTask(DS2 LoadFromRange)
+    0,16 [Avail. VMem] 132113622 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113606 MB - @ArraySliceGroup.SlicedArray()
+
+-----------------------------------------------------------------------------
+
+DS1
+   0,001 [Avail. VMem] 132114044 MB - @ArraySliceGroup.SlicedArray()
+  18,605 [Avail. VMem] (-159 MB) 132113884 MB - @RebuildTask(DS1 LoadFromFileAsCSV)
+   2,083 [Avail. VMem] (4 MB) 132113888 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113872 MB - @ArraySliceGroup.SlicedArray()
+
+T1
+   0,001 [Avail. VMem] 132113876 MB - @RebuildTask(T1 SetNumberFormat)
+   1,975 [Avail. VMem] (16 MB) 132113892 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113876 MB - @ArraySliceGroup.SlicedArray()
+
+T2
+   2,625 [Avail. VMem] (-141 MB) 132113707 MB - @ArraySliceGroup.SlicedArray()
+   4,979 [Avail. VMem] (-80 MB) 132113627 MB - @RebuildTask(T2 AsRecordsetTable)
+   0,003 [Avail. VMem] 132113627 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113627 MB - @ArraySliceGroup.SlicedArray()
+
+XLG1
+   1,635 [Avail. VMem] (16 MB) 132113633 MB - @RebuildTask(XLG1 CreateNewExcelApp)
+   0,002 [Avail. VMem] 132113633 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113617 MB - @ArraySliceGroup.SlicedArray()
+
+XLG2
+   8,101 [Avail. VMem] (32 MB) 132113649 MB - @RebuildTask(XLG2 CopyToRange)
+   0,003 [Avail. VMem] 132113649 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113633 MB - @ArraySliceGroup.SlicedArray()
+
+DS2
+   2,819 [Avail. VMem] (-12 MB) 132113615 MB - @RebuildTask(DS2 LoadFromRange)
+    0,15 [Avail. VMem] 132113615 MB - @ArraySliceGroup.SlicedArray()
+       0 [Avail. VMem] 132113599 MB - @ArraySliceGroup.SlicedArray()
+
