@@ -608,11 +608,7 @@ Private Sub Class_Terminate()
 End Sub
 
 Public Sub Dispose()
-    On Error Resume Next
-    ' EDIT: DISPOSE
-'    Stop
-'    Instance.Clear
-'    Set Instance = Nothing
+    ' REMOVED
 End Sub
 
 Private Function Is2dArray(ByRef ArrayLike As Variant) As Boolean

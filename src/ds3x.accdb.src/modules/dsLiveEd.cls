@@ -473,8 +473,8 @@ Private Function SetNamedEntryToEntries(ByRef dX As DictionaryEx, ByRef Entry As
 Finally:
 End Function
 
-' ---
 
+' --- OTHER ---
 
 Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean = False)
     On Error Resume Next

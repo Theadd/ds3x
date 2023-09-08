@@ -12,28 +12,6 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
-' dsTaskController
-
-' Err.Raise:
-' 9 - Subscript out of range (Array index out of bounds)
-' 17 - Can't perform requested operation
-' 13 - Type mismatch
-' 51 - Internal error
-' 70 - Permission denied
-' 327 - Data value named not found
-' 328 - Illegal parameter; can't write arrays
-' 380 - Invalid property value
-' 419 - Permission to use object denied
-' 422 - Property not found
-' 423 - Property or method not found
-' 424 - Object Required
-' 425 - Invalid object use
-' 448 - Named Not Argument
-' 449 - Argument not optional or invalid property assignment
-' 450 - Wrong number of arguments or invalid property assignment
-' 31001 - Out of memory
-' 31004 - No Object
-' 65536 - Invalid procedure call or argument
 
 Public Event OnTableChange()
 Public Event OnDataSourceChange(ByVal dsId As String)
@@ -98,7 +76,6 @@ Public Property Get DirtyRebuildIndex() As Long: DirtyRebuildIndex = pDirtyRebui
 Public Property Get GeneratedValue() As Variant: Assign GeneratedValue, pTaskResults(RebuildSequence(SequenceIndex)("Id")): End Property
 
 
-
 Public Sub AddTask(ByVal TaskName As String, ByVal TaskValues As Variant, Optional ByVal TaskId As String = "")
     Dim sIndex As Long: sIndex = SequenceIndex
     
@@ -159,7 +136,6 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx, bFailed As Boolean
     
     RaiseEvent OnBusyChange(True)
-'    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
         If TryGetSourceTableForSequence(pDirtyRebuildIndex, oTable) Then
@@ -187,9 +163,7 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     End If
     
 ExitRebuild:
-'    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
     RaiseEvent OnTableChange
-'    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
     RaiseEvent OnBusyChange(False)
     Rebuild = Not bFailed
     Exit Function
@@ -227,7 +201,6 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     End If
     
     dsApp.GlobalVMemAnalysis "@RebuildTask(" & dX("Id") & " " & TaskName & ")"
-'    VMemAnalysis "@" & dX("Id") & " " & TaskName
 End Sub
 
 
@@ -249,12 +222,11 @@ End Sub
 
 Public Sub Dispose()
     On Error Resume Next
-'    Debug.Print "[INFO] @dsTaskController.Dispose()"
     Set pTable = Nothing
     pTaskResults.RemoveAll
     pDataSources.RemoveAll
     ' Run GarbageCollector
-    FreeUnlinkedResources
+    FreeUnlinkedResources True
     pDataSources.Unbind
     Set pTaskResults = Nothing
     Set pDataSources = Nothing
@@ -309,37 +281,18 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
             Stop
     End Select
     
-'    Select Case TaskId
-'        Case "DS1", "XS1"
-'            pTaskResults.RemoveAll
-'            pSequenceIndex = -1
-'            Set pTable = Nothing
-'            Set pWorksheet = Nothing
-'            MakeRebuildSequenceDirtyOn 0
-'            Set pDataSources(TaskId) = Nothing
-'            Select Case sourceType
-'                Case "DS"
-'                    Set pDataSources(TaskId) = dsT
-'                    Set pTable = dsT
-'                Case "XS"
-'                    Set pDataSources(TaskId) = xlS
-'                    Set pWorksheet = xlS
-'                Case Else: Stop
-'            End Select
-'        Case Else
-            If TryGetIndexOfTaskId(TaskId, Index) Then
-                MakeRebuildSequenceDirtyOn Index
-                Select Case sourceType
-                    Case "DS"
-                        Set pDataSources(TaskId) = dsT
-                    Case "XS"
-                        Set pDataSources(TaskId) = xlS
-                    Case Else: Stop
-                End Select
-            Else
-                Err.Raise 327, , "DataSource """ & TaskId & """ not found."
-            End If
-'    End Select
+    If TryGetIndexOfTaskId(TaskId, Index) Then
+        MakeRebuildSequenceDirtyOn Index
+        Select Case sourceType
+            Case "DS"
+                Set pDataSources(TaskId) = dsT
+            Case "XS"
+                Set pDataSources(TaskId) = xlS
+            Case Else: Stop
+        End Select
+    Else
+        Err.Raise 327, , "DataSource """ & TaskId & """ not found."
+    End If
     
     RaiseEvent OnDataSourceChange(TaskId)
 End Sub
@@ -570,7 +523,6 @@ Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As 
 End Function
 
 
-
 ' --- GARBAGE COLLECTOR ---
 
 Public Function AddResource(ByRef TargetResource As Object) As Object
@@ -580,7 +532,6 @@ Public Function AddResource(ByRef TargetResource As Object) As Object
     Set AddResource = TargetResource
 End Function
 
-' Run GarbageCollector
 Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
     Dim i As Long, gcKeys As Variant, iMax As Long, cKey As LongPtr, isMatch As Boolean
     Dim iTR As Long, iDS As Long, trKeys As Variant, dsKeys As Variant
@@ -648,17 +599,4 @@ DisposeFailed:
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
     Resume Finally
 End Function
-
-'Private Sub VMemAnalysis(Optional ByVal Message As Variant)
-'    Static LastVMemFree As Long, sVMemCallCount As Long
-'    Dim cVMemFree As Long
-'
-'    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
-'    sVMemCallCount = sVMemCallCount + 1
-'    If LastVMemFree <> 0 Then
-'        Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
-'    End If
-'    LastVMemFree = cVMemFree
-'End Sub
-
 
