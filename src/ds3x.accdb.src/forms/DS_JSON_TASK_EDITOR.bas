@@ -24,10 +24,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =6885
-    Top =4230
-    Right =22380
-    Bottom =14385
+    Left =12240
+    Top =4950
+    Right =27735
+    Bottom =15105
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -575,7 +575,7 @@ Private Sub Form_Unload(Cancel As Integer)
     ' Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.Unload()"
 End Sub
 
-Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
+Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
     On Error GoTo Finally
     
     pSequenceIndex = TargetIndex    ' Controller.SequenceIndex

@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =6885
-    Top =4230
-    Right =22380
-    Bottom =14385
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -355,7 +355,6 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     TextFormat =1
-                    VerticalAnchor =2
                     ShowDatePicker =0
 
                     LayoutCachedLeft =2910
@@ -1372,6 +1371,8 @@ Private Sub DS_TASK_PARAM_1_Change()
     If GetControlText(Me.DS_TASK_PARAM_1) = "< Select... >" Then
         If pSelectedTask Like "*JSON*" Then
             sExtension = "*.json"
+        ElseIf pSelectedTask Like "*CSV*" Then
+            sExtension = "*.csv"
         Else
             sExtension = "*.xlsx"
         End If
@@ -1384,7 +1385,8 @@ Private Sub DS_TASK_PARAM_1_Change()
 End Sub
 
 Private Sub Form_Load()
-    ScreenLib.WindowSizeTo Me, 11000, 6000
+    ScreenLib.ScreenLib_Resync
+    ScreenLib.WindowSizeTo Me, 12300, 6500
 '    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
     ScreenLib.WindowAlwaysOnTop Me
     ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
@@ -1394,6 +1396,7 @@ Private Sub Form_Resize()
     Me.DS_FOOTER_BG.HorizontalAnchor = acHorizontalAnchorBoth
     Me.DS_TASK_DEFINITION_SYNTAX.HorizontalAnchor = acHorizontalAnchorBoth
     Me.DS_TASK_TEXT_CONTENT.HorizontalAnchor = acHorizontalAnchorBoth
+    Me.DS_TASK_TEXT_CONTENT.Height = (Me.InsideHeight - Me.DS_CREATE_TASK_LIST.Top - Me.DS_FOOTER_BG.Height - Me.DS_TASK_TEXT_CONTENT.Top)
 End Sub
 
 Private Function GetReturnTypeOf(ByVal TaskName As String) As String
@@ -1437,7 +1440,11 @@ Finally:
 End Sub
 
 Private Sub MoveTaskTextContentToFit(ByVal NumParams As Long)
-    Me.DS_TASK_TEXT_CONTENT.Top = 3000 - ((5 - NumParams) * 450)
+    With Me.DS_TASK_TEXT_CONTENT
+        .Height = 270
+        .Top = 3000 - ((5 - NumParams) * 450)
+        .Height = (Me.InsideHeight - Me.DS_CREATE_TASK_LIST.Top - Me.DS_FOOTER_BG.Height - .Top)
+    End With
 End Sub
 
 Private Sub ResetAllTaskParamTextFields()
@@ -1480,24 +1487,30 @@ Private Sub RefillExistingParamValues(ByVal TaskName As String, ByVal ParamIndex
 End Sub
 
 Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex As Long, ByVal TaskParams As Variant)
-    Dim Item As Variant, isRequired As Boolean
+    Dim Item As Variant, isRequired As Boolean, ParamName As String
     
     With Me.Controls("DS_TASK_PARAM_" & CStr(ParamIndex))
         .RowSourceType = "Value List"
         .RowSource = vbNullString
         .ColumnCount = 1
         .Visible = True
-        isRequired = Not (VBA.Mid$(TaskParams(ParamIndex)(0), 1, 1) = "[")
+        ParamName = TaskParams(ParamIndex)(0)
+        isRequired = Not (VBA.Mid$(ParamName, 1, 1) = "[")
         
-        If TaskParams(ParamIndex)(0) Like "*ColumnIndexes*" Then
+        '"SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
+
+        If ParamName Like "*ColumnIndexes*" Then
             If pController.SelectedColumnIndexes.Count >= 1 Then
                 .Value = JSON.Stringify(pController.SelectedColumnIndexes)
             Else
                 .Value = ""
             End If
-        ElseIf TaskParams(ParamIndex)(0) Like "*TargetFile*" Then
+        ElseIf ParamName Like "*TargetFile*" Then
             .AddItem ""
             .AddItem "< Select... >"
+        ElseIf ParamName Like "*NumberFormat*" Then
+            AddDefaultNumberFormatItems Me.Controls("DS_TASK_PARAM_" & CStr(ParamIndex))
+            .Value = GetSelectedColumnNumberFormat()
         Else
             ' Select by PARAM TYPE
             Select Case TaskParams(ParamIndex)(1)
@@ -1511,6 +1524,11 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                     Select Case TaskName
                         Case "LoadFromExcelFile", "OpenWorksheetFromFile"
                             Item = "{""UpdateLinks"": false, ""ReadOnly"": true, ""Local"": true, ""UTF8"": false, ""NoTextQualifier"": true}"
+                            .AddItem ""
+                            .AddItem Item
+                            .Value = Item
+                        Case "LoadFromFileAsCSV"
+                            Item = "{""Delimiter"": "";"", ""AsUnicode"": false, ""InLocalFormat"": true, ""AutoHeaders"": true}"
                             .AddItem ""
                             .AddItem Item
                             .Value = Item
@@ -1590,7 +1608,11 @@ Private Sub AddTaskUsingCurrentValuesAs(ByVal TaskName As String)
                     If IsObject(Item) Then
                         Set t(i) = Item
                     Else
-                        t(i) = Item
+                        Select Case TaskParams(i)(1)
+                            Case "Long": t(i) = CLng(Item)
+                            Case "Boolean": t(i) = CBool(Item)
+                            Case Else: t(i) = Item
+                        End Select
                     End If
                 Else
                     t(i) = CVErr(0)
@@ -1700,3 +1722,44 @@ End Sub
 Private Sub pCVarsScrollview_OnWindowClose(Cancel As Integer)
     Set pCVarsScrollview = Nothing
 End Sub
+
+Private Sub AddDefaultNumberFormatItems(ByVal TargetControl As Access.ComboBox)
+    With TargetControl
+        .AddItem ""
+        .AddItem "General"
+        .AddItem "@"
+        .AddItem "0"
+        .AddItem "0%"
+        .AddItem "0.00%"
+        .AddItem "#,##0.00;-#,##0.00"
+        .AddItem "m/d/yyyy"
+        .AddItem "mm/dd/yyyy"
+        .AddItem "h:mm"
+        .AddItem "h:mm:ss"
+        .AddItem "[h]:mm:ss"
+        .AddItem "mm:ss"
+        .AddItem "hh:mm"
+        .AddItem "hh:mm:ss"
+        .AddItem "m/d/yyyy h:mm"
+        .AddItem "m/d/yyyy h:mm:ss"
+        .AddItem "mm/dd/yyyy hh:mm"
+        .AddItem "mm/dd/yyyy hh:mm:ss"
+    End With
+End Sub
+
+Private Function GetSelectedColumnNumberFormat() As String
+    Dim cIndex As Long, cIndexValid As Boolean
+    On Error GoTo Finally
+    
+    With pController.SelectedColumnIndexes
+        If .Count > 0 Then
+            cIndex = CLng(.Item(0))
+            cIndexValid = True
+        End If
+    End With
+    
+    If cIndexValid Then
+        GetSelectedColumnNumberFormat = pController.Table.Headers.Row(0)(cIndex)("NumberFormat")
+    End If
+Finally:
+End Function

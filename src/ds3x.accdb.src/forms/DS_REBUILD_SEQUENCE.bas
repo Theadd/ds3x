@@ -24,10 +24,10 @@ Begin Form
     Width =3248
     DatasheetFontHeight =11
     ItemSuffix =1590
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =12240
+    Top =4950
+    Right =27735
+    Bottom =15105
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -1303,9 +1303,10 @@ Private Sub pContinuousList_OnNoActiveIndexChange(ByVal ActiveIndex As Long)
     pController.SequenceIndex = ActiveIndex
 End Sub
 
-Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
+Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
     On Error Resume Next
 '    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnActiveSequenceIndexChange()"
+    If (Not HasFailed) And pFailedSequenceIndex <= TargetIndex Then pFailedSequenceIndex = -1
     RebuildSequenceList
     pContinuousList.SetActiveIndex pController.SequenceIndex, True
 End Sub

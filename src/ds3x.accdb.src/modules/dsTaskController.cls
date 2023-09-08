@@ -12,33 +12,11 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
-' dsTaskController
-
-' Err.Raise:
-' 9 - Subscript out of range (Array index out of bounds)
-' 17 - Can't perform requested operation
-' 13 - Type mismatch
-' 51 - Internal error
-' 70 - Permission denied
-' 327 - Data value named not found
-' 328 - Illegal parameter; can't write arrays
-' 380 - Invalid property value
-' 419 - Permission to use object denied
-' 422 - Property not found
-' 423 - Property or method not found
-' 424 - Object Required
-' 425 - Invalid object use
-' 448 - Named Not Argument
-' 449 - Argument not optional or invalid property assignment
-' 450 - Wrong number of arguments or invalid property assignment
-' 31001 - Out of memory
-' 31004 - No Object
-' 65536 - Invalid procedure call or argument
 
 Public Event OnTableChange()
 Public Event OnDataSourceChange(ByVal dsId As String)
 Public Event OnRebuildSequenceChange()
-Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long)
+Public Event OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
 Public Event OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
 Public Event OnBusyChange(ByVal IsBusy As Boolean)
 
@@ -98,7 +76,6 @@ Public Property Get DirtyRebuildIndex() As Long: DirtyRebuildIndex = pDirtyRebui
 Public Property Get GeneratedValue() As Variant: Assign GeneratedValue, pTaskResults(RebuildSequence(SequenceIndex)("Id")): End Property
 
 
-
 Public Sub AddTask(ByVal TaskName As String, ByVal TaskValues As Variant, Optional ByVal TaskId As String = "")
     Dim sIndex As Long: sIndex = SequenceIndex
     
@@ -155,11 +132,10 @@ Public Sub RebuildAll()
     SequenceIndex = RebuildSequence.Count - 1
 End Sub
 
-Private Sub Rebuild(ByVal TargetIndex As Long)
-    Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx
+Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
+    Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx, bFailed As Boolean
     
     RaiseEvent OnBusyChange(True)
-    VMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
         If TryGetSourceTableForSequence(pDirtyRebuildIndex, oTable) Then
@@ -189,18 +165,21 @@ Private Sub Rebuild(ByVal TargetIndex As Long)
 ExitRebuild:
     RaiseEvent OnTableChange
     RaiseEvent OnBusyChange(False)
-    Exit Sub
+    Rebuild = Not bFailed
+    Exit Function
 RebuildTaskFail:
+    bFailed = True
     MakeRebuildSequenceDirtyOn pSequenceIndex
     RaiseEvent OnRebuildSequenceFail(pSequenceIndex)
     Resume ExitRebuild
-End Sub
+End Function
 
 Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Static dX As New DictionaryEx
     Static cb As New Callback
     Dim t() As Variant, TaskName As String, TaskParams As Variant
     
+    dsApp.GlobalVMemAnalysis "", False
     dX.Bind Task
     TaskName = dX("TaskName")
     TaskParams = TaskInfo(TaskName)(DS_T_PARAMS)(2)
@@ -209,10 +188,10 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     If TryRebuildTaskValues(t, TaskParams, dX.GetValue("Values", Array())) Then
         Select Case GetReturnTypeOf(dX("TaskName"))
             Case "Table"
-                Set pTable = cb.ExecuteOnArray(t).result
+                Set pTable = cb.ExecuteOnArray(t).Result
                 Set pTaskResults(dX("Id")) = pTable
             Case "Worksheet"
-                Set pWorksheet = cb.ExecuteOnArray(t).result
+                Set pWorksheet = cb.ExecuteOnArray(t).Result
                 Set pTaskResults(dX("Id")) = pWorksheet
             Case Else
                 Err.Raise 13
@@ -221,7 +200,7 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
         Err.Raise 13
     End If
     
-    VMemAnalysis "@" & dX("Id") & " " & TaskName
+    dsApp.GlobalVMemAnalysis "@RebuildTask(" & dX("Id") & " " & TaskName & ")"
 End Sub
 
 
@@ -243,12 +222,11 @@ End Sub
 
 Public Sub Dispose()
     On Error Resume Next
-'    Debug.Print "[INFO] @dsTaskController.Dispose()"
     Set pTable = Nothing
     pTaskResults.RemoveAll
     pDataSources.RemoveAll
     ' Run GarbageCollector
-    FreeUnlinkedResources
+    FreeUnlinkedResources True
     pDataSources.Unbind
     Set pTaskResults = Nothing
     Set pDataSources = Nothing
@@ -303,37 +281,18 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
             Stop
     End Select
     
-    Select Case TaskId
-        Case "DS1", "XS1"
-            pTaskResults.RemoveAll
-            pSequenceIndex = -1
-            Set pTable = Nothing
-            Set pWorksheet = Nothing
-            MakeRebuildSequenceDirtyOn 0
-            Set pDataSources(TaskId) = Nothing
-            Select Case sourceType
-                Case "DS"
-                    Set pDataSources(TaskId) = dsT
-                    Set pTable = dsT
-                Case "XS"
-                    Set pDataSources(TaskId) = xlS
-                    Set pWorksheet = xlS
-                Case Else: Stop
-            End Select
-        Case Else
-            If TryGetIndexOfTaskId(TaskId, Index) Then
-                MakeRebuildSequenceDirtyOn Index
-                Select Case sourceType
-                    Case "DS"
-                        Set pDataSources(TaskId) = dsT
-                    Case "XS"
-                        Set pDataSources(TaskId) = xlS
-                    Case Else: Stop
-                End Select
-            Else
-                Err.Raise 327, , "DataSource """ & TaskId & """ not found."
-            End If
-    End Select
+    If TryGetIndexOfTaskId(TaskId, Index) Then
+        MakeRebuildSequenceDirtyOn Index
+        Select Case sourceType
+            Case "DS"
+                Set pDataSources(TaskId) = dsT
+            Case "XS"
+                Set pDataSources(TaskId) = xlS
+            Case Else: Stop
+        End Select
+    Else
+        Err.Raise 327, , "DataSource """ & TaskId & """ not found."
+    End If
     
     RaiseEvent OnDataSourceChange(TaskId)
 End Sub
@@ -354,16 +313,16 @@ Finally:
 End Function
 
 Private Sub SetActiveSequenceIndex(ByVal Value As Long)
+    Dim rebuildFail As Boolean
     If Value < 0 Then Exit Sub
     If Value >= RebuildSequence.Count Then Exit Sub
     On Error GoTo Finally
     
     pSequenceIndex = Value
-    VMemAnalysis "@SetActiveSequenceIndex"
-    Rebuild Value
+    rebuildFail = Not Rebuild(Value)
 Finally:
     On Error GoTo 0
-    RaiseEvent OnActiveSequenceIndexChange(Value)
+    RaiseEvent OnActiveSequenceIndexChange(Value, rebuildFail)
 End Sub
 
 Private Function GetNextSequenceId(ByVal IdPrefix As String) As String
@@ -564,7 +523,6 @@ Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As 
 End Function
 
 
-
 ' --- GARBAGE COLLECTOR ---
 
 Public Function AddResource(ByRef TargetResource As Object) As Object
@@ -574,8 +532,7 @@ Public Function AddResource(ByRef TargetResource As Object) As Object
     Set AddResource = TargetResource
 End Function
 
-' Run GarbageCollector
-Public Sub FreeUnlinkedResources()
+Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
     Dim i As Long, gcKeys As Variant, iMax As Long, cKey As LongPtr, isMatch As Boolean
     Dim iTR As Long, iDS As Long, trKeys As Variant, dsKeys As Variant
     
@@ -615,11 +572,12 @@ Public Sub FreeUnlinkedResources()
         End If
         
         If Not isMatch Then
-            SafeDisposeResource pGarbageCollector(gcKeys(i))
-            On Error Resume Next
-            Set pGarbageCollector(gcKeys(i)) = Nothing
-            pGarbageCollector.Remove gcKeys(i)
-            On Error GoTo 0
+            If SafeDisposeResource(pGarbageCollector(gcKeys(i)), DisposeAll) Then
+                On Error Resume Next
+                Set pGarbageCollector(gcKeys(i)) = Nothing
+                pGarbageCollector.Remove gcKeys(i)
+                On Error GoTo 0
+            End If
         End If
     Next i
     
@@ -629,26 +587,16 @@ StopOnError:
     Resume Next
 End Sub
 
-Private Sub SafeDisposeResource(ByRef TargetResource As Object)
+Private Function SafeDisposeResource(ByRef TargetResource As Object, Optional ByVal DisposeAll As Boolean = False) As Boolean
     On Error GoTo DisposeFailed
     
+    If Not DisposeAll And TypeOf TargetResource Is dbQuery Then Exit Function
     TargetResource.Dispose
-    Exit Sub
+Finally:
+    SafeDisposeResource = True
+    Exit Function
 DisposeFailed:
-    On Error Resume Next
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
-End Sub
-
-Private Sub VMemAnalysis(Optional ByVal Message As Variant)
-    Static LastVMemFree As Long, sVMemCallCount As Long
-    Dim cVMemFree As Long
-    
-    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
-    sVMemCallCount = sVMemCallCount + 1
-    If LastVMemFree <> 0 Then
-        Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
-    End If
-    LastVMemFree = cVMemFree
-End Sub
-
+    Resume Finally
+End Function
 

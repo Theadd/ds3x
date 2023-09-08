@@ -75,13 +75,13 @@ End Property
     End Property
     
     Public Property Get RunAll() As Boolean
-        Dim t As Variant, shouldContinue As Boolean, g As Variant, sTarget As String
+        Dim t As Variant, shouldContinue As Boolean, sTarget As String
         On Error GoTo ErrorHandler
         pFailedTask = Empty
         
         For Each t In RunnableTasks.ToArray()
             pActiveTask = t
-            Set pLiveEd = Nothing
+            If Not pLiveEd Is Nothing Then pLiveEd.Dispose
             
             Set pLiveEd = New dsLiveEd
             sTarget = FileSystemLib.Resolve(ApplyCustomVarsOn(CStr(t(0))))
@@ -93,7 +93,7 @@ End Property
 
             shouldContinue = pLiveEd.ImportPreset(sTarget)
             If shouldContinue Then
-                shouldContinue = pLiveEd.TryApply(g)
+                shouldContinue = pLiveEd.TryApply()
                 If Not shouldContinue Then
                     If CBool(t(2)) Then
                         shouldContinue = True   ' Where `t(2)` is the `OnErrorResumeNext` (optional) parameter provided to the `AddRunnableTask()` call.
@@ -117,7 +117,8 @@ End Property
         Next t
         
 Finally:
-        Set pLiveEd = Nothing
+        On Error Resume Next
+        If Not pLiveEd Is Nothing Then pLiveEd.Dispose
         RunAll = shouldContinue
         If pQuitOnRunAll Then Application.Quit acQuitPrompt
         Exit Property
@@ -328,17 +329,18 @@ Public Function TimerSpan() As Single
     cTimer = t
 End Function
 
-Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant)
+Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant, Optional ShowMessage As Boolean = True)
     Static LastVMemFree As Long, sVMemCallCount As Long
-    Dim cVMemFree As Long, elapsedTime As String
+    Dim cVMemFree As Long, elapsedTime As String, sAux As String
     
     cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
     sVMemCallCount = sVMemCallCount + 1
     elapsedTime = CStr(TimerSpan())
     elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
     
-    If LastVMemFree <> 0 Then
-        Debug.Print Printf("%6 [Global VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
+    If LastVMemFree <> 0 And ShowMessage Then
+        If LastVMemFree - cVMemFree <> 0 Then sAux = " (" & CStr(0 - (LastVMemFree - cVMemFree)) & " MB)"
+        Debug.Print Printf("%6 [Avail. VMem]%3 %2 MB %5", LastVMemFree, cVMemFree, sAux, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
     End If
     LastVMemFree = cVMemFree
 End Sub

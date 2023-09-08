@@ -52,13 +52,11 @@ Public Property Let Visible(ByVal Value As Boolean)
             Dim Self As dsLiveEd
             Set Self = Me
             Set pLiveEditor = New Form_DS_LIVE_EDITOR
+            pLiveEditor.WindowVisibility = True
             Set pLiveEditor.Controller = Self
-            pLiveEditor.Visible = True
-            ScreenLib.WindowAndTaskbarIconAsVisible pLiveEditor
         End If
     Else
-        pLiveEditor.Visible = Value
-        If Value Then ScreenLib.WindowAndTaskbarIconAsVisible pLiveEditor
+        pLiveEditor.WindowVisibility = Value
     End If
 End Property
 
@@ -222,15 +220,19 @@ Fallback:
 End Function
 
 ' Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated.
-Public Function TryApply(ByRef GeneratedOutput As Variant) As Boolean
+Public Function TryApply(Optional ByRef GeneratedOutput As Variant) As Boolean
     On Error GoTo Fallback
     
     If TryRebuildAll Then
-        Assign GeneratedOutput, TaskController.GeneratedValue
-        If IsObject(GeneratedOutput) Then
-            If Not GeneratedOutput Is Nothing Then
-                TryApply = True
+        If Not IsMissing(GeneratedOutput) Then
+            Assign GeneratedOutput, TaskController.GeneratedValue
+            If IsObject(GeneratedOutput) Then
+                If Not GeneratedOutput Is Nothing Then
+                    TryApply = True
+                End If
             End If
+        Else
+            TryApply = True
         End If
     End If
     
@@ -251,14 +253,11 @@ Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Valu
 
 
 Private Sub Class_Initialize()
-'    Set pSourceRecordsetEx = Nothing
     Set pGridController = Nothing
     Set pTaskController = Nothing
-    ' Set GridController.TaskController = TaskController
 End Sub
 
 Private Sub Class_Terminate()
-'    Debug.Print "[INFO] dsLiveEd.Terminate()"
     Destroy
 End Sub
 
@@ -474,16 +473,17 @@ Private Function SetNamedEntryToEntries(ByRef dX As DictionaryEx, ByRef Entry As
 Finally:
 End Function
 
-' ---
 
+' --- OTHER ---
 
 Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean = False)
     On Error Resume Next
     
     If Not SkipAutoClose Then
-        Me.Visible = False
-        Set pLiveEditor = Nothing
+        pLiveEditor.Dispose
     End If
+    Set pLiveEditor = Nothing
+    Set pGridController = Nothing
     
     RaiseEvent OnClose
 End Sub

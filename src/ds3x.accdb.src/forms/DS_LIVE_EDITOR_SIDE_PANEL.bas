@@ -24,17 +24,15 @@ Begin Form
     Width =3734
     DatasheetFontHeight =11
     ItemSuffix =1594
-    Left =6885
-    Top =4230
-    Right =22380
-    Bottom =14385
-    OnUnload ="[Event Procedure]"
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
     Caption ="dsSidePanel"
     DatasheetFontName ="Calibri"
-    OnResize ="[Event Procedure]"
     OnLoad ="[Event Procedure]"
     AllowDatasheetView =0
     FilterOnLoad =0
@@ -455,7 +453,6 @@ Begin Form
                 Begin CommandButton
                     TabStop = NotDefault
                     OverlapFlags =85
-                    TextFontCharSet =177
                     Left =165
                     Top =3240
                     Width =1655
@@ -507,7 +504,6 @@ Begin Form
                 Begin CommandButton
                     TabStop = NotDefault
                     OverlapFlags =85
-                    TextFontCharSet =177
                     Left =3195
                     Top =3240
                     Width =375
@@ -520,7 +516,7 @@ Begin Form
                     GroupTable =4
                     LeftPadding =0
                     TopPadding =0
-                    RightPadding =0
+                    RightPadding =15
                     BottomPadding =15
                     GridlineColor =10921638
                     HorizontalAnchor =2
@@ -556,12 +552,10 @@ Begin Form
                     GroupTable =4
                     QuickStyle =13
                     QuickStyleMask =-1
-                    WebImagePaddingRight =-1
                 End
                 Begin CommandButton
                     TabStop = NotDefault
                     OverlapFlags =85
-                    TextFontCharSet =177
                     Left =165
                     Top =3690
                     Width =3402
@@ -929,16 +923,19 @@ Public Property Set Controller(ByRef Value As dsLiveEd): SetController Value: En
 
 
 Private Sub DS_CLOSE_BUTTON_Click()
-    pController.TaskController.FreeUnlinkedResources
-    pController.TriggerLiveEditorWindowClose
+    RemoveFocus
+    On Error Resume Next
+    Me.Parent.Dispose
 End Sub
 
 Private Sub DS_EDIT_BUTTON_Click()
+    RemoveFocus
     ' Set Controller.TaskController.DataSource("DS1") = dsTable.Create(ArrayListEx.Create().Add(Array(1, 2, 3)).Add(Array(4, 5, 6))).SetHeaders(Array("ColA", "ColB", "ColC"))
     'Stop
 End Sub
 
 Private Sub DS_GENERATE_BUTTON_Click()
+    RemoveFocus
     Dim xlSheet As xlSheetsEx
     
     If Controller.TryGenerateAsExcel(xlSheet) Then
@@ -947,6 +944,7 @@ Private Sub DS_GENERATE_BUTTON_Click()
 End Sub
 
 Private Sub DS_NEW_BUTTON_Click()
+    RemoveFocus
     Dim dsEditor As New dsLiveEd
     
     dsEditor.Visible = True
@@ -954,35 +952,23 @@ Private Sub DS_NEW_BUTTON_Click()
 End Sub
 
 Private Sub DS_OPEN_BUTTON_Click()
-'    SetControlAsEnabled Me.DS_EDIT_BUTTON, True
-    If Not Controller.ImportPreset() Then
-'        MsgBox "FAILED TO OPEN THAT PRESET FILE"
-    End If
+    RemoveFocus
+    Controller.ImportPreset
 End Sub
 
 Private Sub DS_SAVE_AS_BUTTON_Click()
-    If Not Controller.SavePreset(VBA.Environ$("USERPROFILE")) Then
-'        MsgBox "SAVE AS... FAILED!"
-    End If
+    RemoveFocus
+    Controller.SavePreset VBA.Environ$("USERPROFILE")
 End Sub
 
 Private Sub DS_SAVE_BUTTON_Click()
-    If Not Controller.SavePreset Then
-'        MsgBox "SAVE FAILED!"
-    End If
+    RemoveFocus
+    Controller.SavePreset
 End Sub
 
 Private Sub Form_Load()
     ScreenLib.SetControlAsEnabled Me.DS_EDIT_BUTTON, False
     ScreenLib.SetControlAsEnabled Me.DS_ENTRY_NAME, False
-End Sub
-
-Private Sub Form_Resize()
-    'LogMe "[DEBUG] @DS_LIVE_EDITOR_SIDE_PANEL.Resize()", True
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
-    ' Debug.Print "[INFO] @DS_LIVE_EDITOR_SIDE_PANEL.Unload()"
 End Sub
 
 Private Sub pController_OnDataSourceChange()
@@ -999,4 +985,9 @@ End Sub
 
 Private Sub Rebuild()
     Me.DS_REBUILD_SEQUENCE.Form.RebuildSequenceList
+End Sub
+
+Private Sub RemoveFocus()
+    Me.HiddenControl.SetFocus
+    DoEvents
 End Sub

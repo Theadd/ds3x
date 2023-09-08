@@ -26,10 +26,10 @@ Begin Form
     Width =31680
     DatasheetFontHeight =11
     ItemSuffix =2116
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =21780
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -457,6 +457,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -502,6 +503,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextAlign =1
@@ -547,6 +549,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextAlign =1
@@ -592,6 +595,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -639,6 +643,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -686,6 +691,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -733,6 +739,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -780,6 +787,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -827,6 +835,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -874,6 +883,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -921,6 +931,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -968,6 +979,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -1015,6 +1027,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextFontCharSet =177
@@ -1062,6 +1075,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextAlign =1
@@ -1107,6 +1121,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextAlign =1
@@ -1152,6 +1167,7 @@ Begin Form
                 Begin TextBox
                     Locked = NotDefault
                     TabStop = NotDefault
+                    DecimalPlaces =2
                     OldBorderStyle =0
                     OverlapFlags =247
                     TextAlign =1

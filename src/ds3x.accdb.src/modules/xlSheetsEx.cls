@@ -314,64 +314,85 @@ Public Function FreezeHeaders(Optional ByVal HeaderRows As Long = 1, Optional By
 End Function
 
 Public Function AutoFormatCells(Optional ByVal TargetRange As Excel.Range = Nothing) As xlSheetsEx
-    Dim c As Long, res As String
+    Dim c As Long, res As Variant
     If TargetRange Is Nothing Then Set TargetRange = Me.UsedRange
     
     For c = 1 To TargetRange.Columns.Count
         res = GetCommonFormatForRange(TargetRange.Columns(c))
-        If res <> "General" Then
-            TargetRange.Columns(c).NumberFormatLocal = res
+        If res(0) <> "General" Then
+            TargetRange.Columns(c).NumberFormatLocal = res(1)
         End If
     Next c
     
     Set AutoFormatCells = Me
 End Function
 
+Public Function GetColumnsAutoNumberFormats(Optional ByVal TargetRange As Excel.Range = Nothing) As Variant
+    Dim c As Long, res As String, aX As ArrayListEx
+    If TargetRange Is Nothing Then Set TargetRange = Me.UsedRange
+    Set aX = ArrayListEx.Create()
+    
+    For c = 1 To TargetRange.Columns.Count
+        aX.Add GetCommonFormatForRange(TargetRange.Columns(c))
+    Next c
+    
+    GetColumnsAutoNumberFormats = aX.ToArray()
+End Function
+
 
 
 ' --- PRIVATE ---
 
-Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As String
-    Dim Item As Variant, i As Long, k As Long, iMax As Long, isDefaultSet As Boolean
-    iMax = 10
-    GetCommonFormatForRange = "General"
+Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As Variant
+    Dim Item As Variant, i As Long, k As Long, isDefaultSet As Boolean, sAux As String, nX As Excel.Range, endRow As Long
+    GetCommonFormatForRange = Array("General", "General")
+    Set nX = Rng.Rows.Item(1)
+    endRow = Rng.Rows.Item(Rng.Rows.Count).Row
     
-    For Each Item In Rng.Cells
-        If Item.Text <> "" Then
-            
+    For k = 1 To 4
+        Set nX = Rng.Rows.Item(nX.Row + 1)
+        If nX.Text = "" Then Set nX = nX.End(xlDown)
+
+        If nX.Text <> "" Then
             If Not isDefaultSet Then
-                If Item.NumberFormat = "General" Then
-                    GetCommonFormatForRange = "General"
+                If nX.NumberFormat = "General" Then
+                    GetCommonFormatForRange = Array("General", nX.NumberFormatLocal)
                 Else
-                    GetCommonFormatForRange = Item.NumberFormatLocal
+                    GetCommonFormatForRange = Array(nX.NumberFormat, nX.NumberFormatLocal)
                 End If
                 isDefaultSet = True
             End If
             
-            If Item.Text <> Item.FormulaR1C1Local Then
-                If Item.NumberFormat = "General" Then
-                    If Item.Text Like "*,*E+*" Then
-                        GetCommonFormatForRange = "0"
+            If nX.Text <> nX.FormulaR1C1Local Then
+                If nX.NumberFormat = "General" Then
+                    If nX.Text Like "*[,.]*E+*" Then
+                        GetCommonFormatForRange = Array("0", "0")
                         Exit For
                     End If
                 Else
-                    If Item.NumberFormatLocal Like "[#][,.][#]?0[,.]*" Then
-                        GetCommonFormatForRange = "#.##0,00;-#.##0,00"
+                    sAux = CStr(nX.NumberFormatLocal)
+                    If sAux Like "[#][,.][#]?0[,.]*" Then
+                        If VBA.InStr(1, sAux, ".") < VBA.InStr(1, sAux, ",") Then
+                            GetCommonFormatForRange = Array("#,##0.00;-#,##0.00", "#.##0,00;-#.##0,00")
+                        Else
+                            GetCommonFormatForRange = Array("#,##0.00;-#,##0.00", "#,##0.00;-#,##0.00")
+                        End If
                     Else
-                        GetCommonFormatForRange = Item.NumberFormatLocal
+                        GetCommonFormatForRange = Array(nX.NumberFormat, sAux)
                     End If
                     Exit For
                 End If
+            Else
+                If nX.NumberFormat = "General" Then
+                    If Not VBA.IsNumeric(nX.Text) Then
+                        GetCommonFormatForRange = Array("@", "@")
+                        Exit For
+                    End If
+                End If
             End If
-            
-            i = i + 1
-            If i >= iMax Then Exit For
         End If
-        
-        k = k + 1
-        If k >= 300 Then Exit For
-    Next Item
-    
+        If nX.Row >= endRow Then Exit For
+    Next k
 End Function
 
 Private Sub SetExcelApplicationVisibility(ByVal xlApp As Excel.Application, ByVal ShouldBeVisible As Boolean)

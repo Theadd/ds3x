@@ -21,32 +21,52 @@ Public Property Get Tasks() As DictionaryEx: Set Tasks = pTasks: End Property
 Public Property Get AppExcelVisibilityAuto() As Boolean: AppExcelVisibilityAuto = False: End Property
 
 
-
-Public Function AddRowNumbers(ByRef TargetTable As Variant, Optional ByVal UseAsFirstNumber As Long = 1) As dsTable
-    Dim t() As Variant, i As Long, Target As dsTable
+Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
+    Dim Target As dsTable, rX As RecordsetEx
     Set Target = TargetTable
-    ReDim t(0 To Target.Count - 1, 0 To 0)
     
-    For i = 0 To Target.Count - 1
-        t(i, 0) = i + UseAsFirstNumber
-    Next i
-    
-    Set AddRowNumbers = dsTable _
-                            .Create(Array2dEx.Create(t)) _
-                            .SetHeaders(ArrayListEx.Create(Array(Array(dsTable.CreateColumnHeader("${#}"))))) _
-                            .Join(Target)
+    Set rX = RecordsetEx.Create(Target.NamedRecordset)
+    Set AsRecordsetTable = pTaskController.AddResource(dsTable.Create(rX, True))
 End Function
 
-Public Function SetColumnName(ByRef TargetTable As Variant, ByVal ColumnIndex As Long, ByVal ColumnName As String) As dsTable
-    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary
+Public Function EnumerateRows(ByRef TargetTable As Variant, Optional ByVal FromNumber As Variant, Optional ByVal ToNumber As Variant) As dsTable
+    Dim t() As Variant, i As Long, n As Long, Target As dsTable, FromNum As Long, ToNum As Long
     Set Target = TargetTable
-    cH = Target.HeaderList(0)
+    FromNum = CLng(GetParam(FromNumber, CLng(1)))
+    ToNum = CLng(GetParam(ToNumber, CLng(-1)))
+    ReDim t(0 To Target.Count - 1, 0 To 0)
+    
+    n = FromNum
+    For i = 0 To Target.Count - 1
+        t(i, 0) = n
+        If n = ToNum Then
+            n = FromNum
+        Else
+            n = n + 1
+        End If
+    Next i
+    
+    Set EnumerateRows = dsTable _
+        .Create(Array2dEx.Create(t)) _
+        .SetHeaders(ArrayListEx.Create(Array(Array(dsTable.CreateColumnHeader("#"))))) _
+        .Join(Target)
+End Function
+
+Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal ColumnName As Variant) As dsTable
+    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, e As Long, colIndexes As ArrayListEx
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    ColumnName = GetParam(ColumnName, "%1")
+    
+    Set Target = TargetTable
+    cH = Target.Headers.Row(0)
+    Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
     
     For i = 0 To Target.ColumnCount - 1
-        If i = ColumnIndex Then
+        If colIndexes.Contains(i) Then
             Set d = cH(i)
-            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", ColumnName).Instance
+            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", dsApp.ApplyCustomVarsOn(Printf(ColumnName, i, e, i + 1, e + 1))).Instance
+            e = e + 1
         Else
             Set d = cH(i)
             Set t(0, i) = d
@@ -54,6 +74,30 @@ Public Function SetColumnName(ByRef TargetTable As Variant, ByVal ColumnIndex As
     Next i
     
     Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
+End Function
+
+Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal NumberFormat As Variant) As dsTable
+    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, colIndexes As ArrayListEx, e As Long
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    NumberFormat = GetParam(NumberFormat, "General")
+    
+    Set Target = TargetTable
+    cH = Target.Headers.Row(0)
+    Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
+    ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
+    
+    For i = 0 To Target.ColumnCount - 1
+        If colIndexes.Contains(i) Then
+            Set d = cH(i)
+            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("NumberFormat", dsApp.ApplyCustomVarsOn(Printf(NumberFormat, i, e, i + 1, e + 1))).Instance
+            e = e + 1
+        Else
+            Set d = cH(i)
+            Set t(0, i) = d
+        End If
+    Next i
+    
+    Set SetNumberFormat = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
 End Function
 
 'RecordsetEx.Filter("REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'")
@@ -90,10 +134,18 @@ Public Function Join(ByRef TargetTable As Variant, ByRef OtherTable As Variant) 
     Set Join = pTaskController.AddResource(Target.Join(Other))
 End Function
 
+Public Function Append(ByRef SourceTable As Variant, ByRef TargetTable As Variant) As dsTable
+    Dim Target As dsTable, Source As dsTable
+    Set Target = TargetTable
+    Set Source = SourceTable
+
+    Set Append = pTaskController.AddResource(Source.AddRange(Target))
+End Function
+
 ' CallbackFunction can also be a global function, for instance: Callback.Create(, "MillisecondsToTime")
 Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
     Dim t() As Variant, i As Long, iMax As Long, c As Long, cMax As Long, Target As dsTable, cb As Callback, v As Variant
-    Dim dRepl As DictionaryEx, colIndexes As New ArrayListEx
+    Dim dRepl As DictionaryEx, colIndexes As New ArrayListEx, sgX As ArraySliceGroup, vSliced() As Variant, r As Variant
     Set Target = TargetTable
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     iMax = Target.Count - 1
@@ -105,46 +157,91 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
     For Each v In ColumnIndexes
         colIndexes.Add CLng(v)
     Next v
+    Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
     
     If TypeName(Replacer) Like "*Dictionary*" Then
         Set dRepl = DictionaryEx.Create(Replacer)
-        With Target.RecordArray
-            For c = 0 To cMax
-                If colIndexes.Contains(c) Then
-                    For i = 0 To iMax
-                        v = .Instance(i, c)
-                        If Not IsNull(v) Then
-                            t(i, c) = dRepl.GetValue(v, v)
-                        End If
-                    Next i
-                Else
-                    For i = 0 To iMax
-                        t(i, c) = .Instance(i, c)
-                    Next i
+        For Each v In colIndexes
+            c = CLng(v)
+            sgX.SliceAt(c).SlicedArray vSliced
+            t = vSliced
+            For i = 0 To iMax
+                r = t(i, 0)
+                If Not IsNull(r) Then
+                    t(i, 0) = dRepl.GetValue(r, r)
                 End If
-            Next c
-        End With
+            Next i
+            Set sgX = sgX.Replace(ArraySlice.Create(t), c)
+        Next v
     Else
         Set cb = Replacer
-        With Target.RecordArray
-            For c = 0 To cMax
-                If colIndexes.Contains(c) Then
-                    For i = 0 To iMax
-                        v = .Instance(i, c)
-                        If Not IsNull(v) Then
-                            t(i, c) = cb.Execute(v).result
-                        End If
-                    Next i
-                Else
-                    For i = 0 To iMax
-                        t(i, c) = .Instance(i, c)
-                    Next i
+        For Each v In colIndexes
+            c = CLng(v)
+            sgX.SliceAt(c).SlicedArray vSliced
+            t = vSliced
+            For i = 0 To iMax
+                r = t(i, 0)
+                If Not IsNull(r) Then
+                    t(i, 0) = cb.Execute(r).Result
                 End If
-            Next c
-        End With
+            Next i
+            Set sgX = sgX.Replace(ArraySlice.Create(t), c)
+        Next v
     End If
     
-    Set ReplaceValues = pTaskController.AddResource(dsTable.Create(Array2dEx.Create(t)).SetHeaders(Target.Headers))
+    Set ReplaceValues = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
+End Function
+
+Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
+    Dim t() As Variant, i As Long, iMax As Long, c As Long, k As Long, kMax As Long, Target As dsTable, sgX As ArraySliceGroup, vSliced() As Variant
+    Set Target = TargetTable
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    iMax = Target.Count - 1
+    If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+    End If
+    kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
+    Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
+    
+    For k = 0 To kMax
+        c = CLng(ColumnIndexes(k))
+        sgX.SliceAt(c).SlicedArray vSliced
+        t = vSliced
+        For i = 0 To iMax
+            If VarType(t(i, 0)) = vbString Then
+                t(i, 0) = AsciiToHex(t(i, 0))
+            End If
+        Next i
+        Set sgX = sgX.Replace(ArraySlice.Create(t), c)
+    Next k
+    
+    Set StringValuesToHex = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
+End Function
+
+Public Function HexToStringValues(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
+    Dim t() As Variant, i As Long, iMax As Long, c As Long, k As Long, kMax As Long, Target As dsTable, sgX As ArraySliceGroup, vSliced() As Variant
+    Set Target = TargetTable
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    iMax = Target.Count - 1
+    If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+    End If
+    kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
+    Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
+    
+    For k = 0 To kMax
+        c = CLng(ColumnIndexes(k))
+        sgX.SliceAt(c).SlicedArray vSliced
+        t = vSliced
+        For i = 0 To iMax
+            If VarType(t(i, 0)) = vbString Then
+                t(i, 0) = HexToAscii(t(i, 0))
+            End If
+        Next i
+        Set sgX = sgX.Replace(ArraySlice.Create(t), c)
+    Next k
+    
+    Set HexToStringValues = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
 End Function
 
 Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer As Variant) As dsTable
@@ -152,7 +249,7 @@ Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer 
     Dim cb As Callback, dRepl As DictionaryEx
     Set Target = TargetTable
     
-    cH = Target.HeaderList(0)
+    cH = Target.Headers.Row(0)
     ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
     
     If TypeName(Replacer) Like "*Dictionary*" Then
@@ -170,7 +267,7 @@ Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer 
             Set d = cH(i)
             Set dX = DictionaryEx.Bind(d).Clone()
     
-            dX.Add "ColumnName", cb.Execute(dX.Item("ColumnName")).result
+            dX.Add "ColumnName", cb.Execute(dX.Item("ColumnName")).Result
             Set t(0, i) = dX.Instance
         Next i
     End If
@@ -291,28 +388,6 @@ Public Function OpenWorksheetFromFile(ByVal TargetFile As Variant, Optional ByVa
     Set OpenWorksheetFromFile = pTaskController.AddResource(xlSheet)
 End Function
 
-Private Function GetParamAsDictionaryEx(Optional ByVal Value As Variant) As DictionaryEx
-    If Not IsMissing(Value) Then
-        If IsObject(Value) Then
-            If TypeName(Value) Like "*Dictionary*" Then
-                Set GetParamAsDictionaryEx = DictionaryEx.Create(JSON.Parse(JSON.Stringify(Value), True, True))
-            Else
-                Err.Raise 13
-            End If
-        Else
-            If IsError(Value) Or IsEmpty(Value) Or IsNull(Value) Then GoTo Fallback
-            If Trim(CStr(Value)) = "" Then GoTo Fallback
-            Set GetParamAsDictionaryEx = DictionaryEx.Create(JSON.Parse(Value, True, True))
-        End If
-    Else
-        GoTo Fallback
-    End If
-    
-    Exit Function
-Fallback:
-    Set GetParamAsDictionaryEx = DictionaryEx.Create()
-End Function
-
 Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal RangeAddress As Variant, Optional ByVal FirstRowHasHeaders As Variant) As dsTable
     Dim xlSheet As xlSheetsEx, xlRange As Excel.Range
     Set xlSheet = SourceSheet
@@ -329,7 +404,7 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
             Set LoadFromRange = pTaskController.AddResource(dsTable.Create(xlRange, True))
         Else
             Set LoadFromRange = pTaskController.AddResource(dsTable _
-                .Create(ArrayListEx.Create(xlRange)) _
+                .Create(xlRange, False) _
                 .SetHeaders(CollectionsLib.ArrayRange(1, .Columns.Count)))
         End If
     End With
@@ -364,6 +439,43 @@ LoadFromFileAsJSONFallback:
     Set LoadFromFileAsJSON = pTaskController.AddResource(dsT)
 End Function
 
+Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Options As Variant, Optional ByVal DisableCache As Variant) As dsTable
+    Dim dsT As dsTable, sContent As String, sTarget As String, dX As DictionaryEx
+    DisableCache = GetParam(DisableCache, False)
+    Set Options = GetParamAsDictionaryEx(Options)
+    
+    ' {"Delimiter": ";", "AsUnicode": false, "InLocalFormat": true, "AutoHeaders": true}
+    Set dX = DictionaryEx.Create() _
+        .Add("Delimiter", Options.GetValue("Delimiter", ";")) _
+        .Add("AsUnicode", Options.GetValue("AsUnicode", False)) _
+        .Add("InLocalFormat", Options.GetValue("InLocalFormat", True)) _
+        .Add("AutoHeaders", Options.GetValue("AutoHeaders", True))
+    
+    If Not DisableCache Then
+        On Error GoTo LoadFromFileAsCSVFallback
+        Set dsT = TaskController().DataSource(ActiveTaskId())
+        If IsObject(dsT) And Not (dsT Is Nothing) Then
+            Set LoadFromFileAsCSV = dsT
+            Exit Function
+        End If
+    End If
+    
+LoadFromFileAsCSVFallback:
+    On Error GoTo 0
+    TargetFile = GetParam(TargetFile, "")
+    sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
+    
+    If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent, CBool(dX("AsUnicode"))) Then
+        Err.Raise 17, , "Unable to read text from provided file"
+    End If
+    Set dsT = LoadFromCSV(sContent, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+    If Not DisableCache Then
+        Set TaskController().DataSource(ActiveTaskId()) = dsT
+    End If
+
+    Set LoadFromFileAsCSV = pTaskController.AddResource(dsT)
+End Function
+
 Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal ConnectionString As Variant, Optional ByVal DisableCache As Variant) As dsTable
     Dim dsT As dsTable, dbQ As dbQuery
     DisableCache = GetParam(DisableCache, False)
@@ -383,7 +495,7 @@ LoadFromSQLFallback:
     Set dbQ = New dbQuery
     If Trim(CStr(ConnectionString)) <> "" Then dbQ.ConnectionString = CStr(ConnectionString)
     dbQ.CloseOnTerminate = False
-    
+    pTaskController.AddResource dbQ
     Set dsT = dsTable.Create(dbQ.Create(CStr(QueryString)), True)
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
@@ -398,12 +510,25 @@ End Function
 Public Function SaveToFileAsJSON(ByRef SourceTable As Variant, ByVal FilePath As Variant) As dsTable
     Dim Target As dsTable
     FilePath = GetParam(FilePath, "")
-    
     Set Target = SourceTable
+
     If Not FileSystemLib.TryWriteTextToFile(FileSystemLib.Resolve(FilePath), JSON.Stringify(Target, 2), True, False) Then
         Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
     End If
     Set SaveToFileAsJSON = Target
+End Function
+
+Public Function SaveToFileAsCSV(ByRef SourceTable As Variant, ByVal FilePath As Variant, Optional ByVal Delimiter As Variant, Optional ByVal AsUnicode As Variant) As dsTable
+    Dim Target As dsTable
+    FilePath = GetParam(FilePath, "")
+    Delimiter = GetParam(Delimiter, ";")
+    AsUnicode = GetParam(AsUnicode, False)
+    Set Target = SourceTable
+
+    If Not FileSystemLib.TryWriteTextToFile(FileSystemLib.Resolve(FilePath), Target.ToCSV(Delimiter), True, CBool(AsUnicode)) Then
+        Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
+    End If
+    Set SaveToFileAsCSV = Target
 End Function
 
 
@@ -565,7 +690,10 @@ Private Sub Class_Initialize()
     AddAllTasks
 End Sub
 
-Private Function StringLines(ParamArray Lines() As Variant) As String: StringLines = VBA.Join(Lines, " " & vbNewLine): End Function
+Private Function StringLines(ParamArray Lines() As Variant) As String
+    StringLines = VBA.Join(Lines, " " & vbNewLine)
+    StringLines = Replace(StringLines, "@param ", "<font face=""Consolas"" size=1 color=""#33CC33"">@param</font> ")
+End Function
 
 Private Sub AddTask(ByVal TaskName As String, _
                     ByVal TaskParameters As String, _
@@ -603,10 +731,30 @@ End Function
 
 Private Sub AddAllTasks()
 
-    AddTask "AddRowNumbers", "[Source]: Table, [FirstNumber = 1]: Long"
+    AddTask "EnumerateRows", "[Source]: Table, [FromNumber = 1]: Long, [ToNumber = -1]: Long", _
+            Description:=StringLines( _
+                "Inserts a new column at the beginning of the table by enumerating its values from <b>FromNumber</b> to <b>ToNumber</b> repeatedly until the end. Ignores the value of <b>ToNumber</b> if it is less than <b>FromNumber</b>.")
     
-    AddTask "SetColumnName", "[Source]: Table, ColumnIndex: Long, ColumnName: String"
+    AddTask "SetColumnName", "[Source]: Table, [ColumnIndexes]: Long|Array(), [ColumnName]: String", _
+            Description:=StringLines( _
+                "@param [<b>ColumnIndexes</b>] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
+                "@param [<b>ColumnName</b>] - The string to use for renaming that/those column/s. Supports <b>CustomVar</b>s and from <b>%1</b> to <b>%4</b>, being:", _
+                "    <b>%1</b>: The column index.", _
+                "    <b>%2</b>: the column index within the <b>ColumnIndexes</b> array.", _
+                "    <b>%3</b> and <b>%4</b>: Position instead of index for <b>%1</b> and <b>%2</b> respectively.")
     
+    AddTask "SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
+            Description:=StringLines( _
+                "Select a single Column before picking this task to see it's current <b>NumberFormat</b>.", _
+                "", _
+                "@param [<b>ColumnIndexes</b>] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
+                "@param [<b>NumberFormat</b>] - Excel's <b>NumberFormat</b> string. Supports <b>CustomVar</b>s and from <b>%1</b> to <b>%4</b>, being:", _
+                "    <b>%1</b>: The column index.", _
+                "    <b>%2</b>: the column index within the <b>ColumnIndexes</b> array.", _
+                "    <b>%3</b> and <b>%4</b>: Position instead of index for <b>%1</b> and <b>%2</b> respectively.", _
+                "", _
+                "NOTE: This task will&nbsp;<u>only</u> apply <b>NumberFormat</b> to corresponding columns in an <b>Excel.Worksheet</b> <u>just before</u> copying the data to the specified <b>Excel.Range</b>.")
+                    
     AddTask "Filter", "[Source]: Table, QueryFilter: String", _
             Usage:="{...TaskName: 'Filter', Values: [, ""REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'""]}"
     
@@ -618,8 +766,11 @@ Private Sub AddAllTasks()
                 "@param [GetCount] - The number of rows in the range.", _
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, no columns are excluded.")
 
-    AddTask "Join", "[Source]: Table, Other: Table", _
-            Description:="Concatenate all elements of Other Table as additional columns into Source Table."
+    AddTask "Join", "[Source]: Table, Target: Table", _
+            Description:="Concatenate all elements of <b>Target</b> Table as additional columns into <b>Source</b> Table."
+            
+    AddTask "Append", "[Source]: Table, Target: Table", _
+            Description:="Appends all rows in <b>Target</b> Table the end of <b>Source</b> Table."
 
     AddTask "ReplaceValues", "[Source]: Table, Replacer: Callable|Dictionary, [ColumnIndexes]: Array()", _
             Description:=StringLines( _
@@ -628,6 +779,18 @@ Private Sub AddAllTasks()
                 "@param Replacer - A name to a global function or a Scripting.Dictionary in JSON format.", _
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included."), _
             Usage:="{...TaskName: 'ReplaceValues', Values: [, 'SecondsToHMS']}"
+            
+    AddTask "StringValuesToHex", "[Source]: Table, [ColumnIndexes]: Array()", _
+            Description:=StringLines( _
+                "Returns a copy of the provided Source Table with the <b>string</b> values within the provided ColumnIndexes being replaced by it's corresponding hex string.", _
+                "", _
+                "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
+    
+    AddTask "HexToStringValues", "[Source]: Table, [ColumnIndexes]: Array()", _
+            Description:=StringLines( _
+                "Returns a copy of the provided Source Table with the <b>hex</b> values within the provided ColumnIndexes being replaced by it's corresponding <b>ascii</b> string.", _
+                "", _
+                "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
             
     AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
     
@@ -651,12 +814,16 @@ Private Sub AddAllTasks()
                                  "[Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
                                  
     AddTask "LoadFromFileAsJSON", "TargetFile: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
+
+    AddTask "LoadFromFileAsCSV", "TargetFile: String, [Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
     
     AddTask "LoadFromSQL", "QueryString: String, [ConnectionString]: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
     
     ' --- GENERATION TASKS ---
     
     AddTask "SaveToFileAsJSON", "[Source]: Table, TargetFile: String", TaskType:="DSG"
+    
+    AddTask "SaveToFileAsCSV", "[Source]: Table, TargetFile: String, [Delimiter = ';']: String, [AsUnicode = False]: Boolean", TaskType:="DSG"
     
     ' --- XL GENERATION TASKS ---
     
@@ -687,6 +854,10 @@ Private Sub AddAllTasks()
     AddTask "AutoFormatCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
 
     AddTask "WindowVisibility", "[Source]: Worksheet, [Visible = True]: Boolean", TaskType:="XL"
+    
+    ' --- DEV / DEBUG ---
+    
+    AddTask "AsRecordsetTable", "[Source]: Table", Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>"
     
 End Sub
 
@@ -727,6 +898,29 @@ Public Function GetRangeInWorksheet(ByRef SourceSheet As Variant, Optional ByVal
     Set GetRangeInWorksheet = xlRange
 End Function
 
+Private Function AsListOfColumnIndexes(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant) As ArrayListEx
+    Dim Target As dsTable, colIndexes As ArrayListEx, v As Variant
+    ColumnIndexes = GetParam(ColumnIndexes, Array())
+    Set Target = TargetTable
+    Set colIndexes = ArrayListEx.Create()
+    
+    If Not IsArray(ColumnIndexes) Then
+        If CStr(ColumnIndexes) = "" Then
+            ColumnIndexes = Array()
+        Else
+            ColumnIndexes = Array(CLng(ColumnIndexes))
+        End If
+    End If
+    If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+    End If
+    For Each v In ColumnIndexes
+        colIndexes.Add CLng(v)
+    Next v
+    
+    Set AsListOfColumnIndexes = colIndexes
+End Function
+
 Private Function GetParam(Optional ByVal Value As Variant, Optional ByVal DefaultValue As Variant) As Variant
     If Not IsMissing(Value) Then
         If Not (IsError(Value) Or IsNull(Value) Or IsEmpty(Value)) Then
@@ -750,6 +944,28 @@ Private Function GetParam(Optional ByVal Value As Variant, Optional ByVal Defaul
     End If
 End Function
 
+Private Function GetParamAsDictionaryEx(Optional ByVal Value As Variant) As DictionaryEx
+    If Not IsMissing(Value) Then
+        If IsObject(Value) Then
+            If TypeName(Value) Like "*Dictionary*" Then
+                Set GetParamAsDictionaryEx = DictionaryEx.Create(JSON.Parse(JSON.Stringify(Value), True, True))
+            Else
+                Err.Raise 13
+            End If
+        Else
+            If IsError(Value) Or IsEmpty(Value) Or IsNull(Value) Then GoTo Fallback
+            If Trim(CStr(Value)) = "" Then GoTo Fallback
+            Set GetParamAsDictionaryEx = DictionaryEx.Create(JSON.Parse(Value, True, True))
+        End If
+    Else
+        GoTo Fallback
+    End If
+    
+    Exit Function
+Fallback:
+    Set GetParamAsDictionaryEx = DictionaryEx.Create()
+End Function
+
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     If Not IsMissing(Value) Then
         If IsObject(Value) Then
@@ -759,5 +975,90 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
         End If
     End If
 End Sub
+
+Private Function AsciiToHex(ByVal Value As String) As String
+    Dim i As Long, iMax As Long, t() As String
+    iMax = Len(Value)
+    ReDim t(1 To iMax)
+    
+    For i = 1 To iMax
+        t(i) = Right("0" & VBA.Hex$(VBA.AscW(VBA.Mid$(Value, i, 1))), 2)
+    Next i
+    
+    AsciiToHex = VBA.Join(t, "")
+End Function
+
+Private Function HexToAscii(ByVal Value As String) As String
+    Dim i As Long, iMax As Long, t() As String
+    iMax = CLng(Len(Value) / 2) - 1
+    ReDim t(0 To iMax)
+    
+    For i = 0 To iMax
+        t(i) = VBA.ChrW(CLng("&H" & VBA.Mid$(Value, 1 + (2 * i), 2)))
+    Next i
+    
+    HexToAscii = VBA.Join(t, "")
+End Function
+
+Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
+    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
+    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long
+    cQuote = """": cDblQuote = """"""
+
+    Set sLines = CollectionsLib.StringLineSlices(ContentString)
+    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+    If AutoHeaders Then sLines.RemoveAt 0
+    nRows = sLines.Count
+    nCols = colHeaders.Count
+    ReDim t(0 To nRows - 1, 0 To nCols - 1)
+
+    r = 0
+    For Each t0 In sLines
+        s = VBA.Mid$(ContentString, t0(0), t0(1))
+        bQuotes = False: bQuoted = False: c = 0: Idx = 0
+        For i = 1 To VBA.Len(s)
+            Select Case VBA.Mid$(s, i, 1)
+                 Case cQuote: bQuotes = Not bQuotes: bQuoted = True
+                 Case Delimiter: bMatch = Not bQuotes
+            End Select
+            If i = VBA.Len(s) Then
+                i = i + 1
+                bMatch = True
+            End If
+            If bMatch Then
+                If bQuoted Then
+                    t(r, c) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 1, i - Idx - 1), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+                Else
+                    sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
+                    Select Case True
+                        Case sCell = vbNullString: t(r, c) = Empty
+                        Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+                        Case IsDate(sCell): t(r, c) = CDate(sCell)
+                        Case Else: t(r, c) = sCell
+                    End Select
+                End If
+                Idx = i
+                bQuoted = False
+                c = c + 1
+                bMatch = False
+            End If
+        Next i
+        r = r + 1
+    Next t0
+    Set a2X = Array2dEx.Create()
+    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    Set dsT = dsTable.Create(a2X, False)
+    If AutoHeaders Then
+        For c = 0 To nCols - 1
+            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+        Next c
+        dsT.SetHeaders colHeaders.ToArray()
+    End If
+
+    Set LoadFromCSV = dsT
+End Function
+
 
 

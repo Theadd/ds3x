@@ -19,6 +19,12 @@ End Property
 Public Property Get ColumnCount() As Long
 End Property
 
+Public Property Get Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0) As Variant
+End Property
+
+Public Property Get Row(ByVal Index As Long) As Variant
+End Property
+
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx
 End Function
 
@@ -47,6 +53,9 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
 End Function
 
 Public Function ToJSON() As String
+End Function
+
+Public Function ToExcel() As String
 End Function
 
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx

@@ -21,10 +21,10 @@ Begin Form
     Width =31636
     DatasheetFontHeight =11
     ItemSuffix =1560
-    Left =3225
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =4605
+    Top =4290
+    Right =7785
+    Bottom =4680
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -2222,7 +2222,7 @@ Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long
     sNames = dsT.GetColumnNames(FirstColumnIndex, pMaxAvailColumns)
     For i = 1 To pMaxAvailColumns
         With Me.Controls("DS_HC_1_" & CStr(i))
-            .Caption = ColumnLetter(FirstColumnIndex + i - 1)
+            .Caption = CollectionsLib.ColumnLetter(FirstColumnIndex + i - 1)
             .BackColor = IIf(pSelectedColumns.Contains(FirstColumnIndex + i - 1), pHeaderButtonBackColorSelected, pHeaderButtonBackColorNormal)
         End With
         Me.Controls("DS_HC_2_" & CStr(i)) = sNames(i - 1)
@@ -2296,17 +2296,3 @@ End Function
 
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
-
-
-' --- MISC ---
-
-Private Function ColumnLetter(ByVal ColumnIndex As Long) As String
-    Const sChars As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-    If Int(ColumnIndex / 26) = 0 Then
-        ColumnLetter = VBA.Mid$(sChars, 1 + ColumnIndex, 1)
-    Else
-        ColumnLetter = VBA.Mid$(sChars, Int(ColumnIndex / 26), 1) & _
-                       VBA.Mid$(sChars, 1 + (ColumnIndex Mod 26), 1)
-    End If
-End Function

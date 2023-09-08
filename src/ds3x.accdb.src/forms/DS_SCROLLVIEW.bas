@@ -875,7 +875,7 @@ Private Sub Form_Load()
         ScreenLib.WindowSizeTo Me, 12000, 8000
         ScreenLib.WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
         
-        ' SetupDevelopmentEnvironment
+        SetupDevelopmentEnvironment
     End If
     Me.TimerInterval = 1
 End Sub
@@ -885,8 +885,9 @@ Private Sub Form_Resize()
     If pInitialized Then
         On Error GoTo Finally
         pIgnoreScrollingEvents = True
-        UpdateScrollbarX
-        UpdateScrollbarY True
+        UpdateScrollbarX False
+        UpdateScrollbarY False
+        Viewport.ScrollTo ScrollbarX, ScrollbarY
 Finally:
         On Error Resume Next
         pIgnoreScrollingEvents = False
@@ -897,7 +898,7 @@ Private Sub Form_Timer()
     Me.TimerInterval = 0
     If pPointerCapture Then
         ScrollUsingLastCapturedPointerPosition
-        If pPointerCapture Then Me.TimerInterval = 100
+        If pPointerCapture Then Me.TimerInterval = 10
     End If
     If Not pReady Then
         pReady = True
@@ -946,7 +947,7 @@ Finally:
         On Error Resume Next
         pIgnoreScrollingEvents = False
     End If
-
+    On Error Resume Next
     Viewport.OnSourceTableChange
 End Sub
 
@@ -1018,7 +1019,8 @@ End Sub
 
 Private Sub ScrollUsingLastCapturedPointerPosition()
     Dim p As ds3xGlobals.POINTAPI, X As Long, Y As Long
-
+    
+    ScreenLib.MouseMoveCursor = True
     p = ScreenLib.GetCursorPosition
     X = p.X - pCapturedPointerPosition.X
     Y = p.Y - pCapturedPointerPosition.Y
@@ -1079,8 +1081,10 @@ Public Sub ApplyScrollbarY(Optional ByVal yVal As Variant, Optional ByVal Explic
                 UpdateScrollbarY ExplicitCall
             Else
                 If .Value <> yVal Then .Value = yVal
-                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo ScrollbarX, yVal
-                pLastScrollY(0) = yVal
+                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+                    Viewport.ScrollTo ScrollbarX, yVal
+                    pLastScrollY(0) = yVal
+                End If
             End If
         End If
     End With
@@ -1111,8 +1115,10 @@ Public Sub ApplyScrollbarX(Optional ByVal xVal As Variant, Optional ByVal Explic
                 UpdateScrollbarX ExplicitCall
             Else
                 If .Value <> xVal Then .Value = xVal
-                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo xVal, ScrollbarY
-                pLastScrollX(0) = xVal
+                If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+                    Viewport.ScrollTo xVal, ScrollbarY
+                    pLastScrollX(0) = xVal
+                End If
             End If
         End If
     End With
@@ -1137,10 +1143,12 @@ Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)
         .Max = yMax
         .LargeChange = IIf(pScrollPageSizeY > yMax, yMax, pScrollPageSizeY)
         .SmallChange = cellSizeY
-        If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
-            If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo ScrollbarX, .Value
-            pLastScrollY(0) = .Value
-            pLastScrollY(1) = .Max
+        If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+            If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
+                Viewport.ScrollTo ScrollbarX, .Value
+                pLastScrollY(0) = .Value
+                pLastScrollY(1) = .Max
+            End If
         End If
     End With
 End Sub
@@ -1164,10 +1172,12 @@ Private Sub UpdateScrollbarX(Optional ByVal ExplicitCall As Boolean = False)
         .Max = xMax
         .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
         .SmallChange = CLng(cellSizeX / 5)
-        If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
-            If (Not pIgnoreScrollingEvents) Or ExplicitCall Then Viewport.ScrollTo .Value, ScrollbarY
-            pLastScrollX(0) = .Value
-            pLastScrollX(1) = .Max
+        If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
+            If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
+                Viewport.ScrollTo .Value, ScrollbarY
+                pLastScrollX(0) = .Value
+                pLastScrollX(1) = .Max
+            End If
         End If
     End With
 End Sub
@@ -1224,7 +1234,7 @@ Private Sub pWorksheetHeaders_OnColumnNameWillChange(ByVal ColumnIndex As Long, 
     Dim oldValue As String
     
     On Error GoTo Finally
-    oldValue = Table().HeaderList(0)(ColumnIndex)("ColumnName")
+    oldValue = Table().Headers.Row(0)(ColumnIndex)("ColumnName")
     If StrComp(oldValue, Value, vbBinaryCompare) <> 0 Then
         On Error GoTo 0
         RaiseEvent OnColumnNameChange(ColumnIndex, oldValue, Value)
@@ -1251,22 +1261,15 @@ Public Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
             RaiseEvent OnSelectionControlKeyDown(KeyCode, Shift)
     End Select
     
-    If KeyCode = vbKeyDown Then
-        If Shift = 2 Then
-            Debug.Print "Stop default action for Ctrl + Down"
-            KeyCode = 0
-        End If
-    End If
-    If KeyCode = vbKeyP Then
-        If GetAsyncKeyState(vbKeyShift) And GetAsyncKeyState(vbKeyControl) Then
-            Stop
-        End If
-    End If
-    If KeyCode = vbKeyShift Then
-        pScrollSpeedMultiplier = 3
-    Else
-        SetPointerCapture (KeyCode = vbKeySpace And (Shift = 2 Or Shift = 3))
-    End If
+    Select Case True
+        Case (KeyCode = 0): ' Ignore
+        Case (KeyCode = vbKeyDown And Shift = 2): KeyCode = 0
+        Case (KeyCode = vbKeyP And Shift = 3): Stop
+        Case (KeyCode = vbKeyShift): pScrollSpeedMultiplier = 3
+        Case (KeyCode = vbKeyC And Shift = 2): CopySelectionToClipboard
+        Case Else
+            SetPointerCapture (KeyCode = vbKeySpace And (Shift = 2 Or Shift = 3))
+    End Select
 End Sub
 
 Public Sub OnKeyUpHandler(KeyCode As Integer, Shift As Integer)
@@ -1291,6 +1294,41 @@ Private Sub SetPointerCapture(ByVal Value As Boolean)
     End If
 End Sub
 
+' TODO: IncludeHeaders
+Private Sub CopySelectionToClipboard(Optional ByVal IncludeHeaders As Boolean = False)
+    Const dsChunkSize As Long = 1000
+    Dim i As Long, iMax As Long, nRows As Long, rStart As Long, rEnd As Long, rTake As Long, rTakeFrom As Long, aX As ArraySliceGroup, sCols As Variant, sValues As String
+    On Error GoTo Finally
+    pSelectedColumns.Sort
+    sCols = Empty
+    If pSelectedColumns.Count > 0 Then sCols = pSelectedColumns.ToArray()
+    
+    If pSelectedRows.Count > 0 Then
+        pSelectedRows.Sort
+        rStart = pSelectedRows(0)
+        rEnd = pSelectedRows(pSelectedRows.Count - 1)
+        nRows = 1 + rEnd - rStart
+    Else
+        rStart = 0
+        nRows = pTable.Count
+        rEnd = 0
+    End If
+    iMax = Int(CLng(nRows - 1) / dsChunkSize)
+    
+    For i = 0 To iMax
+        rTake = IIf(i = iMax, nRows - (dsChunkSize * i), dsChunkSize)
+        rTakeFrom = rStart + (i * dsChunkSize)
+        Set aX = CollectionsLib.AsArraySliceGroup(pTable.Records.GetRange(rTakeFrom, rTake, sCols))
+        If rEnd = 0 Then
+            sValues = sValues & aX.ToExcel()
+        Else
+            sValues = sValues & aX.GetRows(pSelectedRows, 0 - rTakeFrom).ToExcel()
+        End If
+    Next i
+Finally:
+    FileSystemLib.SystemClipboard sValues
+End Sub
+
 
 ' --- HELPERS ---
 
@@ -1300,7 +1338,7 @@ Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X,
 
 ' --- TESTING / DEVELOPMENT ---
 
-'Private Sub SetupDevelopmentEnvironment()
-'    pEnableOutOfRangeScrolling = True
-'    Set Table = CreateSampleTable
-'End Sub
+Private Sub SetupDevelopmentEnvironment()
+    pEnableOutOfRangeScrolling = True
+    Set Table = dsTable.CreateBlank(10, 0)
+End Sub

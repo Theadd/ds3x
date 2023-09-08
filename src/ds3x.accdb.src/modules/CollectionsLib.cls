@@ -50,6 +50,33 @@ End Enum
 Public Property Get Tokenize(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As Variant: Tokenize = Split(TokenizeArgs(SearchString, Tokenizer), VBA.Chr$(0)): End Property
 Public Property Get ParseToken(ByVal Target As String, Optional ByVal Splitter As String = "=") As Variant: ParseToken = ParseTokenizedArg(Target, Splitter): End Property
 
+Public Property Get AsArray2dEx(ByRef Value As ICollectionEx) As Array2dEx
+    Select Case True
+        Case (TypeOf Value Is ArraySliceGroup): Set AsArray2dEx = C2ArraySliceGroup(Value).Instance
+        Case (TypeOf Value Is Array2dEx): Set AsArray2dEx = Value
+        Case (TypeOf Value Is ArrayListEx): Set AsArray2dEx = Array2dEx.Create(Value)
+        Case Else: Err.Raise 17, , "Not implemented."
+    End Select
+End Property
+
+Public Property Get AsArrayListEx(ByRef Value As ICollectionEx) As ArrayListEx
+    Select Case True
+        Case (TypeOf Value Is ArraySliceGroup): Set AsArrayListEx = ArrayListEx.Create(AsArray2dEx(Value))
+        Case (TypeOf Value Is Array2dEx): Set AsArrayListEx = ArrayListEx.Create(Value)
+        Case (TypeOf Value Is ArrayListEx): Set AsArrayListEx = Value
+        Case Else: Err.Raise 17, , "Not implemented."
+    End Select
+End Property
+
+Public Property Get AsArraySliceGroup(ByRef Value As ICollectionEx) As ArraySliceGroup
+    Select Case True
+        Case (TypeOf Value Is ArraySliceGroup): Set AsArraySliceGroup = Value
+        Case (TypeOf Value Is Array2dEx): Set AsArraySliceGroup = ArraySliceGroup.Create(Value)
+        Case (TypeOf Value Is ArrayListEx): Set AsArraySliceGroup = ArraySliceGroup.Create(AsArray2dEx(Value))
+        Case Else: Err.Raise 17, , "Not implemented."
+    End Select
+End Property
+
 Public Property Get JScriptCode(ByVal JScriptName As String) As String
     Select Case JScriptName
         Case "JSON.serialize": JScriptCode = JSON_SERIALIZER
@@ -70,10 +97,10 @@ End Property
 '       t2(1) = "bar"
 '       Debug.Print JSON.Stringify(t)
 '
-Public Function GetArrayByRef(ByRef Arr As Variant) As Variant
-    If IsArray(Arr) Then
-        GetArrayByRef = VarPtrArr(Arr)
-        Dim vt As VbVarType: vt = VarType(Arr) Or VT_BYREF
+Public Function GetArrayByRef(ByRef arr As Variant) As Variant
+    If IsArray(arr) Then
+        GetArrayByRef = VarPtrArr(arr)
+        Dim vt As VbVarType: vt = VarType(arr) Or VT_BYREF
         CopyMemory GetArrayByRef, vt, 2
     Else
         Err.Raise 5, "GetArrayByRef", "Array required"
@@ -81,16 +108,16 @@ Public Function GetArrayByRef(ByRef Arr As Variant) As Variant
 End Function
 
 #If Win64 Then
-Public Function VarPtrArr(ByRef Arr As Variant) As LongLong
+Public Function VarPtrArr(ByRef arr As Variant) As LongLong
 #Else
-Public Function VarPtrArr(ByRef Arr As Variant) As Long
+Public Function VarPtrArr(ByRef arr As Variant) As Long
 #End If
     Const vtArrByRef As Long = vbArray + VT_BYREF
     Dim vt As VbVarType
-    CopyMemory vt, Arr, 2
+    CopyMemory vt, arr, 2
     If (vt And vtArrByRef) = vtArrByRef Then
         Const pArrayOffset As Long = 8
-        CopyMemory VarPtrArr, ByVal VarPtr(Arr) + pArrayOffset, PTR_SIZE
+        CopyMemory VarPtrArr, ByVal VarPtr(arr) + pArrayOffset, PTR_SIZE
     Else
         Err.Raise 5, "VarPtrArr", "Array required"
     End If
@@ -338,9 +365,9 @@ Fallback:
 End Function
 
 ' USAGE: sArgv() = Split(TokenizeArgs("one ""two twoB twoC"" three ""four fourB"" five"), Chr$(0))
-Private Function TokenizeArgs(ByVal SearchString As String, Optional ByVal Tokenizer As String = " ") As String
+Public Function TokenizeArgs(ByRef SearchString As String, Optional ByVal Tokenizer As String = " ") As String
    Dim sArgs As String, sChar As String, nCount As Long, bQuotes As Boolean
-   
+
    For nCount = 1 To Len(SearchString)
       sChar = Mid$(SearchString, nCount, 1)
       If sChar = Chr$(34) Then
@@ -381,6 +408,38 @@ Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitte
     ParseTokenizedArg = t
 End Function
 
+Public Function StringLineSlices(ByRef SearchString As String) As ArrayListEx
+    Dim aX As ArrayListEx, i As Long, iMax As Long, bQuotes As Boolean, r As Long
+    Const cQuote As String = """"
+    Set aX = ArrayListEx.Create()
+    iMax = Len(SearchString)
+    r = 1
+    
+    For i = 1 To iMax
+        Select Case VBA.Mid$(SearchString, i, 1)
+            Case cQuote: bQuotes = Not bQuotes
+            Case vbLf
+                If Not bQuotes Then
+                    If VBA.Mid$(SearchString, i - 1, 1) = vbCr Then
+                        aX.Add Array(r, i - (r + 1))
+                    Else
+                        aX.Add Array(r, i - r)
+                    End If
+                    r = i + 1
+                End If
+        End Select
+    Next i
+    
+    If r < iMax Then
+        aX.Add Array(r, iMax - r)
+    End If
+    
+    Set StringLineSlices = aX
+End Function
+
+
+' --- MISC ---
+
 ' USAGE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
 Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
     Dim t() As Variant, i As Long, aSize As Long
@@ -396,57 +455,16 @@ Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal
     ArrayRange = t
 End Function
 
-'Public Function CreateBlankRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
-'    Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
-'
-'    ReDim iRow(0 To ColumnsCount - 1)
-'    ReDim rValues(0 To ColumnsCount - 1)
-'
-'    With rs
-'        For i = LBound(iRow) To UBound(iRow)
-'            iRow(i) = CStr(ColumnStartIndex + i)
-'            .Fields.Append CStr(iRow(i)), adLongVarWChar, -1, adFldIsNullable
-'            rValues(i) = ""
-'        Next i
-'        .Open
-'        For i = 0 To RowsCount - 1
-'            .AddNew FieldList:=iRow, Values:=rValues
-'        Next i
-'        .MoveFirst
-'    End With
-'
-'    Set CreateBlankRecordset = rs
-'End Function
+Public Function ColumnLetter(ByVal ColumnIndex As Long) As String
+    Const sChars As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    Dim i As Long
 
-'Public Function dsTable.CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
-'    Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
-'
-'    If RowsCount > 0 And ColumnsCount > 0 Then
-'        ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
-'        Set dsT = dsTable.Create(Array2dEx.Create(t))
-'    Else
-'        Set aX = ArrayListEx.Create()
-'        If RowsCount > 0 Then
-'            For i = 0 To RowsCount - 1
-'                aX.Add Array()
-'            Next i
-'        End If
-'        Set dsT = dsTable.Create(aX)
-'    End If
-'
-'    If ColumnsCount > 0 Then
-'        ReDim k(0 To ColumnsCount - 1)
-'        For i = 0 To ColumnsCount - 1
-'            k(i) = vbNullString
-'        Next i
-'        Set dsTable.CreateBlank = dsT.SetHeaders(k)
-'    Else
-'        Set dsTable.CreateBlank = dsT.SetHeaders(Array())
-'    End If
-'End Function
+    Do
+        ColumnLetter = VBA.Mid$(sChars, (0 ^ i) + ((Int(ColumnIndex / CLng(CLng(26) ^ i)) - (1 - (0 ^ i))) Mod CLng(26)) + (1 - (0 ^ i)), 1) & ColumnLetter
+        i = i + 1
+    Loop Until ((26 ^ i) + (26 * (1 - (0 ^ (i - 1)))) > ColumnIndex)
+End Function
 
-
-
-
-
+Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
+Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
 
