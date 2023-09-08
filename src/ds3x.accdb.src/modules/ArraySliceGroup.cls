@@ -139,9 +139,15 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
     Set aX = ArrayListEx.Create()
     
-    For Each c In ColumnIndexes
-        aX.Add C2ArraySlice(pGroups(CLng(c))).Slice(Index, GetCount)
-    Next c
+    If Index = 0 And GetCount = Count Then
+        For Each c In ColumnIndexes
+            aX.Add C2ArraySlice(pGroups(CLng(c)))
+        Next c
+    Else
+        For Each c In ColumnIndexes
+            aX.Add C2ArraySlice(pGroups(CLng(c))).Slice(Index, GetCount)
+        Next c
+    End If
     
     Set GetRange = New ArraySliceGroup
     GetRange.SliceGroups = aX.ToArray()
@@ -203,18 +209,14 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     If Not nRows > 0 Then Exit Function
     
     On Error GoTo UserLocaleFail
-    
     For c = 0 To nCols - 1
-
         With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
             If ApplyUserLocale Then
-                
                 .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance.Instance
             Else
                 .Value = C2ArraySlice(pGroups(c)).Instance.Instance
             End If
         End With
-        
     Next c
     
     Exit Function
