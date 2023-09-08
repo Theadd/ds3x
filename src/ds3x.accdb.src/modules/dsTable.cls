@@ -145,7 +145,7 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
             ElseIf TypeOf AllHeaders Is ADODB.Recordset Then
                 Set pHeaders = CreateColumnHeadersFromRecordsetFields(C2Recordset(AllHeaders).Fields)
             ElseIf TypeOf AllHeaders Is ArrayListEx Then
-                Set pHeaders = AllHeaders
+                Set pHeaders = Array2dEx.Create(AllHeaders)
             ElseIf TypeOf AllHeaders Is Array2dEx Then
                 Set pHeaders = AllHeaders
             ElseIf TypeOf AllHeaders Is Excel.Range Then
@@ -272,11 +272,12 @@ End Sub
 Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As dsTable
     If WriteHeaders Then
         Array2dEx.Create(Array(GetColumnNames)).CopyToRange RangeObject, False
+        ApplyFormatToExcelRange RangeObject, WriteHeaders
         Records.CopyToRange RangeObject.Range("A2"), ApplyUserLocale
     Else
+        ApplyFormatToExcelRange RangeObject, WriteHeaders
         Records.CopyToRange RangeObject, ApplyUserLocale
     End If
-    ApplyFormatToExcelRange RangeObject, WriteHeaders
 End Function
 
 
