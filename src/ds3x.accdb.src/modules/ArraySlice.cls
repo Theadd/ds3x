@@ -100,11 +100,11 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
     For Each vRange In AllRanges
         iMin = vRange(0)
         iMax = iMin + (vRange(1) - 1)
-        
+        ' ArrayLike, ColumnIndex, Index, GetCount
         For Each v In pSlices
             rMax = rMin + (v(3) - 1)
             
-            If iMin <= rMax And iMax <= rMax Then
+            If iMin <= rMax And iMin >= rMin And iMax <= rMax Then
                 '    #rMin                  #rMax
                 ' ---|---------|------|-----|--------
                 '              #iMin  #iMax
@@ -112,7 +112,7 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
                 aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod - (rMax - iMax))
                 Exit For
                 
-            ElseIf iMin <= rMax And iMax > rMax Then
+            ElseIf iMin <= rMax And iMin >= rMin And iMax > rMax Then
                 '    #rMin             #rMax
                 ' ---|---------|-------|-------|----
                 '              #iMin           #iMax

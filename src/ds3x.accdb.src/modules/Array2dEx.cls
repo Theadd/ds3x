@@ -160,8 +160,16 @@ Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
 End Function
 
 Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
+    Dim t() As Variant
+    
     Set CreateFromExcelRange = New Array2dEx
-    CreateFromExcelRange.Instance = TargetRange.Value
+    t = TargetRange.Value
+    'Stop
+    MemoryLib.UpdateLBound t, 1, 0
+    MemoryLib.UpdateLBound t, 2, 0
+    'Stop
+    CreateFromExcelRange.Instance = MemoryLib.GetArrayByRef(t)
+    
 End Function
 
 Private Function CreateFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx

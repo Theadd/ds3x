@@ -206,12 +206,12 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     
     For c = 0 To nCols - 1
 
-        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c + 1)
+        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
             If ApplyUserLocale Then
                 
-                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance
+                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance.Instance
             Else
-                .Value = C2ArraySlice(pGroups(c)).Instance
+                .Value = C2ArraySlice(pGroups(c)).Instance.Instance
             End If
         End With
         
@@ -232,7 +232,7 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     End If
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
-    dsApp.GlobalVMemAnalysis "", True
+    dsApp.GlobalVMemAnalysis "", False
     For c = 0 To nCols - 1
         SliceAt(c).SlicedArray vSliced
         For r = 0 To UBound(vSliced, 1)
@@ -307,7 +307,8 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
                 nRows = .Rows.Count
                 iAux = GetBaseRowIndexOfRange(C2ExcelRange(ArrayLike))
                 For c = 0 To .Columns.Count - 1
-                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 1, nRows, 1)
+                    ' EDIT: , 0, nRows, 0)
+                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 0, nRows, 0)
                 Next c
             End With
             Set CreateSliceGroups = aX

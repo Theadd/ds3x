@@ -339,7 +339,7 @@ Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant, Optional ShowMe
     elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
     
     If LastVMemFree <> 0 And ShowMessage Then
-        Debug.Print Printf("%6 [Global VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
+        Debug.Print Printf("%6 [VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
     End If
     LastVMemFree = cVMemFree
 End Sub

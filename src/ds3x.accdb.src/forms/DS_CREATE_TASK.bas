@@ -1608,7 +1608,11 @@ Private Sub AddTaskUsingCurrentValuesAs(ByVal TaskName As String)
                     If IsObject(Item) Then
                         Set t(i) = Item
                     Else
-                        t(i) = Item
+                        Select Case TaskParams(i)(1)
+                            Case "Long": t(i) = CLng(Item)
+                            Case "Boolean": t(i) = CBool(Item)
+                            Case Else: t(i) = Item
+                        End Select
                     End If
                 Else
                     t(i) = CVErr(0)
