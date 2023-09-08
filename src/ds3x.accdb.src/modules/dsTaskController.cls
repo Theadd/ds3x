@@ -159,7 +159,7 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx, bFailed As Boolean
     
     RaiseEvent OnBusyChange(True)
-    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
+'    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ")"
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
         If TryGetSourceTableForSequence(pDirtyRebuildIndex, oTable) Then
@@ -187,9 +187,9 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     End If
     
 ExitRebuild:
-    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
+'    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
     RaiseEvent OnTableChange
-    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
+'    dsApp.GlobalVMemAnalysis "@Rebuild(" & CStr(TargetIndex) & ") BEFORE OnTableChange"
     RaiseEvent OnBusyChange(False)
     Rebuild = Not bFailed
     Exit Function
@@ -205,6 +205,7 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Static cb As New Callback
     Dim t() As Variant, TaskName As String, TaskParams As Variant
     
+    dsApp.GlobalVMemAnalysis "", False
     dX.Bind Task
     TaskName = dX("TaskName")
     TaskParams = TaskInfo(TaskName)(DS_T_PARAMS)(2)
@@ -225,7 +226,8 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
         Err.Raise 13
     End If
     
-    VMemAnalysis "@" & dX("Id") & " " & TaskName
+    dsApp.GlobalVMemAnalysis "@RebuildTask(" & dX("Id") & " " & TaskName & ")"
+'    VMemAnalysis "@" & dX("Id") & " " & TaskName
 End Sub
 
 
@@ -364,7 +366,6 @@ Private Sub SetActiveSequenceIndex(ByVal Value As Long)
     On Error GoTo Finally
     
     pSequenceIndex = Value
-    VMemAnalysis "@SetActiveSequenceIndex"
     rebuildFail = Not Rebuild(Value)
 Finally:
     On Error GoTo 0
@@ -580,7 +581,7 @@ Public Function AddResource(ByRef TargetResource As Object) As Object
 End Function
 
 ' Run GarbageCollector
-Public Sub FreeUnlinkedResources()
+Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
     Dim i As Long, gcKeys As Variant, iMax As Long, cKey As LongPtr, isMatch As Boolean
     Dim iTR As Long, iDS As Long, trKeys As Variant, dsKeys As Variant
     
@@ -620,11 +621,12 @@ Public Sub FreeUnlinkedResources()
         End If
         
         If Not isMatch Then
-            SafeDisposeResource pGarbageCollector(gcKeys(i))
-            On Error Resume Next
-            Set pGarbageCollector(gcKeys(i)) = Nothing
-            pGarbageCollector.Remove gcKeys(i)
-            On Error GoTo 0
+            If SafeDisposeResource(pGarbageCollector(gcKeys(i)), DisposeAll) Then
+                On Error Resume Next
+                Set pGarbageCollector(gcKeys(i)) = Nothing
+                pGarbageCollector.Remove gcKeys(i)
+                On Error GoTo 0
+            End If
         End If
     Next i
     
@@ -634,26 +636,29 @@ StopOnError:
     Resume Next
 End Sub
 
-Private Sub SafeDisposeResource(ByRef TargetResource As Object)
+Private Function SafeDisposeResource(ByRef TargetResource As Object, Optional ByVal DisposeAll As Boolean = False) As Boolean
     On Error GoTo DisposeFailed
     
+    If Not DisposeAll And TypeOf TargetResource Is dbQuery Then Exit Function
     TargetResource.Dispose
-    Exit Sub
+Finally:
+    SafeDisposeResource = True
+    Exit Function
 DisposeFailed:
-    On Error Resume Next
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
-End Sub
+    Resume Finally
+End Function
 
-Private Sub VMemAnalysis(Optional ByVal Message As Variant)
-    Static LastVMemFree As Long, sVMemCallCount As Long
-    Dim cVMemFree As Long
-    
-    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
-    sVMemCallCount = sVMemCallCount + 1
-    If LastVMemFree <> 0 Then
-        Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
-    End If
-    LastVMemFree = cVMemFree
-End Sub
+'Private Sub VMemAnalysis(Optional ByVal Message As Variant)
+'    Static LastVMemFree As Long, sVMemCallCount As Long
+'    Dim cVMemFree As Long
+'
+'    cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
+'    sVMemCallCount = sVMemCallCount + 1
+'    If LastVMemFree <> 0 Then
+'        Debug.Print Printf("[VMem %4] %1 MB -> %2 MB (%3 MB) %5", LastVMemFree, cVMemFree, LastVMemFree - cVMemFree, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)))
+'    End If
+'    LastVMemFree = cVMemFree
+'End Sub
 
 
