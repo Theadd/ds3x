@@ -20,10 +20,10 @@ Begin Form
     Width =1361
     DatasheetFontHeight =11
     ItemSuffix =2096
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -342,7 +342,7 @@ Begin Form
         Begin FormHeader
             Visible = NotDefault
             Height =225
-            Name ="EncabezadoDelFormulario"
+            Name ="FormHeader"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
             BackThemeColorIndex =2
@@ -395,7 +395,7 @@ Begin Form
             CanGrow = NotDefault
             CanShrink = NotDefault
             Height =285
-            Name ="Detalle"
+            Name ="FormDetail"
             AlternateBackThemeColorIndex =1
             BackThemeColorIndex =1
             Begin
@@ -640,7 +640,7 @@ Begin Form
         Begin FormFooter
             Visible = NotDefault
             Height =0
-            Name ="PieDelFormulario"
+            Name ="FormFooter"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
             BackThemeColorIndex =1
@@ -659,6 +659,7 @@ Option Base 0
 
 
 Private pLastActiveIndex As Long
+Private pScrollPosY As Long
 
 Public Event OnActiveIndexChange(ByVal ActiveIndex As Long)
 Public Event OnNoActiveIndexChange(ByVal ActiveIndex As Long)
@@ -688,8 +689,9 @@ Private Sub DS_LIST_ITEM_OVERLAY_Click()
     On Error GoTo Finally
 
     If CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_STATE)))) = 4 Then Exit Sub
+    SaveScrollPosY
     SetCurrentAsActiveIndex
-    
+    RestoreScrollPosY
     Exit Sub
 Finally:
     Debug.Print "[ERROR] @DS_LIST_ITEM_OVERLAY.Click() - " & Err.Description
@@ -727,4 +729,15 @@ End Sub
 
 Private Sub Form_Load()
     pLastActiveIndex = -1
+End Sub
+
+
+Private Sub SaveScrollPosY()
+    pScrollPosY = Me.SelTop - Round(Me.CurrentSectionTop / Me.FormDetail.Height)
+End Sub
+
+Private Sub RestoreScrollPosY()
+    On Error Resume Next
+    Me.SelTop = Me.Recordset.RecordCount
+    Me.SelTop = pScrollPosY
 End Sub
