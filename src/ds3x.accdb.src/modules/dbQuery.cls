@@ -215,3 +215,11 @@ Private Sub OpenConnection()
     pConn.ConnectionTimeout = 10
     pConn.Open
 End Sub
+
+Public Sub Dispose()
+    If Not pConn Is Nothing Then
+        pConn.Close
+        Set pConn = Nothing
+    End If
+End Sub
+

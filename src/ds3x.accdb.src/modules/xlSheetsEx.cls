@@ -344,32 +344,33 @@ End Function
 ' --- PRIVATE ---
 
 Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As Variant
-    Dim Item As Variant, i As Long, k As Long, iMax As Long, isDefaultSet As Boolean, sAux As String
-    iMax = 10
+    Dim Item As Variant, i As Long, k As Long, isDefaultSet As Boolean, sAux As String, nX As Excel.Range, endRow As Long
     GetCommonFormatForRange = Array("General", "General")
+    Set nX = Rng.Rows.Item(1)
+    endRow = Rng.Rows.Item(Rng.Rows.Count).Row
     
-    For Each Item In Rng.Cells
-        k = k + 1
-        If Item.Text <> "" Then
-            
+    For k = 1 To 4
+        Set nX = Rng.Rows.Item(nX.Row + 1)
+        If nX.Text = "" Then Set nX = nX.End(xlDown)
+
+        If nX.Text <> "" Then
             If Not isDefaultSet Then
-                If Item.NumberFormat = "General" Then
-                    GetCommonFormatForRange = Array("General", Item.NumberFormatLocal)
+                If nX.NumberFormat = "General" Then
+                    GetCommonFormatForRange = Array("General", nX.NumberFormatLocal)
                 Else
-                    GetCommonFormatForRange = Array(Item.NumberFormat, Item.NumberFormatLocal)
+                    GetCommonFormatForRange = Array(nX.NumberFormat, nX.NumberFormatLocal)
                 End If
                 isDefaultSet = True
-                If k = 1 Then GoTo NextIteration
             End If
             
-            If Item.Text <> Item.FormulaR1C1Local Then
-                If Item.NumberFormat = "General" Then
-                    If Item.Text Like "*[,.]*E+*" Then
+            If nX.Text <> nX.FormulaR1C1Local Then
+                If nX.NumberFormat = "General" Then
+                    If nX.Text Like "*[,.]*E+*" Then
                         GetCommonFormatForRange = Array("0", "0")
                         Exit For
                     End If
                 Else
-                    sAux = CStr(Item.NumberFormatLocal)
+                    sAux = CStr(nX.NumberFormatLocal)
                     If sAux Like "[#][,.][#]?0[,.]*" Then
                         If VBA.InStr(1, sAux, ".") < VBA.InStr(1, sAux, ",") Then
                             GetCommonFormatForRange = Array("#,##0.00;-#,##0.00", "#.##0,00;-#.##0,00")
@@ -377,27 +378,21 @@ Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As Variant
                             GetCommonFormatForRange = Array("#,##0.00;-#,##0.00", "#,##0.00;-#,##0.00")
                         End If
                     Else
-                        GetCommonFormatForRange = Array(Item.NumberFormat, sAux)
+                        GetCommonFormatForRange = Array(nX.NumberFormat, sAux)
                     End If
                     Exit For
                 End If
             Else
-                If Item.NumberFormat = "General" Then
-                    If Not VBA.IsNumeric(Item.Text) Then
+                If nX.NumberFormat = "General" Then
+                    If Not VBA.IsNumeric(nX.Text) Then
                         GetCommonFormatForRange = Array("@", "@")
                         Exit For
                     End If
                 End If
             End If
-            
-            i = i + 1
-            If i >= iMax Then Exit For
-NextIteration:
         End If
-        
-        If k >= 300 Then Exit For
-    Next Item
-    
+        If nX.Row >= endRow Then Exit For
+    Next k
 End Function
 
 Private Sub SetExcelApplicationVisibility(ByVal xlApp As Excel.Application, ByVal ShouldBeVisible As Boolean)

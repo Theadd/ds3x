@@ -335,7 +335,6 @@ Begin Form
                     Height =15
                     FontSize =1
                     FontWeight =100
-                    TabIndex =1
                     Name ="HiddenControl"
                     LeftPadding =0
                     TopPadding =0
@@ -407,6 +406,7 @@ Begin Form
                     Top =30
                     Width =3734
                     Height =5670
+                    TabIndex =1
                     BorderColor =10921638
                     Name ="DS_SIDE_PANEL"
                     GroupTable =2
@@ -538,12 +538,10 @@ Private Sub Bind(ByVal TargetController As dsLiveEd)
 
     Me.DS_MAIN_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_MAIN_PANEL"
     Me.DS_SIDE_PANEL.SourceObject = "Form.DS_LIVE_EDITOR_SIDE_PANEL"
-    Set Me.DS_SIDE_PANEL.Form.Controller = pController
     Set Me.DS_MAIN_PANEL.Form.Controller = pController
+    Set Me.DS_SIDE_PANEL.Form.Controller = pController
     Me.DS_SIDE_PANEL.Visible = True
-'    If pController.TaskController.Initialized Then
-        Me.DS_MAIN_PANEL.Visible = True
-'    End If
+    Me.DS_MAIN_PANEL.Visible = True
 End Sub
 
 Private Sub Form_Resize()
@@ -568,6 +566,12 @@ Private Sub Form_Unload(Cancel As Integer)
     Set pController = Nothing
 End Sub
 
+Public Sub Dispose()
+    On Error Resume Next
+    Focus Me
+    Me.SetFocus
+    DoCmd.Close
+End Sub
 
 Private Sub ResizeToFitAllControls()
     Dim parentWidth As Long, pSize As Long

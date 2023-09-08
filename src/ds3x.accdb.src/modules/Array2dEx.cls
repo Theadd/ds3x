@@ -16,6 +16,7 @@ Implements ICollectionEx
 
 
 Public Instance As Variant
+Private pColumnCountMod As Long
 
 
 Public Property Get Count() As Long
@@ -25,7 +26,15 @@ End Property
 
 Public Property Get ColumnCount() As Long
     On Error Resume Next
-    ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2))
+    ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2)) + pColumnCountMod
+End Property
+
+Public Property Let ColumnCount(ByVal Value As Long): pColumnCountMod = IIf(IsEmpty(Instance), Value, pColumnCountMod): End Property
+
+'@DefaultMember
+Public Property Get Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0) As Variant
+Attribute Item.VB_UserMemId = 0
+    Item = Instance(Index, ColumnIndex)
 End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
@@ -74,7 +83,17 @@ Private Function CreateFromObject(ByVal ArrayLike As Object) As Array2dEx
     ElseIf TypeOf ArrayLike Is ADODB.Fields Then
         Set CreateFromObject = CreateFromRecordsetFields(C2RecordsetFields(ArrayLike))
     ElseIf TypeOf ArrayLike Is ArrayListEx Then
-        Set CreateFromObject = CreateFromArrayList(ArrayLike.Instance)
+        With C2ArrayListEx(ArrayLike)
+            If .ColumnCount = 0 Then
+                If .Count = 0 Then
+                    Set CreateFromObject = CreateArray2dEx(0, 0)
+                Else
+                    Set CreateFromObject = CreateFromSingleColumnArrayListEx(C2ArrayListEx(ArrayLike))
+                End If
+            Else
+                Set CreateFromObject = CreateFromArrayList(.Instance)
+            End If
+        End With
     ElseIf TypeOf ArrayLike Is ArrayList Then
         Set CreateFromObject = CreateFromArrayList(C2ArrayList(ArrayLike))
     Else
@@ -97,11 +116,6 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     If Not Me.Count > 0 Then Exit Function
 
     With RangeObject.Resize(Me.Count, 1 + (UBound(Instance, 2) - LBound(Instance, 2)))
-'        .Value = Instance
-'        If ApplyUserLocale Then
-'            On Error GoTo UserLocaleFail
-'            .FormulaR1C1Local = .FormulaR1C1Local
-'        End If
         If ApplyUserLocale Then
             On Error GoTo UserLocaleFail
             .FormulaR1C1Local = Instance
@@ -146,8 +160,16 @@ Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
 End Function
 
 Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
+    Dim t() As Variant
+    
     Set CreateFromExcelRange = New Array2dEx
-    CreateFromExcelRange.Instance = TargetRange.Value
+    t = TargetRange.Value
+    'Stop
+    MemoryLib.UpdateLBound t, 1, 0
+    MemoryLib.UpdateLBound t, 2, 0
+    'Stop
+    CreateFromExcelRange.Instance = MemoryLib.GetArrayByRef(t)
+    
 End Function
 
 Private Function CreateFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx
@@ -185,8 +207,25 @@ Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dE
     CreateFromArrayList.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
+Private Function CreateFromSingleColumnArrayListEx(ByVal TargetArray As ArrayListEx) As Array2dEx
+    Dim t() As Variant, i As Long, v As Variant
+    If TargetArray.Count = 0 Then Exit Function
+    ReDim t(0 To TargetArray.Count - 1, 0 To 0)
+    
+    For Each v In TargetArray.ToArray()
+        If IsObject(v) Then
+            Set t(i, 0) = v
+        Else
+            t(i, 0) = v
+        End If
+        i = i + 1
+    Next v
+    
+    Set CreateFromSingleColumnArrayListEx = New Array2dEx
+    CreateFromSingleColumnArrayListEx.Instance = CollectionsLib.GetArrayByRef(t)
+End Function
 
-Private Function CreateFromJaggedArray(ByVal TargetArray As Variant) As Array2dEx
+Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dEx
     Dim Entry As Variant, i As Long, c As Long, lc As Long, uc As Long, t() As Variant
     Set CreateFromJaggedArray = New Array2dEx
     If UBound(TargetArray) < 0 Then Exit Function
@@ -222,10 +261,8 @@ End Function
 ' Concatenate all elements of TargetArray as additional columns into a new Array2dEx
 Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     Dim t() As Variant, i As Long, c As Long, c2 As Long, uc1 As Long, uc2 As Long
-    
     uc1 = Me.ColumnCount - 1
     uc2 = TargetArray.ColumnCount - 1
-    ' ReDim t(0 To Me.Count - 1, 0 To (Me.ColumnCount - 1) + TargetArray.ColumnCount)
     ReDim t(0 To Me.Count - 1, 0 To (uc1 + uc2 + 1))
     
     For i = 0 To Me.Count - 1
@@ -258,8 +295,7 @@ End Function
 ' @SEEALSO: ArrayListEx.GetRange([Index], [Count], [ColumnIndexes]) As ArrayListEx
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
     Dim t() As Variant, i As Long, c As Variant, c0 As Long
-    ' EDIT: CopyMemory
-    ' Dim j() As Variant, k As Long, e As Long, kMax As Long
+    Set GetRange = New Array2dEx
     
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If Index >= Me.Count Then
@@ -276,17 +312,8 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     End If
     
     If GetCount > 0 Then
-        ' EDIT: CopyMemory
-'        kMax = UBound(ColumnIndexes)
-'        ReDim t(0 To GetCount - 1, 0 To kMax)
         ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes) - LBound(ColumnIndexes))
-        
-        ' EDIT: CopyMemory
-'        For k = 0 To kMax
-'            e = CLng(ColumnIndexes(k))
-'            MemoryLib.MemCopy VBA.VarPtr(t(0, k)), VBA.VarPtr(Instance(Index, e)), VARIANT_SIZE * CLng(GetCount)
-'        Next k
-    
+
         For i = Index To Index + GetCount - 1
             c0 = 0
             For Each c In ColumnIndexes
@@ -300,9 +327,9 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         Next i
     Else
         t = CreateBlank2DArray()
+        GetRange.ColumnCount = -1
     End If
     
-    Set GetRange = New Array2dEx
     GetRange.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
@@ -370,8 +397,7 @@ Private Sub Class_Terminate()
 End Sub
 
 Public Sub Dispose()
-    ' EDIT: DISPOSE
-    ' Instance = Empty
+    ' TODO
 End Sub
 
 Private Function ValueToCSV(ByVal Value As Variant) As String
@@ -422,25 +448,12 @@ Private Function C2Date(Optional ByVal Value As Variant) As Variant
     C2Date = DateValue(Value)
 End Function
 
-Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset
-    Set C2Recordset = Value
-End Function
-
-Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range
-    Set C2ExcelRange = Value
-End Function
-
-Private Function C2RecordsetFields(ByVal Value As Variant) As ADODB.Fields
-    Set C2RecordsetFields = Value
-End Function
-
-Private Function C2ArrayList(ByVal Value As Variant) As ArrayList
-    Set C2ArrayList = Value
-End Function
-
-Private Function C2Object(ByRef Value As Variant) As Object
-    Set C2Object = Value
-End Function
+Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2Recordset = Value: End Function
+Private Function C2ExcelRange(ByVal Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
+Private Function C2RecordsetFields(ByVal Value As Variant) As ADODB.Fields: Set C2RecordsetFields = Value: End Function
+Private Function C2ArrayList(ByVal Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
+Private Function C2ArrayListEx(ByVal Value As Variant) As ArrayListEx: Set C2ArrayListEx = Value: End Function
+Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
 
 Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Finally
@@ -464,9 +477,19 @@ Fallback:
     Is1dArray = IsArray(ArrayLike)
 End Function
 
-Private Function CreateBlank2DArray() As Variant
+Private Function CreateBlank2DArray(Optional ByVal NumRows As Long = 0) As Variant
+    Dim Miss As Variant, t() As Variant, i As Long
     With CreateObject("Forms.ComboBox.1")
-        .List = Array()
+        If NumRows = 0 Then
+            .List = Array()
+        Else
+            Miss = Array(, Null)(0)
+            ReDim t(0 To NumRows - 1)
+            For i = 0 To NumRows - 1
+                t(i) = Miss
+            Next i
+            .List = t
+        End If
         CreateBlank2DArray = .List
     End With
 End Function
@@ -499,13 +522,14 @@ End Function
 Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx
     Dim t() As Variant
 
+    Set CreateArray2dEx = New Array2dEx
     If RowsCount > 0 And ColumnsCount > 0 Then
         ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
     Else
-        t = CreateBlank2DArray()
+        t = CreateBlank2DArray(RowsCount)
+        CreateArray2dEx.ColumnCount = -1
     End If
     
-    Set CreateArray2dEx = New Array2dEx
     CreateArray2dEx.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
 
@@ -514,6 +538,7 @@ End Function
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0&) As Variant: ICollectionEx_Item = Item(Index, ColumnIndex): End Property
 Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
@@ -527,7 +552,3 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") A
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale): End Function
-
-
-
-

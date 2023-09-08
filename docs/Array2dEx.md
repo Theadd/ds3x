@@ -14,7 +14,7 @@ Implements __[ICollectionEx](./ICollectionEx.md)__.
 - All methods returning an `Array2dEx` are chainable.
 - Publicly exposes it's inner `2D Array` for extensibility purposes with no need to alter it's code.
 - With `Array2dEx.Create()` supports creating new instances directly converting from:
-  - Plain **2D Arrays** and **Jagged Arrays** (array of arrays).
+  - Plain **2D Arrays**, **Jagged Arrays** (array of arrays) and plain **1D Arrays** (distributing their elements vertically, in a single column).
   - **ArrayList** and **ArrayListEx**.
   - **Excel.Range**.
   - **ADODB.Recordset**, **RecordsetEx** and **ADODB.Fields**.

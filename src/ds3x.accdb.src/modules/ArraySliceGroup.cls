@@ -6,7 +6,7 @@ Attribute VB_Name = "ArraySliceGroup"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 '@PredeclaredId
 Option Compare Database
 Option Explicit
@@ -26,6 +26,12 @@ End Property
 Public Property Get ColumnCount() As Long
     On Error Resume Next
     ColumnCount = pGroups.Count
+End Property
+
+'@DefaultMember
+Public Property Get Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0) As Variant
+Attribute Item.VB_UserMemId = 0
+    Item = SliceAt(ColumnIndex).Item(Index)
 End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
@@ -74,7 +80,29 @@ Public Function Create(Optional ByRef ArrayLike As Variant) As ArraySliceGroup
     End If
 End Function
 
+Public Function Add(ByRef Target As ArraySlice) As ArraySliceGroup: Set Add = Insert(Target): End Function
 
+Public Function Insert(ByRef Target As ArraySlice, Optional ByVal ColumnIndex As Variant) As ArraySliceGroup
+    Dim aX As ArrayListEx
+    If IsMissing(ColumnIndex) Then ColumnIndex = ColumnCount
+    Set Insert = New ArraySliceGroup
+    Set aX = ArrayListEx.Create(SliceGroups)
+    aX.Insert ColumnIndex, Target
+    Insert.SliceGroups = aX.ToArray()
+End Function
+
+Public Function Replace(ByRef Target As ArraySlice, ByVal ColumnIndex As Long) As ArraySliceGroup
+    Dim aX As ArrayListEx
+    Set Replace = New ArraySliceGroup
+    Set aX = ArrayListEx.Create(SliceGroups)
+    Set aX(ColumnIndex) = Target
+    Replace.SliceGroups = aX.ToArray()
+End Function
+
+Public Function RemoveAt(ByVal ColumnIndex As Long) As ArraySliceGroup
+    Set RemoveAt = New ArraySliceGroup
+    RemoveAt.SliceGroups = ArrayListEx.Create(SliceGroups).RemoveAt(ColumnIndex).ToArray()
+End Function
 
 Public Function AddRange(ByRef Target As Variant) As ArraySliceGroup
     Dim t As ArraySliceGroup, c As Long, aX As ArrayListEx
@@ -178,12 +206,12 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     
     For c = 0 To nCols - 1
 
-        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c + 1)
+        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
             If ApplyUserLocale Then
                 
-                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance
+                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance.Instance
             Else
-                .Value = C2ArraySlice(pGroups(c)).Instance
+                .Value = C2ArraySlice(pGroups(c)).Instance.Instance
             End If
         End With
         
@@ -204,14 +232,14 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     End If
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
+    dsApp.GlobalVMemAnalysis "", False
     For c = 0 To nCols - 1
         SliceAt(c).SlicedArray vSliced
         For r = 0 To UBound(vSliced, 1)
             Out2dArray(r, c) = vSliced(r, 0)
         Next r
     Next c
-    
-    Out2dArray = vSliced
+    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
 End Sub
 
 ' Practically there's no point in cloning an immutable object, it's just exposed to share some common API with the other collection class modules.
@@ -219,6 +247,8 @@ Public Function Clone() As ArraySliceGroup
     Set Clone = New ArraySliceGroup
     Clone.SliceGroups = SliceGroups
 End Function
+
+Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
 
 Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
     Dim t() As String, s() As String, i As Long, c As Long, uc As Long, vSliced() As Variant
@@ -261,15 +291,26 @@ End Sub
 ' --- PRIVATE ---
 
 Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
-    Dim aX As ArrayListEx, nRows As Long, c As Long
+    Dim aX As ArrayListEx, nRows As Long, c As Long, iAux As Long
     
     If IsObject(ArrayLike) Then
+        Set aX = ArrayListEx.Create()
         If TypeOf ArrayLike Is ICollectionEx Then
-            Set aX = ArrayListEx.Create()
             nRows = C2ICollectionEx(ArrayLike).Count
             For c = 0 To C2ICollectionEx(ArrayLike).ColumnCount - 1
                 aX.Add ArraySlice.Create(ArrayLike, Index:=0, GetCount:=nRows, ColumnIndex:=c)
             Next c
+            Set CreateSliceGroups = aX
+            Exit Function
+        ElseIf TypeOf ArrayLike Is Excel.Range Then
+            With C2ExcelRange(ArrayLike)
+                nRows = .Rows.Count
+                iAux = GetBaseRowIndexOfRange(C2ExcelRange(ArrayLike))
+                For c = 0 To .Columns.Count - 1
+                    ' EDIT: , 0, nRows, 0)
+                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 0, nRows, 0)
+                Next c
+            End With
             Set CreateSliceGroups = aX
             Exit Function
         End If
@@ -279,10 +320,16 @@ End Function
 
 Private Function ValueToCSV(ByVal Value As Variant) As String
     Select Case VarType(Value)
-        Case vbString: ValueToCSV = """" & Replace(CStr(Value), """", """""") & """"
+        Case vbString: ValueToCSV = """" & VBA.Replace(CStr(Value), """", """""") & """"
         Case vbNull: ValueToCSV = vbNullString
         Case Else: ValueToCSV = CStr(Value)
     End Select
+End Function
+
+Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
+    On Error Resume Next
+    GetBaseRowIndexOfRange = 1
+    GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
 End Function
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
@@ -290,12 +337,14 @@ Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2d
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ICollectionEx(ByRef Value As Variant) As ICollectionEx: Set C2ICollectionEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
+Private Function C2ExcelRange(ByRef Value As Variant) As Excel.Range: Set C2ExcelRange = Value: End Function
 
 
 ' --- ICollectionEx ---
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
 Private Property Get ICollectionEx_ColumnCount() As Long: ICollectionEx_ColumnCount = ColumnCount: End Property
+Private Property Get ICollectionEx_Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0&) As Variant: ICollectionEx_Item = Item(Index, ColumnIndex): End Property
 Private Property Get ICollectionEx_Row(ByVal Index As Long) As Variant: ICollectionEx_Row = Row(Index): End Property
 Private Function ICollectionEx_CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ICollectionEx: Set ICollectionEx_CreateBlank = CreateBlank(RowsCount, ColumnsCount): End Function
 Private Function ICollectionEx_Create(Optional ByRef FromTarget As Variant) As ICollectionEx: Set ICollectionEx_Create = Create(FromTarget): End Function
@@ -309,8 +358,3 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") A
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale): End Function
-
-
-
-
-
