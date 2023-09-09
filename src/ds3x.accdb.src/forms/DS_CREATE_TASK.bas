@@ -23,7 +23,7 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =4230
+    Left =4770
     Top =3030
     Right =28545
     Bottom =15225
@@ -1330,6 +1330,7 @@ Private Function GetTaskTypeHeader(ByVal TaskType As String) As Variant
         Case "DS": Title = "DATA SOURCES"
         Case "T": Title = "TRANSFORMATION"
         Case "DSG": Title = "GENERATION"
+        Case "DBG": Title = "DEV / DEBUG"
         Case Else
             GetTaskTypeHeader = Array(IndexCountdown, " ", 4)
             Exit Function

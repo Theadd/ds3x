@@ -204,3 +204,6 @@ End Sub
 Private Sub Class_Initialize()
     pSliced = Array()
 End Sub
+
+Public Sub Debugger(): Stop: End Sub
+

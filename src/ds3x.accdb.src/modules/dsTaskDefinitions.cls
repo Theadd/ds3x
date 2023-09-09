@@ -32,22 +32,15 @@ Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
 End Function
 
 Public Function CreateMassiveTable() As dsTable
-    Dim dsT As dsTable, t() As Byte, a2X As Array2dEx, i As Long, sX As ArraySlice, aX As ArrayListEx, v As Variant, sgX As ArraySliceGroup
-    Dim NumRows As Long, NumRowSlices As Long, NumColumns As Long
-    NumRows = 42000
-    NumRowSlices = 50000
-    NumColumns = 1000000
-    dsApp.GlobalVMemAnalysis "MASSIVE START"
-'    Dim r(0 To 1000000000 - 1) As Byte
-    Dim r() As Byte
-'    Dim r(0 To 100 - 1) As Long
+    Dim dsT As dsTable, t() As Variant, a2X As Array2dEx, i As Long, sX As ArraySlice, aX As ArrayListEx, v As Variant, sgX As ArraySliceGroup
+    Dim NumRows As Long, NumRowSlices As Long, NumColumns As Long, r() As Byte
+    NumRows = 42000: NumRowSlices = 50000: NumColumns = 1000
     ReDim r(0 To NumColumns - 1)
-    
     ReDim t(0 To NumRows - 1, 0 To 0)
-    For i = 0 To NumRows - 1
-        t(i, 0) = CByte(i Mod 256)
-    Next i
     
+    For i = 0 To NumRows - 1
+        t(i, 0) = i
+    Next i
     Set a2X = New Array2dEx
     a2X.Instance = MemoryLib.GetArrayByRef(t)
     Set sX = ArraySlice.Create(a2X)
@@ -59,14 +52,9 @@ Public Function CreateMassiveTable() As dsTable
     Set sX = sX.SliceAllRanges(aX)
     Set sgX = New ArraySliceGroup
     sgX.SliceGroups = Array(sX)
-'    dsApp.GlobalVMemAnalysis "MASSIVE * COLUMNS"
     Set sgX = sgX.GetRange(, , r)
-'    dsApp.GlobalVMemAnalysis "MASSIVE dsTable"
     Set dsT = dsTable.Create(sgX)
-'    dsApp.GlobalVMemAnalysis "MASSIVE AddResource & SetHeaders"
-'    Set CreateMassiveTable = pTaskController.AddResource(dsT.SetHeaders(r))
-    Set CreateMassiveTable = dsT    ' dsT.SetHeaders(r)
-    dsApp.GlobalVMemAnalysis "MASSIVE END"
+    Set CreateMassiveTable = pTaskController.AddResource(dsT)
 End Function
 
 ' ---
@@ -839,9 +827,13 @@ Private Sub AddAllTasks()
 
     ' --- DATA SOURCE TASKS ---
     
-    AddTask "DataSource", "", TaskType:="DS", Requires:="*"
+    AddTask "DataSource", "", _
+            Description:="Provides an empty data source for programmatic use in code.", _
+            TaskType:="DS", Requires:="*"
     
-    AddTask "WorksheetSource", "", TaskType:="XS", Requires:="*"
+    AddTask "WorksheetSource", "", _
+            Description:="Provides an empty worksheet for programmatic use in code.", _
+            TaskType:="XS", Requires:="*"
     
     AddTask "LoadFromRange", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range, [FirstRowHasHeaders = True]: Boolean", TaskType:="DS", Requires:="X*"
     
@@ -892,9 +884,13 @@ Private Sub AddAllTasks()
     
     ' --- DEV / DEBUG ---
     
-    AddTask "AsRecordsetTable", "[Source]: Table", Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>"
+    AddTask "AsRecordsetTable", "[Source]: Table", _
+            Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>", _
+            TaskType:="DBG", Requires:="*"
     
-    AddTask "CreateMassiveTable", "", TaskType:="DS", Requires:="*"
+    AddTask "CreateMassiveTable", "", _
+            Description:="Quickly provides a new Table generated with <b>2.100.000.000</b> rows * <b>1.000</b> columns of sample data.", _
+            TaskType:="DBG", Requires:="*"
     
 End Sub
 

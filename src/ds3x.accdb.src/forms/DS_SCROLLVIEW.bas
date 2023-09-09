@@ -21,7 +21,7 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =4230
+    Left =4770
     Top =3030
     Right =28545
     Bottom =15225
@@ -1088,9 +1088,11 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     sAxisX = IIf(GetAsyncKeyState(vbKeyControl) And GetAsyncKeyState(vbKeyControl), Not sAxisX, sAxisX)
     
     If sAxisX Then
-        ApplyScrollbarX CDbl(ScrollPosX + CDbl(Count * sMod * Me.SCROLLBAR_X.SmallChange))
+'        ApplyScrollbarX CDbl(ScrollPosX + CDbl(Count * sMod * Me.SCROLLBAR_X.SmallChange))
+        ScrollPosX = ScrollPosX + CDbl(Count * sMod * Fix(CDbl(Worksheet.GridCellSizeX) / 5#))
     Else
-        ApplyScrollbarY CDbl(ScrollPosY + CDbl(Count * sMod * Me.SCROLLBAR_Y.SmallChange))
+'        ApplyScrollbarY CDbl(ScrollPosY + CDbl(Count * sMod * Me.SCROLLBAR_Y.SmallChange))
+        ScrollPosY = ScrollPosY + CDbl(Count * sMod * Worksheet.GridCellSizeY)
     End If
 End Function
 
@@ -1165,7 +1167,7 @@ Public Sub ApplyScrollbarX(Optional ByVal Value As Variant, Optional ByVal Expli
                 If nX <> CDbl(Value) Then ScrollPosX = CDbl(Value)
                 If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
                     nX = ScrollPosX
-                    Viewport.ScrollTo nX, ScrollPosX
+                    Viewport.ScrollTo nX, ScrollPosY
                     pLastScrollX(0) = nX
                 End If
             End If
@@ -1188,7 +1190,7 @@ Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)
     pScrollPageSizeY = CLng(Int((Me.InsideHeight - 270) / cellSizeY)) * cellSizeY
     pMaxContentSizeY = CDbl(pTable.Count * CDbl(cellSizeY)) + CDbl(pWorksheetHeadersSizeY)
     
-    nMod = IIf(pMaxContentSizeY > 2 ^ 30, 1000, 1)
+    nMod = IIf(pMaxContentSizeY + CDbl(OutOfBoundsScrollY) > 2 ^ 30, 1000, 1)
     If nMod <> pScrollFactorPosY Then
         ' TODO: check it
         pScrollFactorPosY = nMod
@@ -1227,7 +1229,7 @@ Private Sub UpdateScrollbarX(Optional ByVal ExplicitCall As Boolean = False)
     
     pMaxContentSizeX = Max(CDbl(pTable.ColumnCount * CDbl(cellSizeX)), viewSizeX)
     
-    nMod = IIf(pMaxContentSizeX > 2 ^ 30, 20000, 1)
+    nMod = IIf(pMaxContentSizeX + CDbl(OutOfBoundsScrollX) > 2 ^ 30, 20000, 1)
     If nMod <> pScrollFactorPosX Then
         ' TODO: check it
         pScrollFactorPosX = nMod

@@ -139,6 +139,3 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
     Printf = Join(parts, vbNullString)
 End Function
 
-
-' --- DEV ---
-
