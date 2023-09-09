@@ -465,6 +465,28 @@ Public Function ColumnLetter(ByVal ColumnIndex As Long) As String
     Loop Until ((26 ^ i) + (26 * (1 - (0 ^ (i - 1)))) > ColumnIndex)
 End Function
 
+Public Function ArrayItem(ByRef ArrayLike As Variant, ByVal Index As Long, Optional ByRef ValueIfNull As Variant) As Variant
+    If Not IsMissing(ValueIfNull) Then Assign ArrayItem, ValueIfNull
+    On Error Resume Next
+    AssignWhenValid ArrayItem, ArrayLike(Index)
+End Function
+
+Private Sub AssignWhenValid(ByRef Target, ByRef Value As Variant)
+    Select Case True
+        Case IsObject(Value): If Not Value Is Nothing Then Set Target = Value
+        Case IsEmpty(Value), IsNull(Value), IsError(Value): ' Ignore invalid values
+        Case Else: Target = Value
+    End Select
+End Sub
+
+Private Sub Assign(ByRef Target, ByRef Value As Variant)
+    If IsObject(Value) Then
+        Set Target = Value
+    Else
+        Target = Value
+    End If
+End Sub
+
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
 
