@@ -23,7 +23,7 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =3225
+    Left =4230
     Top =3030
     Right =28545
     Bottom =15225
@@ -1759,7 +1759,7 @@ Private Function GetSelectedColumnNumberFormat() As String
     End With
     
     If cIndexValid Then
-        GetSelectedColumnNumberFormat = pController.Table.Headers.Row(0)(cIndex)("NumberFormat")
+        GetSelectedColumnNumberFormat = CollectionsLib.ArrayItem(pController.Table.Headers.Row(0)(cIndex), 1, "General")
     End If
 Finally:
 End Function

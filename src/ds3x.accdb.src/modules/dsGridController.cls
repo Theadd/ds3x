@@ -71,14 +71,6 @@ End Sub
 
 ' --- OTHER ---
 
-Public Function TryGetColumnHeaderAt(ByVal ColumnIndex As Long, ByRef OutColumnHeader As DictionaryEx) As Boolean
-    On Error GoTo Finally
-    
-    Set OutColumnHeader = DictionaryEx.Bind(Table().Headers.Row(0)(ColumnIndex)).Clone()
-    TryGetColumnHeaderAt = True
-Finally:
-End Function
-
 Friend Sub TriggerOnChangeEvent()
     RaiseEvent OnChange
     If pTaskController.IsValidTable Then

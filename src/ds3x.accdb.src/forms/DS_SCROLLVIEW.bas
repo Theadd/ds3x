@@ -798,7 +798,6 @@ Private pLowScrollModY As Long
 Private pScrollFactorPosX As Double
 Private pScrollFactorPosY As Double
 Private pWorksheetHeadersSizeY As Long
-Private Const pLongMaxValue As Long = Not &H80000000
 
 Private pViewport As Form_DS_VIEWPORT
 Private pViewportSticky As Form_DS_VIEWPORT_STICKY
@@ -1303,7 +1302,7 @@ Private Sub pWorksheetHeaders_OnColumnNameWillChange(ByVal ColumnIndex As Long, 
     Dim oldValue As String
     
     On Error GoTo Finally
-    oldValue = Table().Headers.Row(0)(ColumnIndex)("ColumnName")
+    oldValue = CollectionsLib.ArrayItem(Table().Headers.Row(0)(ColumnIndex), 0)
     If StrComp(oldValue, Value, vbBinaryCompare) <> 0 Then
         On Error GoTo 0
         RaiseEvent OnColumnNameChange(ColumnIndex, oldValue, Value)
