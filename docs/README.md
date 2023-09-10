@@ -6,7 +6,7 @@ This repository contains both; [ds3x](./ds3x-lib/README.md), a **lightweight MSA
 <blockquote><br/><ul>
 Current releases are pretty stable but this is still in <b>active development</b>, being released earlier than planned so <b>anything can be subject to change</b>.
 <br/><br/>
-I'm considering to use a custom <b>ArrayList</b> implementation to get rid of <code>.NET Framework v3.5</code> dependency.
+I'm still considering to use a custom <b>ArrayList</b> implementation to get rid of the <code>.NET Framework v3.5</code> dependency.
 <br/><br/>
 This documentation is largely incomplete.
 <br/><br/>
