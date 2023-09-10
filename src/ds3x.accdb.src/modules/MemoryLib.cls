@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Libraries"
 '''=============================================================================
 ''' VBA MemoryTools
 ''' -----------------------------------------------
@@ -67,11 +68,11 @@ Private Const MODULE_NAME As String = "MemoryLib"
 Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
 
 #If Win64 Then
-    Const PTR_SIZE As Long = 8
-    Const VARIANT_SIZE As Long = 24
+    Private Const PTR_SIZE As Long = 8
+    Private Const VARIANT_SIZE As Long = 24
 #Else
-    Const PTR_SIZE As Long = 4
-    Const VARIANT_SIZE As Long = 16
+    Private Const PTR_SIZE As Long = 4
+    Private Const VARIANT_SIZE As Long = 16
 #End If
 
 Private Const BYTE_SIZE As Long = 1
@@ -79,18 +80,41 @@ Private Const INT_SIZE As Long = 2
 Private Const VT_SPACING As Long = VARIANT_SIZE / INT_SIZE 'VarType spacing in an array of Variants
 
 #If Win64 Then
-    Const vbLongPtr As Long = vbLongLong
+    Private Const vbLongPtr As Long = vbLongLong
 #Else
-    Const vbLongLong As Long = 20 'Useful in Select Case logic
-    Const vbLongPtr As Long = vbLong
+    Private Const vbLongLong As Long = 20 'Useful in Select Case logic
+    Private Const vbLongPtr As Long = vbLong
 #End If
 
+Private Type REMOTE_MEMORY
+    memValue As Variant
+    remoteVT As Variant
+    isInitialized As Boolean
+End Type
 
+Private Type SAFEARRAYBOUND
+    cElements As Long
+    lLbound As Long
+End Type
+
+Private Type SAFEARRAY_1D
+    cDims As Integer
+    fFeatures As Integer
+    cbElements As Long
+    cLocks As Long
+    #If Win64 Then
+        dummyPadding As Long
+        pvData As LongLong
+    #Else
+        pvData As Long
+    #End If
+    rgsabound0 As SAFEARRAYBOUND
+End Type
 
 'https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-oaut/3fe7db9f-5803-4dc4-9d14-5425d3f5461f
 'https://docs.microsoft.com/en-us/windows/win32/api/oaidl/ns-oaidl-variant?redirectedfrom=MSDN
 'Flag used to simulate ByRef Variants
-Const VT_BYREF As Long = &H4000
+Private Const VT_BYREF As Long = &H4000
 
 
 Private Const FADF_HAVEVARTYPE As Long = &H80
@@ -99,7 +123,7 @@ Private Const FADF_HAVEVARTYPE As Long = &H80
 'Returns an initialized (linked) REMOTE_MEMORY struct
 'Links .remoteVt to the first 2 bytes of .memValue
 '*******************************************************************************
-Public Sub InitRemoteMemory(ByRef rm As REMOTE_MEMORY)
+Private Sub InitRemoteMemory(ByRef rm As REMOTE_MEMORY)
     rm.remoteVT = VarPtr(rm.memValue)
     MemIntAPI(VarPtr(rm.remoteVT)) = vbInteger + VT_BYREF
     rm.isInitialized = True
@@ -422,7 +446,7 @@ End Function
 
 '*******************************************************************************
 'Redirects the instance of a class to another instance of the same class within
-'   the scope of a private class Function (not  Sub) where the call happens.
+'   the scope of a private class Function (not Sub) where the call happens.
 '
 'Warning! ONLY call this method from a Private Function of a class!
 '
@@ -984,6 +1008,5 @@ End Function
 '    Next c
 '    vtArr = vbEmpty
 'End Sub
-
 
 
