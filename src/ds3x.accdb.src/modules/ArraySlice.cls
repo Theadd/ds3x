@@ -71,7 +71,11 @@ Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index
             ElseIf TypeOf ArrayLike Is ArraySliceGroup Then
                 Set Create = C2ArraySliceGroup(ArrayLike).SliceAt(ColumnIndex).Slice(Index, GetCount)
             ElseIf TypeOf ArrayLike Is ArraySlice Then
-                Set Create = C2ArraySlice(ArrayLike).Slice(Index, GetCount, ColumnIndex)
+                If Index = 0 And GetCount = Count Then
+                    Set Create = ArrayLike  ' Leveraging immutability
+                Else
+                    Set Create = C2ArraySlice(ArrayLike).Slice(Index, GetCount, ColumnIndex)
+                End If
             ElseIf TypeOf ArrayLike Is Array2dEx Then
                 Set Create = New ArraySlice
                 Create.Slices = ArrayListEx.Create().Add(Array(C2Array2dEx(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
@@ -200,3 +204,6 @@ End Sub
 Private Sub Class_Initialize()
     pSliced = Array()
 End Sub
+
+Public Sub Debugger(): Stop: End Sub
+

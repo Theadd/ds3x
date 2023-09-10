@@ -1,77 +1,42 @@
 # __ds3x__
+<sup><sup>WIN32 / WIN64 / VBA7 <small><i>(MS Office 2010+)</i></small></sup></sup>
 
-_A **lightweight MSAccess (VBA) shared library** providing a dead simple <u>abstraction</u> in working with different sources/types <u>of data collections</u> to query, iterate, filter, fix/reformat, transform and even to convert to and from other collection types (`CSV/Excel`, `ArrayLists`, `2D Arrays`, `Dictionaries`, `Recordsets`, `JSON`, etc.)_
+This repository contains both; [ds3x](./docs/ds3x-lib/README.md), a **lightweight MSAccess (VBA) shared library** providing a dead simple <u>abstraction</u> over operating on lists and table-like types of data collections and, the [dsLiveEd](./docs/live-editor-app/README.md), a **PowerQuery-like MSAccess Application** for managing automation tasks of data manipulation or direct-data manipulation with it's **Live Editor** interface. 
 
+<blockquote><br/><ul>
+Current releases are pretty stable but this is still in <b>active development</b>, being released earlier than planned so <b>anything can be subject to change</b>.
+<br/><br/>
+I'm still considering to use a custom <b>ArrayList</b> implementation to get rid of the <code>.NET Framework v3.5</code> dependency.
+<br/><br/>
+This documentation is largely incomplete.
+<br/><br/>
+</ul></blockquote>
+<br/>
 
-### __QUICK FEATURE OVERVIEW__
+### __dsLiveEd__
 
-<ul>
-<strong><u>RAW</u> INPUT/OUTPUT DATA SUPPORT</strong>
+Read the __dsLiveEd__ docs [here](./docs/live-editor-app/README.md).
 
-`CSV`, `Excel`, `ADODB.Recordset`, `2D Array`, `Jagged Array`, `JSON`.
+- . . .
+<br/><br/>
 
-<strong>MINIMUM GLOBAL SCOPE POLLUTION</strong> - Except a few public types and some externally accessible automation calls, everything is contained it's own class module.
+### __ds3x__
 
-<strong>WIN32/WIN64 SUPPORT</strong>
+Read the **ds3x** shared library docs [here](./docs/ds3x-lib/README.md).
 
-<strong>REALLY FAST COPY TO EXCEL RANGE ALTERNATIVE</strong> - Making use of **Array2dEx**'s `2D Array` implementation for direct in-memory copying to and from an Excel.Range, transforming it and writting it back.
+#### __Main collection classes__
 
-</ul>
-<ul>
-<strong>SUPPORTED OPERATIONS</strong>
+  - __[ArrayListEx](./docs/ds3x-lib/ArrayListEx.md)__ - *`.NET Framework v3.5`'s `ArrayList` wrapper.*
+  - __[Array2dEx](./docs/ds3x-lib/Array2dEx.md)__ <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> - *`VBA`'s built-in `2D Array` wrapper.*
+  - __[DictionaryEx](./docs/ds3x-lib/DictionaryEx.md)__ - *`Scripting.Dictionary` wrapper.*
+  - __[RecordsetEx](./docs/ds3x-lib/RecordsetEx.md)__ - *`ADODB.Recordset` wrapper.*
+  - __[xlSheetsEx](./docs/ds3x-lib/xlSheetsEx.md)__ - *`CSV`/`Excel` wrapper.*
+  - __[dsTable](./docs/ds3x-lib/dsTable.md)__ <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> - *Greatly simplifies working w/ table-like collections (holding column-related info, not just data).*
+<br/><br/>
 
-  - __All possible data conversion among supported types__ *(e.g., `Excel` -> `Recordset`)*.
-  - __dsLiveEd__ - _(Setup and manage lists of transformation or other kind of tasks to be applied in a `PowerQuery`-like way)._
-    - __Modes of Use__
-      - __Live Editor UI__ - *It can be embedded in your application as a project reference or opened as an external (standalone) application.*
-      - __Headless mode__ - *Those list of tasks to be applied can be exported as a presset in JSON, which can be imported in your application and just generate the resulting output without having to involve any visible UI.*
-      - __Automation__ - *Formerly known as `OLE Automation`, allows to programatically use `dsLiveEd` from another application without even having to include `ds3x` as a project reference.*
-      - __Command line__ - Allows executing automation tasks from command line switches, no programming skills neded.
-    - __Immutability support__ - *Allowing to go back and forward within the resulting state of each and every single transformation task applied to data tables (Excel doesn't support immutability so it won't go back and fordward by just switching between Excel tasks but they can be edited anyway).*
+## __Known limitations__
 
-</ul>
-
-
-#### __CLASS MODULES__
-
-##### __COLLECTIONS__
-
-<ul>
-Ultra-lightweight chainable wrappers.
-
-  - __[ArrayListEx](./docs/ArrayListEx.md)__ - *`.NET Framework v3.5`'s `ArrayList` wrapper.*
-  - __[Array2dEx](./docs/Array2dEx.md)__ <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> - *`VBA`'s built-in `2D Array` wrapper.*
-  - __[DictionaryEx](./docs/DictionaryEx.md)__ - *`Scripting.Dictionary` wrapper.*
-  - __[RecordsetEx](./docs/RecordsetEx.md)__ - *`ADODB.Recordset` wrapper.*
-  - __[xlSheetsEx](./docs/xlSheetsEx.md)__ - *`CSV`/`Excel` wrapper.*
-  - __[dsTable](./docs/dsTable.md)__ <sup><sub><sup><kbd><code>__IMMUTABLE__</code></kbd></sup></sub></sup> - *Greatly simplifies working w/ table-like collections (holding column-related info, not just data).*
-
-
-</ul>
-<ul>
-Miscellaneous.
-
-  - __[Callback](./docs/Callback.md)__ - *A <kbd>`pass function as parameter`</kbd>-like feature on steroids with additional support for executing `javascript` code and `Filter`/`Map`/`Reduce` calls on callback's results (`Where`/`Select`/`Aggregate` equivalents on `.NET`).*
-  - __[dbQuery](./docs/dbQuery.md)__ <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> - *Not a fan of your current `ADODB` connector? Just try this one.*
-
-</ul>
-
-##### __LIBRARIES__
-
-<ul>
-
-  - __[JSON](./docs/JSON.md)__ - *Backwards-compatible custom version of [Tim Hall](https://github.com/VBA-tools/VBA-JSON)'s `JSON` utilities.*
-  - __[FileSystemLib](./docs/FileSystemLib.md)__ - *Safe, network<sup><small>(NFS)</small></sup>-load/delay aware, `FileSystemObject`-related, clipboard and memory usage utilities.*
-  - __[ScreenLib](./docs/ScreenLib.md)__ <sup><sub><sup><kbd><code>__OPTIONAL__</code></kbd></sup></sub></sup> - *No more messing with twips to pixels conversion. Everything you'd ever need, speaking in the same language.*
-  
-</ul>
-
-
-### __LIMITATIONS__
-
-Under **Win64**, all collection-type classes are limited to VBA's `Long` capacity, `2,147,483,647` rows <sup><sub>x</sub></sup> `2,147,483,647` columns (being `4,611,686,014,132,420,608` cells in total) which, of course, I have not verified.
-
-In **Win32**, all MS Access applications are limited to 2GB of virtual memory, which is a real problem but since I was targeting Win32 virtual machines I had to adapt, optimizing memory consumption as much as possible, sometimes, at expenses of time consumption (Operations on large datasets are processed in chunks rather than in a single pass).
-
-**MS Excel** has it's own limitation of `1,048,576` rows <sup><sub>x</sub></sup> `16,384` columns _(XFD)_ but **dsLiveEd** is just the perfect tool to split your data in several sheets if needed.
+- All collection-type classes are limited to VBA's `Long` capacity, `2,147,483,647` rows <sup><sub>x</sub></sup> `2,147,483,647` columns, being `4,611,686,014,132,420,608` cells in total.
+<br/><small><i>(There's a task for de live editor app that creates a `2,100,000,000 * 1,000` sample table for quick development which only consumes about `17MB` of VMem and takes less than a second to generate.)</i></small>
+- No support implemented for `Mac` or `MS Office` versions previous to 2010.
 

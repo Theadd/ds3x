@@ -21,6 +21,8 @@ Public Property Get Tasks() As DictionaryEx: Set Tasks = pTasks: End Property
 Public Property Get AppExcelVisibilityAuto() As Boolean: AppExcelVisibilityAuto = False: End Property
 
 
+' --- DEBUG / DEV ---
+
 Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
     Dim Target As dsTable, rX As RecordsetEx
     Set Target = TargetTable
@@ -28,6 +30,34 @@ Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
     Set rX = RecordsetEx.Create(Target.NamedRecordset)
     Set AsRecordsetTable = pTaskController.AddResource(dsTable.Create(rX, True))
 End Function
+
+Public Function CreateMassiveTable() As dsTable
+    Dim dsT As dsTable, t() As Variant, a2X As Array2dEx, i As Long, sX As ArraySlice, aX As ArrayListEx, v As Variant, sgX As ArraySliceGroup
+    Dim NumRows As Long, NumRowSlices As Long, NumColumns As Long, r() As Byte
+    NumRows = 42000: NumRowSlices = 50000: NumColumns = 1000
+    ReDim r(0 To NumColumns - 1)
+    ReDim t(0 To NumRows - 1, 0 To 0)
+    
+    For i = 0 To NumRows - 1
+        t(i, 0) = i
+    Next i
+    Set a2X = New Array2dEx
+    a2X.Instance = MemoryLib.GetArrayByRef(t)
+    Set sX = ArraySlice.Create(a2X)
+    Set aX = New ArrayListEx
+    v = Array(0, NumRows)
+    For i = 0 To NumRowSlices - 1
+        aX.Add v
+    Next i
+    Set sX = sX.SliceAllRanges(aX)
+    Set sgX = New ArraySliceGroup
+    sgX.SliceGroups = Array(sX)
+    Set sgX = sgX.GetRange(, , r)
+    Set dsT = dsTable.Create(sgX)
+    Set CreateMassiveTable = pTaskController.AddResource(dsT)
+End Function
+
+' ---
 
 Public Function EnumerateRows(ByRef TargetTable As Variant, Optional ByVal FromNumber As Variant, Optional ByVal ToNumber As Variant) As dsTable
     Dim t() As Variant, i As Long, n As Long, Target As dsTable, FromNum As Long, ToNum As Long
@@ -53,51 +83,43 @@ Public Function EnumerateRows(ByRef TargetTable As Variant, Optional ByVal FromN
 End Function
 
 Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal ColumnName As Variant) As dsTable
-    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, e As Long, colIndexes As ArrayListEx
+    Dim Target As dsTable, e As Long, colIndexes As ArrayListEx
+    Dim sgX As ArraySliceGroup, sX As ArraySlice, v As Variant, cH As Variant, vItems As Variant
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     ColumnName = GetParam(ColumnName, "%1")
     
     Set Target = TargetTable
-    cH = Target.Headers.Row(0)
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
-    ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
+    Set sgX = ArraySliceGroup.Create(Target.Headers)
     
-    For i = 0 To Target.ColumnCount - 1
-        If colIndexes.Contains(i) Then
-            Set d = cH(i)
-            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("ColumnName", dsApp.ApplyCustomVarsOn(Printf(ColumnName, i, e, i + 1, e + 1))).Instance
-            e = e + 1
-        Else
-            Set d = cH(i)
-            Set t(0, i) = d
-        End If
-    Next i
+    For Each cH In colIndexes
+        v = sgX.SliceAt(CLng(cH)).Row(0)
+        vItems = Array(dsApp.ApplyCustomVarsOn(Printf(ColumnName, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 1), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
+        Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
+        e = e + 1
+    Next cH
     
-    Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
+    Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(sgX.Instance)
 End Function
 
 Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal NumberFormat As Variant) As dsTable
-    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, colIndexes As ArrayListEx, e As Long
+    Dim Target As dsTable, e As Long, colIndexes As ArrayListEx
+    Dim sgX As ArraySliceGroup, sX As ArraySlice, v As Variant, cH As Variant, vItems As Variant
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     NumberFormat = GetParam(NumberFormat, "General")
     
     Set Target = TargetTable
-    cH = Target.Headers.Row(0)
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
-    ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
+    Set sgX = ArraySliceGroup.Create(Target.Headers)
     
-    For i = 0 To Target.ColumnCount - 1
-        If colIndexes.Contains(i) Then
-            Set d = cH(i)
-            Set t(0, i) = DictionaryEx.Bind(d).Clone().Add("NumberFormat", dsApp.ApplyCustomVarsOn(Printf(NumberFormat, i, e, i + 1, e + 1))).Instance
-            e = e + 1
-        Else
-            Set d = cH(i)
-            Set t(0, i) = d
-        End If
-    Next i
+    For Each cH In colIndexes
+        v = sgX.SliceAt(CLng(cH)).Row(0)
+        vItems = Array(CollectionsLib.ArrayItem(v, 0), dsApp.ApplyCustomVarsOn(Printf(NumberFormat, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
+        Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
+        e = e + 1
+    Next cH
     
-    Set SetNumberFormat = dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t))
+    Set SetNumberFormat = dsTable.Create(Target.Records).SetHeaders(sgX.Instance)
 End Function
 
 'RecordsetEx.Filter("REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'")
@@ -244,36 +266,37 @@ Public Function HexToStringValues(ByRef TargetTable As Variant, Optional ByVal C
     Set HexToStringValues = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
 End Function
 
-Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer As Variant) As dsTable
-    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, dX As New DictionaryEx
-    Dim cb As Callback, dRepl As DictionaryEx
-    Set Target = TargetTable
-    
-    cH = Target.Headers.Row(0)
-    ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
-    
-    If TypeName(Replacer) Like "*Dictionary*" Then
-        Set dRepl = DictionaryEx.Create(Replacer)
-        For i = 0 To Target.ColumnCount - 1
-            Set d = cH(i)
-            Set dX = DictionaryEx.Bind(d).Clone()
-    
-            dX.Add "ColumnName", dRepl.GetValue(dX.Item("ColumnName"), dX.Item("ColumnName"))
-            Set t(0, i) = dX.Instance
-        Next i
-    Else
-        Set cb = Replacer
-        For i = 0 To Target.ColumnCount - 1
-            Set d = cH(i)
-            Set dX = DictionaryEx.Bind(d).Clone()
-    
-            dX.Add "ColumnName", cb.Execute(dX.Item("ColumnName")).Result
-            Set t(0, i) = dX.Instance
-        Next i
-    End If
-    
-    Set ReplaceColumnNames = pTaskController.AddResource(dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t)))
-End Function
+' TODO: Convert to the new dsTable.Headers implementation
+'Public Function ReplaceColumnNames(ByRef TargetTable As Variant, ByRef Replacer As Variant) As dsTable
+'    Dim t() As Variant, i As Long, cH As Variant, Target As dsTable, d As Scripting.Dictionary, dX As New DictionaryEx
+'    Dim cb As Callback, dRepl As DictionaryEx
+'    Set Target = TargetTable
+'
+'    cH = Target.Headers.Row(0)
+'    ReDim t(0 To 0, 0 To Target.ColumnCount - 1)
+'
+'    If TypeName(Replacer) Like "*Dictionary*" Then
+'        Set dRepl = DictionaryEx.Create(Replacer)
+'        For i = 0 To Target.ColumnCount - 1
+'            Set d = cH(i)
+'            Set dX = DictionaryEx.Bind(d).Clone()
+'
+'            dX.Add "ColumnName", dRepl.GetValue(dX.Item("ColumnName"), dX.Item("ColumnName"))
+'            Set t(0, i) = dX.Instance
+'        Next i
+'    Else
+'        Set cb = Replacer
+'        For i = 0 To Target.ColumnCount - 1
+'            Set d = cH(i)
+'            Set dX = DictionaryEx.Bind(d).Clone()
+'
+'            dX.Add "ColumnName", cb.Execute(dX.Item("ColumnName")).Result
+'            Set t(0, i) = dX.Instance
+'        Next i
+'    End If
+'
+'    Set ReplaceColumnNames = pTaskController.AddResource(dsTable.Create(Target.Records).SetHeaders(Array2dEx.Create(t)))
+'End Function
 
 Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
     Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant
@@ -792,7 +815,7 @@ Private Sub AddAllTasks()
                 "", _
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
             
-    AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
+    ' TODO: AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
     
     AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()"
     
@@ -804,9 +827,13 @@ Private Sub AddAllTasks()
 
     ' --- DATA SOURCE TASKS ---
     
-    AddTask "DataSource", "", TaskType:="DS", Requires:="*"
+    AddTask "DataSource", "", _
+            Description:="Provides an empty data source for programmatic use in code.", _
+            TaskType:="DS", Requires:="*"
     
-    AddTask "WorksheetSource", "", TaskType:="XS", Requires:="*"
+    AddTask "WorksheetSource", "", _
+            Description:="Provides an empty worksheet for programmatic use in code.", _
+            TaskType:="XS", Requires:="*"
     
     AddTask "LoadFromRange", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range, [FirstRowHasHeaders = True]: Boolean", TaskType:="DS", Requires:="X*"
     
@@ -857,7 +884,13 @@ Private Sub AddAllTasks()
     
     ' --- DEV / DEBUG ---
     
-    AddTask "AsRecordsetTable", "[Source]: Table", Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>"
+    AddTask "AsRecordsetTable", "[Source]: Table", _
+            Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>", _
+            TaskType:="DBG", Requires:="*"
+    
+    AddTask "CreateMassiveTable", "", _
+            Description:="Quickly provides a new Table generated with <b>2.100.000.000</b> rows * <b>1.000</b> columns of sample data.", _
+            TaskType:="DBG", Requires:="*"
     
 End Sub
 

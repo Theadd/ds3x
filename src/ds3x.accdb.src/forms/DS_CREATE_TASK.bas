@@ -23,7 +23,7 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =3225
+    Left =4770
     Top =3030
     Right =28545
     Bottom =15225
@@ -1330,6 +1330,7 @@ Private Function GetTaskTypeHeader(ByVal TaskType As String) As Variant
         Case "DS": Title = "DATA SOURCES"
         Case "T": Title = "TRANSFORMATION"
         Case "DSG": Title = "GENERATION"
+        Case "DBG": Title = "DEV / DEBUG"
         Case Else
             GetTaskTypeHeader = Array(IndexCountdown, " ", 4)
             Exit Function
@@ -1759,7 +1760,7 @@ Private Function GetSelectedColumnNumberFormat() As String
     End With
     
     If cIndexValid Then
-        GetSelectedColumnNumberFormat = pController.Table.Headers.Row(0)(cIndex)("NumberFormat")
+        GetSelectedColumnNumberFormat = CollectionsLib.ArrayItem(pController.Table.Headers.Row(0)(cIndex), 1, "General")
     End If
 Finally:
 End Function
