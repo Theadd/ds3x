@@ -21,7 +21,7 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =4770
+    Left =3225
     Top =3030
     Right =28545
     Bottom =15225
@@ -798,6 +798,12 @@ Private pLowScrollModY As Long
 Private pScrollFactorPosX As Double
 Private pScrollFactorPosY As Double
 Private pWorksheetHeadersSizeY As Long
+Private pIsScrollXQueueListening As Boolean
+Private pIsScrollXQueueTriggering As Boolean
+Private pIsScrollXInQueue As Boolean
+Private pIsScrollYQueueListening As Boolean
+Private pIsScrollYQueueTriggering As Boolean
+Private pIsScrollYInQueue As Boolean
 
 Private pViewport As Form_DS_VIEWPORT
 Private pViewportSticky As Form_DS_VIEWPORT_STICKY
@@ -848,11 +854,6 @@ Public Property Set ViewportSticky(ByRef Value As Form_DS_VIEWPORT_STICKY): Set 
 Public Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
 
-'Public Property Get ScrollbarX() As Long: ScrollbarX = Nz(Me.SCROLLBAR_X, 0): End Property
-'Public Property Let ScrollbarX(ByVal Value As Long): On Error Resume Next: Me.SCROLLBAR_X = Value: End Property
-'Public Property Get ScrollbarY() As Long: ScrollbarY = Nz(Me.SCROLLBAR_Y, 0): End Property
-'Public Property Let ScrollbarY(ByVal Value As Long): On Error Resume Next: Me.SCROLLBAR_Y = Value: End Property
-
 Public Property Get OutOfBoundsScrollX() As Long: OutOfBoundsScrollX = pOutOfBoundsScrollX: End Property
 Public Property Let OutOfBoundsScrollX(ByVal Value As Long): pOutOfBoundsScrollX = Value: End Property
 Public Property Get OutOfBoundsScrollY() As Long: OutOfBoundsScrollY = pOutOfBoundsScrollY: End Property
@@ -899,6 +900,45 @@ Fallback:
     pLowScrollModX = nMod
 End Property
 
+Private Sub QueueDelayedScrollX()
+    On Error Resume Next
+    If pIsScrollXQueueListening Then pIsScrollXInQueue = True
+    If pIsScrollXInQueue Then
+        If pIsScrollXQueueTriggering Then
+            Do While pIsScrollXInQueue
+                pIsScrollXQueueTriggering = False
+                pIsScrollXQueueListening = False
+                DoEvents
+                pIsScrollXQueueListening = True
+                pIsScrollXInQueue = False
+                ApplyScrollbarX
+                DoEvents
+            Loop
+            pIsScrollXQueueTriggering = True
+            pIsScrollXQueueListening = True
+        End If
+    End If
+End Sub
+
+Private Sub QueueDelayedScrollY()
+    On Error Resume Next
+    If pIsScrollYQueueListening Then pIsScrollYInQueue = True
+    If pIsScrollYInQueue Then
+        If pIsScrollYQueueTriggering Then
+            Do While pIsScrollYInQueue
+                pIsScrollYQueueTriggering = False
+                pIsScrollYQueueListening = False
+                DoEvents
+                pIsScrollYQueueListening = True
+                pIsScrollYInQueue = False
+                ApplyScrollbarY
+                DoEvents
+            Loop
+            pIsScrollYQueueTriggering = True
+            pIsScrollYQueueListening = True
+        End If
+    End If
+End Sub
 
 ' --- FORM EVENTS ---
 
@@ -909,6 +949,10 @@ Private Sub Form_Load()
     pLastScrollY = Array(0, 0)
     pScrollFactorPosX = 1
     pScrollFactorPosY = 1
+    pIsScrollYQueueListening = True
+    pIsScrollYQueueTriggering = True
+    pIsScrollXQueueListening = True
+    pIsScrollXQueueTriggering = True
     Set pSelectedColumns = ArrayListEx.Create()
     Set pSelectedRows = ArrayListEx.Create()
     Setup
@@ -1088,18 +1132,16 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     sAxisX = IIf(GetAsyncKeyState(vbKeyControl) And GetAsyncKeyState(vbKeyControl), Not sAxisX, sAxisX)
     
     If sAxisX Then
-'        ApplyScrollbarX CDbl(ScrollPosX + CDbl(Count * sMod * Me.SCROLLBAR_X.SmallChange))
         ScrollPosX = ScrollPosX + CDbl(Count * sMod * Fix(CDbl(Worksheet.GridCellSizeX) / 5#))
     Else
-'        ApplyScrollbarY CDbl(ScrollPosY + CDbl(Count * sMod * Me.SCROLLBAR_Y.SmallChange))
         ScrollPosY = ScrollPosY + CDbl(Count * sMod * Worksheet.GridCellSizeY)
     End If
 End Function
 
-Private Sub SCROLLBAR_X_Change(): ApplyScrollbarX: End Sub
-Private Sub SCROLLBAR_X_Scroll(): ApplyScrollbarX: End Sub
-Private Sub SCROLLBAR_Y_Change(): ApplyScrollbarY: End Sub
-Private Sub SCROLLBAR_Y_Scroll(): ApplyScrollbarY: End Sub
+Private Sub SCROLLBAR_X_Change(): QueueDelayedScrollX: End Sub
+Private Sub SCROLLBAR_X_Scroll(): QueueDelayedScrollX: End Sub
+Private Sub SCROLLBAR_Y_Change(): QueueDelayedScrollY: End Sub
+Private Sub SCROLLBAR_Y_Scroll(): QueueDelayedScrollY: End Sub
 
 Public Sub ApplyScrollbarY(Optional ByVal Value As Variant, Optional ByVal ExplicitCall As Boolean = False)
     If (Not Me.SCROLLBAR_Y.Visible) Or (Not pInitialized) Then Exit Sub
@@ -1184,18 +1226,12 @@ End Sub
 
 Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)
     If Not Me.SCROLLBAR_Y.Visible Then Exit Sub
-    Dim yMax As Long, cellSizeY As Long, nMod As Double, nY As Double
+    Dim yMax As Long, cellSizeY As Long, nY As Double
 
     cellSizeY = Worksheet.GridCellSizeY
     pScrollPageSizeY = CLng(Int((Me.InsideHeight - 270) / cellSizeY)) * cellSizeY
     pMaxContentSizeY = CDbl(pTable.Count * CDbl(cellSizeY)) + CDbl(pWorksheetHeadersSizeY)
-    
-    nMod = IIf(pMaxContentSizeY + CDbl(OutOfBoundsScrollY) > 2 ^ 30, 1000, 1)
-    If nMod <> pScrollFactorPosY Then
-        ' TODO: check it
-        pScrollFactorPosY = nMod
-    End If
-    
+    pScrollFactorPosY = IIf(pMaxContentSizeY + CDbl(OutOfBoundsScrollY) > 2 ^ 30, 1000, 1)
     yMax = CLng(Fix(Max((pMaxContentSizeY + CDbl(OutOfBoundsScrollY)) - CDbl(Me.InsideHeight - 270), 0) / pScrollFactorPosY))
     
     With Me.SCROLLBAR_Y
@@ -1221,20 +1257,13 @@ Private Sub UpdateScrollbarX(Optional ByVal ExplicitCall As Boolean = False)
     '|________________________________________|
     '                                         * Viewport.ViewportContentFullWidth
     
-    Dim xMax As Long, cellSizeX As Long, viewSizeX As Long, nMod As Double, nX As Double
+    Dim xMax As Long, cellSizeX As Long, viewSizeX As Long, nX As Double
     
     viewSizeX = Me.InsideWidth - 270 - Me.DS_VIEWPORT.Left
     cellSizeX = Worksheet.GridCellSizeX
     pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
-    
     pMaxContentSizeX = Max(CDbl(pTable.ColumnCount * CDbl(cellSizeX)), viewSizeX)
-    
-    nMod = IIf(pMaxContentSizeX + CDbl(OutOfBoundsScrollX) > 2 ^ 30, 20000, 1)
-    If nMod <> pScrollFactorPosX Then
-        ' TODO: check it
-        pScrollFactorPosX = nMod
-    End If
-    
+    pScrollFactorPosX = IIf(pMaxContentSizeX + CDbl(OutOfBoundsScrollX) > 2 ^ 30, 20000, 1)
     xMax = CLng(Fix(Max((pMaxContentSizeX + CDbl(OutOfBoundsScrollX)) - CDbl(viewSizeX), 0) / pScrollFactorPosX))
 
     With Me.SCROLLBAR_X
