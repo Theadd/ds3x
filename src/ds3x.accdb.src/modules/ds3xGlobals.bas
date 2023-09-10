@@ -6,13 +6,11 @@ Option Base 0
 
 ' --- ACCESS WINDOW HIDE / SHOW ---
 
-Global Const SW_HIDE = 0
-Global Const SW_SHOWNORMAL = 1
-Global Const SW_SHOWMINIMIZED = 2
-Global Const SW_SHOWMAXIMIZED = 3
-Global Const SW_SHOW = 5
-'Forces a top-level window onto the taskbar when the window is visible.
-Public Const WS_EX_APPWINDOW As Long = &H40000
+Public Const SW_HIDE = 0
+Public Const SW_SHOWNORMAL = 1
+Public Const SW_SHOWMINIMIZED = 2
+Public Const SW_SHOWMAXIMIZED = 3
+Public Const SW_SHOW = 5
 
 
 ' --- ScreenLib Types ---
@@ -34,34 +32,6 @@ Public Type BOUNDS
     Y As Long
     W As Long
     h As Long
-End Type
-
-
-' --- MemoryLib Types ---
-
-Public Type REMOTE_MEMORY
-    memValue As Variant
-    remoteVT As Variant
-    isInitialized As Boolean
-End Type
-
-Public Type SAFEARRAYBOUND
-    cElements As Long
-    lLbound As Long
-End Type
-
-Public Type SAFEARRAY_1D
-    cDims As Integer
-    fFeatures As Integer
-    cbElements As Long
-    cLocks As Long
-    #If Win64 Then
-        dummyPadding As Long
-        pvData As LongLong
-    #Else
-        pvData As Long
-    #End If
-    rgsabound0 As SAFEARRAYBOUND
 End Type
 
 

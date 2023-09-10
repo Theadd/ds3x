@@ -56,6 +56,8 @@ Private Declare PtrSafe Function LockWindowUpdate Lib "user32" (ByVal hWndLock A
 Private Const LOGPIXELSX As Long = 88   ' Pixels per logical inch in X
 Private Const LOGPIXELSY As Long = 90   ' Pixels per logical inch in Y
 Private Const TWIPSPERINCH As Long = 1440
+'Forces a top-level window onto the taskbar when the window is visible.
+Private Const WS_EX_APPWINDOW As Long = &H40000
 
 Private Const GW_HWNDNEXT = 2
 Private Const GW_CHILD = 5
