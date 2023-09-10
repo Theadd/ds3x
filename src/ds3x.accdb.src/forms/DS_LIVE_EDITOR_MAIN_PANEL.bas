@@ -24,10 +24,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -461,7 +461,7 @@ Private Sub SetController(ByVal TargetController As dsLiveEd)
     Me.DS_JSON_TASK_EDITOR.Visible = True
     Me.DS_SCROLLVIEW.Visible = True
     Me.DS_SCROLLVIEW.Form.EnableOutOfRangeScrolling = True
-    Me.DS_SCROLLVIEW.Form.InvertScrollInputAxis = True
+    ' Me.DS_SCROLLVIEW.Form.InvertScrollInputAxis = True
     Me.DS_SCROLLVIEW.Form.KeepScrollPositionOnTableChange = True
     Rebuild
 End Sub

@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 '@PredeclaredId
 Option Compare Database
 Option Explicit
@@ -206,4 +207,3 @@ Private Sub Class_Initialize()
 End Sub
 
 Public Sub Debugger(): Stop: End Sub
-
