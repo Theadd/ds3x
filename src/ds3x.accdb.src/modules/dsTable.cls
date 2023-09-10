@@ -26,7 +26,7 @@ End Property
 Public Property Get ColumnCount() As Long
     On Error Resume Next
     ColumnCount = Records.ColumnCount
-    ColumnCount = Headers.ColumnCount
+    ColumnCount = pHeaders.ColumnCount
 End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
@@ -42,7 +42,7 @@ Public Property Get Instance() As Scripting.Dictionary
         .Instance
 End Property
 
-Public Property Get Headers() As ICollectionEx: Set Headers = pHeaders: End Property
+Public Property Get Headers() As ICollectionEx: MakeSureHeadersExist: Set Headers = pHeaders: End Property
 Public Property Get Records() As ICollectionEx: Set Records = pRecords: End Property
 
 Public Property Get IndexRecordset(Optional ByVal PageSize As Variant, Optional ByVal PageIndex As Variant) As ADODB.Recordset: Set IndexRecordset = CreateIndexRecordset(PageSize, PageIndex): End Property
@@ -239,20 +239,18 @@ Finally:
 End Function
 
 Private Sub ApplyFormatToExcelRange(ByVal RangeObject As Excel.Range, ByVal RangeHasHeaders As Boolean)
-    Dim r As Excel.Range, i As Long, iX As Variant, dX As DictionaryEx
+    Dim r As Excel.Range, i As Long, iX As Variant
     
     If RangeHasHeaders Then
         Set r = RangeObject.Range("A2").Resize(Count, ColumnCount)
     Else
         Set r = RangeObject.Range("A1").Resize(Count, ColumnCount)
     End If
-    
-    Set dX = DictionaryEx.Create()
+
     iX = Headers.Row(0)
     For i = 0 To UBound(iX)
-        dX.Bind iX(i)
-        If dX("NumberFormat") <> "General" Then
-            r.Columns(i + 1).NumberFormat = dX("NumberFormat")
+        If CollectionsLib.ArrayItem(iX(i), 0, "General") <> "General" Then
+            r.Columns(i + 1).NumberFormat = CollectionsLib.ArrayItem(iX(i), 1, "@")
         End If
     Next i
 End Sub
@@ -269,47 +267,49 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
 End Function
 
 
-Public Function CreateColumnHeader(ByVal ColumnName As String, Optional ByVal NumberFormat As String = "General", Optional ByVal DataType As String = "", Optional ByVal MaxSize As Long = -1) As Scripting.Dictionary
-    Dim d As New Scripting.Dictionary
-    d("ColumnName") = ColumnName
-    d("NumberFormat") = NumberFormat
-    d("DataType") = DataType
-    d("MaxSize") = MaxSize
-    Set CreateColumnHeader = d
+Public Function CreateColumnHeader(Optional ByVal ColumnName As Variant, Optional ByVal NumberFormat As Variant, Optional ByVal DataType As Variant, Optional ByVal MaxSize As Variant) As Variant
+    ' "General", "", -1
+    CreateColumnHeader = Array(ColumnName, NumberFormat, DataType, MaxSize)
+'    Dim d As New Scripting.Dictionary
+'    d("ColumnName") = ColumnName
+'    d("NumberFormat") = NumberFormat
+'    d("DataType") = DataType
+'    d("MaxSize") = MaxSize
+'    Set CreateColumnHeader = d
 End Function
 
-Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.Field) As Scripting.Dictionary
-    Dim d As Scripting.Dictionary
+Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.Field) As Variant
+    Dim d As Variant
     
     With TargetField
         Select Case .Type
             Case adVarChar
-                Set d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
+                d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
             Case adVarWChar
                 If .DefinedSize = 10 Then
-                    Set d = CreateColumnHeader(Nz(.Name), DataType:="Date", MaxSize:=10)
+                    d = CreateColumnHeader(Nz(.Name), DataType:="Date", MaxSize:=10)
                 Else
-                    Set d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
+                    d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
                 End If
             Case adInteger, adBigInt, adSmallInt, adTinyInt, adUnsignedBigInt, adUnsignedInt, adUnsignedSmallInt, adUnsignedTinyInt
-                Set d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
             Case adNumeric
                 If .NumericScale < 16 And .NumericScale > 0 Then
-                    Set d = CreateColumnHeader(Nz(.Name), NumberFormat:="0." & String(.NumericScale, "0"), DataType:="Numeric")
+                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="0." & String(.NumericScale, "0"), DataType:="Numeric")
                 Else
-                    Set d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
+                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
                 End If
             Case adCurrency
-                Set d = CreateColumnHeader(Nz(.Name), NumberFormat:="0.00", DataType:="Currency")
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="0.00", DataType:="Currency")
             Case adDBTimeStamp
-                Set d = CreateColumnHeader(Nz(.Name), DataType:="DateTime") ' , MaxSize:=.DefinedSize
+                d = CreateColumnHeader(Nz(.Name), DataType:="DateTime") ' , MaxSize:=.DefinedSize
             Case adLongVarChar, adLongVarWChar
-                Set d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=-1)
+                d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=-1)
             Case Else
-                Set d = CreateColumnHeader(Nz(.Name))
+                d = CreateColumnHeader(Nz(.Name))
         End Select
         
-        Set CreateColumnHeaderFromRecordsetField = d
+        CreateColumnHeaderFromRecordsetField = d
     End With
 End Function
 
@@ -489,7 +489,7 @@ Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Opti
     sLimit = IIf(ColumnCount - FirstColumnIndex < GetCount, ColumnCount - FirstColumnIndex, GetCount)
     
     For c = 0 To sLimit - 1
-        t(c) = CStr(hItems(c + FirstColumnIndex)("ColumnName"))
+        t(c) = CStr(CollectionsLib.ArrayItem(hItems(c + FirstColumnIndex), 0, vbNullString))
     Next c
     If sLimit < 0 Then sLimit = 0
     For c = sLimit To GetCount - 1
@@ -507,7 +507,7 @@ Private Function CreateColumnHeadersFromRecordsetFields(ByVal AllFields As ADODB
     ReDim t(0 To 0, 0 To AllFields.Count - 1)
     
     For i = 0 To AllFields.Count - 1
-        Set t(0, i) = CreateColumnHeaderFromRecordsetField(AllFields(i))
+        t(0, i) = CreateColumnHeaderFromRecordsetField(AllFields(i))
     Next i
 
     Set CreateColumnHeadersFromRecordsetFields = New Array2dEx
@@ -526,21 +526,32 @@ Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Ra
     For i = 0 To UBound(cFormats)
         Select Case UCase(Left(CStr(cFormats(i)(0)), 1))
             Case "G"
-                Set t(0, i) = CreateColumnHeader(cNames(i))
+                t(0, i) = CreateColumnHeader(cNames(i))
             Case "0", "#"
-                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Numeric")
+                t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Numeric")
             Case "@"
-                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Text")
+                t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Text")
             Case "D", "M", "Y", "H"
-                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Date")
+                t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0), DataType:="Date")
             Case Else
-                Set t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0))
+                t(0, i) = CreateColumnHeader(cNames(i), NumberFormat:=cFormats(i)(0))
         End Select
     Next i
 
     Set CreateColumnHeadersFromExcelRange = New Array2dEx
     CreateColumnHeadersFromExcelRange.Instance = CollectionsLib.GetArrayByRef(t)
 End Function
+
+Private Sub MakeSureHeadersExist()
+    If Not pHeaders Is Nothing Then Exit Sub
+    Dim t() As Variant, i As Long
+    
+    ReDim t(0 To 0, 0 To ColumnCount - 1)
+    For i = 0 To ColumnCount - 1
+        t(0, i) = Array()
+    Next i
+    SetHeaders Array2dEx.Create(t)
+End Sub
 
 
 ' --- TYPE CASTING ---

@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =5280
+    Top =3675
+    Right =8460
+    Bottom =6210
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -437,12 +437,6 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private Declare PtrSafe Function SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As LongPtr, ByVal wMsg As Long, ByVal wParam As LongPtr, lParam As Any) As LongPtr
-
-Private Const WM_VSCROLL = &H115
-Private Const SB_LINEUP = 0
-Private Const SB_LINEDOWN = 1
-Private Const SB_TOP = 6
 
 Private pWorksheet As Form_DS_WORKSHEET
 Private pWorksheetHeaders As Form_DS_WORKSHEET_HEADERS
@@ -456,8 +450,8 @@ Const PageSize As Long = 10
 Const PageCount As Long = 10
 
 Private Type TViewportState
-    ScrollPosX As Long
-    ScrollPosY As Long
+    ScrollPosX As Double
+    ScrollPosY As Double
     ' Index of current visible track in Viewport
     TrackIndex As Long
     ' Index of current visible page in Viewport
@@ -485,12 +479,6 @@ End Type
 Private this As TViewportState
 
 ' ---
-
-Private pScrollX As Long
-Private pScrollY As Long
-
-Private pScrollModX As Long
-Private pScrollModY As Long
 
 Public Property Get Worksheet() As Form_DS_WORKSHEET: Set Worksheet = pWorksheet: End Property
 Public Property Set Worksheet(ByRef Value As Form_DS_WORKSHEET): Set pWorksheet = Value: End Property
@@ -562,7 +550,7 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     pScrollview.PropagateMouseWheel Page, Count
 End Function
 
-Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
+Public Sub ScrollTo(ByVal X As Double, ByVal Y As Double)
     Dim sView As TViewportState
     sView = GetViewportStateAt(X, Y)
     
@@ -592,7 +580,7 @@ End Sub
 
 ' --- STATE MANAGEMENT ---
 
-Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewportState
+Private Function GetViewportStateAt(ByVal X As Double, ByVal Y As Double) As TViewportState
     Dim t As TViewportState, maxTrackWidth As Long, cellWidth As Long, viewWidth As Long, cellHeight As Long
     
     t.ScrollPosX = X
@@ -605,11 +593,11 @@ Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewpo
     
     t.ColumnsToLargeChangeTrack = Max(CLng((maxTrackWidth - viewWidth) / cellWidth) - 1, 1)
     
-    t.FirstVisibleColumn = CLng(Int(X / cellWidth))
-    t.FirstVisibleRow = CLng(Int(Y / cellHeight))
-    t.FirstVisibleColumnPositionModX = X Mod cellWidth
-    t.FirstVisibleRowPositionModY = Y Mod cellHeight
-    t.TrackIndex = CLng(Int(X / (cellWidth * t.ColumnsToLargeChangeTrack)))
+    t.FirstVisibleColumn = CLng(Int(X / CDbl(cellWidth)))
+    t.FirstVisibleRow = CLng(Int(Y / CDbl(cellHeight)))
+    t.FirstVisibleColumnPositionModX = CLng(ModFunc(X, CDbl(cellWidth)))
+    t.FirstVisibleRowPositionModY = CLng(ModFunc(Y, CDbl(cellHeight)))
+    t.TrackIndex = CLng(Int(X / CDbl(cellWidth * t.ColumnsToLargeChangeTrack)))
     t.PageIndex = CLng(Int(t.FirstVisibleRow / (PageSize * NumPagesInLargeChangeRows)))
     t.FirstVisibleColumnInTrack = t.FirstVisibleColumn - (t.ColumnsToLargeChangeTrack * t.TrackIndex)
     t.FirstVisibleRowInPage = t.FirstVisibleRow - (t.PageIndex * PageSize * NumPagesInLargeChangeRows)
@@ -619,49 +607,49 @@ Private Function GetViewportStateAt(ByVal X As Long, ByVal Y As Long) As TViewpo
     GetViewportStateAt = t
 End Function
 
-Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Long
-    Dim cellWidth As Long, viewWidth As Long, curViewMinX As Long, curViewMaxX As Long
-    Dim targetCellMinX As Long, targetCellMaxX As Long, X As Long
+Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Double
+    Dim cellWidth As Long, viewWidth As Long, curViewMinX As Double, curViewMaxX As Double
+    Dim targetCellMinX As Double, targetCellMaxX As Double, X As Double
     
     cellWidth = Worksheet.GridCellSizeX
     viewWidth = Scrollview.ScrollPageSizeX
     
-    X = cellWidth * ColumnIndex
-    targetCellMinX = Max(X - cellWidth, 0)
-    targetCellMaxX = X + (3 * cellWidth)
+    X = CDbl(cellWidth) * CDbl(ColumnIndex)
+    targetCellMinX = Max(X - CDbl(cellWidth), 0)
+    targetCellMaxX = X + CDbl(3 * cellWidth)
     
     curViewMinX = this.ScrollPosX
-    curViewMaxX = curViewMinX + viewWidth
+    curViewMaxX = curViewMinX + CDbl(viewWidth)
     
     X = this.ScrollPosX
     If curViewMinX > targetCellMinX Then
         X = targetCellMinX
     ElseIf curViewMaxX < targetCellMaxX Then
-        X = targetCellMaxX - viewWidth
+        X = targetCellMaxX - CDbl(viewWidth)
     End If
     
     GetScrollXTo = X
 End Function
 
-Public Function GetScrollYTo(ByVal RowIndex As Long) As Long
-    Dim cellHeight As Long, viewHeight As Long, curViewMinY As Long, curViewMaxY As Long
-    Dim targetCellMinY As Long, targetCellMaxY As Long, Y As Long
+Public Function GetScrollYTo(ByVal RowIndex As Long) As Double
+    Dim cellHeight As Long, viewHeight As Long, curViewMinY As Double, curViewMaxY As Double
+    Dim targetCellMinY As Double, targetCellMaxY As Double, Y As Double
     
     cellHeight = Worksheet.GridCellSizeY
     viewHeight = Scrollview.ScrollPageSizeY
     
-    Y = cellHeight * RowIndex
-    targetCellMinY = Max(Y - cellHeight, 0)
-    targetCellMaxY = Y + (3 * cellHeight)
+    Y = CDbl(cellHeight) * CDbl(RowIndex)
+    targetCellMinY = Max(Y - CDbl(cellHeight), 0)
+    targetCellMaxY = Y + CDbl(3 * cellHeight)
     
     curViewMinY = this.ScrollPosY
-    curViewMaxY = curViewMinY + viewHeight
+    curViewMaxY = curViewMinY + CDbl(viewHeight)
     
     Y = this.ScrollPosY
     If curViewMinY > targetCellMinY Then
         Y = targetCellMinY
     ElseIf curViewMaxY < targetCellMaxY Then
-        Y = targetCellMaxY - viewHeight
+        Y = targetCellMaxY - CDbl(viewHeight)
     End If
     
     GetScrollYTo = Y
@@ -674,9 +662,9 @@ Public Sub OnSourceTableChange()
     Else
         On Error GoTo Finally
         pScrollview.IgnoreScrollingEvents = True
-        pScrollview.ScrollbarX = 0
-        pScrollview.ScrollbarY = 0
-        ScrollTo 0, 0
+        pScrollview.ScrollPosX = 0#
+        pScrollview.ScrollPosY = 0#
+        ScrollTo 0#, 0#
 Finally:
         pScrollview.IgnoreScrollingEvents = False
     End If
@@ -721,6 +709,7 @@ End Function
 
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
+Private Function ModFunc(X As Variant, Y As Variant) As Variant: ModFunc = X - (Fix(X / Y) * Y): End Function
 
 
 ' --- DEBUG ---

@@ -21,7 +21,7 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =3225
+    Left =4770
     Top =3030
     Right =28545
     Bottom =15225
@@ -791,6 +791,14 @@ Private pCapturedPointerPosition As ds3xGlobals.POINTAPI
 Private pScrollSpeedMultiplier As Long
 Private pIgnoreScrollingEvents As Boolean
 
+Private pMaxContentSizeX As Double
+Private pMaxContentSizeY As Double
+Private pLowScrollModX As Long
+Private pLowScrollModY As Long
+Private pScrollFactorPosX As Double
+Private pScrollFactorPosY As Double
+Private pWorksheetHeadersSizeY As Long
+
 Private pViewport As Form_DS_VIEWPORT
 Private pViewportSticky As Form_DS_VIEWPORT_STICKY
 Private WithEvents pWorksheet As Form_DS_WORKSHEET
@@ -840,10 +848,10 @@ Public Property Set ViewportSticky(ByRef Value As Form_DS_VIEWPORT_STICKY): Set 
 Public Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
 
-Public Property Get ScrollbarX() As Long: ScrollbarX = Nz(Me.SCROLLBAR_X, 0): End Property
-Public Property Let ScrollbarX(ByVal Value As Long): On Error Resume Next: Me.SCROLLBAR_X = Value: End Property
-Public Property Get ScrollbarY() As Long: ScrollbarY = Nz(Me.SCROLLBAR_Y, 0): End Property
-Public Property Let ScrollbarY(ByVal Value As Long): On Error Resume Next: Me.SCROLLBAR_Y = Value: End Property
+'Public Property Get ScrollbarX() As Long: ScrollbarX = Nz(Me.SCROLLBAR_X, 0): End Property
+'Public Property Let ScrollbarX(ByVal Value As Long): On Error Resume Next: Me.SCROLLBAR_X = Value: End Property
+'Public Property Get ScrollbarY() As Long: ScrollbarY = Nz(Me.SCROLLBAR_Y, 0): End Property
+'Public Property Let ScrollbarY(ByVal Value As Long): On Error Resume Next: Me.SCROLLBAR_Y = Value: End Property
 
 Public Property Get OutOfBoundsScrollX() As Long: OutOfBoundsScrollX = pOutOfBoundsScrollX: End Property
 Public Property Let OutOfBoundsScrollX(ByVal Value As Long): pOutOfBoundsScrollX = Value: End Property
@@ -859,6 +867,38 @@ Public Property Let PointerCapture(ByVal Value As Boolean): SetPointerCapture Va
 Friend Property Get IgnoreScrollingEvents() As Boolean: IgnoreScrollingEvents = pIgnoreScrollingEvents: End Property
 Friend Property Let IgnoreScrollingEvents(ByVal Value As Boolean): pIgnoreScrollingEvents = Value: End Property
 
+Public Property Get ScrollPosY() As Double
+    ScrollPosY = (CDbl(Nz(Me.SCROLLBAR_Y, 0)) * pScrollFactorPosY) + pLowScrollModY
+End Property
+
+Public Property Let ScrollPosY(ByVal Value As Double)
+    Dim t As Double, nMod As Double
+    nMod = pLowScrollModY
+    t = CDbl(Fix(Value / pScrollFactorPosY))
+    On Error GoTo Fallback
+    pLowScrollModY = CLng(Value - (t * pScrollFactorPosY))
+    Me.SCROLLBAR_Y = CLng(t)
+    Exit Property
+Fallback:
+    pLowScrollModY = nMod
+End Property
+
+Public Property Get ScrollPosX() As Double
+    ScrollPosX = (CDbl(Nz(Me.SCROLLBAR_X, 0)) * pScrollFactorPosX) + pLowScrollModX
+End Property
+
+Public Property Let ScrollPosX(ByVal Value As Double)
+    Dim t As Double, nMod As Double
+    nMod = pLowScrollModX
+    t = CDbl(Fix(Value / pScrollFactorPosX))
+    On Error GoTo Fallback
+    pLowScrollModX = CLng(Value - (t * pScrollFactorPosX))
+    Me.SCROLLBAR_X = CLng(t)
+    Exit Property
+Fallback:
+    pLowScrollModX = nMod
+End Property
+
 
 ' --- FORM EVENTS ---
 
@@ -867,6 +907,8 @@ Private Sub Form_Load()
     pScrollSpeedMultiplier = 1
     pLastScrollX = Array(0, 0)
     pLastScrollY = Array(0, 0)
+    pScrollFactorPosX = 1
+    pScrollFactorPosY = 1
     Set pSelectedColumns = ArrayListEx.Create()
     Set pSelectedRows = ArrayListEx.Create()
     Setup
@@ -887,7 +929,7 @@ Private Sub Form_Resize()
         pIgnoreScrollingEvents = True
         UpdateScrollbarX False
         UpdateScrollbarY False
-        Viewport.ScrollTo ScrollbarX, ScrollbarY
+        Viewport.ScrollTo ScrollPosX, ScrollPosY
 Finally:
         On Error Resume Next
         pIgnoreScrollingEvents = False
@@ -932,6 +974,7 @@ Private Sub Setup()
     pViewport.Setup
     Set Worksheet = pViewport.Worksheet
     Set WorksheetHeaders = pViewport.WorksheetHeaders
+    pWorksheetHeadersSizeY = pViewport.FormHeaders.Height
 End Sub
 
 Private Sub SetTable(ByRef Value As dsTable)
@@ -1025,10 +1068,10 @@ Private Sub ScrollUsingLastCapturedPointerPosition()
     X = p.X - pCapturedPointerPosition.X
     Y = p.Y - pCapturedPointerPosition.Y
     ScreenLib.SetCursorPosition pCapturedPointerPosition
-    ScrollTo Max(Me.SCROLLBAR_X.Value + (X * pScrollSpeedMultiplier), 0), Max(Me.SCROLLBAR_Y.Value + (Y * pScrollSpeedMultiplier), 0)
+    ScrollTo CDbl(Max(ScrollPosX + CDbl(X * pScrollSpeedMultiplier), 0)), CDbl(Max(ScrollPosY + CDbl(Y * pScrollSpeedMultiplier), 0))
 End Sub
 
-Public Sub ScrollTo(ByVal X As Long, ByVal Y As Long)
+Public Sub ScrollTo(ByVal X As Double, ByVal Y As Double)
     On Error GoTo Finally
     pIgnoreScrollingEvents = True
     ApplyScrollbarX X
@@ -1042,12 +1085,14 @@ Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     sAxisX = pInvertScrollInputAxis
     
     sMod = IIf(GetAsyncKeyState(vbKeyShift), 3, 1)
-    sAxisX = IIf(GetAsyncKeyState(vbKeyControl), Not sAxisX, sAxisX)
+    sAxisX = IIf(GetAsyncKeyState(vbKeyControl) And GetAsyncKeyState(vbKeyControl), Not sAxisX, sAxisX)
     
     If sAxisX Then
-        ApplyScrollbarX CLng(Me.SCROLLBAR_X.Value + (Count * sMod * Me.SCROLLBAR_X.SmallChange))
+'        ApplyScrollbarX CDbl(ScrollPosX + CDbl(Count * sMod * Me.SCROLLBAR_X.SmallChange))
+        ScrollPosX = ScrollPosX + CDbl(Count * sMod * Fix(CDbl(Worksheet.GridCellSizeX) / 5#))
     Else
-        ApplyScrollbarY CLng(Me.SCROLLBAR_Y.Value + (Count * sMod * Me.SCROLLBAR_Y.SmallChange))
+'        ApplyScrollbarY CDbl(ScrollPosY + CDbl(Count * sMod * Me.SCROLLBAR_Y.SmallChange))
+        ScrollPosY = ScrollPosY + CDbl(Count * sMod * Worksheet.GridCellSizeY)
     End If
 End Function
 
@@ -1056,12 +1101,14 @@ Private Sub SCROLLBAR_X_Scroll(): ApplyScrollbarX: End Sub
 Private Sub SCROLLBAR_Y_Change(): ApplyScrollbarY: End Sub
 Private Sub SCROLLBAR_Y_Scroll(): ApplyScrollbarY: End Sub
 
-Public Sub ApplyScrollbarY(Optional ByVal yVal As Variant, Optional ByVal ExplicitCall As Boolean = False)
+Public Sub ApplyScrollbarY(Optional ByVal Value As Variant, Optional ByVal ExplicitCall As Boolean = False)
     If (Not Me.SCROLLBAR_Y.Visible) Or (Not pInitialized) Then Exit Sub
-    Dim rawMax As Long
+    Dim rawMax As Long, yVal As Double, nY As Double
     
     With Me.SCROLLBAR_Y
-        If IsMissing(yVal) Then yVal = .Value
+        nY = ScrollPosY
+        yVal = CDbl(IIf(IsMissing(Value), nY, CDbl(Value)) / pScrollFactorPosY)
+        If IsMissing(Value) Then Value = nY
         If yVal < 0 Then yVal = 0
         rawMax = .Max - pOutOfBoundsScrollY
         If yVal > .Max Then
@@ -1077,25 +1124,28 @@ Public Sub ApplyScrollbarY(Optional ByVal yVal As Variant, Optional ByVal Explic
             If pOutOfBoundsScrollY > 0 Then
                 pOutOfBoundsScrollY = IIf(yVal - rawMax > 0, yVal - rawMax, 0)
                 If .Max <> rawMax + pOutOfBoundsScrollY Then .Max = rawMax + pOutOfBoundsScrollY
-                If .Value <> yVal Then .Value = yVal
+                If nY <> CDbl(Value) Then ScrollPosY = CDbl(Value)
                 UpdateScrollbarY ExplicitCall
             Else
-                If .Value <> yVal Then .Value = yVal
+                If nY <> CDbl(Value) Then ScrollPosY = CDbl(Value)
                 If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
-                    Viewport.ScrollTo ScrollbarX, yVal
-                    pLastScrollY(0) = yVal
+                    nY = ScrollPosY
+                    Viewport.ScrollTo ScrollPosX, nY
+                    pLastScrollY(0) = nY
                 End If
             End If
         End If
     End With
 End Sub
 
-Public Sub ApplyScrollbarX(Optional ByVal xVal As Variant, Optional ByVal ExplicitCall As Boolean = False)
+Public Sub ApplyScrollbarX(Optional ByVal Value As Variant, Optional ByVal ExplicitCall As Boolean = False)
     If (Not Me.SCROLLBAR_X.Visible) Or (Not pInitialized) Then Exit Sub
-    Dim rawMax As Long
+    Dim rawMax As Long, xVal As Double, nX As Double
     
     With Me.SCROLLBAR_X
-        If IsMissing(xVal) Then xVal = .Value
+        nX = ScrollPosX
+        xVal = CDbl(IIf(IsMissing(Value), nX, CDbl(Value)) / pScrollFactorPosX)
+        If IsMissing(Value) Then Value = nX
         If xVal < 0 Then xVal = 0
         rawMax = .Max - pOutOfBoundsScrollX
         If xVal > .Max Then
@@ -1111,13 +1161,14 @@ Public Sub ApplyScrollbarX(Optional ByVal xVal As Variant, Optional ByVal Explic
             If pOutOfBoundsScrollX > 0 Then
                 pOutOfBoundsScrollX = IIf(xVal - rawMax > 0, xVal - rawMax, 0)
                 If .Max <> rawMax + pOutOfBoundsScrollX Then .Max = rawMax + pOutOfBoundsScrollX
-                If .Value <> xVal Then .Value = xVal
+                If nX <> CDbl(Value) Then ScrollPosX = CDbl(Value)
                 UpdateScrollbarX ExplicitCall
             Else
-                If .Value <> xVal Then .Value = xVal
+                If nX <> CDbl(Value) Then ScrollPosX = CDbl(Value)
                 If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
-                    Viewport.ScrollTo xVal, ScrollbarY
-                    pLastScrollX(0) = xVal
+                    nX = ScrollPosX
+                    Viewport.ScrollTo nX, ScrollPosY
+                    pLastScrollX(0) = nX
                 End If
             End If
         End If
@@ -1133,21 +1184,30 @@ End Sub
 
 Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)
     If Not Me.SCROLLBAR_Y.Visible Then Exit Sub
-    Dim yMax As Long, cellSizeY As Long, fullViewportContentSizeY As Long
+    Dim yMax As Long, cellSizeY As Long, nMod As Double, nY As Double
 
     cellSizeY = Worksheet.GridCellSizeY
     pScrollPageSizeY = CLng(Int((Me.InsideHeight - 270) / cellSizeY)) * cellSizeY
-    fullViewportContentSizeY = (pTable.Count - 0) * cellSizeY
-    yMax = Max((fullViewportContentSizeY + OutOfBoundsScrollY) - (Me.InsideHeight - 270), 0)
+    pMaxContentSizeY = CDbl(pTable.Count * CDbl(cellSizeY)) + CDbl(pWorksheetHeadersSizeY)
+    
+    nMod = IIf(pMaxContentSizeY + CDbl(OutOfBoundsScrollY) > 2 ^ 30, 1000, 1)
+    If nMod <> pScrollFactorPosY Then
+        ' TODO: check it
+        pScrollFactorPosY = nMod
+    End If
+    
+    yMax = CLng(Fix(Max((pMaxContentSizeY + CDbl(OutOfBoundsScrollY)) - CDbl(Me.InsideHeight - 270), 0) / pScrollFactorPosY))
+    
     With Me.SCROLLBAR_Y
         .Max = yMax
-        .LargeChange = IIf(pScrollPageSizeY > yMax, yMax, pScrollPageSizeY)
-        .SmallChange = cellSizeY
+        .LargeChange = IIf(CLng(pScrollPageSizeY / pScrollFactorPosY) > yMax, yMax, CLng(pScrollPageSizeY / pScrollFactorPosY))
+        .SmallChange = IIf(CLng(cellSizeY / pScrollFactorPosY) < 1, 1, CLng(cellSizeY / pScrollFactorPosY))
         If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
-            If .Value <> pLastScrollY(0) Or .Max <> pLastScrollY(1) Then
-                Viewport.ScrollTo ScrollbarX, .Value
-                pLastScrollY(0) = .Value
-                pLastScrollY(1) = .Max
+            nY = ScrollPosY
+            If nY <> pLastScrollY(0) Or yMax <> pLastScrollY(1) Then
+                Viewport.ScrollTo ScrollPosX, nY
+                pLastScrollY(0) = nY
+                pLastScrollY(1) = yMax
             End If
         End If
     End With
@@ -1161,22 +1221,32 @@ Private Sub UpdateScrollbarX(Optional ByVal ExplicitCall As Boolean = False)
     '|________________________________________|
     '                                         * Viewport.ViewportContentFullWidth
     
-    Dim xMax As Long, cellSizeX As Long, fullViewportContentSizeX As Long, viewSizeX As Long
+    Dim xMax As Long, cellSizeX As Long, viewSizeX As Long, nMod As Double, nX As Double
     
     viewSizeX = Me.InsideWidth - 270 - Me.DS_VIEWPORT.Left
     cellSizeX = Worksheet.GridCellSizeX
     pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
-    fullViewportContentSizeX = Max((pTable.ColumnCount - 0) * cellSizeX, viewSizeX)
-    xMax = Max((fullViewportContentSizeX + pOutOfBoundsScrollX) - viewSizeX, 0)
+    
+    pMaxContentSizeX = Max(CDbl(pTable.ColumnCount * CDbl(cellSizeX)), viewSizeX)
+    
+    nMod = IIf(pMaxContentSizeX + CDbl(OutOfBoundsScrollX) > 2 ^ 30, 20000, 1)
+    If nMod <> pScrollFactorPosX Then
+        ' TODO: check it
+        pScrollFactorPosX = nMod
+    End If
+    
+    xMax = CLng(Fix(Max((pMaxContentSizeX + CDbl(OutOfBoundsScrollX)) - CDbl(viewSizeX), 0) / pScrollFactorPosX))
+
     With Me.SCROLLBAR_X
         .Max = xMax
-        .LargeChange = IIf(pScrollPageSizeX > xMax, xMax, pScrollPageSizeX)
-        .SmallChange = CLng(cellSizeX / 5)
+        .LargeChange = IIf(CLng(pScrollPageSizeX / pScrollFactorPosX) > xMax, xMax, CLng(pScrollPageSizeX / pScrollFactorPosX))
+        .SmallChange = IIf(CLng(CLng(cellSizeX / 5) / pScrollFactorPosX) < 1, 1, CLng(CLng(cellSizeX / 5) / pScrollFactorPosX))
         If (Not pIgnoreScrollingEvents) Or ExplicitCall Then
-            If .Value <> pLastScrollX(0) Or .Max <> pLastScrollX(1) Then
-                Viewport.ScrollTo .Value, ScrollbarY
-                pLastScrollX(0) = .Value
-                pLastScrollX(1) = .Max
+            nX = ScrollPosX
+            If nX <> pLastScrollX(0) Or xMax <> pLastScrollX(1) Then
+                Viewport.ScrollTo nX, ScrollPosY
+                pLastScrollX(0) = nX
+                pLastScrollX(1) = xMax
             End If
         End If
     End With
@@ -1186,14 +1256,14 @@ End Sub
 ' --- SELECTION ---
 
 Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional ByVal PropagateEvent As Boolean = True)
-    Dim X As Long, Y As Long
+    Dim X As Double, Y As Double
     
     Select Case CLng(0 - 1)
         Case RowIndex
-            Y = Me.ScrollbarY
+            Y = ScrollPosY
             X = pViewport.GetScrollXTo(ColumnIndex)
         Case ColumnIndex
-            X = Me.ScrollbarX
+            X = ScrollPosX
             Y = pViewport.GetScrollYTo(RowIndex)
         Case Else
             X = pViewport.GetScrollXTo(ColumnIndex)
@@ -1234,7 +1304,7 @@ Private Sub pWorksheetHeaders_OnColumnNameWillChange(ByVal ColumnIndex As Long, 
     Dim oldValue As String
     
     On Error GoTo Finally
-    oldValue = Table().Headers.Row(0)(ColumnIndex)("ColumnName")
+    oldValue = CollectionsLib.ArrayItem(Table().Headers.Row(0)(ColumnIndex), 0)
     If StrComp(oldValue, Value, vbBinaryCompare) <> 0 Then
         On Error GoTo 0
         RaiseEvent OnColumnNameChange(ColumnIndex, oldValue, Value)
