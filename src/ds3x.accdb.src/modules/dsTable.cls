@@ -279,11 +279,11 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
             Case adVarChar
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=.DefinedSize)
             Case adVarWChar
-                If .DefinedSize = 10 Then
-                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy", DataType:="Date", MaxSize:=10)
-                Else
+'                If .DefinedSize = 10 Then
+'                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy", DataType:="Date", MaxSize:=10)
+'                Else
                     d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=.DefinedSize)
-                End If
+'                End If
             Case adInteger, adBigInt, adSmallInt, adTinyInt, adUnsignedBigInt, adUnsignedInt, adUnsignedSmallInt, adUnsignedTinyInt
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
             Case adNumeric
@@ -295,7 +295,7 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
             Case adCurrency
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="0.00", DataType:="Currency")
             Case adDBTimeStamp
-                d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy h:mm", DataType:="DateTime") ' , MaxSize:=.DefinedSize
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy h:mm", DataType:="DateTime", MaxSize:=.DefinedSize)
             Case adLongVarChar, adLongVarWChar
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=-1)
             Case Else
@@ -385,15 +385,25 @@ Fallback:
 End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, vHeads As Variant
     iRow = GetColumnNames
     cMax = UBound(iRow)
     cMin = LBound(iRow)
     Set AllValues = CollectionsLib.AsArrayListEx(Records)
+    vHeads = Headers.Row(0)
     
     With rs
         For c = cMin To cMax
-            .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable
+            Select Case CollectionsLib.ArrayItem(vHeads(c), 2, "Text")
+                Case "Text"
+                    i = CLng(CollectionsLib.ArrayItem(vHeads(c), 3, -1))
+                    Select Case i
+                        Case -1: .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable Or adFldMayBeNull
+                        Case Else: .Fields.Append CStr(iRow(c)), adBSTR, i, adFldIsNullable Or adFldMayBeNull
+                    End Select
+                Case "DateTime": .Fields.Append CStr(iRow(c)), adDBTimeStamp, CLng(CollectionsLib.ArrayItem(vHeads(c), 3, 16)), adFldIsNullable Or adFldMayBeNull Or adFldFixed
+                Case Else: .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable Or adFldMayBeNull
+            End Select
         Next c
         .Open
         For i = 0 To Count - 1
