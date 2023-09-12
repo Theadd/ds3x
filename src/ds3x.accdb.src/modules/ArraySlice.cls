@@ -38,10 +38,11 @@ End Property
 '@DefaultMember
 Public Property Get Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0) As Variant
 Attribute Item.VB_UserMemId = 0
-    Dim v As Variant, r As Long
+    Dim v As Variant, r As Long, k As ICollectionEx
     For Each v In pSlices
         If r + v(3) > Index Then
-            Item = v(0).Item(v(2) + (Index - r), v(1))  ' + ColumnIndex
+            Set k = v(0)
+            Item = k.Item(v(2) + (Index - r), v(1))  ' + ColumnIndex
             Exit For
         End If
         r = r + v(3)
@@ -184,7 +185,7 @@ Private Sub SliceArray()
             Case TypeOf v(0) Is RecordsetEx
                 With C2RecordsetEx(v(0))
                     iAux = CLng(.Instance.AbsolutePosition)
-                    .Instance.AbsolutePosition = v(2) + 1
+                    .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
                     MemoryLib.CloneParamArray k(0, 0), v(3), t
                     For i = 0 To v(3) - 1

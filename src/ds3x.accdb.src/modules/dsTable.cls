@@ -268,14 +268,7 @@ End Function
 
 
 Public Function CreateColumnHeader(Optional ByVal ColumnName As Variant, Optional ByVal NumberFormat As Variant, Optional ByVal DataType As Variant, Optional ByVal MaxSize As Variant) As Variant
-    ' "General", "", -1
     CreateColumnHeader = Array(ColumnName, NumberFormat, DataType, MaxSize)
-'    Dim d As New Scripting.Dictionary
-'    d("ColumnName") = ColumnName
-'    d("NumberFormat") = NumberFormat
-'    d("DataType") = DataType
-'    d("MaxSize") = MaxSize
-'    Set CreateColumnHeader = d
 End Function
 
 Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.Field) As Variant
@@ -284,12 +277,12 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
     With TargetField
         Select Case .Type
             Case adVarChar
-                d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=.DefinedSize)
             Case adVarWChar
                 If .DefinedSize = 10 Then
-                    d = CreateColumnHeader(Nz(.Name), DataType:="Date", MaxSize:=10)
+                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy", DataType:="Date", MaxSize:=10)
                 Else
-                    d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
+                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=.DefinedSize)
                 End If
             Case adInteger, adBigInt, adSmallInt, adTinyInt, adUnsignedBigInt, adUnsignedInt, adUnsignedSmallInt, adUnsignedTinyInt
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
@@ -302,9 +295,9 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
             Case adCurrency
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="0.00", DataType:="Currency")
             Case adDBTimeStamp
-                d = CreateColumnHeader(Nz(.Name), DataType:="DateTime") ' , MaxSize:=.DefinedSize
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy h:mm", DataType:="DateTime") ' , MaxSize:=.DefinedSize
             Case adLongVarChar, adLongVarWChar
-                d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=-1)
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=-1)
             Case Else
                 d = CreateColumnHeader(Nz(.Name))
         End Select

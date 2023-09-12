@@ -300,8 +300,9 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
         Set aX = ArrayListEx.Create()
         If TypeOf ArrayLike Is ICollectionEx Then
             nRows = C2ICollectionEx(ArrayLike).Count
+            iAux = IIf(TypeOf ArrayLike Is RecordsetEx, 1, 0)
             For c = 0 To C2ICollectionEx(ArrayLike).ColumnCount - 1
-                aX.Add ArraySlice.Create(ArrayLike, Index:=0, GetCount:=nRows, ColumnIndex:=c)
+                aX.Add ArraySlice.Create(ArrayLike, Index:=iAux, GetCount:=nRows, ColumnIndex:=c)
             Next c
             Set CreateSliceGroups = aX
             Exit Function
