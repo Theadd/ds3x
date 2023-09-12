@@ -517,6 +517,7 @@ Public Function Clone() As RecordsetEx
 Attribute Clone.VB_Description = "Devuelve una nueva instancia de RecordsetEx vinculada a un Recordset.Clone() de esta Instance."
     Dim xClone As New RecordsetEx
     Set Clone = xClone.Bind(Instance.Clone)
+    If VarType(Instance.Filter) = vbString Then Clone.Filter Instance.Filter
 End Function
 
 ' Un Recordset.Clone() solo devuelve una nueva instancia de un objeto Recordset pero apuntando al mismo
