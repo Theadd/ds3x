@@ -401,6 +401,7 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
                         Case -1: .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable Or adFldMayBeNull
                         Case Else: .Fields.Append CStr(iRow(c)), adBSTR, i, adFldIsNullable Or adFldMayBeNull
                     End Select
+                Case "Date": .Fields.Append CStr(iRow(c)), adDate, CLng(CollectionsLib.ArrayItem(vHeads(c), 3, 10)), adFldIsNullable Or adFldMayBeNull
                 Case "DateTime": .Fields.Append CStr(iRow(c)), adDBTimeStamp, CLng(CollectionsLib.ArrayItem(vHeads(c), 3, 16)), adFldIsNullable Or adFldMayBeNull Or adFldFixed
                 Case Else: .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable Or adFldMayBeNull
             End Select
