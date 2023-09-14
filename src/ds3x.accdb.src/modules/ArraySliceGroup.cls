@@ -188,6 +188,9 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
             End If
         ElseIf isValid And Not wasValid Then
             gStartIndex = i
+            If r = rMax Then
+                aX.Add Array(gStartIndex, i - gStartIndex + 1)
+            End If
         End If
         
         iLast = i
