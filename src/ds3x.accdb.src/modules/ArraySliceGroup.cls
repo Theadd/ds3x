@@ -134,7 +134,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         If GetCount + Index > Count Then GetCount = Count - Index
     End If
     If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then
-        ColumnIndexes = CollectionsLib.ArrayRange(0, ColumnCount - 1)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, ColumnCount)
     Else
         If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array(ColumnIndexes)
     End If

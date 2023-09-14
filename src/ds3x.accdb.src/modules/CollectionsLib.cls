@@ -440,19 +440,14 @@ End Function
 
 ' --- MISC ---
 
-' USAGE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
-Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
-    Dim t() As Variant, i As Long, aSize As Long
-
-    If IsMissing(RangeEnd) Then RangeEnd = RangeStart
-    aSize = RangeEnd - RangeStart
-    ReDim t(0 To aSize)
-
-    For i = 0 To aSize
-        t(i) = RangeStart + i
+' USAGE: ArrayRange(5, 4) => [5, 6, 7, 8]
+Public Function ArrayRange(ByVal Index As Long, ByVal GetCount As Long) As Variant
+    Dim i As Long, t() As Long
+    ReDim t(0 To GetCount - 1)
+    For i = 0 To GetCount - 1
+        t(i) = Index + i
     Next i
-
-    ArrayRange = t
+    ArrayRange = GetArrayByRef(t)
 End Function
 
 Public Function ColumnLetter(ByVal ColumnIndex As Long) As String

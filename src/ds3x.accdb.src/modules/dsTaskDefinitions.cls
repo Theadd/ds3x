@@ -174,7 +174,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
     cMax = Target.ColumnCount - 1
     ReDim t(0 To iMax, 0 To cMax)
     If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
-        ColumnIndexes = CollectionsLib.ArrayRange(0, cMax)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, cMax + 1)
     End If
     For Each v In ColumnIndexes
         colIndexes.Add CLng(v)
@@ -220,7 +220,7 @@ Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal C
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     iMax = Target.Count - 1
     If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
-        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount)
     End If
     kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
     Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
@@ -246,7 +246,7 @@ Public Function HexToStringValues(ByRef TargetTable As Variant, Optional ByVal C
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     iMax = Target.Count - 1
     If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
-        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount)
     End If
     kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
     Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
@@ -302,7 +302,7 @@ Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes 
     Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant
     Set Target = TargetTable
     
-    Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target) - 1))
+    Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target)))
     For Each c In ColumnIndexes
         aX.Remove CLng(c)
     Next c
@@ -337,7 +337,7 @@ Public Function MoveColumn(ByRef TargetTable As Variant, ByVal ColumnIndex As Va
     Set Target = TargetTable
     MoveCount = CLng(Val(GetParam(MoveCount, 1)))
 
-    Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target) - 1))
+    Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target)))
     aX.RemoveAt CLng(ColumnIndex)
     aX.Insert ColumnIndex + MoveCount, CLng(ColumnIndex)
     
@@ -945,7 +945,7 @@ Private Function AsListOfColumnIndexes(ByRef TargetTable As Variant, Optional By
         End If
     End If
     If ArrayListEx.CountElementsIn(ColumnIndexes) = 0 Then
-        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount - 1)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, Target.ColumnCount)
     End If
     For Each v In ColumnIndexes
         colIndexes.Add CLng(v)
