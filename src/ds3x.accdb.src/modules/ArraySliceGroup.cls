@@ -311,8 +311,7 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
                 nRows = .Rows.Count
                 iAux = GetBaseRowIndexOfRange(C2ExcelRange(ArrayLike))
                 For c = 0 To .Columns.Count - 1
-                    ' EDIT: , 0, nRows, 0)
-                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 0, nRows, 0)
+                    aX.Add GetSlicedExcelRangeColumn(C2ExcelRange(ArrayLike), iAux, nRows, c + 1)
                 Next c
             End With
             Set CreateSliceGroups = aX
@@ -321,6 +320,26 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
     End If
     Set CreateSliceGroups = CreateSliceGroups(Array2dEx.Create(ArrayLike))
 End Function
+
+Private Function GetSlicedExcelRangeColumn(ByRef Target As Excel.Range, ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long) As ArraySlice
+    Dim sX As ArraySlice, ct As Long, ctCap As Long, nCts As Long
+    Const dsChunkSize As Long = 1000
+    nCts = CLng(Int((GetCount - 1) / dsChunkSize))
+    
+    With Target
+        For ct = 0 To nCts
+            ctCap = IIf(ct = nCts, ((GetCount - 1) Mod dsChunkSize) + 1, dsChunkSize)
+            If ct = 0 Then
+                Set sX = ArraySlice.Create(Array2dEx.Create(.Range(.Cells(Index + (dsChunkSize * ct), ColumnIndex), .Cells(Index + (dsChunkSize * ct) + ctCap - 1, ColumnIndex))), 0, ctCap, 0)
+            Else
+                Set sX = sX.Add(ArraySlice.Create(Array2dEx.Create(.Range(.Cells(Index + (dsChunkSize * ct), ColumnIndex), .Cells(Index + (dsChunkSize * ct) + ctCap - 1, ColumnIndex))), 0, ctCap, 0))
+            End If
+        Next ct
+    End With
+    
+    Set GetSlicedExcelRangeColumn = sX
+End Function
+
 
 Private Function ValueToCSV(ByVal Value As Variant) As String
     Select Case VarType(Value)
