@@ -1033,21 +1033,11 @@ Private Function HexToAscii(ByVal Value As String) As String
     HexToAscii = VBA.Join(t, "")
 End Function
 
-Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
-    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
-    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
-    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
-    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long
-    cQuote = """": cDblQuote = """"""
-
-    Set sLines = CollectionsLib.StringLineSlices(ContentString)
-    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
-    If AutoHeaders Then sLines.RemoveAt 0
-    nRows = sLines.Count
-    nCols = colHeaders.Count
-    ReDim t(0 To nRows - 1, 0 To nCols - 1)
-
-    r = 0
+Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sLines As ArrayListEx, ByRef t As Variant, ByVal Delimiter As String, ByVal InLocalFormat As Boolean, ByVal cQuote As String, ByVal cDblQuote As String)
+    Dim i As Long, t0 As Variant, r As Long, sCell As String, s As String, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
+    Dim c As Long
+    
+    DoEvents
     For Each t0 In sLines
         s = VBA.Mid$(ContentString, t0(0), t0(1))
         bQuotes = False: bQuoted = False: c = 0: Idx = 0
@@ -1062,14 +1052,14 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
             End If
             If bMatch Then
                 If bQuoted Then
-                    t(r, c) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 1, i - Idx - 1), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+                    t(c)(r, 0) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 1, i - Idx - 1), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
                 Else
                     sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
                     Select Case True
-                        Case sCell = vbNullString: t(r, c) = Empty
-                        Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
-                        Case IsDate(sCell): t(r, c) = CDate(sCell)
-                        Case Else: t(r, c) = sCell
+                        Case sCell = vbNullString: t(c)(r, 0) = Empty
+                        Case IsNumeric(sCell): t(c)(r, 0) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+                        Case IsDate(sCell): t(c)(r, 0) = CDate(sCell)
+                        Case Else: t(c)(r, 0) = sCell
                     End Select
                 End If
                 Idx = i
@@ -1080,9 +1070,46 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
         Next i
         r = r + 1
     Next t0
-    Set a2X = Array2dEx.Create()
-    a2X.Instance = CollectionsLib.GetArrayByRef(t)
-    Set dsT = dsTable.Create(a2X, False)
+    DoEvents
+End Sub
+
+Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
+    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
+    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long
+    Dim nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
+    Const dsChunkSize As Long = 1000
+    cQuote = """": cDblQuote = """"""
+
+    Set sLines = CollectionsLib.StringLineSlices(ContentString)
+    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+    If AutoHeaders Then sLines.RemoveAt 0
+    nRows = sLines.Count
+    nCols = colHeaders.Count
+    
+    nContainers = CLng(Int((nRows - 1) / dsChunkSize))
+    Set ctX = ArrayListEx.Create()
+    
+    For ct = 0 To nContainers
+        ctCap = IIf(ct = nContainers, ((nRows - 1) Mod dsChunkSize) + 1, dsChunkSize)
+        ctArr = MakeJagged2dArrayContainer(ctCap, nCols)
+        Build2dArrayFromStringSlices ContentString, sLines.GetRange(dsChunkSize * ct, ctCap), ctArr, Delimiter, InLocalFormat, cQuote, cDblQuote
+        If ct = 0 Then
+            For i = 0 To nCols - 1
+                ctX(i) = ArraySlice.Create(ctArr(i), 0, ctCap, 0)
+            Next i
+        Else
+            For i = 0 To nCols - 1
+                ctX(i) = C2ArraySlice(ctX(i)).Add(ArraySlice.Create(ctArr(i), 0, ctCap, 0))
+            Next i
+        End If
+    Next ct
+
+    Set sgX = ArraySliceGroup.Create()
+    sgX.SliceGroups = ctX.ToArray()
+    
+    Set dsT = dsTable.Create(sgX, False)
     If AutoHeaders Then
         For c = 0 To nCols - 1
             colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
@@ -1093,5 +1120,15 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
     Set LoadFromCSV = dsT
 End Function
 
+Private Function MakeJagged2dArrayContainer(ByVal Rows As Long, ByVal Columns As Long) As Variant
+    Dim t() As Variant, r() As Variant, i As Long
+    ReDim r(0 To Rows - 1, 0 To 0)
+    ReDim t(0 To Columns - 1)
+    For i = 0 To Columns - 1
+        t(i) = r
+    Next i
+    MakeJagged2dArrayContainer = t
+End Function
 
+Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
 
