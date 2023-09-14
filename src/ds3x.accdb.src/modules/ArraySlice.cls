@@ -178,10 +178,15 @@ Private Sub SliceArray()
         Select Case True
             Case TypeOf v(0) Is Array2dEx
                 Set a2dX = C2Array2dEx(v(0))
-                MemoryLib.CloneParamArray a2dX.Instance(v(2), v(1)), v(3), t
-                For i = 0 To v(3) - 1
-                    pSliced(r + i, 0) = t(i)
-                Next i
+                ' V0
+'                MemoryLib.CloneParamArray a2dX.Instance(v(2), v(1)), v(3), t
+'                For i = 0 To v(3) - 1
+'                    pSliced(r + i, 0) = t(i)
+'                Next i
+                ' V1
+'                MemoryLib.Slice2dArrayTo a2dX.Instance, v(2), v(1), v(3), pSliced, r
+                ' V2
+                MemoryLib.Slice2dArrayToV2 VarPtr(a2dX.Instance(v(2), v(1))), VarPtr(pSliced(r, 0)), v(3)
             Case TypeOf v(0) Is RecordsetEx
                 With C2RecordsetEx(v(0))
                     iAux = CLng(.Instance.AbsolutePosition)
