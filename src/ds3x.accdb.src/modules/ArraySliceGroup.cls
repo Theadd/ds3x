@@ -202,14 +202,15 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
     GetRows.SliceGroups = gX.ToArray()
 End Function
 
-Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As ArraySliceGroup
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As ArraySliceGroup
     Dim nRows As Long, c As Long, nCols As Long
     Set CopyToRange = Me
     nRows = Count
     nCols = ColumnCount
     If Not nRows > 0 Then Exit Function
+    On Error GoTo ErrorHandler
     
-    On Error GoTo UserLocaleFail
+#If Win64 Then
     For c = 0 To nCols - 1
         With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
             If ApplyUserLocale Then
@@ -219,9 +220,13 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
             End If
         End With
     Next c
-    
+#Else
+    For c = 0 To nCols - 1
+        SliceAt(c).CopyToRange RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c), ApplyUserLocale
+    Next c
+#End If
     Exit Function
-UserLocaleFail:
+ErrorHandler:
     Debug.Print "[ERROR] @ArraySliceGroup.CopyToRange() -> " & Err.Description
     Resume Next
 End Function
