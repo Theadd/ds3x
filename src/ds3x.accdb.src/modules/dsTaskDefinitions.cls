@@ -104,7 +104,7 @@ End Function
 
 Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal ColumnIndexes As Variant, Optional ByVal NumberFormat As Variant) As dsTable
     Dim Target As dsTable, e As Long, colIndexes As ArrayListEx
-    Dim sgX As ArraySliceGroup, sX As ArraySlice, v As Variant, cH As Variant, vItems As Variant
+    Dim sgX As ArraySliceGroup, v As Variant, cH As Variant, vItems As Variant
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     NumberFormat = GetParam(NumberFormat, "General")
     
@@ -126,7 +126,7 @@ End Function
 Public Function Filter(ByRef TargetTable As Variant, Optional ByVal QueryFilter As Variant) As dsTable
     Dim rX As RecordsetEx, Target As dsTable
     Set Target = TargetTable
-    QueryFilter = GetParam(QueryFilter, "")
+    QueryFilter = GetParam(QueryFilter, vbNullString)
 
     Set rX = RecordsetEx.Create(Target.NamedRecordset).Filter(QueryFilter)
     Set Filter = dsTable.Create(rX).SetHeaders(Target.Headers)
@@ -1057,7 +1057,12 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
                     sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
                     Select Case True
                         Case sCell = vbNullString: t(c)(r, 0) = Empty
-                        Case IsNumeric(sCell): t(c)(r, 0) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+                        Case IsNumeric(sCell)
+                            If InLocalFormat Then
+                                t(c)(r, 0) = CDbl(CCur(sCell))
+                            Else
+                                t(c)(r, 0) = CDbl(Val(sCell))
+                            End If
                         Case IsDate(sCell): t(c)(r, 0) = CDate(sCell)
                         Case Else: t(c)(r, 0) = sCell
                     End Select
@@ -1074,11 +1079,8 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
 End Sub
 
 Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
-    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
-    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
-    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
-    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long
-    Dim nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
+    Dim nRows As Long, nCols As Long, c As Long, colHeaders As ArrayListEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+    Dim i As Long, sgX As ArraySliceGroup, nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
     Const dsChunkSize As Long = 1000
     cQuote = """": cDblQuote = """"""
 
@@ -1097,11 +1099,11 @@ Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delim
         Build2dArrayFromStringSlices ContentString, sLines.GetRange(dsChunkSize * ct, ctCap), ctArr, Delimiter, InLocalFormat, cQuote, cDblQuote
         If ct = 0 Then
             For i = 0 To nCols - 1
-                ctX(i) = ArraySlice.Create(ctArr(i), 0, ctCap, 0)
+                Set ctX(i) = ArraySlice.Create(ctArr(i), 0, ctCap, 0)
             Next i
         Else
             For i = 0 To nCols - 1
-                ctX(i) = C2ArraySlice(ctX(i)).Add(ArraySlice.Create(ctArr(i), 0, ctCap, 0))
+                Set ctX(i) = C2ArraySlice(ctX(i)).Add(ArraySlice.Create(ctArr(i), 0, ctCap, 0))
             Next i
         End If
     Next ct
