@@ -408,46 +408,63 @@ Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitte
     ParseTokenizedArg = t
 End Function
 
-Public Function StringLineSlices(ByRef SearchString As String) As ArrayListEx
-    Dim aX As ArrayListEx, i As Long, iMax As Long, bQuotes As Boolean, r As Long
+' Seamlessly supports both vbLf and vbCrLf as line delimiters, excluding those between double quotation marks.
+' Returns whether all characters were successfully accounted for in their slices or there has been some leftover characters at the end,
+' returning them as a single slice in the IncompleteSlice "out" parameter. It's not being automatically added to the list of slices to
+' keep it buffer-friendly, allowing it to be called with string chunks instead of the whole one, assuming that slices might be beheaded
+' and it will be attached with it's leftovers in the next call. Reaching the Limit of lines to slice, if specified, also returns true.
+'
+' Each single line-slice is just a plain array with two elements, Index and GetCount, respectively.
+'
+' @param SearchString - The string to be sliced into line slices.
+' @param Slices - Where the slices are being dropped, byref.
+' @param IncompleteSlice - The leftovers of the last slice which didn't properly terminate in a line ending character, or Empty.
+' @param [Index] - The 1-based index of the character to start slicing lines from.
+' @param [Limit] - The maximum limit of lines to slice, writting the leftovers as a single slice in the IncompleteSlice "out" parameter.
+Public Function StringLineSlices(ByRef SearchString As String, ByRef Slices As ArrayListEx, ByRef IncompleteSlice As Variant, Optional ByVal Index As Long = 1, Optional ByVal Limit As Long = -1) As Boolean
+    Dim i As Long, iMax As Long, bQuotes As Boolean, r As Long
     Const cQuote As String = """"
-    Set aX = ArrayListEx.Create()
     iMax = Len(SearchString)
-    r = 1
+    IncompleteSlice = Empty
+    r = Index
     
-    For i = 1 To iMax
+    For i = Index To iMax
         Select Case VBA.Mid$(SearchString, i, 1)
             Case cQuote: bQuotes = Not bQuotes
             Case vbLf
                 If Not bQuotes Then
                     If VBA.Mid$(SearchString, i - 1, 1) = vbCr Then
-                        aX.Add Array(r, i - (r + 1))
+                        Slices.Add Array(r, i - (r + 1))
                     Else
-                        aX.Add Array(r, i - r)
+                        Slices.Add Array(r, i - r)
                     End If
                     r = i + 1
+                    Limit = Limit - 1
+                    If Limit = 0 Then
+                        StringLineSlices = True
+                        Exit For
+                    End If
                 End If
         End Select
     Next i
-    
     If r < iMax Then
-        aX.Add Array(r, iMax - r)
+        IncompleteSlice = Array(r, iMax - r)
+    Else
+        StringLineSlices = True
     End If
-    
-    Set StringLineSlices = aX
 End Function
 
 
 ' --- MISC ---
 
 ' USAGE: ArrayRange(5, 4) => [5, 6, 7, 8]
-Public Function ArrayRange(ByVal Index As Long, ByVal GetCount As Long) As Variant
+Public Function ArrayRange(ByVal Index As Long, ByVal GetCount As Long) As Long()
     Dim i As Long, t() As Long
     ReDim t(0 To GetCount - 1)
     For i = 0 To GetCount - 1
         t(i) = Index + i
     Next i
-    ArrayRange = GetArrayByRef(t)
+    ArrayRange = t
 End Function
 
 Public Function ColumnLetter(ByVal ColumnIndex As Long) As String
