@@ -123,13 +123,36 @@ Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal Col
 End Function
 
 'RecordsetEx.Filter("REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'")
-Public Function Filter(ByRef TargetTable As Variant, Optional ByVal QueryFilter As Variant) As dsTable
+Public Function FilterQuery(ByRef TargetTable As Variant, Optional ByVal QueryFilter As Variant) As dsTable
     Dim rX As RecordsetEx, Target As dsTable
     Set Target = TargetTable
     QueryFilter = GetParam(QueryFilter, vbNullString)
 
     Set rX = RecordsetEx.Create(Target.NamedRecordset).Filter(QueryFilter)
-    Set Filter = dsTable.Create(rX).SetHeaders(Target.Headers)
+    Set FilterQuery = dsTable.Create(rX).SetHeaders(Target.Headers)
+End Function
+
+Public Function FilterValue(ByRef TargetTable As Variant, ByVal ColumnIndex As Variant, Optional ByVal Value As Variant, Optional ByVal FilterOut As Variant) As dsTable
+    Dim Target As dsTable, t() As Variant, aX As ArrayListEx, sgX As ArraySliceGroup, i As Long, sValue As String
+    Set Target = TargetTable
+    FilterOut = GetParam(FilterOut, False)
+    Value = GetParam(Value, vbNullString)
+    sValue = CStr(Value)
+
+    Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
+    Set aX = ArrayListEx.Create()
+    sgX.SliceAt(CLng(ColumnIndex)).SlicedArray t
+    If FilterOut Then
+        For i = 0 To UBound(t, 1)
+            If CStr(Nz(t(i, 0), vbNullString)) <> sValue Then aX.Add i
+        Next i
+    Else
+        For i = 0 To UBound(t, 1)
+            If CStr(Nz(t(i, 0), vbNullString)) = sValue Then aX.Add i
+        Next i
+    End If
+    
+    Set FilterValue = dsTable.Create(sgX.GetRows(aX.ToArray()), False).SetHeaders(Target.Headers)
 End Function
 
 Public Function GetRange(ByRef TargetTable As Variant, Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As dsTable
@@ -467,11 +490,10 @@ Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Op
     DisableCache = GetParam(DisableCache, False)
     Set Options = GetParamAsDictionaryEx(Options)
     
-    ' {"Delimiter": ";", "AsUnicode": false, "InLocalFormat": true, "AutoHeaders": true}
+    ' {"Delimiter": "Auto", "InLocalFormat": true, "AutoHeaders": true}
     Set dX = DictionaryEx.Create() _
-        .Add("Delimiter", Options.GetValue("Delimiter", ";")) _
-        .Add("AsUnicode", Options.GetValue("AsUnicode", False)) _
-        .Add("InLocalFormat", Options.GetValue("InLocalFormat", True)) _
+        .Add("Delimiter", Options.GetValue("Delimiter", "Auto")) _
+        .Add("InLocalFormat", Options.GetValue("InLocalFormat", False)) _
         .Add("AutoHeaders", Options.GetValue("AutoHeaders", True))
     
     If Not DisableCache Then
@@ -488,10 +510,7 @@ LoadFromFileAsCSVFallback:
     TargetFile = GetParam(TargetFile, "")
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
     
-    If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent, CBool(dX("AsUnicode"))) Then
-        Err.Raise 17, , "Unable to read text from provided file"
-    End If
-    Set dsT = LoadFromCSV(sContent, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+    Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
     End If
@@ -778,8 +797,10 @@ Private Sub AddAllTasks()
                 "", _
                 "NOTE: This task will&nbsp;<u>only</u> apply <b>NumberFormat</b> to corresponding columns in an <b>Excel.Worksheet</b> <u>just before</u> copying the data to the specified <b>Excel.Range</b>.")
                     
-    AddTask "Filter", "[Source]: Table, QueryFilter: String", _
-            Usage:="{...TaskName: 'Filter', Values: [, ""REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'""]}"
+    AddTask "FilterQuery", "[Source]: Table, QueryFilter: String", _
+            Usage:="{...TaskName: 'FilterQuery', Values: [, ""REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'""]}"
+    
+    AddTask "FilterValue", "[Source]: Table, ColumnIndex: Long, [Value]: Variant, [FilterOut = False]: Boolean"
     
     AddTask "GetRange", "[Source]: Table, [Index]: Long, [GetCount]: Long, [ColumnIndexes]: Array()", _
             Description:=StringLines( _
@@ -1078,36 +1099,94 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
     DoEvents
 End Sub
 
-Private Function LoadFromCSV(ByRef ContentString As String, Optional ByVal Delimiter As String = ";", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+Private Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
     Dim nRows As Long, nCols As Long, c As Long, colHeaders As ArrayListEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
     Dim i As Long, sgX As ArraySliceGroup, nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
-    Const dsChunkSize As Long = 1000
+    Dim leftOvers As Variant, leftOversIndex As Long, buff As String, buffStream As String
+    Dim skipLoading As Boolean, skipFetching As Boolean, slicingOk As Boolean
+    Const dsChunkSize As Long = 1000, buffCap As Long = &H100000 ' 1MB
     cQuote = """": cDblQuote = """"""
-
-    Set sLines = CollectionsLib.StringLineSlices(ContentString)
-    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
-    If AutoHeaders Then sLines.RemoveAt 0
-    nRows = sLines.Count
-    nCols = colHeaders.Count
+    Set sLines = ArrayListEx.Create()
     
-    nContainers = CLng(Int((nRows - 1) / dsChunkSize))
-    Set ctX = ArrayListEx.Create()
+    With FileSystemLib.StreamReader(TargetFile)
+        Do
+            If Not skipFetching Then
+                buffStream = .ReadText(buffCap)
+                buff = buff & buffStream
+                If .Position >= .SIZE Then buffStream = vbNullString
+            End If
+            i = dsChunkSize + IIf(AutoHeaders And ctX Is Nothing, 1, 0)
+            c = IIf(leftOversIndex > 0, leftOversIndex, 1)
+            slicingOk = CollectionsLib.StringLineSlices(buff, sLines, leftOvers, c, i - sLines.Count)
+            If slicingOk Then
+                If IsEmpty(leftOvers) Then
+                    If (buffStream = vbNullString) Then
+                        ' All done
+                        skipFetching = True
+                        skipLoading = False
+                        leftOvers = Array(VBA.Len(buff) + 1, 0)
+                        leftOversIndex = leftOvers(0)
+                    Else
+                        ' Not done yet, only consumed the buff, reaching or not the limit
+                        skipFetching = False
+                        leftOvers = Array(VBA.Len(buff) + 1, 0)
+                        leftOversIndex = leftOvers(0)
+                        If sLines.Count >= i Then
+                            skipLoading = False
+                        Else
+                            skipLoading = True
+                        End If
+                    End If
+                Else
+                    ' Not done yet, only reached the limit
+                    skipLoading = False
+                    skipFetching = True
+                    leftOversIndex = leftOvers(0)
+                End If
+            Else
+                If (buffStream = vbNullString) Then
+                    ' All done but last slice doesn't terminate with a new line character
+                    sLines.Add Array(leftOvers(0), leftOvers(1))
+                    skipFetching = True
+                    leftOversIndex = 0
+                    leftOvers = Empty
+                    skipLoading = False
+                Else
+                    ' Not done yet and there's an incomplete line slice at the end of the current buff
+                    leftOversIndex = leftOvers(0)
+                    skipFetching = False
+                    skipLoading = True
+                End If
+            End If
+            If ctX Is Nothing And sLines.Count > 0 Then
+                ' It's the first loop, initialize all empty slices n stuff
+                Set ctX = ArrayListEx.Create()
+                If Delimiter = "Auto" Then
+                    Delimiter = AutoDetectDelimiterInCSV(VBA.Mid$(buff, sLines(0)(0), sLines(0)(1)))
+                End If
+                Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(buff, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+                If AutoHeaders Then sLines.RemoveAt 0
+                nCols = colHeaders.Count
+                For i = 0 To nCols - 1
+                    ctX.Add ArraySlice.Create()
+                Next i
+            End If
+            If Not skipLoading Then
+                ctArr = MakeJagged2dArrayContainer(sLines.Count, nCols)
+                Build2dArrayFromStringSlices buff, sLines, ctArr, Delimiter, InLocalFormat, cQuote, cDblQuote
+                For i = 0 To nCols - 1
+                    Set ctX(i) = C2ArraySlice(ctX(i)).Add(ArraySlice.Create(ctArr(i), 0, sLines.Count, 0))
+                Next i
+                sLines.Clear
+            End If
+            If leftOversIndex > 0 And sLines.Count = 0 Then
+                buff = VBA.Mid$(buff, leftOvers(0), Len(buff))
+                leftOversIndex = 0
+            End If
+        Loop While (Not (buffStream = vbNullString And buff = vbNullString And sLines.Count = 0))
+        .Close
+    End With
     
-    For ct = 0 To nContainers
-        ctCap = IIf(ct = nContainers, ((nRows - 1) Mod dsChunkSize) + 1, dsChunkSize)
-        ctArr = MakeJagged2dArrayContainer(ctCap, nCols)
-        Build2dArrayFromStringSlices ContentString, sLines.GetRange(dsChunkSize * ct, ctCap), ctArr, Delimiter, InLocalFormat, cQuote, cDblQuote
-        If ct = 0 Then
-            For i = 0 To nCols - 1
-                Set ctX(i) = ArraySlice.Create(ctArr(i), 0, ctCap, 0)
-            Next i
-        Else
-            For i = 0 To nCols - 1
-                Set ctX(i) = C2ArraySlice(ctX(i)).Add(ArraySlice.Create(ctArr(i), 0, ctCap, 0))
-            Next i
-        End If
-    Next ct
-
     Set sgX = ArraySliceGroup.Create()
     sgX.SliceGroups = ctX.ToArray()
     
@@ -1130,6 +1209,10 @@ Private Function MakeJagged2dArrayContainer(ByVal Rows As Long, ByVal Columns As
         t(i) = r
     Next i
     MakeJagged2dArrayContainer = t
+End Function
+
+Private Function AutoDetectDelimiterInCSV(ByRef ContentString As String) As String
+    AutoDetectDelimiterInCSV = IIf(UBound(VBA.Split(ContentString, ",")) > UBound(VBA.Split(ContentString, ";")), ",", ";")
 End Function
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
