@@ -530,7 +530,7 @@ End Function
 '
 Public Function Duplicate() As RecordsetEx
 Attribute Duplicate.VB_Description = "Realiza y devuelve una copia entera del conjunto de datos, desvinculandolos del Recordset original."
-    Dim xClone As New RecordsetEx, rsClone As New ADODB.Recordset, rStream As New ADODB.stream
+    Dim xClone As New RecordsetEx, rsClone As New ADODB.Recordset, rStream As New ADODB.Stream
     
     Instance.Save rStream
     rsClone.Open rStream

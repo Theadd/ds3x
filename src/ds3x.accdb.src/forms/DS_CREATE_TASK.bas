@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =4770
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8655
+    Top =3360
+    Right =24150
+    Bottom =13515
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1529,7 +1529,7 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                             .AddItem Item
                             .Value = Item
                         Case "LoadFromFileAsCSV"
-                            Item = "{""Delimiter"": "";"", ""AsUnicode"": false, ""InLocalFormat"": true, ""AutoHeaders"": true}"
+                            Item = "{""Delimiter"": ""Auto"", ""InLocalFormat"": false, ""AutoHeaders"": true}"
                             .AddItem ""
                             .AddItem Item
                             .Value = Item

@@ -89,6 +89,8 @@ Public Function Create(Optional ByRef ArrayLike As Variant, Optional ByVal Index
             Set Create = New ArraySlice
             Create.Slices = ArrayListEx.Create().Add(Array(Array2dEx.Create(ArrayLike), ColumnIndex, Index, GetCount)).ToArray()
         End If
+    Else
+        Set Create = New ArraySlice
     End If
 End Function
 

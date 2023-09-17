@@ -21,10 +21,10 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =5610
+    Top =4590
+    Right =21105
+    Bottom =14745
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -1366,6 +1366,8 @@ Public Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
         Case (KeyCode = vbKeyP And Shift = 3): Stop
         Case (KeyCode = vbKeyShift): pScrollSpeedMultiplier = 3
         Case (KeyCode = vbKeyC And Shift = 2): CopySelectionToClipboard
+        Case (KeyCode = vbKeyPageDown): KeyCode = 0
+        Case (KeyCode = vbKeyPageUp): KeyCode = 0
         Case Else
             SetPointerCapture (KeyCode = vbKeySpace And (Shift = 2 Or Shift = 3))
     End Select
