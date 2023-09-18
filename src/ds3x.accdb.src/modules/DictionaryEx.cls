@@ -267,13 +267,13 @@ Public Function Unserialize(ByRef Serialized As Variant) As DictionaryEx
     Set Unserialize.Instance = JSON.Parse(CStr(Serialized), True, True)
 End Function
 
-Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
-    ToCSV = dsTable.Create(ArrayListEx.Create(Entries()), False).SetHeaders(Array("Key", "Value")).ToCSV(Delimiter)
+Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String
+    ToCSV = dsTable.Create(ArrayListEx.Create(Entries()), False).SetHeaders(Array("Key", "Value")).ToCSV(Delimiter, InLocalFormat)
 End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
-Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
+Public Function ToExcel() As String: ToExcel = ToCSV(vbTab, True): End Function
 
 Public Function ToString(Optional mPrettyIndent As Variant) As String
     If IsMissing(mPrettyIndent) Then
@@ -423,7 +423,7 @@ Private Sub ICollectionEx_Dispose(): Dispose: End Sub
 Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
 Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
 Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount): End Function
-Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String: ICollectionEx_ToCSV = ToCSV(Delimiter, InLocalFormat): End Function
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
