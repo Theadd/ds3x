@@ -364,27 +364,35 @@ Public Function Clone() As Array2dEx
     Set Clone = Array2dEx.Create(t)
 End Function
 
-Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
+Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String
     Dim t() As String, s() As String, i As Long, c As Long, uc As Long
-    uc = Me.ColumnCount - 1
-    ReDim t(0 To Me.Count)
+    uc = ColumnCount - 1
+    ReDim t(0 To Count)
     ReDim s(0 To uc)
+    t(UBound(t)) = ""
     
-    For i = 0 To Me.Count - 1
-        For c = 0 To uc
-            s(c) = ValueToCSV(Instance(i, c))
-        Next c
-        
-        t(i) = VBA.Join(s, Delimiter)
-    Next i
-    
-    t(Me.Count) = ""
-    ToCSV = VBA.Join(t, vbNewLine)
+    If InLocalFormat Then
+        For i = 0 To UBound(t) - 1
+            For c = 0 To uc
+                s(c) = CollectionsLib.ValueToLocalString(Instance(i, c))
+            Next c
+            t(i) = VBA.Join(s, Delimiter)
+        Next i
+        ToCSV = VBA.Join(t, vbNewLine)
+    Else
+        For i = 0 To UBound(t) - 1
+            For c = 0 To uc
+                s(c) = CollectionsLib.ValueToString(Instance(i, c))
+            Next c
+            t(i) = VBA.Join(s, Delimiter)
+        Next i
+        ToCSV = VBA.Join(t, vbLf)
+    End If
 End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
-Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
+Public Function ToExcel() As String: ToExcel = ToCSV(vbTab, True): End Function
 
 ' --- OTHER ---
 
@@ -548,7 +556,7 @@ Private Sub ICollectionEx_Dispose(): Dispose: End Sub
 Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
 Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
 Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
-Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String: ICollectionEx_ToCSV = ToCSV(Delimiter, InLocalFormat): End Function
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale): End Function
