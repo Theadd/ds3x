@@ -96,6 +96,21 @@ Finally:
     StreamReader.Close
 End Property
 
+' Multi-Byte file stream writer
+Public Property Get StreamWriter() As ADODB.Stream
+    On Error GoTo Finally
+    Set StreamWriter = New ADODB.Stream
+    With StreamWriter
+        .Open
+        .Type = adTypeText
+'        .Charset = "UTF-8"
+    End With
+    Exit Property
+Finally:
+    On Error Resume Next
+    StreamWriter.Close
+End Property
+
 Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
 Public Property Get Resolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String: Resolve = PathResolve(Path, RelativeTo): End Property
 Public Property Get ReadAllTextInFile(ByVal TargetFile As String, Optional ByVal AsUnicode As Boolean = True) As String: Dim s As String: FileSystemLib.TryReadAllTextInFile TargetFile, s, AsUnicode: ReadAllTextInFile = s: End Property
@@ -469,7 +484,7 @@ Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As 
     Dim Stream As TextStream
     
     Set Stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
-    Stream.Write (Content)
+    Stream.Write Content
     Stream.Close
     
     TryWriteTextToFile = True
@@ -477,6 +492,7 @@ Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As 
     
 ErrorHandler:
     On Error Resume Next
+    Resume Next
     TryWriteTextToFile = False
     If Not (Stream Is Nothing) Then Stream.Close
 End Function
