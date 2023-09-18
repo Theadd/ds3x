@@ -477,6 +477,30 @@ Public Function ColumnLetter(ByVal ColumnIndex As Long) As String
     Loop Until ((26 ^ i) + (26 * (1 - (0 ^ (i - 1)))) > ColumnIndex)
 End Function
 
+Public Function ValueToString(ByRef Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString: ValueToString = """" & VBA.Replace(Value, """", """""") & """"
+        Case vbNull: ValueToString = vbNullString
+        Case vbDouble, vbDecimal, vbSingle, vbCurrency, vbInteger, vbByte, vbLong, &H14: ValueToString = VBA.Mid$(Str(Value), 2)
+        Case vbDate
+            Select Case Fix(Value)
+                Case Value: ValueToString = VBA.Join(Array(Year(Value), Month(Value), Day(Value)), "-")
+                Case 0: ValueToString = CStr(TimeValue(Value))
+                Case Else: ValueToString = VBA.Join(Array(VBA.Join(Array(Year(Value), Month(Value), Day(Value)), "-"), CStr(TimeValue(Value))), " ")
+            End Select
+        Case vbBoolean: ValueToString = IIf(Value, "true", "false")
+        Case Else: ValueToString = CStr(Value)
+    End Select
+End Function
+
+Public Function ValueToLocalString(ByRef Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString: ValueToLocalString = """" & VBA.Replace(Value, """", """""") & """"
+        Case vbNull: ValueToLocalString = vbNullString
+        Case Else: ValueToLocalString = CStr(Value)
+    End Select
+End Function
+
 Public Function ArrayItem(ByRef ArrayLike As Variant, ByVal Index As Long, Optional ByRef ValueIfNull As Variant) As Variant
     If Not IsMissing(ValueIfNull) Then Assign ArrayItem, ValueIfNull
     On Error Resume Next
