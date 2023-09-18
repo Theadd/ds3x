@@ -560,16 +560,24 @@ Public Function SaveToFileAsJSON(ByRef SourceTable As Variant, ByVal FilePath As
     Set SaveToFileAsJSON = Target
 End Function
 
-Public Function SaveToFileAsCSV(ByRef SourceTable As Variant, ByVal FilePath As Variant, Optional ByVal Delimiter As Variant, Optional ByVal AsUnicode As Variant) As dsTable
+Public Function SaveToFileAsCSV(ByRef SourceTable As Variant, ByVal FilePath As Variant, Optional ByVal Delimiter As Variant, Optional ByVal InLocalFormat As Variant, Optional ByVal OverWriteIfExists As Variant) As dsTable
     Dim Target As dsTable
     FilePath = GetParam(FilePath, "")
-    Delimiter = GetParam(Delimiter, ";")
-    AsUnicode = GetParam(AsUnicode, False)
+    Delimiter = GetParam(Delimiter, ",")
+    InLocalFormat = GetParam(InLocalFormat, False)
+    OverWriteIfExists = GetParam(OverWriteIfExists, True)
     Set Target = SourceTable
+    
+    With FileSystemLib.StreamWriter()
+        .WriteText Target.ToCSV(Delimiter, InLocalFormat)
+        If OverWriteIfExists Then
+            .SaveToFile FileSystemLib.Resolve(FilePath), adSaveCreateOverWrite
+        Else
+            .SaveToFile FileSystemLib.Resolve(FilePath), adSaveCreateNotExist
+        End If
+        .Close
+    End With
 
-    If Not FileSystemLib.TryWriteTextToFile(FileSystemLib.Resolve(FilePath), Target.ToCSV(Delimiter), True, CBool(AsUnicode)) Then
-        Err.Raise 17, , "Failed to save dsTable as JSON to """ & CStr(FilePath) & """"
-    End If
     Set SaveToFileAsCSV = Target
 End Function
 
@@ -871,7 +879,7 @@ Private Sub AddAllTasks()
     
     AddTask "SaveToFileAsJSON", "[Source]: Table, TargetFile: String", TaskType:="DSG"
     
-    AddTask "SaveToFileAsCSV", "[Source]: Table, TargetFile: String, [Delimiter = ';']: String, [AsUnicode = False]: Boolean", TaskType:="DSG"
+    AddTask "SaveToFileAsCSV", "[Source]: Table, TargetFile: String, [Delimiter = ',']: String, [InLocalFormat = False]: Boolean, [OverWriteIfExists = True]: Boolean", TaskType:="DSG"
     
     ' --- XL GENERATION TASKS ---
     
@@ -1073,7 +1081,7 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
             End If
             If bMatch Then
                 If bQuoted Then
-                    t(c)(r, 0) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 1, i - Idx - 1), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+                    t(c)(r, 0) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 2, i - Idx - 3), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
                 Else
                     sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
                     Select Case True
@@ -1099,7 +1107,7 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
     DoEvents
 End Sub
 
-Private Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
     Dim nRows As Long, nCols As Long, c As Long, colHeaders As ArrayListEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
     Dim i As Long, sgX As ArraySliceGroup, nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
     Dim leftOvers As Variant, leftOversIndex As Long, buff As String, buffStream As String
@@ -1193,7 +1201,11 @@ Private Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimite
     Set dsT = dsTable.Create(sgX, False)
     If AutoHeaders Then
         For c = 0 To nCols - 1
-            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+            If colHeaders(c) = cDblQuote Then
+                colHeaders(c) = vbNullString
+            Else
+                colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+            End If
         Next c
         dsT.SetHeaders colHeaders.ToArray()
     End If
