@@ -1067,6 +1067,7 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
     Dim c As Long
     
     DoEvents
+    If Not pTaskController Is Nothing Then pTaskController.TriggerOnBusyChange (True)
     For Each t0 In sLines
         s = VBA.Mid$(ContentString, t0(0), t0(1))
         bQuotes = False: bQuoted = False: c = 0: Idx = 0
@@ -1104,7 +1105,6 @@ Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sL
         Next i
         r = r + 1
     Next t0
-    DoEvents
 End Sub
 
 Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
