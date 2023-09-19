@@ -121,23 +121,24 @@ ErrorHandler:
     TryQuery = False
 End Function
 
-' Ejecuta la consulta y devuelve un nuevo ADODB.Recordset VINCULADO a la conexión activa al SQL Server,
-' permitiendo el uso de filtros a nivel del objeto recordset, ordenar registros según el valor de uno o
-' varios campos y actualizar los valores del recordset con últimos cambios en la BBDD mediante una simple
-' llamada a .Requery (o reabriendolo con .Close y .Open, que parece funcionar mejor).
-Public Function Create(ByVal SqlQuery As String) As ADODB.Recordset
-    Dim rs As New ADODB.Recordset
 
-    With rs
-        Set .ActiveConnection = Me.Connection
-        .Source = SqlQuery
-        .CursorLocation = adUseClient
-        .LockType = adLockReadOnly
-        .CursorType = adOpenStatic
-        .Open CursorType:=adOpenStatic, Options:=adCmdText
+Public Function Create(Optional ByRef ConnectionLike As Variant) As dsQuery
+    Set Create = New dsQuery
+    With Create
+        If Not IsMissing(ConnectionLike) Then
+            If IsObject(ConnectionLike) Then
+                Dim c As ADODB.Connection
+                Set c = ConnectionLike
+                Create.ConnectionString = c.ConnectionString
+            Else
+                If VarType(ConnectionLike) = vbString Then
+                    Create.ConnectionString = ConnectionLike
+                End If
+            End If
+        Else
+            Create.ConnectionString = ConnectionString
+        End If
     End With
-    
-    Set Create = rs
 End Function
 
 ' Envia la consulta al SQL Server para su ejecución y diréctamente devuelve el control a la aplicación,

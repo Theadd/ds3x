@@ -200,7 +200,7 @@ Public Function Create(ByVal TargetType As String) As Object
         Case "dsLiveEd": Set Create = New dsLiveEd
         Case "DS_SCROLLVIEW": Set Create = New Form_DS_SCROLLVIEW
         Case "DS_LIVE_EDITOR": Set Create = New Form_DS_LIVE_EDITOR
-        Case "dbQuery": Set Create = New dsQuery
+        Case "dsQuery": Set Create = New dsQuery
         Case "dsComparer": Set Create = New dsComparer
         Case "dsGridSelectionController": Set Create = New dsGridSelectionController
         Case Else
