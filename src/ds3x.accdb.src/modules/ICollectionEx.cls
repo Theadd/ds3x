@@ -49,7 +49,7 @@ End Function
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx
 End Function
 
-Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
+Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String
 End Function
 
 Public Function ToJSON() As String

@@ -336,6 +336,22 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
                         SelectionClear
                         MoveTo .RowIndex, 0, True
                 End Select
+            Case vbKeyPageDown, vbKeyPageUp
+                Select Case True
+                    Case .IsColumnTrigger 'Ignore
+                    Case .IsRowTrigger, .IsCellTrigger
+                        cIndex = IIf(.IsRowTrigger, -1, .Cell(1))
+                        rIndex = IIf(.IsRowTrigger, .RowIndex, .Cell(0))
+                        iAux = IIf(sKeyCode = vbKeyPageUp, -1, 1)
+                        iAux = iAux * IIf(.ShiftKey, 3, 1)
+                        If .CtrlKey Then
+                            iAux = iAux * CLng(Int((pScrollview.ScrollPageSizeX / pScrollview.Worksheet.GridCellSizeX) * 0.8))
+                            MoveTo rIndex, cIndex + iAux, True
+                        Else
+                            iAux = iAux * CLng(Int((pScrollview.ScrollPageSizeY / pScrollview.Worksheet.GridCellSizeY) * 0.8))
+                            MoveTo rIndex + iAux, cIndex, True
+                        End If
+                End Select
             Case Else
                 KeyCode = sKeyCode
         End Select

@@ -134,7 +134,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         If GetCount + Index > Count Then GetCount = Count - Index
     End If
     If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then
-        ColumnIndexes = CollectionsLib.ArrayRange(0, ColumnCount - 1)
+        ColumnIndexes = CollectionsLib.ArrayRange(0, ColumnCount)
     Else
         If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array(ColumnIndexes)
     End If
@@ -188,6 +188,9 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
             End If
         ElseIf isValid And Not wasValid Then
             gStartIndex = i
+            If r = rMax Then
+                aX.Add Array(gStartIndex, i - gStartIndex + 1)
+            End If
         End If
         
         iLast = i
@@ -202,14 +205,15 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
     GetRows.SliceGroups = gX.ToArray()
 End Function
 
-Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As ArraySliceGroup
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As ArraySliceGroup
     Dim nRows As Long, c As Long, nCols As Long
     Set CopyToRange = Me
     nRows = Count
     nCols = ColumnCount
     If Not nRows > 0 Then Exit Function
+    On Error GoTo ErrorHandler
     
-    On Error GoTo UserLocaleFail
+#If Win64 Then
     For c = 0 To nCols - 1
         With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
             If ApplyUserLocale Then
@@ -219,9 +223,13 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
             End If
         End With
     Next c
-    
+#Else
+    For c = 0 To nCols - 1
+        SliceAt(c).CopyToRange RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c), ApplyUserLocale
+    Next c
+#End If
     Exit Function
-UserLocaleFail:
+ErrorHandler:
     Debug.Print "[ERROR] @ArraySliceGroup.CopyToRange() -> " & Err.Description
     Resume Next
 End Function
@@ -253,27 +261,36 @@ End Function
 
 Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
 
-Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
+Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String
     Dim t() As String, s() As String, i As Long, c As Long, uc As Long, vSliced() As Variant
     SlicedArray vSliced
     uc = ColumnCount - 1
     ReDim t(0 To Count)
     ReDim s(0 To uc)
-
-    For i = 0 To Count - 1
-        For c = 0 To uc
-            s(c) = ValueToCSV(vSliced(i, c))
-        Next c
-        t(i) = VBA.Join(s, Delimiter)
-    Next i
-
-    t(Count) = ""
-    ToCSV = VBA.Join(t, vbNewLine)
+    t(UBound(t)) = ""
+    
+    If InLocalFormat Then
+        For i = 0 To UBound(t) - 1
+            For c = 0 To uc
+                s(c) = CollectionsLib.ValueToLocalString(vSliced(i, c))
+            Next c
+            t(i) = VBA.Join(s, Delimiter)
+        Next i
+        ToCSV = VBA.Join(t, vbNewLine)
+    Else
+        For i = 0 To UBound(t) - 1
+            For c = 0 To uc
+                s(c) = CollectionsLib.ValueToString(vSliced(i, c))
+            Next c
+            t(i) = VBA.Join(s, Delimiter)
+        Next i
+        ToCSV = VBA.Join(t, vbLf)
+    End If
 End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
-Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
+Public Function ToExcel() As String: ToExcel = ToCSV(vbTab, True): End Function
 
 
 Public Function Bind(Optional ByRef ArrayLike As Variant) As ArraySliceGroup
@@ -300,8 +317,9 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
         Set aX = ArrayListEx.Create()
         If TypeOf ArrayLike Is ICollectionEx Then
             nRows = C2ICollectionEx(ArrayLike).Count
+            iAux = IIf(TypeOf ArrayLike Is RecordsetEx, 1, 0)
             For c = 0 To C2ICollectionEx(ArrayLike).ColumnCount - 1
-                aX.Add ArraySlice.Create(ArrayLike, Index:=0, GetCount:=nRows, ColumnIndex:=c)
+                aX.Add ArraySlice.Create(ArrayLike, Index:=iAux, GetCount:=nRows, ColumnIndex:=c)
             Next c
             Set CreateSliceGroups = aX
             Exit Function
@@ -310,8 +328,7 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
                 nRows = .Rows.Count
                 iAux = GetBaseRowIndexOfRange(C2ExcelRange(ArrayLike))
                 For c = 0 To .Columns.Count - 1
-                    ' EDIT: , 0, nRows, 0)
-                    aX.Add ArraySlice.Create(Array2dEx.Create(.Range(.Cells(iAux, c + 1), .Cells(iAux + nRows - 1, c + 1))), 0, nRows, 0)
+                    aX.Add GetSlicedExcelRangeColumn(C2ExcelRange(ArrayLike), iAux, nRows, c + 1)
                 Next c
             End With
             Set CreateSliceGroups = aX
@@ -321,12 +338,23 @@ Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
     Set CreateSliceGroups = CreateSliceGroups(Array2dEx.Create(ArrayLike))
 End Function
 
-Private Function ValueToCSV(ByVal Value As Variant) As String
-    Select Case VarType(Value)
-        Case vbString: ValueToCSV = """" & VBA.Replace(CStr(Value), """", """""") & """"
-        Case vbNull: ValueToCSV = vbNullString
-        Case Else: ValueToCSV = CStr(Value)
-    End Select
+Private Function GetSlicedExcelRangeColumn(ByRef Target As Excel.Range, ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long) As ArraySlice
+    Dim sX As ArraySlice, ct As Long, ctCap As Long, nCts As Long
+    Const dsChunkSize As Long = 1000
+    nCts = CLng(Int((GetCount - 1) / dsChunkSize))
+    
+    With Target
+        For ct = 0 To nCts
+            ctCap = IIf(ct = nCts, ((GetCount - 1) Mod dsChunkSize) + 1, dsChunkSize)
+            If ct = 0 Then
+                Set sX = ArraySlice.Create(Array2dEx.Create(.Range(.Cells(Index + (dsChunkSize * ct), ColumnIndex), .Cells(Index + (dsChunkSize * ct) + ctCap - 1, ColumnIndex))), 0, ctCap, 0)
+            Else
+                Set sX = sX.Add(ArraySlice.Create(Array2dEx.Create(.Range(.Cells(Index + (dsChunkSize * ct), ColumnIndex), .Cells(Index + (dsChunkSize * ct) + ctCap - 1, ColumnIndex))), 0, ctCap, 0))
+            End If
+        Next ct
+    End With
+    
+    Set GetSlicedExcelRangeColumn = sX
 End Function
 
 Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
@@ -358,7 +386,7 @@ Private Sub ICollectionEx_Dispose(): Dispose: End Sub
 Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
 Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
 Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
-Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String: ICollectionEx_ToCSV = ToCSV(Delimiter, InLocalFormat): End Function
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale): End Function

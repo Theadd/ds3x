@@ -180,13 +180,13 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
                      .SetHeaders(Headers.GetRange(0, Headers.Count, ColumnIndexes))
 End Function
 
-Public Function ToCSV(Optional ByVal Delimiter As String = ",") As String
-    ToCSV = ArrayListEx.Create().Add(GetColumnNames).ToCSV(Delimiter) & Records.ToCSV(Delimiter)
+Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String
+    ToCSV = ArrayListEx.Create().Add(GetColumnNames).ToCSV(Delimiter, InLocalFormat) & Records.ToCSV(Delimiter, InLocalFormat)
 End Function
 
 Public Function ToJSON() As String: ToJSON = JSON.Stringify(Me, 2): End Function
 
-Public Function ToExcel() As String: ToExcel = ToCSV(vbTab): End Function
+Public Function ToExcel() As String: ToExcel = ToCSV(vbTab, True): End Function
 
 Public Function ToMarkdownTable() As String
     On Error GoTo Finally
@@ -268,14 +268,7 @@ End Function
 
 
 Public Function CreateColumnHeader(Optional ByVal ColumnName As Variant, Optional ByVal NumberFormat As Variant, Optional ByVal DataType As Variant, Optional ByVal MaxSize As Variant) As Variant
-    ' "General", "", -1
     CreateColumnHeader = Array(ColumnName, NumberFormat, DataType, MaxSize)
-'    Dim d As New Scripting.Dictionary
-'    d("ColumnName") = ColumnName
-'    d("NumberFormat") = NumberFormat
-'    d("DataType") = DataType
-'    d("MaxSize") = MaxSize
-'    Set CreateColumnHeader = d
 End Function
 
 Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.Field) As Variant
@@ -284,13 +277,13 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
     With TargetField
         Select Case .Type
             Case adVarChar
-                d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=.DefinedSize)
             Case adVarWChar
-                If .DefinedSize = 10 Then
-                    d = CreateColumnHeader(Nz(.Name), DataType:="Date", MaxSize:=10)
-                Else
-                    d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=.DefinedSize)
-                End If
+'                If .DefinedSize = 10 Then
+'                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy", DataType:="Date", MaxSize:=10)
+'                Else
+                    d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=.DefinedSize)
+'                End If
             Case adInteger, adBigInt, adSmallInt, adTinyInt, adUnsignedBigInt, adUnsignedInt, adUnsignedSmallInt, adUnsignedTinyInt
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="0", DataType:="Numeric")
             Case adNumeric
@@ -302,9 +295,9 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
             Case adCurrency
                 d = CreateColumnHeader(Nz(.Name), NumberFormat:="0.00", DataType:="Currency")
             Case adDBTimeStamp
-                d = CreateColumnHeader(Nz(.Name), DataType:="DateTime") ' , MaxSize:=.DefinedSize
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="m/d/yyyy h:mm", DataType:="DateTime", MaxSize:=.DefinedSize)
             Case adLongVarChar, adLongVarWChar
-                d = CreateColumnHeader(Nz(.Name), DataType:="Text", MaxSize:=-1)
+                d = CreateColumnHeader(Nz(.Name), NumberFormat:="@", DataType:="Text", MaxSize:=-1)
             Case Else
                 d = CreateColumnHeader(Nz(.Name))
         End Select
@@ -392,15 +385,26 @@ Fallback:
 End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, vHeads As Variant
     iRow = GetColumnNames
     cMax = UBound(iRow)
     cMin = LBound(iRow)
     Set AllValues = CollectionsLib.AsArrayListEx(Records)
+    vHeads = Headers.Row(0)
     
     With rs
         For c = cMin To cMax
-            .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable
+            Select Case CollectionsLib.ArrayItem(vHeads(c), 2, "Text")
+                Case "Text"
+                    i = CLng(CollectionsLib.ArrayItem(vHeads(c), 3, -1))
+                    Select Case i
+                        Case -1: .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable Or adFldMayBeNull
+                        Case Else: .Fields.Append CStr(iRow(c)), adBSTR, i, adFldIsNullable Or adFldMayBeNull
+                    End Select
+                Case "Date": .Fields.Append CStr(iRow(c)), adDate, CLng(CollectionsLib.ArrayItem(vHeads(c), 3, 10)), adFldIsNullable Or adFldMayBeNull
+                Case "DateTime": .Fields.Append CStr(iRow(c)), adDBTimeStamp, CLng(CollectionsLib.ArrayItem(vHeads(c), 3, 16)), adFldIsNullable Or adFldMayBeNull Or adFldFixed
+                Case Else: .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable Or adFldMayBeNull
+            End Select
         Next c
         .Open
         For i = 0 To Count - 1
@@ -579,7 +583,7 @@ Private Sub ICollectionEx_Dispose(): Dispose: End Sub
 Private Function ICollectionEx_Join(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_Join = Join(Target): End Function
 Private Function ICollectionEx_AddRange(ByVal Target As ICollectionEx) As ICollectionEx: Set ICollectionEx_AddRange = AddRange(Target): End Function
 Private Function ICollectionEx_GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ICollectionEx: Set ICollectionEx_GetRange = GetRange(Index, GetCount, ColumnIndexes): End Function
-Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",") As String: ICollectionEx_ToCSV = ToCSV(Delimiter): End Function
+Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False) As String: ICollectionEx_ToCSV = ToCSV(Delimiter, InLocalFormat): End Function
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function

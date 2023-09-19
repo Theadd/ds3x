@@ -1009,4 +1009,45 @@ End Function
 '    vtArr = vbEmpty
 'End Sub
 
+Public Sub Slice2dArrayTo(ByRef SrcArray As Variant, ByVal RowIndex As Long, ByVal ColIndex As Long, ByVal GetCount As Long, ByRef DstArray() As Variant, Optional ByVal DstRowIndex As Long = 0, Optional DstColIndex As Long = 0)
+    Dim t() As Variant, sArr As SAFEARRAY_1D, zeroAddr As LongPtr
+    Dim i As Long
+    With sArr
+        .cDims = 1
+        .cbElements = INT_SIZE
+        .pvData = VarPtr(SrcArray(RowIndex, ColIndex))
+        .rgsabound0.cElements = GetCount
+    End With
+    CopyMemory ByVal VarPtrArr(t), VarPtr(sArr), CLngPtr(PTR_SIZE)
+    For i = 0 To UBound(t)
+        DstArray(DstRowIndex + i, DstColIndex) = t(i)
+    Next i
+    zeroAddr = 0
+    CopyMemory ByVal VarPtrArr(t), zeroAddr, CLngPtr(PTR_SIZE)
+End Sub
+
+Public Sub Slice2dArrayToV2(ByVal SrcMemAddr As LongPtr, ByVal DstMemAddr As LongPtr, ByVal GetCount As Long)
+    Dim t() As Variant, r() As Variant, sSrcA As SAFEARRAY_1D, sDstA As SAFEARRAY_1D, zeroAddr As LongPtr
+    Dim i As Long
+    With sSrcA
+        .cDims = 1
+        .cbElements = VARIANT_SIZE
+        .pvData = SrcMemAddr
+        .rgsabound0.cElements = GetCount
+    End With
+    With sDstA
+        .cDims = 1
+        .cbElements = VARIANT_SIZE
+        .pvData = DstMemAddr
+        .rgsabound0.cElements = GetCount
+    End With
+    CopyMemory ByVal VarPtrArr(t), VarPtr(sSrcA), CLngPtr(PTR_SIZE)
+    CopyMemory ByVal VarPtrArr(r), VarPtr(sDstA), CLngPtr(PTR_SIZE)
+    For i = 0 To UBound(t)
+        r(i) = t(i)
+    Next i
+    zeroAddr = 0
+    CopyMemory ByVal VarPtrArr(t), zeroAddr, CLngPtr(PTR_SIZE)
+    CopyMemory ByVal VarPtrArr(r), zeroAddr, CLngPtr(PTR_SIZE)
+End Sub
 

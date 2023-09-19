@@ -21,10 +21,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1568
-    Left =5280
-    Top =3675
-    Right =8460
-    Bottom =6210
+    Left =5610
+    Top =4590
+    Right =21105
+    Bottom =14745
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -684,14 +684,14 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
         nRows = Min(dsT.Count - RowStartIndex, PageSize * PageCount)
         If dsT.ColumnCount - ColumnStartIndex > nCols Then
             If nRows < PageSize * PageCount Then
-                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, ColumnStartIndex + (nCols - 1)))
+                Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, nCols))
                 Set dsT2 = dsT2.AddRange(dsTable.CreateBlank((PageSize * PageCount) - nRows, nCols))
                 Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
             Else
                 Set rX = RecordsetEx.Create(dsT.CreateIndexRecordset(PageSize, PageIndex * NumPagesInLargeChangeRows, PageCount, ColumnStartIndex, nCols, True))
             End If
         Else
-            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, dsT.ColumnCount - 1))
+            Set dsT2 = dsT.GetRange(RowStartIndex, nRows, CollectionsLib.ArrayRange(ColumnStartIndex, dsT.ColumnCount))
             Set dsT3 = dsTable.CreateBlank(nRows, nCols - (dsT.ColumnCount - ColumnStartIndex))
             Set dsT2 = dsT2.Join(dsT3)
             If nRows < PageSize * PageCount Then

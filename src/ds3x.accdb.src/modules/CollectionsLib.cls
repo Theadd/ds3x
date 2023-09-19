@@ -408,50 +408,62 @@ Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitte
     ParseTokenizedArg = t
 End Function
 
-Public Function StringLineSlices(ByRef SearchString As String) As ArrayListEx
-    Dim aX As ArrayListEx, i As Long, iMax As Long, bQuotes As Boolean, r As Long
+' Seamlessly supports both vbLf and vbCrLf as line delimiters, excluding those between double quotation marks.
+' Returns whether all characters were successfully accounted for in their slices or there has been some leftover characters at the end,
+' returning them as a single slice in the IncompleteSlice "out" parameter. It's not being automatically added to the list of slices to
+' keep it buffer-friendly, allowing it to be called with string chunks instead of the whole one, assuming that slices might be beheaded
+' and it will be attached with it's leftovers in the next call. Reaching the Limit of lines to slice, if specified, also returns true.
+'
+' Each single line-slice is just a plain array with two elements, Index and GetCount, respectively.
+'
+' @param SearchString - The string to be sliced into line slices.
+' @param Slices - Where the slices are being dropped, byref.
+' @param IncompleteSlice - The leftovers of the last slice which didn't properly terminate in a line ending character, or Empty.
+' @param [Index] - The 1-based index of the character to start slicing lines from.
+' @param [Limit] - The maximum limit of lines to slice, writting the leftovers as a single slice in the IncompleteSlice "out" parameter.
+Public Function StringLineSlices(ByRef SearchString As String, ByRef Slices As ArrayListEx, ByRef IncompleteSlice As Variant, Optional ByVal Index As Long = 1, Optional ByVal Limit As Long = -1) As Boolean
+    Dim i As Long, iMax As Long, bQuotes As Boolean, r As Long
     Const cQuote As String = """"
-    Set aX = ArrayListEx.Create()
     iMax = Len(SearchString)
-    r = 1
+    IncompleteSlice = Empty
+    r = Index
     
-    For i = 1 To iMax
+    For i = Index To iMax
         Select Case VBA.Mid$(SearchString, i, 1)
             Case cQuote: bQuotes = Not bQuotes
             Case vbLf
                 If Not bQuotes Then
                     If VBA.Mid$(SearchString, i - 1, 1) = vbCr Then
-                        aX.Add Array(r, i - (r + 1))
+                        Slices.Add Array(r, i - (r + 1))
                     Else
-                        aX.Add Array(r, i - r)
+                        Slices.Add Array(r, i - r)
                     End If
                     r = i + 1
+                    Limit = Limit - 1
+                    If Limit = 0 Then
+                        StringLineSlices = True
+                        Exit For
+                    End If
                 End If
         End Select
     Next i
-    
     If r < iMax Then
-        aX.Add Array(r, iMax - r)
+        IncompleteSlice = Array(r, iMax - r)
+    Else
+        StringLineSlices = True
     End If
-    
-    Set StringLineSlices = aX
 End Function
 
 
 ' --- MISC ---
 
-' USAGE: ?JSON.Stringify(ArrayRange(5, 8)) => [5, 6, 7, 8]
-Public Function ArrayRange(Optional ByVal RangeStart As Long = 0, Optional ByVal RangeEnd As Variant) As Variant()
-    Dim t() As Variant, i As Long, aSize As Long
-
-    If IsMissing(RangeEnd) Then RangeEnd = RangeStart
-    aSize = RangeEnd - RangeStart
-    ReDim t(0 To aSize)
-
-    For i = 0 To aSize
-        t(i) = RangeStart + i
+' USAGE: ArrayRange(5, 4) => [5, 6, 7, 8]
+Public Function ArrayRange(ByVal Index As Long, ByVal GetCount As Long) As Long()
+    Dim i As Long, t() As Long
+    ReDim t(0 To GetCount - 1)
+    For i = 0 To GetCount - 1
+        t(i) = Index + i
     Next i
-
     ArrayRange = t
 End Function
 
@@ -463,6 +475,30 @@ Public Function ColumnLetter(ByVal ColumnIndex As Long) As String
         ColumnLetter = VBA.Mid$(sChars, (0 ^ i) + ((Int(ColumnIndex / CLng(CLng(26) ^ i)) - (1 - (0 ^ i))) Mod CLng(26)) + (1 - (0 ^ i)), 1) & ColumnLetter
         i = i + 1
     Loop Until ((26 ^ i) + (26 * (1 - (0 ^ (i - 1)))) > ColumnIndex)
+End Function
+
+Public Function ValueToString(ByRef Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString: ValueToString = """" & VBA.Replace(Value, """", """""") & """"
+        Case vbNull: ValueToString = vbNullString
+        Case vbDouble, vbDecimal, vbSingle, vbCurrency, vbInteger, vbByte, vbLong, &H14: ValueToString = VBA.Mid$(Str(Value), 2)
+        Case vbDate
+            Select Case Fix(Value)
+                Case Value: ValueToString = VBA.Join(Array(Year(Value), Month(Value), Day(Value)), "-")
+                Case 0: ValueToString = CStr(TimeValue(Value))
+                Case Else: ValueToString = VBA.Join(Array(VBA.Join(Array(Year(Value), Month(Value), Day(Value)), "-"), CStr(TimeValue(Value))), " ")
+            End Select
+        Case vbBoolean: ValueToString = IIf(Value, "true", "false")
+        Case Else: ValueToString = CStr(Value)
+    End Select
+End Function
+
+Public Function ValueToLocalString(ByRef Value As Variant) As String
+    Select Case VarType(Value)
+        Case vbString: ValueToLocalString = """" & VBA.Replace(Value, """", """""") & """"
+        Case vbNull: ValueToLocalString = vbNullString
+        Case Else: ValueToLocalString = CStr(Value)
+    End Select
 End Function
 
 Public Function ArrayItem(ByRef ArrayLike As Variant, ByVal Index As Long, Optional ByRef ValueIfNull As Variant) As Variant

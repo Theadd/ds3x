@@ -10,6 +10,7 @@ Attribute VB_Exposed = True
 '@Folder "ds3x.Libraries"
 Option Compare Database
 Option Explicit
+Option Base 0
 
 
 '
@@ -63,6 +64,51 @@ Private pFSO As Scripting.FileSystemObject
 Public Property Get FSO() As Scripting.FileSystemObject
     If pFSO Is Nothing Then Set pFSO = New Scripting.FileSystemObject
     Set FSO = pFSO
+End Property
+
+' Multi-Byte file stream reader
+' Just keep calling .ReadText(&H20000) on it until it gives you no more (vbNullString), make a call to .Close once you're done.
+Public Property Get StreamReader(ByVal TargetFile As String) As ADODB.Stream
+    Dim e As String
+    ' 2B 2F 76 -> UTF-7
+    ' EF BB BF -> UTF-8
+    ' FF FE    -> UTF-16LE
+    ' FE FF    -> UTF-16BE
+    On Error GoTo Finally
+    Set StreamReader = New ADODB.Stream
+    With StreamReader
+        .Open
+        .LoadFromFile FileSystemLib.Resolve(TargetFile)
+        If .Charset = "Unicode" Then
+            .Type = adTypeBinary
+            If VBA.Hex$(.Read(4)(3)) <> "0" Then e = "UTF-8"
+            .Position = 0
+        End If
+        .Type = adTypeText
+        If e <> vbNullString Then
+            .Charset = e
+            .Position = 2
+        End If
+    End With
+    Exit Property
+Finally:
+    On Error Resume Next
+    StreamReader.Close
+End Property
+
+' Multi-Byte file stream writer
+Public Property Get StreamWriter() As ADODB.Stream
+    On Error GoTo Finally
+    Set StreamWriter = New ADODB.Stream
+    With StreamWriter
+        .Open
+        .Type = adTypeText
+'        .Charset = "UTF-8"
+    End With
+    Exit Property
+Finally:
+    On Error Resume Next
+    StreamWriter.Close
 End Property
 
 Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
@@ -268,7 +314,7 @@ End Function
 ' de intentos, hasta que el archivo sea liberado (escrito por completo y cerrado).
 ' Si el archivo especificado no existe, se asegurará de que podamos crear ese fichero, de lo contrario devolverá false.
 Public Function TryWaitFileWriteAccess(ByVal TargetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
-    Dim stream As TextStream
+    Dim Stream As TextStream
     TryWaitFileWriteAccess = False
 
     If TryWaitFileExists(TargetPath, 0) Then
@@ -300,8 +346,8 @@ MoveFileBack:
         End If
     Else
         ' There's no existing file at targetPath, ensure write access
-        Set stream = FSO.CreateTextFile(TargetPath, overwrite:=False)
-        stream.Close
+        Set Stream = FSO.CreateTextFile(TargetPath, overwrite:=False)
+        Stream.Close
         
         If TryWaitFileExists(TargetPath, retryAttempts) Then
             
@@ -435,28 +481,29 @@ End Function
 
 Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal overwriteIfAlreadyExists As Boolean = True, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
-    Dim stream As TextStream
+    Dim Stream As TextStream
     
-    Set stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
-    stream.Write (Content)
-    stream.Close
+    Set Stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
+    Stream.Write Content
+    Stream.Close
     
     TryWriteTextToFile = True
     Exit Function
     
 ErrorHandler:
     On Error Resume Next
+    Resume Next
     TryWriteTextToFile = False
-    If Not (stream Is Nothing) Then stream.Close
+    If Not (Stream Is Nothing) Then Stream.Close
 End Function
 
 Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
-    Dim stream As TextStream
+    Dim Stream As TextStream
     
-    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, IIf(AsUnicode, TristateTrue, TristateFalse))
-    Content = stream.ReadAll
-    stream.Close
+    Set Stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, IIf(AsUnicode, TristateTrue, TristateFalse))
+    Content = Stream.ReadAll
+    Stream.Close
     
     TryReadAllTextInFile = True
     Exit Function
@@ -464,16 +511,16 @@ Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content A
 ErrorHandler:
     On Error Resume Next
     TryReadAllTextInFile = False
-    If Not (stream Is Nothing) Then stream.Close
+    If Not (Stream Is Nothing) Then Stream.Close
 End Function
 
 Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As String, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
-    Dim stream As TextStream
+    Dim Stream As TextStream
     
-    Set stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(AsUnicode, TristateTrue, TristateFalse))
-    stream.Write Content
-    stream.Close
+    Set Stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(AsUnicode, TristateTrue, TristateFalse))
+    Stream.Write Content
+    Stream.Close
     
     TryAppendTextInFile = True
     Exit Function
@@ -481,7 +528,7 @@ Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As
 ErrorHandler:
     On Error Resume Next
     TryAppendTextInFile = False
-    If Not (stream Is Nothing) Then stream.Close
+    If Not (Stream Is Nothing) Then Stream.Close
 End Function
 
 Public Function TryShellExecute(ByRef TargetFile As String, Optional ByVal ShowStyle As VbAppWinStyle = vbNormalFocus) As Boolean
@@ -607,5 +654,4 @@ Public Function SystemClipboard(Optional StoreText As String) As String
         End With
     End With
 End Function
-
 

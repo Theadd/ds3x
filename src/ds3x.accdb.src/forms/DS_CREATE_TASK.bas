@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =4770
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8655
+    Top =3360
+    Right =24150
+    Bottom =13515
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1284,9 +1284,7 @@ Public Sub RebuildTasksList()
     Set pTasks = pController.TaskController.AvailableTasks.Tasks
     Set pTaskNames = ArrayListEx.Create(pTasks.Keys)
     Set pTaskGroups = DictionaryEx.Create()
-    If pActiveTaskName = "" Then
-        ActiveTaskType = ""
-    Else
+    If pActiveTaskName <> vbNullString Then
         ActiveTaskType = pTasks(pActiveTaskName)(DS_T_TYPE)
     End If
     
@@ -1295,8 +1293,6 @@ Public Sub RebuildTasksList()
         TaskType = pTasks(TaskName)(DS_T_TYPE)
         If TaskType = "XS" Then TaskType = "DS"
         RequiresPattern = pTasks(TaskName)(DS_T_REQUIRES)
-        'Debug.Print Printf("# %1 => ActiveTaskType Like RequiresPattern: %2 Like %3 = %4", TaskName, ActiveTaskType, RequiresPattern, CBool(ActiveTaskType Like RequiresPattern))
-        
         If Not pTaskGroups.Exists(TaskType) Then
             pTaskGroups.Add TaskType, ArrayListEx.Create()
         End If
@@ -1388,7 +1384,6 @@ End Sub
 Private Sub Form_Load()
     ScreenLib.ScreenLib_Resync
     ScreenLib.WindowSizeTo Me, 12300, 6500
-'    WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(PointInRect(GetWindowRect(Me), DirectionType.Center))
     ScreenLib.WindowAlwaysOnTop Me
     ScreenLib.SetControlAsEnabled Me.DS_ADD_TASK_BUTTON, False
 End Sub
@@ -1506,6 +1501,12 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
             Else
                 .Value = ""
             End If
+        ElseIf ParamName Like "*ColumnIndex*" Then
+            If pController.SelectedColumnIndexes.Count >= 1 Then
+                .Value = CStr(pController.SelectedColumnIndexes(0))
+            Else
+                .Value = ""
+            End If
         ElseIf ParamName Like "*TargetFile*" Then
             .AddItem ""
             .AddItem "< Select... >"
@@ -1529,7 +1530,7 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                             .AddItem Item
                             .Value = Item
                         Case "LoadFromFileAsCSV"
-                            Item = "{""Delimiter"": "";"", ""AsUnicode"": false, ""InLocalFormat"": true, ""AutoHeaders"": true}"
+                            Item = "{""Delimiter"": ""Auto"", ""InLocalFormat"": false, ""AutoHeaders"": true}"
                             .AddItem ""
                             .AddItem Item
                             .Value = Item
