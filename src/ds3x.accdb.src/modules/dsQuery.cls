@@ -2,7 +2,7 @@
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "dbQuery"
+Attribute VB_Name = "dsQuery"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -33,21 +33,20 @@ Private pNoCloseOnTerminate As Boolean
 
 ' Contiene el Err.Description de la última llamada fallida a TryQuery().
 Public Property Get LastError() As String: LastError = pLastError: End Property
-Attribute LastError.VB_Description = "Contiene el err.Description de la última llamada fallida a TryQuery."
 
 Public Property Get CloseOnTerminate() As Boolean: CloseOnTerminate = Not pNoCloseOnTerminate: End Property
 Public Property Let CloseOnTerminate(ByVal Value As Boolean): pNoCloseOnTerminate = Not Value: End Property
 
-Public Property Get Connection() As ADODB.Connection
-    If pConn Is Nothing Then OpenConnection
+Public Property Get Connection(Optional ByVal CursorLocation As ADODB.CursorLocationEnum = adUseServer) As ADODB.Connection
+    If pConn Is Nothing Then OpenConnection CursorLocation
     Set Connection = pConn
 End Property
 
 Public Property Get ConnectionString() As String
     On Error GoTo Finally
     If pConnectionString = vbNullString Then
-        If ObjPtr(Me) <> ObjPtr(dbQuery) Then
-            pConnectionString = dbQuery.ConnectionString
+        If ObjPtr(Me) <> ObjPtr(dsQuery) Then
+            pConnectionString = dsQuery.ConnectionString
         Else
             Dim s As String
             s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
@@ -69,6 +68,23 @@ Public Property Let ConnectionString(ByVal Value As String)
         pConn.Close
         Set pConn = Nothing
     End If
+End Property
+
+'@DefaultMember
+Public Property Get Item(ByVal QueryString As String) As ADODB.Recordset
+Attribute Item.VB_UserMemId = 0
+    Dim rs As New ADODB.Recordset
+
+    With rs
+        Set .ActiveConnection = Me.Connection
+        .Source = QueryString
+        .CursorLocation = adUseClient
+        .LockType = adLockReadOnly
+        .CursorType = adOpenStatic
+        .Open CursorType:=adOpenStatic, Options:=adCmdText
+    End With
+    
+    Set Item = rs
 End Property
 
 
@@ -208,12 +224,15 @@ Private Sub Class_Terminate()
     End If
 End Sub
 
-Private Sub OpenConnection()
+Private Sub OpenConnection(ByVal CursorLocation As ADODB.CursorLocationEnum)
     Set pConn = New ADODB.Connection
-    pConn.ConnectionString = ConnectionString
-    pConn.CommandTimeout = 240000   ' ~= 2d 18h
-    pConn.ConnectionTimeout = 10
-    pConn.Open
+    With pConn
+        .CursorLocation = CursorLocation
+        .ConnectionString = ConnectionString
+        .CommandTimeout = 240000   ' ~= 2d 18h
+        .ConnectionTimeout = 10
+        .Open
+    End With
 End Sub
 
 Public Sub Dispose()
@@ -222,4 +241,3 @@ Public Sub Dispose()
         Set pConn = Nothing
     End If
 End Sub
-

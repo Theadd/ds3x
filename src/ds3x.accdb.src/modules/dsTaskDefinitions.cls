@@ -519,7 +519,7 @@ LoadFromFileAsCSVFallback:
 End Function
 
 Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal ConnectionString As Variant, Optional ByVal DisableCache As Variant) As dsTable
-    Dim dsT As dsTable, dbQ As dbQuery
+    Dim dsT As dsTable, dbQ As dsQuery
     DisableCache = GetParam(DisableCache, False)
     
     If Not DisableCache Then
@@ -534,11 +534,11 @@ Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal Connect
 LoadFromSQLFallback:
     On Error GoTo 0
     ConnectionString = GetParam(ConnectionString, "")
-    Set dbQ = New dbQuery
+    Set dbQ = New dsQuery
     If Trim(CStr(ConnectionString)) <> "" Then dbQ.ConnectionString = CStr(ConnectionString)
     dbQ.CloseOnTerminate = False
     pTaskController.AddResource dbQ
-    Set dsT = dsTable.Create(dbQ.Create(CStr(QueryString)), True)
+    Set dsT = dsTable.Create(dbQ(CStr(QueryString)), True)
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
     End If
@@ -1228,4 +1228,5 @@ Private Function AutoDetectDelimiterInCSV(ByRef ContentString As String) As Stri
 End Function
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
+
 
