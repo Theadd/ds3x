@@ -203,7 +203,9 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     dsApp.GlobalVMemAnalysis "@RebuildTask(" & dX("Id") & " " & TaskName & ")"
 End Sub
 
-
+Public Sub TriggerOnBusyChange(ByVal IsBusy As Boolean)
+    RaiseEvent OnBusyChange(IsBusy)
+End Sub
 
 
 Private Sub Class_Initialize()
