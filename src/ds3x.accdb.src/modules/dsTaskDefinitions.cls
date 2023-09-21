@@ -474,7 +474,7 @@ LoadFromFileAsJSONFallback:
     TargetFile = GetParam(TargetFile, "")
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
     
-    If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent, False) Then
+    If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent) Then
         Err.Raise 17, , "Unable to read text from provided file"
     End If
     Set dsT = dsTable.Create(sContent)
@@ -489,7 +489,7 @@ Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Op
     Dim dsT As dsTable, sContent As String, sTarget As String, dX As DictionaryEx
     DisableCache = GetParam(DisableCache, False)
     Set Options = GetParamAsDictionaryEx(Options)
-    
+
     ' {"Delimiter": "Auto", "InLocalFormat": true, "AutoHeaders": true}
     Set dX = DictionaryEx.Create() _
         .Add("Delimiter", Options.GetValue("Delimiter", "Auto")) _
@@ -511,6 +511,7 @@ LoadFromFileAsCSVFallback:
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
     
     Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+'    Set dsT = LoadFromCSVAsSingleSlice(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
     End If
@@ -1112,16 +1113,17 @@ Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter
     Dim i As Long, sgX As ArraySliceGroup, nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
     Dim leftOvers As Variant, leftOversIndex As Long, buff As String, buffStream As String
     Dim skipLoading As Boolean, skipFetching As Boolean, slicingOk As Boolean
-    Const dsChunkSize As Long = 1000, buffCap As Long = &H100000 ' 1MB
+    Const dsChunkSize As Long = 10000, buffCap As Long = &H100000 ' 1MB
     cQuote = """": cDblQuote = """"""
     Set sLines = ArrayListEx.Create()
     
-    With FileSystemLib.StreamReader(TargetFile)
+'    With FileSystemLib.StreamReader(TargetFile)
+    FileSystemLib.TryReadAllTextInFile TargetFile, buff
         Do
             If Not skipFetching Then
-                buffStream = .ReadText(buffCap)
-                buff = buff & buffStream
-                If .Position >= .SIZE Then buffStream = vbNullString
+'                buffStream = .ReadText(buffCap)
+'                buff = buff & buffStream
+'                If .Position >= .SIZE Then buffStream = vbNullString
             End If
             i = dsChunkSize + IIf(AutoHeaders And ctX Is Nothing, 1, 0)
             c = IIf(leftOversIndex > 0, leftOversIndex, 1)
@@ -1192,8 +1194,8 @@ Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter
                 leftOversIndex = 0
             End If
         Loop While (Not (buffStream = vbNullString And buff = vbNullString And sLines.Count = 0))
-        .Close
-    End With
+'        .Close
+'    End With
     
     Set sgX = ArraySliceGroup.Create()
     sgX.SliceGroups = ctX.ToArray()
@@ -1211,6 +1213,74 @@ Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter
     End If
 
     Set LoadFromCSV = dsT
+End Function
+
+Private Function LoadFromCSVAsSingleSlice(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
+    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
+    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
+    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
+    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long, ContentString As String, leftOvers As Variant
+    Dim buffStream As String
+    cQuote = """": cDblQuote = """"""
+
+    FileSystemLib.TryReadAllTextInFile TargetFile, ContentString
+    Set sLines = ArrayListEx.Create()
+    If Not CollectionsLib.StringLineSlices(ContentString, sLines, leftOvers) Then
+        sLines.Add leftOvers
+    End If
+    If Delimiter = "Auto" Then
+        Delimiter = AutoDetectDelimiterInCSV(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)))
+    End If
+    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+    If AutoHeaders Then sLines.RemoveAt 0
+    nRows = sLines.Count
+    nCols = colHeaders.Count
+    ReDim t(0 To nRows - 1, 0 To nCols - 1)
+
+    r = 0
+    For Each t0 In sLines
+        s = VBA.Mid$(ContentString, t0(0), t0(1))
+        bQuotes = False: bQuoted = False: c = 0: Idx = 0
+        For i = 1 To VBA.Len(s)
+            Select Case VBA.Mid$(s, i, 1)
+                 Case cQuote: bQuotes = Not bQuotes: bQuoted = True
+                 Case Delimiter: bMatch = Not bQuotes
+            End Select
+            If i = VBA.Len(s) Then
+                i = i + 1
+                bMatch = True
+            End If
+            If bMatch Then
+                If bQuoted Then
+                    t(r, c) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 2, i - Idx - 3), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+                Else
+                    sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
+                    Select Case True
+                        Case sCell = vbNullString: t(r, c) = Empty
+                        Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
+                        Case IsDate(sCell): t(r, c) = CDate(sCell)
+                        Case Else: t(r, c) = sCell
+                    End Select
+                End If
+                Idx = i
+                bQuoted = False
+                c = c + 1
+                bMatch = False
+            End If
+        Next i
+        r = r + 1
+    Next t0
+    Set a2X = Array2dEx.Create()
+    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    Set dsT = dsTable.Create(a2X, False)
+    If AutoHeaders Then
+        For c = 0 To nCols - 1
+            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
+        Next c
+        dsT.SetHeaders colHeaders.ToArray()
+    End If
+
+    Set LoadFromCSVAsSingleSlice = dsT
 End Function
 
 Private Function MakeJagged2dArrayContainer(ByVal Rows As Long, ByVal Columns As Long) As Variant
