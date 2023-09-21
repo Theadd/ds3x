@@ -213,21 +213,21 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
     If Not nRows > 0 Then Exit Function
     On Error GoTo ErrorHandler
     
-#If Win64 Then
-    For c = 0 To nCols - 1
-        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
-            If ApplyUserLocale Then
-                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance.Instance
-            Else
-                .Value = C2ArraySlice(pGroups(c)).Instance.Instance
-            End If
-        End With
-    Next c
-#Else
+'#If Win64 Then
+'    For c = 0 To nCols - 1
+'        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
+'            If ApplyUserLocale Then
+'                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance.Instance
+'            Else
+'                .Value = C2ArraySlice(pGroups(c)).Instance.Instance
+'            End If
+'        End With
+'    Next c
+'#Else
     For c = 0 To nCols - 1
         SliceAt(c).CopyToRange RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c), ApplyUserLocale
     Next c
-#End If
+'#End If
     Exit Function
 ErrorHandler:
     Debug.Print "[ERROR] @ArraySliceGroup.CopyToRange() -> " & Err.Description
