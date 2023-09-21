@@ -52,6 +52,10 @@ Public Property Get Row(ByVal Index As Long) As Variant
 End Property
 
 
+Public Sub CloneArray(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef OutArray() As Variant)
+    MemoryLib.CloneParamArray Instance(Index, ColumnIndex), GetCount, OutArray
+End Sub
+
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx: Set CreateBlank = CreateArray2dEx(RowsCount, ColumnsCount): End Function
 
 Public Function Create(Optional ByRef ArrayLike As Variant) As Array2dEx
