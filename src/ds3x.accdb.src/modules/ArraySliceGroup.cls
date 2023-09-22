@@ -213,21 +213,10 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
     If Not nRows > 0 Then Exit Function
     On Error GoTo ErrorHandler
     
-'#If Win64 Then
-'    For c = 0 To nCols - 1
-'        With RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c)
-'            If ApplyUserLocale Then
-'                .FormulaR1C1Local = C2ArraySlice(pGroups(c)).Instance.Instance
-'            Else
-'                .Value = C2ArraySlice(pGroups(c)).Instance.Instance
-'            End If
-'        End With
-'    Next c
-'#Else
     For c = 0 To nCols - 1
         SliceAt(c).CopyToRange RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c), ApplyUserLocale
     Next c
-'#End If
+
     Exit Function
 ErrorHandler:
     Debug.Print "[ERROR] @ArraySliceGroup.CopyToRange() -> " & Err.Description
@@ -246,10 +235,6 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
 '    dsApp.GlobalVMemAnalysis "", False
     For c = 0 To nCols - 1
         SliceAt(c).CloneIntoArray Out2dArray, 0, c
-'        SliceAt(c).SlicedArray vSliced
-'        For r = 0 To UBound(vSliced, 1)
-'            Out2dArray(r, c) = vSliced(r, 0)
-'        Next r
     Next c
 '    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
 End Sub
@@ -341,7 +326,7 @@ End Function
 
 Private Function GetSlicedExcelRangeColumn(ByRef Target As Excel.Range, ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long) As ArraySlice
     Dim sX As ArraySlice, ct As Long, ctCap As Long, nCts As Long
-    Const dsChunkSize As Long = 1000
+    Const dsChunkSize As Long = 50000
     nCts = CLng(Int((GetCount - 1) / dsChunkSize))
     
     With Target
@@ -364,7 +349,6 @@ Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
     GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
 End Function
 
-Public Sub Debugger(): Stop: End Sub
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function

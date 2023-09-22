@@ -84,48 +84,6 @@ Public Property Get JScriptCode(ByVal JScriptName As String) As String
 End Property
 
 
-
-' --- ByRef Variant Array ---
-
-' WARN: Provided arr must be declared with ending parenthesis or access will instantly crash.
-'   @EXAMPLE:
-'
-'       Dim t() as Variant, t2 as Variant
-'       ReDim t(0 To 10)
-'       t(0) = "foo"
-'       t2 = CollectionsLib.GetArrayByRef(t)
-'       t2(1) = "bar"
-'       Debug.Print JSON.Stringify(t)
-'
-Public Function GetArrayByRef(ByRef arr As Variant) As Variant
-    If IsArray(arr) Then
-        GetArrayByRef = VarPtrArr(arr)
-        Dim vt As VbVarType: vt = VarType(arr) Or VT_BYREF
-        CopyMemory GetArrayByRef, vt, 2
-    Else
-        Err.Raise 5, "GetArrayByRef", "Array required"
-    End If
-End Function
-
-#If Win64 Then
-Public Function VarPtrArr(ByRef arr As Variant) As LongLong
-#Else
-Public Function VarPtrArr(ByRef arr As Variant) As Long
-#End If
-    Const vtArrByRef As Long = vbArray + VT_BYREF
-    Dim vt As VbVarType
-    CopyMemory vt, arr, 2
-    If (vt And vtArrByRef) = vtArrByRef Then
-        Const pArrayOffset As Long = 8
-        CopyMemory VarPtrArr, ByVal VarPtr(arr) + pArrayOffset, PTR_SIZE
-    Else
-        Err.Raise 5, "VarPtrArr", "Array required"
-    End If
-End Function
-
-' ---
-
-
 ' Devuelve un array estructurado en formato SearchDefinition como el descrito en los comentarios de la parte superior
 ' de este módulo, partiendo de una SearchString que puede estar compuesta por múltiples criterios de búsqueda y en
 ' distintos formatos.
