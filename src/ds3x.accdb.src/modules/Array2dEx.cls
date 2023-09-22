@@ -56,6 +56,14 @@ Public Sub CloneArray(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnI
     MemoryLib.CloneParamArray Instance(Index, ColumnIndex), GetCount, OutArray
 End Sub
 
+Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByVal TargetMemoryAddress As LongPtr)
+    MemoryLib.Slice2dArrayToV2 VarPtr(Instance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
+End Sub
+
+Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
+    Instance = MemoryLib.GetArrayByRef(TargetArray)
+End Sub
+
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx: Set CreateBlank = CreateArray2dEx(RowsCount, ColumnsCount): End Function
 
 Public Function Create(Optional ByRef ArrayLike As Variant) As Array2dEx
@@ -117,7 +125,7 @@ End Function
 
 Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
     Set CopyToRange = Me
-    If Not Me.Count > 0 Then Exit Function
+    If Not Count > 0 Then Exit Function
 
     With RangeObject.Resize(Me.Count, 1 + (UBound(Instance, 2) - LBound(Instance, 2)))
         If ApplyUserLocale Then
@@ -160,7 +168,7 @@ Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
     End If
     
     Set CreateFromRecordset = New Array2dEx
-    CreateFromRecordset.Instance = CollectionsLib.GetArrayByRef(k)
+    CreateFromRecordset.SetInstanceByRef k
 End Function
 
 Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
@@ -172,7 +180,7 @@ Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array
     MemoryLib.UpdateLBound t, 1, 0
     MemoryLib.UpdateLBound t, 2, 0
     'Stop
-    CreateFromExcelRange.Instance = MemoryLib.GetArrayByRef(t)
+    CreateFromExcelRange.SetInstanceByRef t
     
 End Function
 
@@ -185,7 +193,7 @@ Private Function CreateFromRecordsetFields(ByVal AllFields As ADODB.Fields) As A
     Next i
     
     Set CreateFromRecordsetFields = New Array2dEx
-    CreateFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromRecordsetFields.SetInstanceByRef t
 End Function
 
 Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dEx
@@ -208,7 +216,7 @@ Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dE
     Next i
 
     Set CreateFromArrayList = New Array2dEx
-    CreateFromArrayList.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromArrayList.SetInstanceByRef t
 End Function
 
 Private Function CreateFromSingleColumnArrayListEx(ByVal TargetArray As ArrayListEx) As Array2dEx
@@ -226,7 +234,7 @@ Private Function CreateFromSingleColumnArrayListEx(ByVal TargetArray As ArrayLis
     Next v
     
     Set CreateFromSingleColumnArrayListEx = New Array2dEx
-    CreateFromSingleColumnArrayListEx.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromSingleColumnArrayListEx.SetInstanceByRef t
 End Function
 
 Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dEx
@@ -259,7 +267,7 @@ Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dE
         i = i + 1
     Next Entry
     
-    CreateFromJaggedArray.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateFromJaggedArray.SetInstanceByRef t
 End Function
 
 ' Concatenate all elements of TargetArray as additional columns into a new Array2dEx
@@ -287,7 +295,7 @@ Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     Next i
     
     Set Join = New Array2dEx
-    Join.Instance = CollectionsLib.GetArrayByRef(t)
+    Join.SetInstanceByRef t
 End Function
 
 Public Function AddRange(ByVal TargetArray As Array2dEx) As Array2dEx
@@ -334,7 +342,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         GetRange.ColumnCount = -1
     End If
     
-    GetRange.Instance = CollectionsLib.GetArrayByRef(t)
+    GetRange.SetInstanceByRef t
 End Function
 
 ' Returns an Array2dEx containing only those rows specified in the RowIndexes array.
@@ -447,7 +455,7 @@ Public Function Transpose() As Array2dEx
     Next
     
     Set Transpose = New Array2dEx
-    Transpose.Instance = CollectionsLib.GetArrayByRef(t)
+    Transpose.SetInstanceByRef t
 End Function
 
 
@@ -542,7 +550,7 @@ Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As 
         CreateArray2dEx.ColumnCount = -1
     End If
     
-    CreateArray2dEx.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateArray2dEx.SetInstanceByRef t
 End Function
 
 
