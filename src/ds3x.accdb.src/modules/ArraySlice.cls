@@ -57,7 +57,7 @@ End Property
 Public Property Get Instance() As Array2dEx
     If UBound(pSliced) < 0 Then SliceArray
     Set Instance = New Array2dEx
-    Instance.Instance = CollectionsLib.GetArrayByRef(pSliced)
+    Instance.SetInstanceByRef pSliced
 End Property
 
 
@@ -217,6 +217,28 @@ Public Sub CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUse
     Next v
 End Sub
 
+Public Sub CloneIntoArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As Long, ByVal TargetColumnIndex As Long)
+    Dim t() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
+    If pCount = 0 Then Exit Sub
+    
+    For Each v In pSlices
+        Select Case True
+            Case TypeOf v(0) Is Array2dEx
+                C2Array2dEx(v(0)).CloneSliceTo v(2), v(3), v(1), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex))
+            Case TypeOf v(0) Is RecordsetEx
+                With C2RecordsetEx(v(0))
+                    iAux = CLng(.Instance.AbsolutePosition)
+                    .Instance.AbsolutePosition = v(2)
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
+                    MemoryLib.Slice2dArrayToV2 VarPtr(k(0, 0)), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), v(3)
+                    .Instance.AbsolutePosition = iAux
+                End With
+            Case Else
+                Err.Raise 17
+        End Select
+        r = r + v(3)
+    Next v
+End Sub
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
@@ -226,11 +248,10 @@ Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: S
 Private Sub SliceArray()
     Dim t() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
     If pCount = 0 Then
-        t = Array2dEx.CreateBlank(0, 0).Instance
+        pSliced = Array2dEx.CreateBlank(0, 0).Instance
         Exit Sub
     End If
     ReDim pSliced(0 To pCount - 1, 0 To 0)
-    r = 0
     
     For Each v In pSlices
         Select Case True
@@ -246,10 +267,12 @@ Private Sub SliceArray()
                 ' V2
 '                MemoryLib.Slice2dArrayToV2 VarPtr(a2dX.Instance(v(2), v(1))), VarPtr(pSliced(r, 0)), v(3)
                 ' V3
-                a2dX.CloneArray v(2), v(3), v(1), t
-                For i = 0 To v(3) - 1
-                    pSliced(r + i, 0) = t(i)
-                Next i
+'                a2dX.CloneArray v(2), v(3), v(1), t
+'                For i = 0 To v(3) - 1
+'                    pSliced(r + i, 0) = t(i)
+'                Next i
+                ' V4
+                a2dX.CloneSliceTo v(2), v(3), v(1), VarPtr(pSliced(r, 0))
             Case TypeOf v(0) Is RecordsetEx
                 With C2RecordsetEx(v(0))
                     iAux = CLng(.Instance.AbsolutePosition)
