@@ -52,12 +52,8 @@ Public Property Get Row(ByVal Index As Long) As Variant
 End Property
 
 
-Public Sub CloneArray(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef OutArray() As Variant)
-    MemoryLib.CloneParamArray Instance(Index, ColumnIndex), GetCount, OutArray
-End Sub
-
 Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByVal TargetMemoryAddress As LongPtr)
-    MemoryLib.Slice2dArrayToV2 VarPtr(Instance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
+    MemoryLib.SliceArray VarPtr(Instance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
 End Sub
 
 Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
@@ -139,6 +135,28 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     Exit Function
 UserLocaleFail:
     Debug.Print "[ERROR] @Array2dEx.CopyToRange() -> ApplyUserLocale - " & Err.Description
+    Resume Next
+End Function
+
+Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
+    Dim t() As Variant
+    Set CopySliceToRange = Me
+    If Not (Count > 0 And GetCount > 0) Then Exit Function
+    ReDim t(0 To GetCount - 1, 0 To 0)
+    MemoryLib.SliceArray VarPtr(Instance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
+    
+    With RangeObject.Resize(GetCount, 1)
+        If ApplyUserLocale Then
+            On Error GoTo UserLocaleFail
+            .FormulaR1C1Local = t
+        Else
+            .Value = t
+        End If
+    End With
+    
+    Exit Function
+UserLocaleFail:
+    Debug.Print "[ERROR] @Array2dEx.CopySliceToRange() -> ApplyUserLocale - " & Err.Description
     Resume Next
 End Function
 
