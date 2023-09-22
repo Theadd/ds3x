@@ -790,7 +790,6 @@ Public Sub CloneParamArray(ByRef firstElem As Variant _
                          , ByRef OutArray() As Variant)
     ReDim OutArray(0 To elemCount - 1)
     MemCopy VarPtr(OutArray(0)), VarPtr(firstElem), VARIANT_SIZE * elemCount
-'    CopyMemory ByVal VarPtr(outArray(0)), ByVal VarPtr(firstElem), CLngPtr(VARIANT_SIZE * elemCount)
     '
     Static sArr As SAFEARRAY_1D 'Fake array of VarTypes (Integers)
     Static rmArr As REMOTE_MEMORY
@@ -964,58 +963,13 @@ FinalDimension:
     GetArrayDimsCount = dimension - 1
 End Function
 
-'Public Sub FixVariantArray(ByRef outArray() As Variant, ByVal elemCount As Long, Optional ByVal numDimensions As Long = 1)
-'    Static sArr As SAFEARRAY_1D
-'    Static rmArr As REMOTE_MEMORY
-'
-'    If Not rmArr.isInitialized Then
-'        With sArr
-'            .cDims = 1
-'            .fFeatures = FADF_HAVEVARTYPE
-'            .cbElements = INT_SIZE
-'        End With
-'        InitRemoteMemory rmArr
-'        rmArr.memValue = VarPtr(sArr)
-'    End If
-'    sArr.rgsabound0.cElements = elemCount * VT_SPACING
-'    If numDimensions = 1 Then
-'        sArr.pvData = VarPtr(outArray(0))
-'        FixByValElements outArray, rmArr, rmArr.remoteVT
-'    Else
-'        sArr.pvData = VarPtr(outArray(0, 0))
-'        FixByValElements2d outArray, rmArr, rmArr.remoteVT
-'    End If
-'End Sub
-'
-'Private Sub FixByValElements2d(ByRef arr() As Variant, ByRef rmArr As REMOTE_MEMORY, ByRef vtArr As Variant)
-'    Dim i As Long, c As Long, v As Variant
-'    Dim vt As VbVarType, vtIndex As Long: vtIndex = 0
-'
-'    vtArr = vbArray + vbInteger
-'    For c = 0 To UBound(arr, 2)
-'        For i = 0 To UBound(arr, 1)
-'            vt = rmArr.memValue(vtIndex)
-'            If (vt And VT_BYREF) = 0 Then
-'                If (vt And vbArray) = vbArray Or vt = vbObject Or vt = vbString _
-'                Or vt = vbDataObject Or vt = vbUserDefinedType Then
-'                    If vt = vbObject Then Set v = arr(i, c) Else v = arr(i, c)
-'                    rmArr.memValue(vtIndex) = vbEmpty 'Avoid deallocation
-'                    If vt = vbObject Then Set arr(i, c) = v Else arr(i, c) = v
-'                End If
-'            End If
-'            vtIndex = vtIndex + VT_SPACING
-'        Next i
-'    Next c
-'    vtArr = vbEmpty
-'End Sub
-
-Public Sub Slice2dArrayTo(ByRef SrcArray As Variant, ByVal RowIndex As Long, ByVal colIndex As Long, ByVal GetCount As Long, ByRef DstArray() As Variant, Optional ByVal DstRowIndex As Long = 0, Optional DstColIndex As Long = 0)
+Public Sub Slice2dArrayTo(ByRef SrcArray As Variant, ByVal RowIndex As Long, ByVal ColIndex As Long, ByVal GetCount As Long, ByRef DstArray() As Variant, Optional ByVal DstRowIndex As Long = 0, Optional DstColIndex As Long = 0)
     Dim t() As Variant, sArr As SAFEARRAY_1D, zeroAddr As LongPtr
     Dim i As Long
     With sArr
         .cDims = 1
         .cbElements = INT_SIZE
-        .pvData = VarPtr(SrcArray(RowIndex, colIndex))
+        .pvData = VarPtr(SrcArray(RowIndex, ColIndex))
         .rgsabound0.cElements = GetCount
     End With
     CopyMemory ByVal VarPtrArr(t), VarPtr(sArr), CLngPtr(PTR_SIZE)
