@@ -42,7 +42,7 @@ Public Function CreateMassiveTable() As dsTable
         t(i, 0) = i
     Next i
     Set a2X = New Array2dEx
-    a2X.Instance = MemoryLib.GetArrayByRef(t)
+    a2X.SetInstanceByRef t
     Set sX = ArraySlice.Create(a2X)
     Set aX = New ArrayListEx
     v = Array(0, NumRows)
@@ -1271,7 +1271,7 @@ Private Function LoadFromCSVAsSingleSlice(ByRef TargetFile As String, Optional B
         r = r + 1
     Next t0
     Set a2X = Array2dEx.Create()
-    a2X.Instance = CollectionsLib.GetArrayByRef(t)
+    a2X.SetInstanceByRef t
     Set dsT = dsTable.Create(a2X, False)
     If AutoHeaders Then
         For c = 0 To nCols - 1

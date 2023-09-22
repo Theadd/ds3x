@@ -515,7 +515,7 @@ Private Function CreateColumnHeadersFromRecordsetFields(ByVal AllFields As ADODB
     Next i
 
     Set CreateColumnHeadersFromRecordsetFields = New Array2dEx
-    CreateColumnHeadersFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateColumnHeadersFromRecordsetFields.SetInstanceByRef t
 End Function
 
 Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
@@ -543,7 +543,7 @@ Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Ra
     Next i
 
     Set CreateColumnHeadersFromExcelRange = New Array2dEx
-    CreateColumnHeadersFromExcelRange.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateColumnHeadersFromExcelRange.SetInstanceByRef t
 End Function
 
 Private Sub MakeSureHeadersExist()

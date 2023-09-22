@@ -67,7 +67,7 @@ Public Property Get Instance() As Array2dEx
     Dim t() As Variant
     SlicedArray t
     Set Instance = New Array2dEx
-    Instance.Instance = CollectionsLib.GetArrayByRef(t)
+    Instance.SetInstanceByRef t
 End Property
 
 
@@ -243,14 +243,15 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     End If
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
-    dsApp.GlobalVMemAnalysis "", False
+'    dsApp.GlobalVMemAnalysis "", False
     For c = 0 To nCols - 1
-        SliceAt(c).SlicedArray vSliced
-        For r = 0 To UBound(vSliced, 1)
-            Out2dArray(r, c) = vSliced(r, 0)
-        Next r
+        SliceAt(c).CloneIntoArray Out2dArray, 0, c
+'        SliceAt(c).SlicedArray vSliced
+'        For r = 0 To UBound(vSliced, 1)
+'            Out2dArray(r, c) = vSliced(r, 0)
+'        Next r
     Next c
-    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
+'    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
 End Sub
 
 ' Practically there's no point in cloning an immutable object, it's just exposed to share some common API with the other collection class modules.

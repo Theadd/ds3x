@@ -787,9 +787,9 @@ End Sub
 '*******************************************************************************
 Public Sub CloneParamArray(ByRef firstElem As Variant _
                          , ByVal elemCount As Long _
-                         , ByRef outArray() As Variant)
-    ReDim outArray(0 To elemCount - 1)
-    MemCopy VarPtr(outArray(0)), VarPtr(firstElem), VARIANT_SIZE * elemCount
+                         , ByRef OutArray() As Variant)
+    ReDim OutArray(0 To elemCount - 1)
+    MemCopy VarPtr(OutArray(0)), VarPtr(firstElem), VARIANT_SIZE * elemCount
 '    CopyMemory ByVal VarPtr(outArray(0)), ByVal VarPtr(firstElem), CLngPtr(VARIANT_SIZE * elemCount)
     '
     Static sArr As SAFEARRAY_1D 'Fake array of VarTypes (Integers)
@@ -805,9 +805,9 @@ Public Sub CloneParamArray(ByRef firstElem As Variant _
         rmArr.memValue = VarPtr(sArr)
     End If
     sArr.rgsabound0.cElements = elemCount * VT_SPACING
-    sArr.pvData = VarPtr(outArray(0))
+    sArr.pvData = VarPtr(OutArray(0))
     '
-    FixByValElements outArray, rmArr, rmArr.remoteVT
+    FixByValElements OutArray, rmArr, rmArr.remoteVT
 End Sub
 
 '*******************************************************************************
@@ -1009,13 +1009,13 @@ End Function
 '    vtArr = vbEmpty
 'End Sub
 
-Public Sub Slice2dArrayTo(ByRef SrcArray As Variant, ByVal RowIndex As Long, ByVal ColIndex As Long, ByVal GetCount As Long, ByRef DstArray() As Variant, Optional ByVal DstRowIndex As Long = 0, Optional DstColIndex As Long = 0)
+Public Sub Slice2dArrayTo(ByRef SrcArray As Variant, ByVal RowIndex As Long, ByVal colIndex As Long, ByVal GetCount As Long, ByRef DstArray() As Variant, Optional ByVal DstRowIndex As Long = 0, Optional DstColIndex As Long = 0)
     Dim t() As Variant, sArr As SAFEARRAY_1D, zeroAddr As LongPtr
     Dim i As Long
     With sArr
         .cDims = 1
         .cbElements = INT_SIZE
-        .pvData = VarPtr(SrcArray(RowIndex, ColIndex))
+        .pvData = VarPtr(SrcArray(RowIndex, colIndex))
         .rgsabound0.cElements = GetCount
     End With
     CopyMemory ByVal VarPtrArr(t), VarPtr(sArr), CLngPtr(PTR_SIZE)
