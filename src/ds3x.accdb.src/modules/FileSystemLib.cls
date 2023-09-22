@@ -110,7 +110,6 @@ Public Property Get StreamWriter() As ADODB.Stream
     With StreamWriter
         .Open
         .Type = adTypeText
-'        .Charset = "UTF-8"
     End With
     Exit Property
 Finally:
@@ -635,24 +634,6 @@ Finally:
 End Function
 
 
-'Public Sub TestMultiByteCharset()
-'    Dim lastBytes As Variant, c As String, TargetFile As String, t() As Variant, i As Long
-'
-'    TargetFile = "C:\dev\AccessVBA\ds3x-repo\package.json"
-'
-'    c = FileSystemLib.GetFileCharset(TargetFile, lastBytes)
-'    If Not IsEmpty(lastBytes) Then
-'        ReDim t(0 To UBound(lastBytes))
-'        For i = 0 To UBound(t)
-'            t(i) = lastBytes(i)
-'        Next i
-'        Debug.Print VBA.Join(t, " ")
-'        '?ChrB(251) & ChrB(0)
-'        '?LeftB("ç", 1) & RightB("ç", 1)
-'    End If
-'
-'End Sub
-
 ' --- Memory Usage ---
 
 #If Win64 Then
@@ -762,7 +743,6 @@ Private Function DecodeByteString(ByRef SourceString As String, ByRef lastBytes 
         End If
         SourceString = SourceString & (ChrB(lastBytes(UBound(lastBytes))))
     End If
-    
     On Error Resume Next
     iSize = LenB(SourceString)
     If iSize = 0 Then Exit Function

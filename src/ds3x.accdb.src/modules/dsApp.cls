@@ -228,7 +228,7 @@ Private Sub InitializeCustomVars()
     
     s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
     If FileSystemLib.TryGetFileInAncestors(s, 3) Then
-        If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
+        If FileSystemLib.TryReadAllTextInFile(s, s) Then
             On Error GoTo Finally
             Set dX = DictionaryEx.Create(DictionaryEx.Create(s)("ds3x.CustomVars"))
             For Each Item In dX
@@ -309,7 +309,7 @@ Private Function GetConfigFromFile(Optional ByVal TargetFile As String = "packag
     
     s = FileSystemLib.Resolve(TargetFile)
     If FileSystemLib.TryGetFileInAncestors(s, 3) Then
-        If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
+        If FileSystemLib.TryReadAllTextInFile(s, s) Then
             Set GetConfigFromFile = DictionaryEx.Create(s)
         End If
     End If
