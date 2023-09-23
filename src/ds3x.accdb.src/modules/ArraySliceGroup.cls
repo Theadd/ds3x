@@ -212,10 +212,21 @@ Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal App
     nCols = ColumnCount
     If Not nRows > 0 Then Exit Function
     On Error GoTo ErrorHandler
-    
+
+#If Win64 Then
+    Dim t() As Variant
+    SlicedArray t
+    If ApplyUserLocale Then
+        RangeObject.Resize(nRows, nCols).FormulaR1C1Local = t
+    Else
+        RangeObject.Resize(nRows, nCols).Value = t
+    End If
+    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.CopyToRange()"
+#Else
     For c = 0 To nCols - 1
         SliceAt(c).CopyToRange RangeObject.Resize(nRows, 1).Offset(ColumnOffset:=c), ApplyUserLocale
     Next c
+#End If
 
     Exit Function
 ErrorHandler:
@@ -230,9 +241,9 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
         Out2dArray = Array2dEx.CreateBlank(0, 0).Instance
         Exit Sub
     End If
+    dsApp.GlobalVMemAnalysis "", False
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
-    dsApp.GlobalVMemAnalysis "", False
     For c = 0 To nCols - 1
         SliceAt(c).CloneInto2dArray Out2dArray, 0, c
     Next c
