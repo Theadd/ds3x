@@ -23,10 +23,10 @@ Begin Form
     Width =8145
     DatasheetFontHeight =11
     ItemSuffix =1582
-    Left =8655
-    Top =3360
-    Right =24150
-    Bottom =13515
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1544,7 +1544,7 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                             For Each Item In GetExcelTableStyles(): .AddItem CStr(Item): Next Item
                             .Value = "TableStyleMedium6"
                         Case "[ConnectionString]", "ConnectionString"
-                            Item = dbQuery.ConnectionString
+                            Item = dsQuery.ConnectionString
                             .AddItem ""
                             .AddItem CStr(Item)
                             .Value = CStr(Item)

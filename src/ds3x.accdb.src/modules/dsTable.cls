@@ -385,11 +385,11 @@ Fallback:
 End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, vHeads As Variant
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues() As Variant, vHeads As Variant
     iRow = GetColumnNames
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    Set AllValues = CollectionsLib.AsArrayListEx(Records)
+    CollectionsLib.AsArraySliceGroup(Records).SlicedJaggedArray AllValues
     vHeads = Headers.Row(0)
     
     With rs
@@ -515,7 +515,7 @@ Private Function CreateColumnHeadersFromRecordsetFields(ByVal AllFields As ADODB
     Next i
 
     Set CreateColumnHeadersFromRecordsetFields = New Array2dEx
-    CreateColumnHeadersFromRecordsetFields.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateColumnHeadersFromRecordsetFields.SetInstanceByRef t
 End Function
 
 Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
@@ -543,7 +543,7 @@ Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Ra
     Next i
 
     Set CreateColumnHeadersFromExcelRange = New Array2dEx
-    CreateColumnHeadersFromExcelRange.Instance = CollectionsLib.GetArrayByRef(t)
+    CreateColumnHeadersFromExcelRange.SetInstanceByRef t
 End Function
 
 Private Sub MakeSureHeadersExist()
