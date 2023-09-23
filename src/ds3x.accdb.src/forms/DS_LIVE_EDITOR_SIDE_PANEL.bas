@@ -23,7 +23,7 @@ Begin Form
     GridY =10
     Width =3734
     DatasheetFontHeight =11
-    ItemSuffix =1594
+    ItemSuffix =1595
     Left =3225
     Top =3030
     Right =28545
@@ -433,21 +433,22 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =4
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =1
                 End
                 Begin CommandButton
@@ -484,21 +485,22 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =4
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =5
                 End
                 Begin CommandButton
@@ -537,21 +539,22 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =4
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                 End
                 Begin CommandButton
                     TabStop = NotDefault
@@ -584,23 +587,24 @@ Begin Form
                     ForeTint =100.0
                     Shape =0
                     Gradient =0
-                    BackThemeColorIndex =8
+                    BackThemeColorIndex =5
                     BackTint =100.0
-                    BorderWidth =1
-                    BorderThemeColorIndex =8
+                    BorderThemeColorIndex =5
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
-                    HoverThemeColorIndex =8
-                    HoverTint =80.0
-                    PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    HoverThemeColorIndex =5
+                    HoverTint =60.0
+                    PressedThemeColorIndex =5
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =5
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                 End
                 Begin CommandButton
                     TabStop = NotDefault
@@ -620,7 +624,6 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    HorizontalAnchor =2
 
                     CursorOnHover =1
                     LayoutCachedLeft =1605
@@ -632,26 +635,27 @@ Begin Form
                     LayoutGroup =4
                     ForeThemeColorIndex =1
                     ForeTint =100.0
-                    WidthStretch =16
+                    WidthStretch =20
                     Shape =0
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =6
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =-1
                     WebImagePaddingBottom =-1
                     Overlaps =1
@@ -659,7 +663,6 @@ Begin Form
                 Begin CommandButton
                     TabStop = NotDefault
                     OverlapFlags =85
-                    TextFontCharSet =177
                     Left =2955
                     Top =165
                     Width =615
@@ -675,7 +678,6 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    HorizontalAnchor =2
 
                     CursorOnHover =1
                     LayoutCachedLeft =2955
@@ -687,33 +689,32 @@ Begin Form
                     LayoutGroup =4
                     ForeThemeColorIndex =1
                     ForeTint =100.0
-                    WidthStretch =16
                     Shape =0
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =6
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =-1
                     WebImagePaddingBottom =-1
                 End
                 Begin CommandButton
                     TabStop = NotDefault
                     OverlapFlags =93
-                    TextFontCharSet =177
                     Left =2250
                     Top =165
                     Width =630
@@ -729,7 +730,6 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    HorizontalAnchor =2
 
                     CursorOnHover =1
                     LayoutCachedLeft =2250
@@ -741,26 +741,27 @@ Begin Form
                     LayoutGroup =4
                     ForeThemeColorIndex =1
                     ForeTint =100.0
-                    WidthStretch =16
+                    WidthStretch =33
                     Shape =0
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =6
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =-1
                     WebImagePaddingBottom =-1
                     Overlaps =1
@@ -797,7 +798,6 @@ Begin Form
                     RightPadding =0
                     BottomPadding =0
                     GridlineColor =10921638
-                    HorizontalAnchor =2
                     LayoutCachedLeft =2880
                     LayoutCachedTop =165
                     LayoutCachedWidth =2955
@@ -805,7 +805,7 @@ Begin Form
                     ColumnStart =5
                     ColumnEnd =5
                     LayoutGroup =4
-                    WidthStretch =16
+                    WidthStretch =50
                     GroupTable =6
                 End
                 Begin TextBox
@@ -836,7 +836,6 @@ Begin Form
                     GridlineStyleRight =1
                     GridlineStyleBottom =1
                     GridlineColor =10921638
-                    HorizontalAnchor =2
                     ShowDatePicker =0
 
                     LayoutCachedLeft =165
@@ -869,7 +868,6 @@ Begin Form
                     ColumnStart =3
                     ColumnEnd =3
                     LayoutGroup =4
-                    WidthStretch =16
                     GroupTable =6
                 End
                 Begin EmptyCell
@@ -930,11 +928,10 @@ End Sub
 
 Private Sub DS_EDIT_BUTTON_Click()
     RemoveFocus
-    ' Set Controller.TaskController.DataSource("DS1") = dsTable.Create(ArrayListEx.Create().Add(Array(1, 2, 3)).Add(Array(4, 5, 6))).SetHeaders(Array("ColA", "ColB", "ColC"))
-    'Stop
 End Sub
 
 Private Sub DS_GENERATE_BUTTON_Click()
+    On Error Resume Next
     RemoveFocus
     Dim xlSheet As xlSheetsEx
     
@@ -952,23 +949,29 @@ Private Sub DS_NEW_BUTTON_Click()
 End Sub
 
 Private Sub DS_OPEN_BUTTON_Click()
+    On Error Resume Next
     RemoveFocus
     Controller.ImportPreset
 End Sub
 
 Private Sub DS_SAVE_AS_BUTTON_Click()
+    On Error Resume Next
     RemoveFocus
     Controller.SavePreset VBA.Environ$("USERPROFILE")
 End Sub
 
 Private Sub DS_SAVE_BUTTON_Click()
+    On Error Resume Next
     RemoveFocus
     Controller.SavePreset
 End Sub
 
 Private Sub Form_Load()
-    ScreenLib.SetControlAsEnabled Me.DS_EDIT_BUTTON, False
+    SetButtonAsClickable Me.DS_EDIT_BUTTON, False, 8
     ScreenLib.SetControlAsEnabled Me.DS_ENTRY_NAME, False
+    SetButtonAsClickable Me.DS_GENERATE_BUTTON, False, 8
+    SetButtonAsClickable Me.DS_SAVE_BUTTON, False, 8
+    SetButtonAsClickable Me.DS_SAVE_AS_BUTTON, False, 8
 End Sub
 
 Private Sub pController_OnDataSourceChange()
@@ -990,4 +993,26 @@ End Sub
 Private Sub RemoveFocus()
     Me.HiddenControl.SetFocus
     DoEvents
+End Sub
+
+Public Function Focus(ByRef frm As Access.Form)
+    On Error Resume Next
+    frm.Controls("HiddenControl").SetFocus
+    DoEvents
+End Function
+
+Private Sub SetButtonAsClickable(ByRef TargetControl As Access.CommandButton, ByVal Value As Boolean, Optional ByVal ThemeColorIndexOnNormal As Long = 8)
+    ScreenLib.SetClickableStyle TargetControl, Value
+    ScreenLib.SetThemeColorStyle TargetControl, IIf(Value, ThemeColorIndexOnNormal, 6)
+End Sub
+
+Public Sub RefreshClickableButtons()
+    Dim hasTasks As Boolean
+    On Error GoTo Finally
+    hasTasks = (pController.TaskController.RebuildSequence.Count > 0)
+Finally:
+    On Error Resume Next
+    SetButtonAsClickable Me.DS_GENERATE_BUTTON, hasTasks, 8
+    SetButtonAsClickable Me.DS_SAVE_BUTTON, hasTasks, 8
+    SetButtonAsClickable Me.DS_SAVE_AS_BUTTON, hasTasks, 8
 End Sub

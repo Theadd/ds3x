@@ -4,6 +4,7 @@ Begin Form
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
+    ShortcutMenu = NotDefault
     AutoCenter = NotDefault
     NavigationButtons = NotDefault
     DividingLines = NotDefault
@@ -21,10 +22,10 @@ Begin Form
     Width =690
     DatasheetFontHeight =11
     ItemSuffix =1591
-    Left =3240
-    Top =3045
-    Right =7365
-    Bottom =15210
+    Left =3225
+    Top =3030
+    Right =21780
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End

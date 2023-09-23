@@ -4,6 +4,7 @@ Begin Form
     PopUp = NotDefault
     RecordSelectors = NotDefault
     FastLaserPrinting = NotDefault
+    ShortcutMenu = NotDefault
     AutoCenter = NotDefault
     NavigationButtons = NotDefault
     DividingLines = NotDefault
@@ -22,7 +23,7 @@ Begin Form
     ItemSuffix =2096
     Left =3225
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
