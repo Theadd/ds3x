@@ -57,7 +57,8 @@ Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal Colum
 End Sub
 
 Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
-    Instance = MemoryLib.GetArrayByRef(TargetArray)
+'    Instance = MemoryLib.GetArrayByRef(TargetArray)
+    Instance = TargetArray
 End Sub
 
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx: Set CreateBlank = CreateArray2dEx(RowsCount, ColumnsCount): End Function
