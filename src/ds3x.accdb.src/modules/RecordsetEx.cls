@@ -322,7 +322,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     
 Finally:
     Set GetRange = New Array2dEx
-    GetRange.Instance = CollectionsLib.GetArrayByRef(t)
+    GetRange.SetInstanceByRef t
 End Function
 
 ' NOTICE: Returns a new RecordsetEx.

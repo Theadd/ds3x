@@ -592,7 +592,7 @@ End Sub
 Private Function SafeDisposeResource(ByRef TargetResource As Object, Optional ByVal DisposeAll As Boolean = False) As Boolean
     On Error GoTo DisposeFailed
     
-    If Not DisposeAll And TypeOf TargetResource Is dbQuery Then Exit Function
+    If Not DisposeAll And TypeOf TargetResource Is dsQuery Then Exit Function
     TargetResource.Dispose
 Finally:
     SafeDisposeResource = True
@@ -601,4 +601,5 @@ DisposeFailed:
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
     Resume Finally
 End Function
+
 

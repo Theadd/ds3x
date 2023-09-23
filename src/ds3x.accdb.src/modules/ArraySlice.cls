@@ -16,7 +16,6 @@ Option Base 0
 
 Private pSlices As Variant
 Private pCount As Long
-Private pSliced() As Variant
 
 
 Public Property Get Count() As Long: Count = pCount: End Property
@@ -55,9 +54,10 @@ Public Property Get Slice(Optional ByVal Index As Long = 0, Optional ByVal GetCo
 End Property
 
 Public Property Get Instance() As Array2dEx
-    If UBound(pSliced) < 0 Then SliceArray
+    Dim t() As Variant
+    SlicedArray t
     Set Instance = New Array2dEx
-    Instance.Instance = CollectionsLib.GetArrayByRef(pSliced)
+    Instance.SetInstanceByRef t
 End Property
 
 
@@ -151,62 +151,87 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
 End Function
 
 Public Sub SlicedArray(ByRef Out2dArray() As Variant)
-    If UBound(pSliced) < 0 Then SliceArray
-    Out2dArray = pSliced
+    ReDim Out2dArray(0 To Count - 1, 0 To 0)
+    CloneInto2dArray Out2dArray, 0, 0
 End Sub
 
 Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
 
 Public Sub Dispose()
-    pSliced = Array()
+    ' TODO
 End Sub
 
 Public Sub CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True)
-    Dim t() As Variant, g() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
+    Dim t() As Variant, v As Variant, r As Long, i As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
     If pCount = 0 Then Exit Sub
-    If UBound(pSliced) >= 0 Then
-        If ApplyUserLocale Then
-            RangeObject.FormulaR1C1Local = pSliced
-        Else
-            RangeObject.Value = pSliced
-        End If
-        Exit Sub
-    End If
 
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx
                 Set a2dX = C2Array2dEx(v(0))
                 If v(2) = 0 And v(3) = a2dX.Count And a2dX.ColumnCount = 1 Then
-                    If ApplyUserLocale Then
-                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).FormulaR1C1Local = a2dX.Instance
-                    Else
-                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).Value = a2dX.Instance
-                    End If
+                    a2dX.CopyToRange RangeObject.Resize(v(3), 1).Offset(RowOffset:=r), ApplyUserLocale
                 Else
-                    ReDim t(0 To v(3) - 1, 0 To 0)
-                    MemoryLib.Slice2dArrayToV2 VarPtr(a2dX.Instance(v(2), v(1))), VarPtr(t(0, 0)), v(3)
-                    If ApplyUserLocale Then
-                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).FormulaR1C1Local = t
-                    Else
-                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).Value = t
-                    End If
+                    a2dX.CopySliceToRange v(2), v(3), v(1), RangeObject.Resize(v(3), 1).Offset(RowOffset:=r), ApplyUserLocale
                 End If
             Case TypeOf v(0) Is RecordsetEx
                 With C2RecordsetEx(v(0))
                     iAux = CLng(.Instance.AbsolutePosition)
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.CloneParamArray k(0, 0), v(3), t
-                    ReDim g(0 To UBound(t), 0 To 0)
-                    For i = 0 To UBound(t)
-                        g(i, 0) = t(i)
-                    Next i
+                    ReDim t(0 To v(3) - 1, 0 To 0)
+                    MemoryLib.SliceArray VarPtr(k(0, 0)), VarPtr(t(0, 0)), v(3)
                     If ApplyUserLocale Then
-                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).FormulaR1C1Local = g
+                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).FormulaR1C1Local = t
                     Else
-                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).Value = g
+                        RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).Value = t
                     End If
+                    .Instance.AbsolutePosition = iAux
+                End With
+            Case Else
+                Err.Raise 17
+        End Select
+        r = r + v(3)
+    Next v
+End Sub
+
+Public Sub CloneInto2dArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As Long, ByVal TargetColumnIndex As Long)
+    Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
+    If pCount = 0 Then Exit Sub
+    
+    For Each v In pSlices
+        Select Case True
+            Case TypeOf v(0) Is Array2dEx
+                C2Array2dEx(v(0)).CloneSliceTo v(2), v(3), v(1), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex))
+            Case TypeOf v(0) Is RecordsetEx
+                With C2RecordsetEx(v(0))
+                    iAux = CLng(.Instance.AbsolutePosition)
+                    .Instance.AbsolutePosition = v(2)
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
+                    MemoryLib.SliceArray VarPtr(k(0, 0)), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), v(3)
+                    .Instance.AbsolutePosition = iAux
+                End With
+            Case Else
+                Err.Raise 17
+        End Select
+        r = r + v(3)
+    Next v
+End Sub
+
+Public Sub CloneIntoArray(ByRef TargetArray() As Variant, Optional ByVal TargetIndex As Long = 0)
+    Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
+    If pCount = 0 Then Exit Sub
+    
+    For Each v In pSlices
+        Select Case True
+            Case TypeOf v(0) Is Array2dEx
+                C2Array2dEx(v(0)).CloneSliceTo v(2), v(3), v(1), VarPtr(TargetArray(TargetIndex + r))
+            Case TypeOf v(0) Is RecordsetEx
+                With C2RecordsetEx(v(0))
+                    iAux = CLng(.Instance.AbsolutePosition)
+                    .Instance.AbsolutePosition = v(2)
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
+                    MemoryLib.SliceArray VarPtr(k(0, 0)), VarPtr(TargetArray(TargetIndex + r)), v(3)
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else
@@ -221,52 +246,3 @@ Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2Array
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
 Private Function C2RecordsetEx(ByRef Value As Variant) As RecordsetEx: Set C2RecordsetEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
-
-Private Sub SliceArray()
-    Dim t() As Variant, v As Variant, r As Long, i As Long, iMod As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
-    If pCount = 0 Then
-        t = Array2dEx.CreateBlank(0, 0).Instance
-        Exit Sub
-    End If
-    ReDim pSliced(0 To pCount - 1, 0 To 0)
-    r = 0
-    
-    For Each v In pSlices
-        Select Case True
-            Case TypeOf v(0) Is Array2dEx
-                Set a2dX = C2Array2dEx(v(0))
-                ' V0
-'                MemoryLib.CloneParamArray a2dX.Instance(v(2), v(1)), v(3), t
-'                For i = 0 To v(3) - 1
-'                    pSliced(r + i, 0) = t(i)
-'                Next i
-                ' V1
-'                MemoryLib.Slice2dArrayTo a2dX.Instance, v(2), v(1), v(3), pSliced, r
-                ' V2
-                MemoryLib.Slice2dArrayToV2 VarPtr(a2dX.Instance(v(2), v(1))), VarPtr(pSliced(r, 0)), v(3)
-            Case TypeOf v(0) Is RecordsetEx
-                With C2RecordsetEx(v(0))
-                    iAux = CLng(.Instance.AbsolutePosition)
-                    .Instance.AbsolutePosition = v(2)
-                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.CloneParamArray k(0, 0), v(3), t
-                    For i = 0 To v(3) - 1
-                        pSliced(r + i, 0) = t(i)
-                    Next i
-                    ' NOTE: No difference in performance observed by using the following line instead of the "CloneParamArray" one and the "For i" following it.
-                    '   For i = 0 To v(3) - 1: pSliced(r + i, 0) = k(0, i): Next i
-                    ' But this same technique applied to the previous case (Case Typeof v(0) Is Array2dEx) performs 100x times slower than the CloneParamArray one.
-                    .Instance.AbsolutePosition = iAux
-                End With
-            Case Else
-                Err.Raise 17
-        End Select
-        r = r + v(3)
-    Next v
-End Sub
-
-Private Sub Class_Initialize()
-    pSliced = Array()
-End Sub
-
-Public Sub Debugger(): Stop: End Sub

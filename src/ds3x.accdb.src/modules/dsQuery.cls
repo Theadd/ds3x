@@ -2,7 +2,7 @@
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "dbQuery"
+Attribute VB_Name = "dsQuery"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -33,26 +33,25 @@ Private pNoCloseOnTerminate As Boolean
 
 ' Contiene el Err.Description de la última llamada fallida a TryQuery().
 Public Property Get LastError() As String: LastError = pLastError: End Property
-Attribute LastError.VB_Description = "Contiene el err.Description de la última llamada fallida a TryQuery."
 
 Public Property Get CloseOnTerminate() As Boolean: CloseOnTerminate = Not pNoCloseOnTerminate: End Property
 Public Property Let CloseOnTerminate(ByVal Value As Boolean): pNoCloseOnTerminate = Not Value: End Property
 
-Public Property Get Connection() As ADODB.Connection
-    If pConn Is Nothing Then OpenConnection
+Public Property Get Connection(Optional ByVal CursorLocation As ADODB.CursorLocationEnum = adUseServer) As ADODB.Connection
+    If pConn Is Nothing Then OpenConnection CursorLocation
     Set Connection = pConn
 End Property
 
 Public Property Get ConnectionString() As String
     On Error GoTo Finally
     If pConnectionString = vbNullString Then
-        If ObjPtr(Me) <> ObjPtr(dbQuery) Then
-            pConnectionString = dbQuery.ConnectionString
+        If ObjPtr(Me) <> ObjPtr(dsQuery) Then
+            pConnectionString = dsQuery.ConnectionString
         Else
             Dim s As String
             s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
             If FileSystemLib.TryGetFileInAncestors(s, 3) Then
-                If FileSystemLib.TryReadAllTextInFile(s, s, False) Then
+                If FileSystemLib.TryReadAllTextInFile(s, s) Then
                     pConnectionString = DictionaryEx.Create(s)("ds3x.dbQuery.ConnectionString")
                 End If
             End If
@@ -69,6 +68,23 @@ Public Property Let ConnectionString(ByVal Value As String)
         pConn.Close
         Set pConn = Nothing
     End If
+End Property
+
+'@DefaultMember
+Public Property Get Item(ByVal QueryString As String) As ADODB.Recordset
+Attribute Item.VB_UserMemId = 0
+    Dim rs As New ADODB.Recordset
+
+    With rs
+        Set .ActiveConnection = Me.Connection
+        .Source = QueryString
+        .CursorLocation = adUseClient
+        .LockType = adLockReadOnly
+        .CursorType = adOpenStatic
+        .Open CursorType:=adOpenStatic, Options:=adCmdText
+    End With
+    
+    Set Item = rs
 End Property
 
 
@@ -105,23 +121,24 @@ ErrorHandler:
     TryQuery = False
 End Function
 
-' Ejecuta la consulta y devuelve un nuevo ADODB.Recordset VINCULADO a la conexión activa al SQL Server,
-' permitiendo el uso de filtros a nivel del objeto recordset, ordenar registros según el valor de uno o
-' varios campos y actualizar los valores del recordset con últimos cambios en la BBDD mediante una simple
-' llamada a .Requery (o reabriendolo con .Close y .Open, que parece funcionar mejor).
-Public Function Create(ByVal SqlQuery As String) As ADODB.Recordset
-    Dim rs As New ADODB.Recordset
 
-    With rs
-        Set .ActiveConnection = Me.Connection
-        .Source = SqlQuery
-        .CursorLocation = adUseClient
-        .LockType = adLockReadOnly
-        .CursorType = adOpenStatic
-        .Open CursorType:=adOpenStatic, Options:=adCmdText
+Public Function Create(Optional ByRef ConnectionLike As Variant) As dsQuery
+    Set Create = New dsQuery
+    With Create
+        If Not IsMissing(ConnectionLike) Then
+            If IsObject(ConnectionLike) Then
+                Dim c As ADODB.Connection
+                Set c = ConnectionLike
+                Create.ConnectionString = c.ConnectionString
+            Else
+                If VarType(ConnectionLike) = vbString Then
+                    Create.ConnectionString = ConnectionLike
+                End If
+            End If
+        Else
+            Create.ConnectionString = ConnectionString
+        End If
     End With
-    
-    Set Create = rs
 End Function
 
 ' Envia la consulta al SQL Server para su ejecución y diréctamente devuelve el control a la aplicación,
@@ -208,12 +225,15 @@ Private Sub Class_Terminate()
     End If
 End Sub
 
-Private Sub OpenConnection()
+Private Sub OpenConnection(ByVal CursorLocation As ADODB.CursorLocationEnum)
     Set pConn = New ADODB.Connection
-    pConn.ConnectionString = ConnectionString
-    pConn.CommandTimeout = 240000   ' ~= 2d 18h
-    pConn.ConnectionTimeout = 10
-    pConn.Open
+    With pConn
+        .CursorLocation = CursorLocation
+        .ConnectionString = ConnectionString
+        .CommandTimeout = 240000   ' ~= 2d 18h
+        .ConnectionTimeout = 10
+        .Open
+    End With
 End Sub
 
 Public Sub Dispose()
@@ -222,4 +242,3 @@ Public Sub Dispose()
         Set pConn = Nothing
     End If
 End Sub
-
