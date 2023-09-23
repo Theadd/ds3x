@@ -21,14 +21,13 @@ Begin Form
     PictureAlignment =2
     DatasheetGridlinesBehavior =3
     GridY =10
-    Width =3248
+    Width =3263
     DatasheetFontHeight =11
-    ItemSuffix =1590
-    Left =12240
-    Top =4950
-    Right =27735
-    Bottom =15105
-    OnUnload ="[Event Procedure]"
+    ItemSuffix =1591
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -330,11 +329,12 @@ Begin Form
             BackThemeColorIndex =3
             Begin
                 Begin Subform
-                    OverlapFlags =87
+                    OverlapFlags =215
                     Left =360
                     Top =30
                     Width =2865
                     Height =2123
+                    TabIndex =1
                     BorderColor =16777215
                     Name ="DS_SEQUENCE_LIST"
                     SourceObject ="Form.DS_RICHTEXT_LIST"
@@ -402,10 +402,55 @@ Begin Form
                         End
                     End
                 End
+                Begin CommandButton
+                    OverlapFlags =93
+                    TextFontCharSet =177
+                    Left =680
+                    Top =113
+                    Width =15
+                    Height =15
+                    FontSize =1
+                    FontWeight =100
+                    Name ="HiddenControl"
+                    Caption ="Comando1435"
+                    LeftPadding =0
+                    TopPadding =0
+                    RightPadding =0
+                    BottomPadding =0
+                    GridlineColor =10921638
+
+                    LayoutCachedLeft =680
+                    LayoutCachedTop =113
+                    LayoutCachedWidth =695
+                    LayoutCachedHeight =128
+                    Alignment =1
+                    ForeThemeColorIndex =1
+                    ForeTint =100.0
+                    Shape =0
+                    Gradient =0
+                    BackThemeColorIndex =1
+                    BackTint =100.0
+                    OldBorderStyle =0
+                    BorderThemeColorIndex =1
+                    BorderTint =100.0
+                    HoverColor =-2
+                    HoverThemeColorIndex =-1
+                    HoverTint =80.0
+                    PressedColor =-2
+                    PressedThemeColorIndex =-1
+                    PressedShade =80.0
+                    HoverForeColor =0
+                    HoverForeTint =100.0
+                    PressedForeColor =0
+                    PressedForeTint =100.0
+                    QuickStyle =4
+                    QuickStyleMask =-1009
+                    Overlaps =1
+                End
             End
         End
         Begin FormFooter
-            Height =454
+            Height =455
             Name ="PieDelFormulario"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
@@ -414,7 +459,7 @@ Begin Form
                 Begin CommandButton
                     OverlapFlags =93
                     Left =420
-                    Top =60
+                    Top =75
                     Width =750
                     Height =300
                     FontSize =8
@@ -431,9 +476,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =420
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =1170
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =2
@@ -443,24 +488,24 @@ Begin Form
                     ForeTint =100.0
                     Shape =0
                     Gradient =0
-                    BackColor =13998939
-                    BackThemeColorIndex =-1
+                    BackThemeColorIndex =5
                     BackTint =100.0
-                    BorderWidth =1
-                    BorderThemeColorIndex =8
+                    BorderThemeColorIndex =5
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
-                    HoverThemeColorIndex =8
-                    HoverTint =80.0
-                    PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    HoverThemeColorIndex =5
+                    HoverTint =60.0
+                    PressedThemeColorIndex =5
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =3
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =-1
                     WebImagePaddingBottom =-1
                     Overlaps =1
@@ -468,7 +513,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =30
-                    Top =60
+                    Top =75
                     Width =330
                     Height =300
                     Name ="CeldaVacía1562"
@@ -481,9 +526,9 @@ Begin Form
                     GridlineColor =8355711
                     VerticalAnchor =1
                     LayoutCachedLeft =30
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =360
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     LayoutGroup =2
@@ -494,7 +539,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =1170
-                    Top =60
+                    Top =75
                     Width =135
                     Height =300
                     BackColor =-2147483603
@@ -507,9 +552,9 @@ Begin Form
                     GridlineColor =10921638
                     VerticalAnchor =1
                     LayoutCachedLeft =1170
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =1305
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =3
@@ -520,7 +565,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =1305
-                    Top =60
+                    Top =75
                     Width =810
                     Height =300
                     BackColor =-2147483603
@@ -534,9 +579,9 @@ Begin Form
                     HorizontalAnchor =2
                     VerticalAnchor =1
                     LayoutCachedLeft =1305
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =2115
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =4
@@ -547,7 +592,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =360
-                    Top =60
+                    Top =75
                     Width =60
                     Height =300
                     BackColor =-2147483603
@@ -560,9 +605,9 @@ Begin Form
                     GridlineColor =10921638
                     VerticalAnchor =1
                     LayoutCachedLeft =360
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =420
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =1
@@ -573,6 +618,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =30
+                    Top =15
                     Width =330
                     Height =60
                     Name ="CeldaVacía1566"
@@ -585,8 +631,9 @@ Begin Form
                     GridlineStyleRight =1
                     GridlineColor =8355711
                     LayoutCachedLeft =30
+                    LayoutCachedTop =15
                     LayoutCachedWidth =360
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     LayoutGroup =2
                     GridlineShade =50.0
                     BackThemeColorIndex =3
@@ -595,6 +642,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =360
+                    Top =15
                     Width =60
                     Height =60
                     BackColor =-2147483603
@@ -607,8 +655,9 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     LayoutCachedLeft =360
+                    LayoutCachedTop =15
                     LayoutCachedWidth =420
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =1
                     ColumnEnd =1
                     LayoutGroup =2
@@ -617,6 +666,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =420
+                    Top =15
                     Width =750
                     Height =60
                     BackColor =-2147483603
@@ -629,8 +679,9 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     LayoutCachedLeft =420
+                    LayoutCachedTop =15
                     LayoutCachedWidth =1170
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =2
                     ColumnEnd =2
                     LayoutGroup =2
@@ -639,6 +690,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =1170
+                    Top =15
                     Width =135
                     Height =60
                     BackColor =-2147483603
@@ -651,8 +703,9 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     LayoutCachedLeft =1170
+                    LayoutCachedTop =15
                     LayoutCachedWidth =1305
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =3
                     ColumnEnd =3
                     LayoutGroup =2
@@ -661,6 +714,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =1305
+                    Top =15
                     Width =1365
                     Height =60
                     BackColor =-2147483603
@@ -674,8 +728,9 @@ Begin Form
                     GridlineColor =10921638
                     HorizontalAnchor =2
                     LayoutCachedLeft =1305
+                    LayoutCachedTop =15
                     LayoutCachedWidth =2670
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =4
                     ColumnEnd =5
                     LayoutGroup =2
@@ -684,7 +739,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =30
-                    Top =360
+                    Top =375
                     Width =330
                     Height =60
                     Name ="CeldaVacía1571"
@@ -696,9 +751,9 @@ Begin Form
                     GridlineStyleRight =1
                     GridlineColor =8355711
                     LayoutCachedLeft =30
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =360
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     LayoutGroup =2
@@ -709,7 +764,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =360
-                    Top =360
+                    Top =375
                     Width =60
                     Height =60
                     BackColor =-2147483603
@@ -722,9 +777,9 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =8355711
                     LayoutCachedLeft =360
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =420
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =1
@@ -736,7 +791,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =420
-                    Top =360
+                    Top =375
                     Width =750
                     Height =60
                     BackColor =-2147483603
@@ -749,9 +804,9 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =8355711
                     LayoutCachedLeft =420
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =1170
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =2
@@ -763,7 +818,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =1170
-                    Top =360
+                    Top =375
                     Width =135
                     Height =60
                     BackColor =-2147483603
@@ -776,9 +831,9 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =8355711
                     LayoutCachedLeft =1170
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =1305
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =3
@@ -790,7 +845,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =1305
-                    Top =360
+                    Top =375
                     Width =1365
                     Height =60
                     BackColor =-2147483603
@@ -804,9 +859,9 @@ Begin Form
                     GridlineColor =8355711
                     HorizontalAnchor =2
                     LayoutCachedLeft =1305
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =2670
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =4
@@ -818,6 +873,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =2730
+                    Top =15
                     Width =450
                     Height =60
                     BackColor =-2147483603
@@ -830,8 +886,9 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     LayoutCachedLeft =2730
+                    LayoutCachedTop =15
                     LayoutCachedWidth =3180
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =7
                     ColumnEnd =7
                     LayoutGroup =2
@@ -840,7 +897,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =2730
-                    Top =360
+                    Top =375
                     Width =450
                     Height =60
                     BackColor =-2147483603
@@ -853,9 +910,9 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =8355711
                     LayoutCachedLeft =2730
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =3180
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =7
@@ -867,6 +924,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =3180
+                    Top =15
                     Width =60
                     Height =60
                     BackColor =-2147483603
@@ -880,8 +938,9 @@ Begin Form
                     GridlineStyleRight =1
                     GridlineColor =8355711
                     LayoutCachedLeft =3180
+                    LayoutCachedTop =15
                     LayoutCachedWidth =3240
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =8
                     ColumnEnd =8
                     LayoutGroup =2
@@ -891,7 +950,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =3180
-                    Top =60
+                    Top =75
                     Width =60
                     Height =300
                     BackColor =-2147483603
@@ -905,9 +964,9 @@ Begin Form
                     GridlineColor =8355711
                     VerticalAnchor =1
                     LayoutCachedLeft =3180
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =3240
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =8
@@ -919,7 +978,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =3180
-                    Top =360
+                    Top =375
                     Width =60
                     Height =60
                     BackColor =-2147483603
@@ -933,9 +992,9 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =8355711
                     LayoutCachedLeft =3180
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =3240
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =8
@@ -947,6 +1006,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =2670
+                    Top =15
                     Width =60
                     Height =60
                     BackColor =-2147483603
@@ -959,8 +1019,9 @@ Begin Form
                     GridlineStyleTop =1
                     GridlineColor =10921638
                     LayoutCachedLeft =2670
+                    LayoutCachedTop =15
                     LayoutCachedWidth =2730
-                    LayoutCachedHeight =60
+                    LayoutCachedHeight =75
                     ColumnStart =6
                     ColumnEnd =6
                     LayoutGroup =2
@@ -969,7 +1030,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =2670
-                    Top =60
+                    Top =75
                     Width =60
                     Height =300
                     BackColor =-2147483603
@@ -982,9 +1043,9 @@ Begin Form
                     GridlineColor =10921638
                     VerticalAnchor =1
                     LayoutCachedLeft =2670
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =2730
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =6
@@ -995,7 +1056,7 @@ Begin Form
                 Begin EmptyCell
                     BackStyle =1
                     Left =2670
-                    Top =360
+                    Top =375
                     Width =60
                     Height =60
                     BackColor =-2147483603
@@ -1008,9 +1069,9 @@ Begin Form
                     GridlineStyleBottom =1
                     GridlineColor =8355711
                     LayoutCachedLeft =2670
-                    LayoutCachedTop =360
+                    LayoutCachedTop =375
                     LayoutCachedWidth =2730
-                    LayoutCachedHeight =420
+                    LayoutCachedHeight =435
                     RowStart =2
                     RowEnd =2
                     ColumnStart =6
@@ -1022,7 +1083,7 @@ Begin Form
                 Begin CommandButton
                     OverlapFlags =87
                     Left =2730
-                    Top =60
+                    Top =75
                     Width =450
                     Height =300
                     FontSize =8
@@ -1040,9 +1101,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =2730
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =3180
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =7
@@ -1052,24 +1113,24 @@ Begin Form
                     ForeTint =100.0
                     Shape =0
                     Gradient =0
-                    BackColor =13998939
-                    BackThemeColorIndex =-1
+                    BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =3
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =-1
                     WebImagePaddingBottom =-1
                     Overlaps =1
@@ -1077,7 +1138,7 @@ Begin Form
                 Begin CommandButton
                     OverlapFlags =87
                     Left =2115
-                    Top =60
+                    Top =75
                     Width =555
                     Height =300
                     FontSize =8
@@ -1095,9 +1156,9 @@ Begin Form
 
                     CursorOnHover =1
                     LayoutCachedLeft =2115
-                    LayoutCachedTop =60
+                    LayoutCachedTop =75
                     LayoutCachedWidth =2670
-                    LayoutCachedHeight =360
+                    LayoutCachedHeight =375
                     RowStart =1
                     RowEnd =1
                     ColumnStart =5
@@ -1108,24 +1169,24 @@ Begin Form
                     WidthStretch =50
                     Shape =0
                     Gradient =0
-                    BackColor =13998939
-                    BackThemeColorIndex =-1
+                    BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =3
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     WebImagePaddingRight =-1
                     WebImagePaddingBottom =-1
                     Overlaps =1
@@ -1217,11 +1278,11 @@ Private Sub CloseFormIfOpen(ByVal FormName As String)
 End Sub
 
 Private Sub DS_LIST_ITEM_REMOVE_Click()
+    Focus Me
     pController.RemoveTask pController.RebuildSequence(pController.SequenceIndex)("Id")
 End Sub
 
 Private Sub Form_Load()
-'    Debug.Print "IN DS_REBUILD_SEQUENCE.Load()"
     pFailedSequenceIndex = -1
 End Sub
 
@@ -1275,6 +1336,9 @@ Public Sub RebuildSequenceList()
         Set pContinuousList = Me.DS_SEQUENCE_LIST.Form
         pContinuousList.SetActiveIndex seqIndex
     End If
+    SetButtonAsClickable Me.DS_LIST_ITEM_REMOVE, (qList.Count > 0), 5
+    SetButtonAsClickable Me.DS_LIST_ITEM_EDIT, (qList.Count > 0), 8
+    If IsSubform Then Me.Parent.RefreshClickableButtons
 End Sub
 
 Private Sub Form_Resize()
@@ -1283,16 +1347,9 @@ Private Sub Form_Resize()
     Me.DS_FOOTER_CELL_GROW.HorizontalAnchor = acHorizontalAnchorBoth
 End Sub
 
-Private Sub Form_Unload(Cancel As Integer)
-    ' Debug.Print "[INFO] @DS_REBUILD_SEQUENCE.Unload()"
-End Sub
-
 Private Sub pContinuousList_OnActiveIndexChange(ByVal ActiveIndex As Long)
     On Error Resume Next
-'    If pController.SequenceIndex <> ActiveIndex Then
-        pController.SequenceIndex = ActiveIndex
-'        RebuildSequenceList
-'    End If
+    pController.SequenceIndex = ActiveIndex
 End Sub
 
 Private Sub pContinuousList_OnItemDoubleClick(ByVal ActiveIndex As Long)
@@ -1305,22 +1362,30 @@ End Sub
 
 Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
     On Error Resume Next
-'    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnActiveSequenceIndexChange()"
     If (Not HasFailed) And pFailedSequenceIndex <= TargetIndex Then pFailedSequenceIndex = -1
     RebuildSequenceList
     pContinuousList.SetActiveIndex pController.SequenceIndex, True
 End Sub
 
 Private Sub pController_OnRebuildSequenceChange()
-'    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnRebuildSequenceChange()"
     pFailedSequenceIndex = -1
     RebuildSequenceList
 End Sub
 
 Private Sub pController_OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
     On Error Resume Next
-'    Debug.Print "[EVENT] @DS_REBUILD_SEQUENCE.pController_OnRebuildSequenceFail()"
     pFailedSequenceIndex = FailedSequenceIndex
     RebuildSequenceList
     pContinuousList.SetActiveIndex pFailedSequenceIndex, True
+End Sub
+
+Public Function Focus(ByRef frm As Access.Form)
+    On Error Resume Next
+    frm.Controls("HiddenControl").SetFocus
+    DoEvents
+End Function
+
+Private Sub SetButtonAsClickable(ByRef TargetControl As Access.CommandButton, ByVal Value As Boolean, Optional ByVal ThemeColorIndexOnNormal As Long = 8)
+    ScreenLib.SetClickableStyle TargetControl, Value
+    ScreenLib.SetThemeColorStyle TargetControl, IIf(Value, ThemeColorIndexOnNormal, 6)
 End Sub

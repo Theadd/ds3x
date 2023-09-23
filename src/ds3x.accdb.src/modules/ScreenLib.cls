@@ -785,6 +785,27 @@ MissingLabel:
     TryGetAttachedLabel = False
 End Function
 
+Public Sub SetClickableStyle(ByRef TargetControl As Access.Control, ByVal Value As Boolean)
+    On Error Resume Next
+    If Value Then
+        TargetControl.OnGotFocus = ""
+        TargetControl.CursorOnHover = acCursorOnHoverHyperlinkHand
+    Else
+        TargetControl.OnGotFocus = "=Focus([Form])"
+        TargetControl.CursorOnHover = acCursorOnHoverDefault
+    End If
+End Sub
+
+Public Sub SetThemeColorStyle(ByRef TargetControl As Access.Control, ByVal ColorIndex As Long)
+    On Error Resume Next
+    With TargetControl
+        .BackThemeColorIndex = ColorIndex
+        .HoverThemeColorIndex = ColorIndex
+        .BorderThemeColorIndex = ColorIndex
+        .PressedThemeColorIndex = ColorIndex
+    End With
+End Sub
+
 
 ' --- UTILITY HELPERS ---
 

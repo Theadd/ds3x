@@ -25,7 +25,7 @@ Begin Form
     ItemSuffix =1582
     Left =3225
     Top =3030
-    Right =28545
+    Right =21780
     Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -876,7 +876,6 @@ Begin Form
                 End
                 Begin CommandButton
                     OverlapFlags =215
-                    TextFontCharSet =177
                     Left =6690
                     Top =4755
                     Width =1245
@@ -907,26 +906,26 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =11
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     Overlaps =1
                 End
                 Begin CommandButton
                     OverlapFlags =215
-                    TextFontCharSet =177
                     Left =5295
                     Top =4755
                     Width =1245
@@ -957,21 +956,22 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =12
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     Overlaps =1
                 End
                 Begin Line
@@ -1061,7 +1061,6 @@ Begin Form
                 End
                 Begin CommandButton
                     OverlapFlags =215
-                    TextFontCharSet =177
                     Left =165
                     Top =4755
                     Width =1755
@@ -1091,26 +1090,26 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =13
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     Overlaps =1
                 End
                 Begin CommandButton
                     OverlapFlags =215
-                    TextFontCharSet =177
                     Left =2115
                     Top =4755
                     Width =1440
@@ -1142,21 +1141,22 @@ Begin Form
                     Gradient =0
                     BackThemeColorIndex =8
                     BackTint =100.0
-                    BorderWidth =1
                     BorderThemeColorIndex =8
                     BorderTint =100.0
+                    BorderShade =50.0
                     ThemeFontIndex =-1
                     HoverThemeColorIndex =8
-                    HoverTint =80.0
+                    HoverTint =60.0
                     PressedThemeColorIndex =8
-                    PressedShade =80.0
+                    PressedTint =40.0
+                    PressedShade =100.0
                     HoverForeThemeColorIndex =1
                     HoverForeTint =100.0
-                    PressedForeThemeColorIndex =1
-                    PressedForeTint =100.0
+                    PressedForeColor =5855577
+                    PressedForeTint =65.0
                     GroupTable =13
-                    QuickStyle =13
-                    QuickStyleMask =-1
+                    QuickStyle =10
+                    QuickStyleMask =-1009
                     Overlaps =1
                 End
                 Begin EmptyCell

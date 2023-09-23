@@ -6,7 +6,6 @@ Begin Form
     FastLaserPrinting = NotDefault
     MaxButton = NotDefault
     MinButton = NotDefault
-    ShortcutMenu = NotDefault
     AutoCenter = NotDefault
     NavigationButtons = NotDefault
     DividingLines = NotDefault
@@ -24,11 +23,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =12240
-    Top =4950
-    Right =27735
-    Bottom =15105
-    OnUnload ="[Event Procedure]"
+    Left =3225
+    Top =3030
+    Right =28545
+    Bottom =15225
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -553,13 +551,11 @@ End Sub
 Private Sub DS_BUTTON_TOGGLE_EXPAND_GotFocus()
     Me.HiddenControl.SetFocus
     ExpandedMode = Not ExpandedMode
-    Debug.Print Printf("DS_JSON_EDITOR TOP: %1, HEIGHT: %2, DETALLE HEIGHT: %3", Me.DS_JSON_EDITOR.Top, Me.DS_JSON_EDITOR.Height, Me.Detalle.Height)
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
     On Error Resume Next
     If KeyCode = vbKeyReturn And Shift = 0 Then
-        ' Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.KeyDown(vbKeyReturn, 0)"
         KeyCode = 0
         Me.HiddenControl.SetFocus
         DoEvents
@@ -569,10 +565,6 @@ End Sub
 Private Sub Form_Resize()
     Me.DS_JSON_EDITOR.HorizontalAnchor = acHorizontalAnchorBoth
     Me.DS_JSON_EDITOR.VerticalAnchor = acVerticalAnchorBoth
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
-    ' Debug.Print "[INFO] @DS_JSON_TASK_EDITOR.Unload()"
 End Sub
 
 Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
