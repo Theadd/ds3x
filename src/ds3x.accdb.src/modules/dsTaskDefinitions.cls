@@ -510,8 +510,8 @@ LoadFromFileAsCSVFallback:
     TargetFile = GetParam(TargetFile, "")
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
     
-    Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
-'    Set dsT = LoadFromCSVAsSingleSlice(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+'    Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+    Set dsT = LoadFromCSVAsSingleSlice(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
     End If
@@ -609,10 +609,11 @@ Public Function CopyToRangeInNewExcelApp(ByRef SourceTable As Variant, Optional 
     Set CopyToRangeInNewExcelApp = xlSheet
 End Function
 
-Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As Variant, Optional ByVal RangeAddress As Variant, Optional ByVal WriteHeaders As Variant) As xlSheetsEx
+Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As Variant, Optional ByVal RangeAddress As Variant, Optional ByVal WriteHeaders As Variant, Optional ByVal ApplyUserLocale As Variant) As xlSheetsEx
     Dim Target As dsTable, xlSheet As xlSheetsEx, xlRange As Excel.Range
     Assign RangeAddress, GetParam(RangeAddress, "A1")
     WriteHeaders = GetParam(WriteHeaders, True)
+    ApplyUserLocale = GetParam(ApplyUserLocale, True)
     
     Set Target = SourceTable
     Set xlSheet = TargetSheet
@@ -621,7 +622,7 @@ Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As V
     Else
         Set xlRange = xlSheet.Range(RangeAddress)
     End If
-    Target.CopyToRange xlRange, True, CBool(WriteHeaders)
+    Target.CopyToRange xlRange, CBool(ApplyUserLocale), CBool(WriteHeaders)
     
     Set CopyToRange = xlSheet
 End Function
@@ -890,7 +891,7 @@ Private Sub AddAllTasks()
     
     AddTask "CopyToRangeInNewExcelApp", "[Source]: Table, [RangeAddress = 'A1']: String, [WorksheetName = 'Sheet%1']: String", TaskType:="XLG", Requires:="[TD]*"
 
-    AddTask "CopyToRange", "[Source]: Table, Target: Worksheet, [RangeAddress = 'A1']: String, [WriteHeaders = True]: Boolean", TaskType:="XLG"
+    AddTask "CopyToRange", "[Source]: Table, Target: Worksheet, [RangeAddress = 'A1']: String, [WriteHeaders = True]: Boolean, [ApplyUserLocale = True]: Boolean", TaskType:="XLG"
     
     AddTask "CopyRange", "[Source]: Worksheet, Target: Worksheet, [SourceRangeAddress = .UsedRange()]: String|Excel.Range, [TargetRangeAddress = 'A1']: String|Excel.Range", TaskType:="XLG"
     
