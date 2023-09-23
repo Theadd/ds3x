@@ -152,7 +152,7 @@ End Function
 
 Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     ReDim Out2dArray(0 To Count - 1, 0 To 0)
-    CloneIntoArray Out2dArray, 0, 0
+    CloneInto2dArray Out2dArray, 0, 0
 End Sub
 
 Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
@@ -195,8 +195,8 @@ Public Sub CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUse
     Next v
 End Sub
 
-Public Sub CloneIntoArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As Long, ByVal TargetColumnIndex As Long)
-    Dim t() As Variant, v As Variant, r As Long, i As Long, iAux As Long, c As Long, k() As Variant, a2dX As Array2dEx
+Public Sub CloneInto2dArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As Long, ByVal TargetColumnIndex As Long)
+    Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
     If pCount = 0 Then Exit Sub
     
     For Each v In pSlices
@@ -209,6 +209,29 @@ Public Sub CloneIntoArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
                     MemoryLib.SliceArray VarPtr(k(0, 0)), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), v(3)
+                    .Instance.AbsolutePosition = iAux
+                End With
+            Case Else
+                Err.Raise 17
+        End Select
+        r = r + v(3)
+    Next v
+End Sub
+
+Public Sub CloneIntoArray(ByRef TargetArray() As Variant, Optional ByVal TargetIndex As Long = 0)
+    Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
+    If pCount = 0 Then Exit Sub
+    
+    For Each v In pSlices
+        Select Case True
+            Case TypeOf v(0) Is Array2dEx
+                C2Array2dEx(v(0)).CloneSliceTo v(2), v(3), v(1), VarPtr(TargetArray(TargetIndex + r))
+            Case TypeOf v(0) Is RecordsetEx
+                With C2RecordsetEx(v(0))
+                    iAux = CLng(.Instance.AbsolutePosition)
+                    .Instance.AbsolutePosition = v(2)
+                    k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
+                    MemoryLib.SliceArray VarPtr(k(0, 0)), VarPtr(TargetArray(TargetIndex + r)), v(3)
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else
