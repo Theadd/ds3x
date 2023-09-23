@@ -385,11 +385,11 @@ Fallback:
 End Function
 
 Private Function CreateNamedRecordset() As ADODB.Recordset
-    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, vHeads As Variant
+    Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues() As Variant, vHeads As Variant
     iRow = GetColumnNames
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    Set AllValues = CollectionsLib.AsArrayListEx(Records)
+    CollectionsLib.AsArraySliceGroup(Records).SlicedJaggedArray AllValues
     vHeads = Headers.Row(0)
     
     With rs
