@@ -224,7 +224,7 @@ ErrorHandler:
 End Function
 
 Public Sub SlicedArray(ByRef Out2dArray() As Variant)
-    Dim nRows As Long, nCols As Long, r As Long, c As Long, vSliced() As Variant
+    Dim nRows As Long, nCols As Long, c As Long
     nRows = Count: nCols = ColumnCount
     If nRows = 0 Then
         Out2dArray = Array2dEx.CreateBlank(0, 0).Instance
@@ -232,18 +232,16 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
     End If
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
-'    dsApp.GlobalVMemAnalysis "", False
+    dsApp.GlobalVMemAnalysis "", False
     For c = 0 To nCols - 1
-        SliceAt(c).CloneIntoArray Out2dArray, 0, c
+        SliceAt(c).CloneInto2dArray Out2dArray, 0, c
     Next c
-'    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
+    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
 End Sub
 
-' Practically there's no point in cloning an immutable object, it's just exposed to share some common API with the other collection class modules.
-Public Function Clone() As ArraySliceGroup
-    Set Clone = New ArraySliceGroup
-    Clone.SliceGroups = SliceGroups
-End Function
+Public Sub SlicedJaggedArray(ByRef OutJaggedArray() As Variant)
+    ToJaggedListLikeArray OutJaggedArray
+End Sub
 
 Public Function ToArray() As Variant(): SlicedArray ToArray: End Function
 
@@ -348,6 +346,32 @@ Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
     GetBaseRowIndexOfRange = 1
     GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
 End Function
+
+Private Sub ToJaggedListLikeArray(ByRef t() As Variant)
+    Dim nRows As Long, nCols As Long, c As Long, r() As Variant, i As Long
+    nRows = Count: nCols = ColumnCount
+    If nRows = 0 Then
+        t = Array()
+        Exit Sub
+    End If
+    MakeJaggedArrayContainer nRows, nCols, t
+    ReDim r(0 To nRows - 1)
+    For c = 0 To nCols - 1
+        SliceAt(c).CloneIntoArray r
+        For i = 0 To nRows - 1
+            t(i)(c) = r(i)
+        Next i
+    Next c
+End Sub
+
+Private Sub MakeJaggedArrayContainer(ByVal Rows As Long, ByVal Columns As Long, ByRef t() As Variant)
+    Dim r() As Variant, i As Long
+    ReDim r(0 To Columns - 1)
+    ReDim t(0 To Rows - 1)
+    For i = 0 To Rows - 1
+        t(i) = r
+    Next i
+End Sub
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
