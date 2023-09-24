@@ -899,7 +899,7 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
     #Else
         Const safeArraySize = 4
     #End If
-    Const FADF_HAVEVARTYPE As Long = &H80
+    'Const FADF_HAVEVARTYPE As Long = &H80
     Const fFeaturesHi As Long = FADF_HAVEVARTYPE * &H10000
     Dim i As Long
     '
@@ -988,4 +988,9 @@ Public Sub SliceArray(ByVal SrcMemAddr As LongPtr, ByVal DstMemAddr As LongPtr, 
     CopyMemory ByVal VarPtrArr(r), zeroAddr, CLngPtr(PTR_SIZE)
 End Sub
 
+Public Sub ReassignArrayTo(ByRef Destination As Variant, ByRef Source As Variant)
+    ReDim Destination(0 To 0, 0 To 0)
+    CopyMemory ByVal VarPtrArr(Destination), ByVal VarPtrArr(Source), CLngPtr(PTR_SIZE)
+    CopyMemory ByVal VarPtrArr(Source), CLngPtr(0), CLngPtr(PTR_SIZE)
+End Sub
 
