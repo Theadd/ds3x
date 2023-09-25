@@ -35,6 +35,54 @@ Public Type BOUNDS
 End Type
 
 
+' --- MemoryLib ---
+
+#If Win64 Then
+    Public Const PTR_SIZE As Long = 8
+    Public Const VARIANT_SIZE As Long = 24
+#Else
+    Public Const PTR_SIZE As Long = 4
+    Public Const VARIANT_SIZE As Long = 16
+#End If
+
+Public Const BYTE_SIZE As Long = 1
+Public Const INT_SIZE As Long = 2
+Public Const VT_SPACING As Long = VARIANT_SIZE / INT_SIZE 'VarType spacing in an array of Variants
+
+Public Type SAFEARRAYBOUND
+    cElements As Long
+    lLbound As Long
+End Type
+
+Public Type SAFEARRAY_1D
+    cDims As Integer
+    fFeatures As Integer
+    cbElements As Long
+    cLocks As Long
+    #If Win64 Then
+        dummyPadding As Long
+        pvData As LongLong
+    #Else
+        pvData As Long
+    #End If
+    rgsabound0 As SAFEARRAYBOUND
+End Type
+
+Public Type SAFEARRAY_2D
+    cDims As Integer
+    fFeatures As Integer
+    cbElements As Long
+    cLocks As Long
+    #If Win64 Then
+        dummyPadding As Long
+        pvData As LongLong
+    #Else
+        pvData As Long
+    #End If
+    rgsabound0(0 To 1) As SAFEARRAYBOUND
+End Type
+
+
 ' --- Automation ---
 
 Public Function RunApplicationCommandArgs()

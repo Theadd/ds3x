@@ -68,18 +68,6 @@ Private Const MODULE_NAME As String = "MemoryLib"
 Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
 
 #If Win64 Then
-    Private Const PTR_SIZE As Long = 8
-    Private Const VARIANT_SIZE As Long = 24
-#Else
-    Private Const PTR_SIZE As Long = 4
-    Private Const VARIANT_SIZE As Long = 16
-#End If
-
-Private Const BYTE_SIZE As Long = 1
-Private Const INT_SIZE As Long = 2
-Private Const VT_SPACING As Long = VARIANT_SIZE / INT_SIZE 'VarType spacing in an array of Variants
-
-#If Win64 Then
     Private Const vbLongPtr As Long = vbLongLong
 #Else
     Private Const vbLongLong As Long = 20 'Useful in Select Case logic
@@ -92,31 +80,10 @@ Private Type REMOTE_MEMORY
     isInitialized As Boolean
 End Type
 
-Private Type SAFEARRAYBOUND
-    cElements As Long
-    lLbound As Long
-End Type
-
-Private Type SAFEARRAY_1D
-    cDims As Integer
-    fFeatures As Integer
-    cbElements As Long
-    cLocks As Long
-    #If Win64 Then
-        dummyPadding As Long
-        pvData As LongLong
-    #Else
-        pvData As Long
-    #End If
-    rgsabound0 As SAFEARRAYBOUND
-End Type
-
 'https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-oaut/3fe7db9f-5803-4dc4-9d14-5425d3f5461f
 'https://docs.microsoft.com/en-us/windows/win32/api/oaidl/ns-oaidl-variant?redirectedfrom=MSDN
 'Flag used to simulate ByRef Variants
 Private Const VT_BYREF As Long = &H4000
-
-
 Private Const FADF_HAVEVARTYPE As Long = &H80
 
 '*******************************************************************************
@@ -899,7 +866,7 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
     #Else
         Const safeArraySize = 4
     #End If
-    Const FADF_HAVEVARTYPE As Long = &H80
+    'Const FADF_HAVEVARTYPE As Long = &H80
     Const fFeaturesHi As Long = FADF_HAVEVARTYPE * &H10000
     Dim i As Long
     '
@@ -963,29 +930,31 @@ FinalDimension:
     GetArrayDimsCount = dimension - 1
 End Function
 
-Public Sub SliceArray(ByVal SrcMemAddr As LongPtr, ByVal DstMemAddr As LongPtr, ByVal GetCount As Long)
-    Dim t() As Variant, r() As Variant, sSrcA As SAFEARRAY_1D, sDstA As SAFEARRAY_1D, zeroAddr As LongPtr
-    Dim i As Long
-    With sSrcA
+Public Sub VariantArrayClone(ByVal SourceAddress As LongPtr, ByVal DestinationAddress As LongPtr, ByVal GetCount As Long)
+    Dim t() As Variant, r() As Variant, sASrc As SAFEARRAY_1D, sADst As SAFEARRAY_1D, i As Long
+    With sASrc
         .cDims = 1
         .cbElements = VARIANT_SIZE
-        .pvData = SrcMemAddr
+        .pvData = SourceAddress
         .rgsabound0.cElements = GetCount
     End With
-    With sDstA
+    With sADst
         .cDims = 1
         .cbElements = VARIANT_SIZE
-        .pvData = DstMemAddr
+        .pvData = DestinationAddress
         .rgsabound0.cElements = GetCount
     End With
-    CopyMemory ByVal VarPtrArr(t), VarPtr(sSrcA), CLngPtr(PTR_SIZE)
-    CopyMemory ByVal VarPtrArr(r), VarPtr(sDstA), CLngPtr(PTR_SIZE)
+    MemLongPtr(VarPtrArr(t)) = VarPtr(sASrc)
+    MemLongPtr(VarPtrArr(r)) = VarPtr(sADst)
     For i = 0 To UBound(t)
         r(i) = t(i)
     Next i
-    zeroAddr = 0
-    CopyMemory ByVal VarPtrArr(t), zeroAddr, CLngPtr(PTR_SIZE)
-    CopyMemory ByVal VarPtrArr(r), zeroAddr, CLngPtr(PTR_SIZE)
+    MemLongPtr(VarPtrArr(t)) = CLngPtr(0)
+    MemLongPtr(VarPtrArr(r)) = CLngPtr(0)
 End Sub
 
+Public Sub ReassignArrayTo(ByRef Destination As Variant, ByRef Source As Variant)
+    MemLongPtr(VarPtrArr(Destination)) = MemLongPtr(VarPtrArr(Source))
+    MemLongPtr(VarPtrArr(Source)) = CLngPtr(0)
+End Sub
 

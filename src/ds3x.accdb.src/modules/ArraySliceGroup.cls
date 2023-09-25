@@ -241,13 +241,13 @@ Public Sub SlicedArray(ByRef Out2dArray() As Variant)
         Out2dArray = Array2dEx.CreateBlank(0, 0).Instance
         Exit Sub
     End If
-    dsApp.GlobalVMemAnalysis "", False
+'    dsApp.GlobalVMemAnalysis "", False
     ReDim Out2dArray(0 To nRows - 1, 0 To nCols - 1)
 
     For c = 0 To nCols - 1
         SliceAt(c).CloneInto2dArray Out2dArray, 0, c
     Next c
-    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
+'    dsApp.GlobalVMemAnalysis "@ArraySliceGroup.SlicedArray()"
 End Sub
 
 Public Sub SlicedJaggedArray(ByRef OutJaggedArray() As Variant)

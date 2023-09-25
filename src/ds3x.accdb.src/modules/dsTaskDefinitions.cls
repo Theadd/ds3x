@@ -490,11 +490,12 @@ Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Op
     DisableCache = GetParam(DisableCache, False)
     Set Options = GetParamAsDictionaryEx(Options)
 
-    ' {"Delimiter": "Auto", "InLocalFormat": true, "AutoHeaders": true}
+    ' {"Delimiter": "Auto", "InLocalFormat": true, "AutoHeaders": true, "TextQualifier": """"}
     Set dX = DictionaryEx.Create() _
         .Add("Delimiter", Options.GetValue("Delimiter", "Auto")) _
         .Add("InLocalFormat", Options.GetValue("InLocalFormat", False)) _
-        .Add("AutoHeaders", Options.GetValue("AutoHeaders", True))
+        .Add("AutoHeaders", Options.GetValue("AutoHeaders", True)) _
+        .Add("TextQualifier", Options.GetValue("TextQualifier", """"))
     
     If Not DisableCache Then
         On Error GoTo LoadFromFileAsCSVFallback
@@ -510,8 +511,7 @@ LoadFromFileAsCSVFallback:
     TargetFile = GetParam(TargetFile, "")
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
     
-'    Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
-    Set dsT = LoadFromCSVAsSingleSlice(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"))
+    Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"), dX("TextQualifier"))
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
     End If
@@ -1064,144 +1064,34 @@ Private Function HexToAscii(ByVal Value As String) As String
     HexToAscii = VBA.Join(t, "")
 End Function
 
-Private Sub Build2dArrayFromStringSlices(ByRef ContentString As String, ByRef sLines As ArrayListEx, ByRef t As Variant, ByVal Delimiter As String, ByVal InLocalFormat As Boolean, ByVal cQuote As String, ByVal cDblQuote As String)
-    Dim i As Long, t0 As Variant, r As Long, sCell As String, s As String, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
-    Dim c As Long
-    
-    DoEvents
-    If Not pTaskController Is Nothing Then pTaskController.TriggerOnBusyChange (True)
-    For Each t0 In sLines
-        s = VBA.Mid$(ContentString, t0(0), t0(1))
-        bQuotes = False: bQuoted = False: c = 0: Idx = 0
-        For i = 1 To VBA.Len(s)
-            Select Case VBA.Mid$(s, i, 1)
-                 Case cQuote: bQuotes = Not bQuotes: bQuoted = True
-                 Case Delimiter: bMatch = Not bQuotes
-            End Select
-            If i = VBA.Len(s) Then
-                i = i + 1
-                bMatch = True
-            End If
-            If bMatch Then
-                If bQuoted Then
-                    t(c)(r, 0) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 2, i - Idx - 3), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
-                Else
-                    sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
-                    Select Case True
-                        Case sCell = vbNullString: t(c)(r, 0) = Empty
-                        Case IsNumeric(sCell)
-                            If InLocalFormat Then
-                                t(c)(r, 0) = CDbl(CCur(sCell))
-                            Else
-                                t(c)(r, 0) = CDbl(Val(sCell))
-                            End If
-                        Case IsDate(sCell): t(c)(r, 0) = CDate(sCell)
-                        Case Else: t(c)(r, 0) = sCell
-                    End Select
-                End If
-                Idx = i
-                bQuoted = False
-                c = c + 1
-                bMatch = False
-            End If
-        Next i
-        r = r + 1
-    Next t0
-End Sub
+Private Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", _
+                                          Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True, _
+                                          Optional ByVal cQuote As String = """") As dsTable
+    Dim nCols As Long, c As Long, ContentString As String, leftOvers As Variant
+    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cDblQuote As String
+    cDblQuote = cQuote & cQuote
 
-Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
-    Dim nRows As Long, nCols As Long, c As Long, colHeaders As ArrayListEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
-    Dim i As Long, sgX As ArraySliceGroup, nContainers As Long, ct As Long, ctCap As Long, ctArr As Variant, ctX As ArrayListEx
-    Dim leftOvers As Variant, leftOversIndex As Long, buff As String, buffStream As String
-    Dim skipLoading As Boolean, skipFetching As Boolean, slicingOk As Boolean
-    Const dsChunkSize As Long = 10000, buffCap As Long = &H100000 ' 1MB
-    cQuote = """": cDblQuote = """"""
+    FileSystemLib.TryReadAllTextInFile TargetFile, ContentString
     Set sLines = ArrayListEx.Create()
+    If Not CollectionsLib.StringLineSlicesV2(ContentString, sLines, leftOvers, , , cQuote) Then
+        sLines.Add leftOvers
+    End If
+    If Delimiter = "Auto" Then
+        Delimiter = AutoDetectDelimiterInCSV(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)))
+    End If
+    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
+    If AutoHeaders Then sLines.RemoveAt 0
+    nCols = colHeaders.Count
     
-'    With FileSystemLib.StreamReader(TargetFile)
-    FileSystemLib.TryReadAllTextInFile TargetFile, buff
-        Do
-            If Not skipFetching Then
-'                buffStream = .ReadText(buffCap)
-'                buff = buff & buffStream
-'                If .Position >= .SIZE Then buffStream = vbNullString
-            End If
-            i = dsChunkSize + IIf(AutoHeaders And ctX Is Nothing, 1, 0)
-            c = IIf(leftOversIndex > 0, leftOversIndex, 1)
-            slicingOk = CollectionsLib.StringLineSlices(buff, sLines, leftOvers, c, i - sLines.Count)
-            If slicingOk Then
-                If IsEmpty(leftOvers) Then
-                    If (buffStream = vbNullString) Then
-                        ' All done
-                        skipFetching = True
-                        skipLoading = False
-                        leftOvers = Array(VBA.Len(buff) + 1, 0)
-                        leftOversIndex = leftOvers(0)
-                    Else
-                        ' Not done yet, only consumed the buff, reaching or not the limit
-                        skipFetching = False
-                        leftOvers = Array(VBA.Len(buff) + 1, 0)
-                        leftOversIndex = leftOvers(0)
-                        If sLines.Count >= i Then
-                            skipLoading = False
-                        Else
-                            skipLoading = True
-                        End If
-                    End If
-                Else
-                    ' Not done yet, only reached the limit
-                    skipLoading = False
-                    skipFetching = True
-                    leftOversIndex = leftOvers(0)
-                End If
-            Else
-                If (buffStream = vbNullString) Then
-                    ' All done but last slice doesn't terminate with a new line character
-                    sLines.Add Array(leftOvers(0), leftOvers(1))
-                    skipFetching = True
-                    leftOversIndex = 0
-                    leftOvers = Empty
-                    skipLoading = False
-                Else
-                    ' Not done yet and there's an incomplete line slice at the end of the current buff
-                    leftOversIndex = leftOvers(0)
-                    skipFetching = False
-                    skipLoading = True
-                End If
-            End If
-            If ctX Is Nothing And sLines.Count > 0 Then
-                ' It's the first loop, initialize all empty slices n stuff
-                Set ctX = ArrayListEx.Create()
-                If Delimiter = "Auto" Then
-                    Delimiter = AutoDetectDelimiterInCSV(VBA.Mid$(buff, sLines(0)(0), sLines(0)(1)))
-                End If
-                Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(buff, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
-                If AutoHeaders Then sLines.RemoveAt 0
-                nCols = colHeaders.Count
-                For i = 0 To nCols - 1
-                    ctX.Add ArraySlice.Create()
-                Next i
-            End If
-            If Not skipLoading Then
-                ctArr = MakeJagged2dArrayContainer(sLines.Count, nCols)
-                Build2dArrayFromStringSlices buff, sLines, ctArr, Delimiter, InLocalFormat, cQuote, cDblQuote
-                For i = 0 To nCols - 1
-                    Set ctX(i) = C2ArraySlice(ctX(i)).Add(ArraySlice.Create(ctArr(i), 0, sLines.Count, 0))
-                Next i
-                sLines.Clear
-            End If
-            If leftOversIndex > 0 And sLines.Count = 0 Then
-                buff = VBA.Mid$(buff, leftOvers(0), Len(buff))
-                leftOversIndex = 0
-            End If
-        Loop While (Not (buffStream = vbNullString And buff = vbNullString And sLines.Count = 0))
-'        .Close
-'    End With
-    
-    Set sgX = ArraySliceGroup.Create()
-    sgX.SliceGroups = ctX.ToArray()
-    
-    Set dsT = dsTable.Create(sgX, False)
+    Set a2X = Array2dEx.Create()
+    If sLines.Count > 0 Then
+        If sLines(0)(0) > 8 Then
+            DelimitedLineSlicesTo2dArrayV2 ContentString, sLines, a2X, nCols, Delimiter, InLocalFormat, cQuote, cDblQuote
+        Else
+            DelimitedLineSlicesTo2dArray ContentString, sLines, a2X, nCols, Delimiter, InLocalFormat, cQuote, cDblQuote
+        End If
+    End If
+    Set dsT = dsTable.Create(a2X, False)
     If AutoHeaders Then
         For c = 0 To nCols - 1
             If colHeaders(c) = cDblQuote Then
@@ -1212,77 +1102,131 @@ Public Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimiter
         Next c
         dsT.SetHeaders colHeaders.ToArray()
     End If
-
     Set LoadFromCSV = dsT
 End Function
 
-Private Function LoadFromCSVAsSingleSlice(ByRef TargetFile As String, Optional ByVal Delimiter As String = "Auto", Optional ByVal InLocalFormat As Boolean = True, Optional ByVal AutoHeaders As Boolean = True) As dsTable
-    Dim t0 As Variant, t2 As Variant, r As Long, sCell As String, t() As Variant, nRows As Long, nCols As Long, c As Long
-    Dim colHeaders As ArrayListEx, a2X As Array2dEx, dsT As dsTable, sLines As ArrayListEx, cQuote As String, cDblQuote As String
-    Dim s As String, i As Long, Idx As Long, bQuotes As Boolean, bQuoted As Boolean, bMatch As Boolean
-    Dim sgX As ArraySliceGroup, e As Long, eMax As Long, n As Long, nMax As Long, ContentString As String, leftOvers As Variant
-    Dim buffStream As String
-    cQuote = """": cDblQuote = """"""
-
-    FileSystemLib.TryReadAllTextInFile TargetFile, ContentString
-    Set sLines = ArrayListEx.Create()
-    If Not CollectionsLib.StringLineSlices(ContentString, sLines, leftOvers) Then
-        sLines.Add leftOvers
-    End If
-    If Delimiter = "Auto" Then
-        Delimiter = AutoDetectDelimiterInCSV(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)))
-    End If
-    Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
-    If AutoHeaders Then sLines.RemoveAt 0
-    nRows = sLines.Count
-    nCols = colHeaders.Count
-    ReDim t(0 To nRows - 1, 0 To nCols - 1)
-
-    r = 0
-    For Each t0 In sLines
-        s = VBA.Mid$(ContentString, t0(0), t0(1))
-        bQuotes = False: bQuoted = False: c = 0: Idx = 0
-        For i = 1 To VBA.Len(s)
-            Select Case VBA.Mid$(s, i, 1)
-                 Case cQuote: bQuotes = Not bQuotes: bQuoted = True
-                 Case Delimiter: bMatch = Not bQuotes
-            End Select
-            If i = VBA.Len(s) Then
-                i = i + 1
-                bMatch = True
-            End If
-            If bMatch Then
-                If bQuoted Then
-                    t(r, c) = Replace(Replace(Replace(VBA.Mid$(s, Idx + 2, i - Idx - 3), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
-                Else
-                    sCell = VBA.Mid$(s, Idx + 1, i - Idx - 1)
-                    Select Case True
-                        Case sCell = vbNullString: t(r, c) = Empty
-                        Case IsNumeric(sCell): t(r, c) = IIf(InLocalFormat, CDbl(CCur(sCell)), CDbl(Val(sCell)))
-                        Case IsDate(sCell): t(r, c) = CDate(sCell)
-                        Case Else: t(r, c) = sCell
-                    End Select
+Private Sub DelimitedLineSlicesTo2dArray(ByRef SearchString As String, ByRef LineSlices As ArrayListEx, ByRef a2X As Array2dEx, _
+                                         ByVal nCols As Long, Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False, _
+                                         Optional ByVal cQuote As String = """", Optional ByVal cDblQuote As String = """""")
+    Dim r As Long, i As Long, iDel As Long, iQt As Long, uStr As String, nQt As Long, rMax As Long
+    Dim t() As Variant, line As String, c As Long, sLines() As Variant
+    rMax = LineSlices.Count - 1
+    ReDim t(0 To rMax, 0 To nCols - 1)
+    sLines = LineSlices.ToArray()
+    
+    For r = 0 To rMax
+        line = VBA.Mid$(SearchString, sLines(r)(0), sLines(r)(1))
+        i = 1
+        c = 0
+        iDel = InStr(i, line, Delimiter, vbBinaryCompare)
+        Do While (iDel > 0)
+            uStr = VBA.Mid$(line, i, iDel - i)
+            iQt = InStr(1, uStr, cQuote, vbBinaryCompare)
+            nQt = Sgn(iQt)
+            Do
+                Do While (iQt > 0)
+                    iQt = InStr(1 + iQt, uStr, cQuote, vbBinaryCompare)
+                    nQt = nQt + Sgn(iQt)
+                Loop
+                If (nQt Mod 2) = 1 Then
+                    iQt = iDel - i
+                    iDel = InStr(1 + i + iQt, line, Delimiter, vbBinaryCompare)
+                    uStr = VBA.Mid$(line, i, iDel - i)
                 End If
-                Idx = i
-                bQuoted = False
-                c = c + 1
-                bMatch = False
+            Loop Until ((nQt Mod 2) = 0)
+            If VBA.Mid$(uStr, 1, 1) = cQuote Then
+                t(r, c) = VBA.Replace(VBA.Mid$(uStr, 2, Len(uStr) - 2), cDblQuote, cQuote, , , vbBinaryCompare)
+            Else
+                If IsNumeric(uStr) Then
+                    If InLocalFormat Then
+                        t(r, c) = CDbl(CCur(uStr))
+                    Else
+                        t(r, c) = Val(uStr)
+                    End If
+                ElseIf uStr = vbNullString Then
+                    t(r, c) = Empty
+                ElseIf IsDate(uStr) Then
+                    t(r, c) = CDate(uStr)
+                Else
+                    t(r, c) = uStr
+                End If
             End If
-        Next i
-        r = r + 1
-    Next t0
-    Set a2X = Array2dEx.Create()
+            i = iDel + 1
+            c = c + 1
+            iDel = InStr(i, line, Delimiter, vbBinaryCompare)
+            If iDel = 0 Then
+                If i <= Len(line) Then iDel = Len(line) + 1
+            End If
+        Loop
+    Next r
     a2X.SetInstanceByRef t
-    Set dsT = dsTable.Create(a2X, False)
-    If AutoHeaders Then
-        For c = 0 To nCols - 1
-            colHeaders(c) = Replace(Replace(Replace(colHeaders(c), cDblQuote, vbNullChar), cQuote, vbNullString), vbNullChar, cQuote)
-        Next c
-        dsT.SetHeaders colHeaders.ToArray()
-    End If
+End Sub
 
-    Set LoadFromCSVAsSingleSlice = dsT
-End Function
+Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef LineSlices As ArrayListEx, ByRef a2X As Array2dEx, _
+                                         ByVal nCols As Long, Optional ByVal Delimiter As String = ",", Optional ByVal InLocalFormat As Boolean = False, _
+                                         Optional ByVal cQuote As String = """", Optional ByVal cDblQuote As String = """""")
+    Dim r As Long, i As Long, iDel As Long, iQt As Long, uStr As String, nQt As Long
+    Dim t() As Variant, line As String, c As Long, sPtr As LongPtr, rMax As Long
+    Dim e As Long, wStr As String, sLines() As Variant, linePtr As LongPtr
+    
+    rMax = LineSlices.Count - 1
+    ReDim t(0 To rMax, 0 To nCols - 1)
+    sLines = LineSlices.ToArray()
+    sPtr = StrPtr(SearchString)
+    
+    For r = 0 To rMax
+        linePtr = sPtr + ((sLines(r)(0) - 1) * INT_SIZE) - 4
+        MemoryLib.MemLong(linePtr - 4) = (sLines(r)(1) * 2) + 4
+        MemoryLib.MemLongPtr(VarPtr(line)) = linePtr
+        i = 3
+        c = 0
+        iDel = InStr(i, line, Delimiter, vbBinaryCompare)
+        Do While (iDel > 0)
+            MemoryLib.MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
+            MemoryLib.MemLongPtr(VarPtr(uStr)) = linePtr + ((i - 1) * INT_SIZE)
+            iQt = InStr(1, uStr, cQuote, vbBinaryCompare)
+            nQt = Sgn(iQt)
+            Do
+                Do While (iQt > 0)
+                    iQt = InStr(1 + iQt, uStr, cQuote, vbBinaryCompare)
+                    nQt = nQt + Sgn(iQt)
+                Loop
+                If (nQt Mod 2) = 1 Then
+                    iQt = iDel - i
+                    iDel = InStr(1 + i + iQt, line, Delimiter, vbBinaryCompare)
+                    MemoryLib.MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
+                End If
+            Loop Until ((nQt Mod 2) = 0)
+            If VBA.Mid$(uStr, 1, 1) = cQuote Then
+                t(r, c) = VBA.Replace(VBA.Mid$(uStr, 2, Len(uStr) - 2), cDblQuote, cQuote, , , vbBinaryCompare)
+            Else
+                wStr = CStr(uStr)
+                If IsNumeric(wStr) Then
+                    If InLocalFormat Then
+                        t(r, c) = CDbl(CCur(wStr))
+                    Else
+                        t(r, c) = Val(wStr)
+                    End If
+                ElseIf wStr = vbNullString Then
+                    t(r, c) = Empty
+                ElseIf IsDate(wStr) Then
+                    t(r, c) = CDate(wStr)
+                Else
+                    t(r, c) = wStr
+                End If
+            End If
+            i = iDel + 1
+            c = c + 1
+            iDel = InStr(i, line, Delimiter, vbBinaryCompare)
+            If iDel = 0 Then
+                If i <= Len(line) Then iDel = Len(line) + 1
+            End If
+        Loop
+    Next r
+    MemoryLib.MemLongPtr(VarPtr(uStr)) = CLngPtr(0)
+    MemoryLib.MemLongPtr(VarPtr(line)) = CLngPtr(0)
+    a2X.SetInstanceByRef t
+End Sub
 
 Private Function MakeJagged2dArrayContainer(ByVal Rows As Long, ByVal Columns As Long) As Variant
     Dim t() As Variant, r() As Variant, i As Long
