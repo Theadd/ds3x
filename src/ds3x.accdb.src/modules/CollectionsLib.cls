@@ -412,6 +412,51 @@ Public Function StringLineSlices(ByRef SearchString As String, ByRef Slices As A
     End If
 End Function
 
+Public Function StringLineSlicesV2(ByRef SearchString As String, ByRef Slices As ArrayListEx, ByRef IncompleteSlice As Variant, _
+                                   Optional ByVal Index As Long = 1, Optional ByVal Limit As Long = -1, _
+                                   Optional ByVal cQuote As String = """") As Boolean
+    Dim i As Long, iLf As Long, iQt As Long, uStr As String, nQt As Long
+    IncompleteSlice = Empty
+    
+    i = Index
+    iLf = InStr(i, SearchString, vbLf, vbBinaryCompare)
+    Do While (iLf > 0)
+        uStr = VBA.Mid$(SearchString, i, iLf - i)
+        iQt = InStr(1, uStr, cQuote, vbBinaryCompare)
+        nQt = Sgn(iQt)
+        Do
+            Do While (iQt > 0)
+                iQt = InStr(1 + iQt, uStr, cQuote, vbBinaryCompare)
+                nQt = nQt + Sgn(iQt)
+            Loop
+            If (nQt Mod 2) = 1 Then
+                iQt = iLf - i
+                iLf = InStr(1 + i + iQt, SearchString, vbLf, vbBinaryCompare)
+                If iLf = 0 Then GoTo BreakLoop
+                uStr = VBA.Mid$(SearchString, i, iLf - i)
+            End If
+        Loop Until ((nQt Mod 2) = 0)
+        If VBA.Mid$(uStr, Len(uStr)) = vbCr Then
+            Slices.Add Array(i, iLf - (i + 1))
+        Else
+            Slices.Add Array(i, iLf - i)
+        End If
+        Limit = Limit - 1
+        If Limit = 0 Then
+            StringLineSlicesV2 = True
+            Exit Do
+        End If
+        i = iLf + 1
+        iLf = InStr(i, SearchString, vbLf, vbBinaryCompare)
+    Loop
+BreakLoop:
+    If i < Len(SearchString) Then
+        IncompleteSlice = Array(i, Len(SearchString) - i)
+    Else
+        StringLineSlicesV2 = True
+    End If
+End Function
+
 
 ' --- MISC ---
 
