@@ -17,6 +17,7 @@ Implements ICollectionEx
 
 Public Instance As Variant
 Private pColumnCountMod As Long
+Private pInstance() As Variant
 
 
 Public Property Get Count() As Long
@@ -53,12 +54,17 @@ End Property
 
 
 Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByVal TargetMemoryAddress As LongPtr)
-    MemoryLib.SliceArray VarPtr(Instance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
+    MemoryLib.VariantArrayClone VarPtr(Instance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
 End Sub
 
 Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
-'    Instance = MemoryLib.GetArrayByRef(TargetArray)
-    Instance = TargetArray
+    If IsEmpty(Instance) Then
+        ReDim pInstance(0 To 0, 0 To 0)
+        Instance = MemoryLib.GetArrayByRef(pInstance)
+        MemoryLib.ReassignArrayTo Instance, TargetArray
+    Else
+        Err.Raise 13, , "Can't reassign an Array2dEx Instance to another 2D Array once initialized."
+    End If
 End Sub
 
 Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As Array2dEx: Set CreateBlank = CreateArray2dEx(RowsCount, ColumnsCount): End Function
@@ -144,7 +150,7 @@ Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, By
     Set CopySliceToRange = Me
     If Not (Count > 0 And GetCount > 0) Then Exit Function
     ReDim t(0 To GetCount - 1, 0 To 0)
-    MemoryLib.SliceArray VarPtr(Instance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
+    MemoryLib.VariantArrayClone VarPtr(Instance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
     
     With RangeObject.Resize(GetCount, 1)
         If ApplyUserLocale Then
@@ -195,12 +201,11 @@ Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array
     
     Set CreateFromExcelRange = New Array2dEx
     t = TargetRange.Value
-    'Stop
+
     MemoryLib.UpdateLBound t, 1, 0
     MemoryLib.UpdateLBound t, 2, 0
-    'Stop
+
     CreateFromExcelRange.SetInstanceByRef t
-    
 End Function
 
 Private Function CreateFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx
@@ -357,7 +362,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
             Next c
         Next i
     Else
-        t = CreateBlank2DArray()
+        t = CreateBlank2dArray()
         GetRange.ColumnCount = -1
     End If
     
@@ -516,7 +521,7 @@ Fallback:
     Is1dArray = IsArray(ArrayLike)
 End Function
 
-Private Function CreateBlank2DArray(Optional ByVal NumRows As Long = 0) As Variant
+Private Function CreateBlank2dArray(Optional ByVal NumRows As Long = 0) As Variant
     Dim Miss As Variant, t() As Variant, i As Long
     With CreateObject("Forms.ComboBox.1")
         If NumRows = 0 Then
@@ -529,7 +534,7 @@ Private Function CreateBlank2DArray(Optional ByVal NumRows As Long = 0) As Varia
             Next i
             .List = t
         End If
-        CreateBlank2DArray = .List
+        CreateBlank2dArray = .List
     End With
 End Function
 
@@ -565,7 +570,7 @@ Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As 
     If RowsCount > 0 And ColumnsCount > 0 Then
         ReDim t(0 To RowsCount - 1, 0 To ColumnsCount - 1)
     Else
-        t = CreateBlank2DArray(RowsCount)
+        t = CreateBlank2dArray(RowsCount)
         CreateArray2dEx.ColumnCount = -1
     End If
     
