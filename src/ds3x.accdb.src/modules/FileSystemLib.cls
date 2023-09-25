@@ -507,60 +507,39 @@ End Function
 ' Using ADODB.Stream with files over a few MB reduces speed performance in an exponential way based on file size.
 Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal Charset As Variant) As Boolean
     On Error GoTo Finally
-    Dim lastBytes As Variant
+    Dim LastBytes As Variant
     
-    If IsMissing(Charset) Then Charset = GetFileCharset(TargetFile, lastBytes)
+    If IsMissing(Charset) Then Charset = GetFileCharset(TargetFile, LastBytes)
     Select Case Charset
         Case "ANSI"
             With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateFalse)
                 Content = .ReadAll
-                TryReadAllTextInFile = True
                 .Close
             End With
         Case "UTF-8"
             With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
-                Content = DecodeByteString(.ReadAll, lastBytes)
-                TryReadAllTextInFile = True
+                Content = DecodeByteString(.ReadAll, LastBytes)
                 .Close
             End With
         Case "UTF-16", "UTF-16LE", "UTF-16BE"
             With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
                 Content = .ReadAll
-                TryReadAllTextInFile = True
                 .Close
             End With
         Case "UTF-8-BOM"
             With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
-                Content = VBA.Mid$(DecodeByteString(.ReadAll, lastBytes), 2)
-                TryReadAllTextInFile = True
+                Content = VBA.Mid$(DecodeByteString(.ReadAll, LastBytes), 2)
                 .Close
             End With
         Case "UTF-8/ANSI"
             With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
-                Content = DecodeByteString(.ReadAll, lastBytes)
-                TryReadAllTextInFile = (InStr(1, Content, VBA.ChrW$(&HFFFD), vbBinaryCompare) = 0)
+                Content = DecodeByteString(.ReadAll, LastBytes, True)
                 .Close
             End With
-            If Not TryReadAllTextInFile Then
-                With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateFalse)
-                    Content = .ReadAll
-                    TryReadAllTextInFile = True
-                    .Close
-                End With
-            End If
         Case Else
-            With New ADODB.Stream
-                .Open
-                On Error GoTo StreamFinally
-                .LoadFromFile FileSystemLib.Resolve(TargetFile)
-                .Type = adTypeText
-                Content = .ReadText(adReadAll)
-                TryReadAllTextInFile = True
-StreamFinally:
-                On Error Resume Next
-                .Close
-            End With
+            Err.Raise 17, , "Unexpected file encoding"
     End Select
+    TryReadAllTextInFile = True
 Finally:
 End Function
 
@@ -731,18 +710,19 @@ End Function
 
 ' --- UTF-8 ---
 
-Private Function DecodeByteString(ByRef SourceString As String, ByRef lastBytes As Variant) As String
+Private Function DecodeByteString(ByRef SourceString As String, ByRef LastBytes As Variant, Optional ByVal MayBeInANSI As Boolean = False) As String
     Dim iSize As Long, oSize As Long, r As String
 
-    If Not IsEmpty(lastBytes) Then
-        If Not (AscB(RightB(Right(SourceString, 1), 1)) = lastBytes(UBound(lastBytes) - 1) And _
-            AscB(LeftB(Right(SourceString, 1), 1)) = lastBytes(UBound(lastBytes) - 2)) Then
+    If Not IsEmpty(LastBytes) Then
+        If Not (AscB(RightB(Right(SourceString, 1), 1)) = LastBytes(UBound(LastBytes) - 1) And _
+            AscB(LeftB(Right(SourceString, 1), 1)) = LastBytes(UBound(LastBytes) - 2)) Then
             ' Not (rb = lastBytes(ulb - 1) And lb = lastBytes(ulb - 2))
             Err.Raise 13, , "Please submit a new issue at https://github.com/Theadd/ds3x/issues if you ever reach " & _
                             "this point, preferably attaching the file causing it in order to reproduce the problem."
         End If
-        SourceString = SourceString & (ChrB(lastBytes(UBound(lastBytes))))
+        SourceString = SourceString & (ChrB(LastBytes(UBound(LastBytes))))
     End If
+    
     On Error Resume Next
     iSize = LenB(SourceString)
     If iSize = 0 Then Exit Function
@@ -750,6 +730,11 @@ Private Function DecodeByteString(ByRef SourceString As String, ByRef lastBytes 
     If oSize > 0 Then
         r = String$(oSize, 0)
         MultiByteToWideChar CP_UTF8, 0, StrPtr(SourceString), iSize, StrPtr(r), oSize
+    End If
+    If MayBeInANSI Then
+        If Not (InStr(1, r, VBA.ChrW$(&HFFFD), vbBinaryCompare) = 0) Then
+            r = StrConv(SourceString, vbUnicode)
+        End If
     End If
     DecodeByteString = r
 End Function
