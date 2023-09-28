@@ -25,6 +25,8 @@ ExitFunc:
 Fallback:
     On Error GoTo FallbackFail
     If Not IsObject(X) Then
+        If IsArray(X) Then X = X(0)
+        If IsArray(Y) Then Y = Y(0)
         Select Case X
             Case Is < Y: IComparer_Compare = -1
             Case Is > Y: IComparer_Compare = 1
