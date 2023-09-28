@@ -109,17 +109,23 @@ Private pIsShallowCopy As Boolean
 ' Equivalente a Recordset.RecordCount
 Public Property Get Count() As Long
 Attribute Count.VB_Description = "Equivalente a Recordset.RecordCount"
-    On Error Resume Next: Count = Instance.RecordCount
+    On Error Resume Next
+    Count = Instance.RecordCount
+    On Error GoTo 0
 End Property
 
 ' DEPRECATED
 Public Property Get Columns() As Long
 Attribute Columns.VB_Description = "Equivalente a Recordset.Fields.Count"
-    On Error Resume Next: Columns = Instance.Fields.Count
+    On Error Resume Next
+    Columns = Instance.Fields.Count
+    On Error GoTo 0
 End Property
 
 Public Property Get ColumnCount() As Long
-    On Error Resume Next: ColumnCount = Instance.Fields.Count
+    On Error Resume Next
+    ColumnCount = Instance.Fields.Count
+    On Error GoTo 0
 End Property
 
 ' Devuelve un RecordsetEx (Shallow Copy) que se desplazará automáticamente a la fila (record)
@@ -261,30 +267,35 @@ End Function
 Public Function MoveFirst() As RecordsetEx
 Attribute MoveFirst.VB_Description = "Alternativa segura y encadenable al método .MoveFirst de Recordset."
     On Error Resume Next: Instance.MoveFirst: Set MoveFirst = Me
+    On Error GoTo 0
 End Function
 
 ' Alternativa segura y encadenable al método .MoveLast de Recordset.
 Public Function MoveLast() As RecordsetEx
 Attribute MoveLast.VB_Description = "Alternativa segura y encadenable al método .MoveLast de Recordset."
     On Error Resume Next: Instance.MoveLast: Set MoveLast = Me
+    On Error GoTo 0
 End Function
 
 ' Alternativa segura y encadenable al método .MoveNext de Recordset.
 Public Function MoveNext() As RecordsetEx
 Attribute MoveNext.VB_Description = "Alternativa segura y encadenable al método .MoveNext de Recordset."
     On Error Resume Next: Instance.MoveNext: Set MoveNext = Me
+    On Error GoTo 0
 End Function
 
 ' Alternativa segura y encadenable al método .MovePrevious de Recordset.
 Public Function MovePrevious() As RecordsetEx
 Attribute MovePrevious.VB_Description = "Alternativa segura y encadenable al método .MovePrevious de Recordset."
     On Error Resume Next: Instance.MovePrevious: Set MovePrevious = Me
+    On Error GoTo 0
 End Function
 
 ' Alternativa segura y encadenable al método .Move de Recordset.
 Public Function Move(ByVal NumRecords As Long) As RecordsetEx
 Attribute Move.VB_Description = "Alternativa segura y encadenable al método .Move de Recordset."
     On Error Resume Next: Instance.Move NumRecords: Set Move = Me
+    On Error GoTo 0
 End Function
 
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
@@ -463,6 +474,7 @@ Attribute Requery.VB_Description = "Actualiza los datos del objeto Recordset vol
     Instance.Close
     Instance.Open
     Set Requery = Me
+    On Error GoTo 0
 End Function
 
 ' Devuelve la posición del primer registro en un Recordset que cumpla con SearchCritera.
@@ -599,6 +611,7 @@ Public Function ToString(Optional ByVal ColumnDelimiter As String = vbTab, Optio
 Attribute ToString.VB_Description = "Similar al método Recordset.GetString()."
     On Error Resume Next
     ToString = Instance.GetString(adClipString, LimitRows, ColumnDelimiter)
+    On Error GoTo 0
 End Function
 
 ' Imprime el recordset en formato Markdown Table a la ventana Inmediato.
@@ -785,6 +798,7 @@ Private Function C2Date(Optional ByVal Value As Variant) As Variant
     On Error Resume Next
     C2Date = Value
     C2Date = DateValue(Value)
+    On Error GoTo 0
 End Function
 
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function

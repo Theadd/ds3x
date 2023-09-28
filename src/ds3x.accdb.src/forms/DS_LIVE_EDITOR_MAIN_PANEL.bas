@@ -24,10 +24,10 @@ Begin Form
     Width =3435
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8250
+    Top =3960
+    Right =23745
+    Bottom =14115
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -435,6 +435,7 @@ Attribute pController.VB_VarHelpID = -1
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property

@@ -11,10 +11,10 @@ Begin Form
     GridY =10
     Width =2777
     DatasheetFontHeight =11
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8250
+    Top =3960
+    Right =23745
+    Bottom =14115
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x09f591aa690ae640
@@ -64,11 +64,13 @@ Private Sub Form_Timer()
     Me.TimerInterval = 0
     Run
     DoCmd.Close acForm, "DS_ASYNC_RUNNER", acSaveNo
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
     Me.TimerInterval = 0
+    On Error GoTo 0
 End Sub
 
 Private Sub Run()

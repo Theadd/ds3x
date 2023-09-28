@@ -22,10 +22,10 @@ Begin Form
     Width =4399
     DatasheetFontHeight =11
     ItemSuffix =1574
-    Left =3225
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =8625
+    Top =5430
+    Right =11775
+    Bottom =8010
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -852,7 +852,7 @@ Public Property Set Viewport(ByRef Value As Form_DS_VIEWPORT): Set pViewport = V
 Public Property Get ViewportSticky() As Form_DS_VIEWPORT_STICKY: Set ViewportSticky = pViewportSticky: End Property
 Public Property Set ViewportSticky(ByRef Value As Form_DS_VIEWPORT_STICKY): Set pViewportSticky = Value: End Property
 
-Public Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
+Public Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: On Error GoTo 0: End Property
 Public Property Get Initialized() As Boolean: Initialized = pInitialized: End Property
 
 Public Property Get OutOfBoundsScrollX() As Long: OutOfBoundsScrollX = pOutOfBoundsScrollX: End Property
@@ -919,6 +919,7 @@ Private Sub QueueDelayedScrollX()
             pIsScrollXQueueListening = True
         End If
     End If
+    On Error GoTo 0
 End Sub
 
 Private Sub QueueDelayedScrollY()
@@ -939,6 +940,7 @@ Private Sub QueueDelayedScrollY()
             pIsScrollYQueueListening = True
         End If
     End If
+    On Error GoTo 0
 End Sub
 
 ' --- FORM EVENTS ---
@@ -976,7 +978,6 @@ Private Sub Form_Resize()
         UpdateScrollbarY False
         Viewport.ScrollTo ScrollPosX, ScrollPosY
 Finally:
-        On Error Resume Next
         pIgnoreScrollingEvents = False
     End If
 End Sub
@@ -996,7 +997,6 @@ Private Sub Form_Timer()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    'On Error Resume Next
     Me.TimerInterval = 0
     RaiseEvent OnWindowClose(Cancel)
     If Not CBool(Cancel) Then Dispose
@@ -1032,11 +1032,11 @@ Private Sub SetTable(ByRef Value As dsTable)
         UpdateScrollbarX
         UpdateScrollbarY True
 Finally:
-        On Error Resume Next
         pIgnoreScrollingEvents = False
     End If
     On Error Resume Next
     Viewport.OnSourceTableChange
+    On Error GoTo 0
 End Sub
 
 Private Sub SetSelectedColumns(ByVal Value As Variant)
@@ -1067,6 +1067,7 @@ Private Sub Dispose()
     Set pWorksheet = Nothing
     Set pViewportSticky = Nothing
     Set pViewport = Nothing
+    On Error GoTo 0
 End Sub
 
 
@@ -1216,13 +1217,6 @@ Public Sub ApplyScrollbarX(Optional ByVal Value As Variant, Optional ByVal Expli
             End If
         End If
     End With
-    
-ExitSub:
-    Exit Sub
-Finally:
-    On Error Resume Next
-    Debug.Print "[ERROR] @DS_SCROLLVIEW.ApplyScrollbarX() - " & CStr(Err.Description)
-    Resume ExitSub
 End Sub
 
 Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)

@@ -23,10 +23,10 @@ Begin Form
     Width =3795
     DatasheetFontHeight =11
     ItemSuffix =1558
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8250
+    Top =3960
+    Right =23745
+    Bottom =14115
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -513,6 +513,7 @@ Private pExpandedMode As Boolean
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 Public Property Get Controller() As dsTaskController
@@ -560,6 +561,7 @@ Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
         Me.HiddenControl.SetFocus
         DoEvents
     End If
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_Resize()
@@ -636,4 +638,5 @@ Private Function GetControlText(ByRef TargetControl As Access.Control) As String
     On Error Resume Next
     GetControlText = TargetControl.Value
     GetControlText = TargetControl.Text
+    On Error GoTo 0
 End Function

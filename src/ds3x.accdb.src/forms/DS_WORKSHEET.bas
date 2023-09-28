@@ -26,10 +26,10 @@ Begin Form
     Width =31680
     DatasheetFontHeight =11
     ItemSuffix =2116
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =10020
+    Top =7605
+    Right =13200
+    Bottom =10185
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1256,6 +1256,7 @@ Public Property Get GridCellSizeY() As Long: GridCellSizeY = pGridCellSizeY: End
 Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
     pViewport.PropagateMouseWheel Page, Count
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyDownHandler KeyCode, Shift: End Sub

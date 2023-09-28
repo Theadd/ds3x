@@ -21,10 +21,10 @@ Begin Form
     Width =1361
     DatasheetFontHeight =11
     ItemSuffix =2096
-    Left =3225
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =9090
+    Top =4755
+    Right =11100
+    Bottom =8745
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -670,6 +670,7 @@ Public Event OnItemDoubleClick(ByVal ActiveIndex As Long)
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 
@@ -726,6 +727,7 @@ Private Sub DS_LIST_ITEM_OVERLAY_DblClick(Cancel As Integer)
     
     If CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_STATE)))) = 4 Then Exit Sub
     RaiseEvent OnItemDoubleClick(CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_INDEX)))))
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_Load()
@@ -741,4 +743,5 @@ Private Sub RestoreScrollPosY()
     On Error Resume Next
     Me.SelTop = Me.Recordset.RecordCount
     Me.SelTop = pScrollPosY
+    On Error GoTo 0
 End Sub

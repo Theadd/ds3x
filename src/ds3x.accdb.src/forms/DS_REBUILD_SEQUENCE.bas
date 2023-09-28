@@ -24,10 +24,10 @@ Begin Form
     Width =3263
     DatasheetFontHeight =11
     ItemSuffix =1591
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8760
+    Top =5280
+    Right =11910
+    Bottom =7290
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -1217,6 +1217,7 @@ Private pIndexCountdown As Long
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 Public Property Get Controller() As dsTaskController: Set Controller = pController: End Property
@@ -1275,6 +1276,7 @@ End Sub
 Private Sub CloseFormIfOpen(ByVal FormName As String)
     On Error Resume Next
     DoCmd.Close acForm, FormName, acSaveNo
+    On Error GoTo 0
 End Sub
 
 Private Sub DS_LIST_ITEM_REMOVE_Click()
@@ -1350,6 +1352,7 @@ End Sub
 Private Sub pContinuousList_OnActiveIndexChange(ByVal ActiveIndex As Long)
     On Error Resume Next
     pController.SequenceIndex = ActiveIndex
+    On Error GoTo 0
 End Sub
 
 Private Sub pContinuousList_OnItemDoubleClick(ByVal ActiveIndex As Long)
@@ -1365,6 +1368,7 @@ Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long, B
     If (Not HasFailed) And pFailedSequenceIndex <= TargetIndex Then pFailedSequenceIndex = -1
     RebuildSequenceList
     pContinuousList.SetActiveIndex pController.SequenceIndex, True
+    On Error GoTo 0
 End Sub
 
 Private Sub pController_OnRebuildSequenceChange()
@@ -1377,12 +1381,14 @@ Private Sub pController_OnRebuildSequenceFail(ByVal FailedSequenceIndex As Long)
     pFailedSequenceIndex = FailedSequenceIndex
     RebuildSequenceList
     pContinuousList.SetActiveIndex pFailedSequenceIndex, True
+    On Error GoTo 0
 End Sub
 
 Public Function Focus(ByRef frm As Access.Form)
     On Error Resume Next
     frm.Controls("HiddenControl").SetFocus
     DoEvents
+    On Error GoTo 0
 End Function
 
 Private Sub SetButtonAsClickable(ByRef TargetControl As Access.CommandButton, ByVal Value As Boolean, Optional ByVal ThemeColorIndexOnNormal As Long = 8)
