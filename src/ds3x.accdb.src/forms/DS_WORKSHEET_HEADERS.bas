@@ -21,10 +21,10 @@ Begin Form
     Width =31636
     DatasheetFontHeight =11
     ItemSuffix =1560
-    Left =4605
-    Top =4290
-    Right =7785
-    Bottom =4680
+    Left =10005
+    Top =6690
+    Right =13185
+    Bottom =7080
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -2187,6 +2187,7 @@ End Sub
 Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
     pViewport.PropagateMouseWheel Page, Count
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyDownHandler KeyCode, Shift: End Sub
@@ -2284,6 +2285,7 @@ Private Function GetControlText(ByRef TargetControl As Access.Control) As String
     On Error Resume Next
     GetControlText = TargetControl.Value
     GetControlText = TargetControl.Text
+    On Error GoTo 0
 End Function
 
 Private Function TryGetActiveControl(ByRef OutActiveControl As Variant) As Boolean

@@ -27,10 +27,10 @@ Begin Form
     Width =705
     DatasheetFontHeight =11
     ItemSuffix =2139
-    Left =3240
-    Top =3045
-    Right =19860
-    Bottom =15210
+    Left =9300
+    Top =7590
+    Right =9735
+    Bottom =10170
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -588,6 +588,7 @@ End Sub
 Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
     pViewport.PropagateMouseWheel Page, Count
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pViewport.Scrollview.OnKeyDownHandler KeyCode, Shift: End Sub

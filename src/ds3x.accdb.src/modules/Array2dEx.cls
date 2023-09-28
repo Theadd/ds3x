@@ -23,11 +23,13 @@ Private pInstance() As Variant
 Public Property Get Count() As Long
     On Error Resume Next
     Count = 1 + (UBound(Instance, 1) - LBound(Instance, 1))
+    On Error GoTo 0
 End Property
 
 Public Property Get ColumnCount() As Long
     On Error Resume Next
     ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2)) + pColumnCountMod
+    On Error GoTo 0
 End Property
 
 Public Property Let ColumnCount(ByVal Value As Long): pColumnCountMod = IIf(IsEmpty(Instance), Value, pColumnCountMod): End Property
@@ -177,7 +179,6 @@ Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
         t = rs.GetRows(adGetRowsRest, adBookmarkFirst)
         ReDim k(0 To ubRows, 0 To ubCols)
         
-        'On Error Resume Next
         rs.MoveFirst
         For c = 0 To ubCols
             If rs.Fields(c).Type = adVarWChar Then
@@ -490,6 +491,7 @@ Private Function C2Date(Optional ByVal Value As Variant) As Variant
     On Error Resume Next
     C2Date = Value
     C2Date = DateValue(Value)
+    On Error GoTo 0
 End Function
 
 Private Function C2Recordset(ByVal Value As Variant) As ADODB.Recordset: Set C2Recordset = Value: End Function

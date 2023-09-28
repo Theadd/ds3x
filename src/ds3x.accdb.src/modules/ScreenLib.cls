@@ -167,6 +167,7 @@ Public Property Get TotalMonitors() As Long: TotalMonitors = TotalScreenMonitors
 Public Property Get IsAccessWindowVisible() As Boolean
     On Error Resume Next
     IsAccessWindowVisible = ((GetWindowLong(Application.hWndAccessApp, GWL_STYLE) And WS_VISIBLE) > 0)
+    On Error GoTo 0
 End Property
 
 Public Property Get IsVBEMainWindowVisible() As Boolean
@@ -176,6 +177,7 @@ Public Property Get IsVBEMainWindowVisible() As Boolean
     If uHwnd > 0 Then
         IsVBEMainWindowVisible = ((GetWindowLong(uHwnd, GWL_STYLE) And WS_VISIBLE) > 0)
     End If
+    On Error GoTo 0
 End Property
 
 Public Property Let IsVBEMainWindowVisible(ByVal ShouldBeVisible As Boolean)
@@ -185,6 +187,7 @@ Public Property Let IsVBEMainWindowVisible(ByVal ShouldBeVisible As Boolean)
     If uHwnd > 0 Then
         SetShowWindow uHwnd, IIf(ShouldBeVisible, SW_SHOW, SW_HIDE)
     End If
+    On Error GoTo 0
 End Property
 
 
@@ -342,6 +345,7 @@ End Function
 Public Function SetAccessWindow(nCmdShow As Long) As Boolean
     On Error Resume Next
     SetAccessWindow = (SetShowWindow(Application.hWndAccessApp, nCmdShow) <> 0)
+    On Error GoTo 0
 End Function
 
 Public Function ShowWindow(ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
@@ -353,6 +357,7 @@ Public Function HideAppWindow(frm As Access.Form)
     SetWindowLong frm.hWnd, GWL_EXSTYLE, GetWindowLong(frm.hWnd, GWL_EXSTYLE) Or WS_EX_APPWINDOW
     SetShowWindow Application.hWndAccessApp, SW_HIDE
     SetShowWindow frm.hWnd, SW_SHOW
+    On Error GoTo 0
  End Function
 
 Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWindow As Boolean = True)
@@ -378,6 +383,7 @@ Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWind
             End If
         End If
     Next i
+    On Error GoTo 0
 End Sub
 
 Public Sub WindowAndTaskbarIconAsVisible(ByRef f As Access.Form)
@@ -589,6 +595,7 @@ End Function
 Private Function Clamp101(n As Variant) As Integer
     On Error Resume Next
     If n <> 0 Then Clamp101 = (n / Abs(n))
+    On Error GoTo 0
 End Function
 
 Private Function GetAlignmentFlagsFromAnchorDirection(ByVal d As DirectionType) As Long
@@ -794,6 +801,7 @@ Public Sub SetClickableStyle(ByRef TargetControl As Access.Control, ByVal Value 
         TargetControl.OnGotFocus = "=Focus([Form])"
         TargetControl.CursorOnHover = acCursorOnHoverDefault
     End If
+    On Error GoTo 0
 End Sub
 
 Public Sub SetThemeColorStyle(ByRef TargetControl As Access.Control, ByVal ColorIndex As Long)
@@ -804,6 +812,7 @@ Public Sub SetThemeColorStyle(ByRef TargetControl As Access.Control, ByVal Color
         .BorderThemeColorIndex = ColorIndex
         .PressedThemeColorIndex = ColorIndex
     End With
+    On Error GoTo 0
 End Sub
 
 

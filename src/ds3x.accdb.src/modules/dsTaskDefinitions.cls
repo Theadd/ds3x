@@ -414,6 +414,7 @@ Finally:
     On Error Resume Next
     xlX.DiscardChangesAndExit
     Set LoadFromExcelFile = dsT
+    On Error GoTo 0
 End Function
 
 Public Function OpenWorksheetFromFile(ByVal TargetFile As Variant, Optional ByVal Options As Variant) As xlSheetsEx

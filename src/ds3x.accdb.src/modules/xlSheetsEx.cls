@@ -154,6 +154,7 @@ Fallback:
     Set pAllSheets = Nothing
     Set xlApp = Nothing
     Set Create = Nothing
+    On Error GoTo 0
 End Function
 
 Private Function LoadWorkbookAt(ByRef xlApp As Excel.Application, ByVal TargetFile, ByVal Options As DictionaryEx) As Excel.Workbook
@@ -212,6 +213,7 @@ Friend Sub Unbind()
     AllSheets.Remove Me
     Set Instance = Nothing
     Set pAllSheets = Nothing
+    On Error GoTo 0
 End Sub
 
 Public Sub Dispose()
@@ -237,6 +239,7 @@ Public Sub Dispose()
             End If
         End If
     End If
+    On Error GoTo 0
 End Sub
 
 Public Sub ReleaseWorkbook()
@@ -261,6 +264,7 @@ Public Sub DiscardChangesAndExit()
         Set Instance = Nothing
     End If
     Set pAllSheets = Nothing
+    On Error GoTo 0
 End Sub
 
 
@@ -419,7 +423,6 @@ Finally:
 End Sub
 
 Private Sub Class_Terminate()
-    Debug.Print "IN xlSheetsEx.Terminate()"
     If Not Instance Is Nothing Then
         On Error Resume Next
         With Instance.Application
@@ -429,7 +432,7 @@ Private Sub Class_Terminate()
         End With
         Set Instance = Nothing
         Set pAllSheets = Nothing
+        On Error GoTo 0
     End If
-    'Unbind
 End Sub
 

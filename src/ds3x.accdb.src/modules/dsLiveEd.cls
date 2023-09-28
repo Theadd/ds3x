@@ -271,6 +271,7 @@ Private Function Destroy()
     pTaskController.Dispose
     Set pTaskController = Nothing
     Set pLiveEditor = Nothing
+    On Error GoTo 0
 End Function
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
@@ -486,5 +487,6 @@ Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean 
     Set pGridController = Nothing
     
     RaiseEvent OnClose
+    On Error GoTo 0
 End Sub
 

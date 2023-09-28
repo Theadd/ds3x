@@ -22,10 +22,10 @@ Begin Form
     Width =690
     DatasheetFontHeight =11
     ItemSuffix =1591
-    Left =3225
-    Top =3030
-    Right =21780
-    Bottom =15225
+    Left =8970
+    Top =6075
+    Right =9405
+    Bottom =8610
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -554,6 +554,7 @@ Public Property Set Scrollview(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollvi
 Private Sub Form_MouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     On Error Resume Next
     pScrollview.PropagateMouseWheel Page, Count
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyDownHandler KeyCode, Shift: End Sub

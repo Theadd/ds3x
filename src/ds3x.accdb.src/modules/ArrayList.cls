@@ -150,6 +150,7 @@ Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ArrayLi
 Finally:
     On Error Resume Next
     MemoryLib.MemLongPtr(MemoryLib.VarPtrArr(t)) = CLngPtr(0)
+    On Error GoTo 0
 End Function
 
 Public Function GetEnumerator(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As IEnumVARIANT
@@ -357,6 +358,7 @@ Private Sub Class_Terminate()
     On Error Resume Next
     DoEvents
     Erase pItems
+    On Error GoTo 0
 End Sub
 
 Private Sub Swap(ByRef a As Variant, ByRef B As Variant)

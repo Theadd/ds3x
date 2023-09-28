@@ -121,6 +121,7 @@ Finally:
         If Not pLiveEd Is Nothing Then pLiveEd.Dispose
         RunAll = shouldContinue
         If pQuitOnRunAll Then Application.Quit acQuitPrompt
+        On Error GoTo 0
         Exit Property
 ErrorHandler:
         dsApp.Log("critical") = "Unhandled error @dsAppGlobals.RunAll() - " & Err.Description

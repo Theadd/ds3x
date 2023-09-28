@@ -31,6 +31,7 @@ Public Property Get ColumnCount() As Long
 Attribute ColumnCount.VB_Description = "In table-like instances, gets the number of columns (the count of elements within the first element, which is expected to be an array)."
     On Error Resume Next
     ColumnCount = CountElementsIn(Instance(0))
+    On Error GoTo 0
 End Property
 
 ' Sets or gets the element at the specified index. It's the default class member. When used as getter, a negative Index is applied to .Count, being -1 the last element.
@@ -134,7 +135,6 @@ Public Function AddRange(Optional ByRef ArrayLike As Variant) As ArrayListEx
         ElseIf TypeOf C2Object(ArrayLike) Is Array2dEx Then
             AddFrom2dArray ArrayLike.Instance
         Else
-'            On Error Resume Next
             For Each Item In ArrayLike
                 Instance.Add Item
             Next Item
@@ -170,9 +170,9 @@ End Function
 
 Static Function CountElementsIn(ByRef ArrayLike As Variant) As Long
     On Error Resume Next
-    
     If IsObject(ArrayLike) Then CountElementsIn = ArrayLike.Count
     If IsArray(ArrayLike) Then CountElementsIn = UBound(ArrayLike) + 1
+    On Error GoTo 0
 End Function
 
 ' Removes an element by value from the ArrayList.
@@ -201,7 +201,6 @@ Attribute RemoveFrom.VB_Description = "Removes each element found in ArrayLike f
     End If
     
     If IsObject(ArrayLike) Or IsArray(ArrayLike) Then
-'        On Error Resume Next
         For Each Item In ArrayLike
             Instance.Remove Item
         Next Item

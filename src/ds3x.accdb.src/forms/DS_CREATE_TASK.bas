@@ -1243,6 +1243,7 @@ Const DS_T_REQUIRES As Long = 5
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 Public Property Get ActiveTaskName() As String: ActiveTaskName = pActiveTaskName: End Property
@@ -1450,6 +1451,7 @@ Private Sub ResetAllTaskParamTextFields()
     For i = 0 To 4
         SetControlText Me.Controls("DS_TASK_PARAM_" & CStr(i)), ""
     Next i
+    On Error GoTo 0
 End Sub
 
 Private Sub RefillExistingParamValues(ByVal TaskName As String, ByVal ParamIndex As Long, ByVal TaskParams As Variant, ByVal TaskIndex As Long)
@@ -1562,6 +1564,7 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
                         Item = LCase(Trim(Split(TaskParams(ParamIndex)(0), "=")(1)))
                         Item = Left(Item, Len(Item) - 1)
                         .Value = CStr(Item)
+                        On Error GoTo 0
                     End If
                 Case Else
                     ' ...
@@ -1670,12 +1673,14 @@ Private Function GetControlText(ByRef TargetControl As Access.Control) As String
     On Error Resume Next
     GetControlText = TargetControl.Value
     GetControlText = TargetControl.Text
+    On Error GoTo 0
 End Function
 
 Private Sub SetControlText(ByRef TargetControl As Access.Control, ByVal Text As String)
     On Error Resume Next
     TargetControl.Value = Text
     TargetControl.Text = Text
+    On Error GoTo 0
 End Sub
 
 Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
