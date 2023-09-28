@@ -21,10 +21,6 @@ Private pItems() As Variant
 Private pIndex As Long
 
 
-Public Property Get Count() As Long
-    Count = pIndex
-End Property
-
 '@DefaultMember
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
@@ -39,8 +35,13 @@ Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     Set pItems(Index) = Value
 End Property
 
+Public Property Get Count() As Long: Count = pIndex: End Property
 Public Property Get Capacity() As Long: Capacity = UBound(pItems) + 1: End Property
 Public Property Let Capacity(ByVal Value As Long): ReDim Preserve pItems(0 To Value - 1): End Property
+Public Property Get IsFixedSize() As Boolean: IsFixedSize = False: End Property
+Public Property Get IsReadOnly() As Boolean: IsReadOnly = False: End Property
+Public Property Get IsSynchronized() As Boolean: IsSynchronized = False: End Property
+Public Property Get SyncRoot() As Object: End Property
 
 Public Function Create() As ArrayList
     Set Create = New ArrayList
@@ -194,6 +195,7 @@ End Function
 Public Sub Clear()
     Erase pItems
     ReDim pItems(0 To 1)
+    pIndex = 0
 End Sub
 
 Public Function Clone() As ArrayList
@@ -213,6 +215,7 @@ End Function
 
 Public Sub CopyTo(Optional ByVal Index As Long = 0, Optional ByRef TargetArray As Variant, Optional ByVal TargetIndex As Long = 0, Optional ByVal GetCount As Variant)
     ' TODO
+    Err.Raise &H80004001
 End Sub
 
 
@@ -305,6 +308,7 @@ End Sub
 
 Public Sub SetRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     ' TODO
+    Err.Raise &H80004001
 End Sub
 
 Public Sub Sort_2(ByRef Comparer As IComparer): Sort 0, , Comparer: End Sub
@@ -318,10 +322,20 @@ Public Sub Sort(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Var
 End Sub
 
 Public Function ToArray() As Variant()
-    Dim t As Variant
-    ReDim ToArray(0 To pIndex - 1)
-    t = MemoryLib.GetArrayByRef(ToArray)
-    MemoryLib.VariantArrayClone VarPtr(pItems(0)), VarPtr(t(0)), pIndex
+    Dim t() As Variant, i As Long
+    If pIndex = 0 Then
+        ToArray = Array()
+        Exit Function
+    End If
+    ReDim t(0 To pIndex - 1)
+    For i = 0 To pIndex - 1
+        If IsObject(pItems(i)) Then
+            Set t(i) = pItems(i)
+        Else
+            t(i) = pItems(i)
+        End If
+    Next i
+    MemoryLib.ReassignArrayTo ToArray, t
 End Function
 
 Public Function GetAddressOfItemAt(ByVal Index As Long) As LongPtr
@@ -331,6 +345,12 @@ End Function
 
 Private Sub Class_Initialize()
     ReDim pItems(0 To 1)
+End Sub
+
+Private Sub Class_Terminate()
+    On Error Resume Next
+    DoEvents
+    Erase pItems
 End Sub
 
 Private Sub Swap(ByRef a As Variant, ByRef B As Variant)
