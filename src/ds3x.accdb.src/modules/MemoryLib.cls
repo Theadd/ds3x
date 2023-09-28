@@ -66,6 +66,7 @@ Private Const MODULE_NAME As String = "MemoryLib"
 
 'https://msdn.microsoft.com/en-us/library/mt723419(v=vs.85).aspx
 Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 
 #If Win64 Then
     Private Const vbLongPtr As Long = vbLongLong
@@ -947,7 +948,11 @@ Public Sub VariantArrayClone(ByVal SourceAddress As LongPtr, ByVal DestinationAd
     MemLongPtr(VarPtrArr(t)) = VarPtr(sASrc)
     MemLongPtr(VarPtrArr(r)) = VarPtr(sADst)
     For i = 0 To UBound(t)
-        r(i) = t(i)
+        If IsObject(t(i)) Then
+            Set r(i) = t(i)
+        Else
+            r(i) = t(i)
+        End If
     Next i
     MemLongPtr(VarPtrArr(t)) = CLngPtr(0)
     MemLongPtr(VarPtrArr(r)) = CLngPtr(0)
@@ -956,5 +961,24 @@ End Sub
 Public Sub ReassignArrayTo(ByRef Destination As Variant, ByRef Source As Variant)
     MemLongPtr(VarPtrArr(Destination)) = MemLongPtr(VarPtrArr(Source))
     MemLongPtr(VarPtrArr(Source)) = CLngPtr(0)
+End Sub
+
+Public Sub ZeroMemory(ByVal TargetAddress As LongPtr, ByVal ByteCount As Long)
+    FillMemory ByVal TargetAddress, ByteCount, CByte(0)
+End Sub
+
+Public Sub VariantArraySliceUnsafe(ByVal SourceAddress As LongPtr, ByVal GetCount As Long, ByRef OutArray() As Variant)
+    Dim sa As SAFEARRAY_1D
+    With sa
+        .cDims = 1
+        .cbElements = VARIANT_SIZE
+        .pvData = SourceAddress
+        .rgsabound0.cElements = GetCount
+    End With
+    MemLongPtr(VarPtrArr(OutArray)) = VarPtr(sa)
+End Sub
+
+Public Sub DestroyArray(ByRef TargetArray As Variant)
+    MemLongPtr(VarPtrArr(TargetArray)) = CLngPtr(0)
 End Sub
 

@@ -182,14 +182,14 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
         If wasValid Then
             If (Not isValid Or Not isSequence) Then
                 aX.Add Array(gStartIndex, iLast - gStartIndex + 1)
-                isValid = False
+                If isValid Then gStartIndex = i
             ElseIf r = rMax Then
                 aX.Add Array(gStartIndex, i - gStartIndex + 1)
             End If
-        ElseIf isValid And Not wasValid Then
-            gStartIndex = i
-            If r = rMax Then
-                aX.Add Array(gStartIndex, i - gStartIndex + 1)
+        Else
+            If isValid Then
+                gStartIndex = i
+                If r = rMax Then aX.Add Array(gStartIndex, i - gStartIndex + 1)
             End If
         End If
         

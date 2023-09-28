@@ -161,7 +161,7 @@ ErrorHandler:
             End Select
         Next sArg
         
-        For Each vArg In dX
+        For Each vArg In dX.Entries()
             CustomVar(vArg(0)) = vArg(1)
         Next vArg
         
@@ -231,7 +231,7 @@ Private Sub InitializeCustomVars()
         If FileSystemLib.TryReadAllTextInFile(s, s) Then
             On Error GoTo Finally
             Set dX = DictionaryEx.Create(DictionaryEx.Create(s)("ds3x.CustomVars"))
-            For Each Item In dX
+            For Each Item In dX.Entries()
                 dsApp.CustomVar(CStr(Item(0))) = CStr(Item(1))
             Next Item
         End If

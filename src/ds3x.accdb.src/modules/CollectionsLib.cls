@@ -13,23 +13,6 @@ Option Compare Database
 Option Explicit
 
 '
-' @REQUIRES:
-'   1. A reference to "Microsoft VBScript Regular Expressions 5.5"
-'
-
-Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
-
-Private Const VT_BYREF As Long = &H4000
-#If Win64 Then
-Private Const PTR_SIZE As Long = 8
-#Else
-Private Const PTR_SIZE As Long = 4
-#End If
-
-Private Const JSON_SERIALIZER As String = "'object'!=typeof JSON&&(JSON={}),function(){'use strict';var t,e=/[\\""\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;function f(t){return t<10?'0'+t:t}function this_value(){return this.valueOf()}function quote(u){return e.lastIndex=0,e.test(u)?'""'+u.replace(e,(function(e){var u=t[e];return'string'==typeof u?u:'\\u'+('0000'+e.charCodeAt(0).toString(16)).slice(-4)}))+'""':'""'+u+'""'}function str(t,e){var u,o,n,r,i,s=e[t];switch(s&&'object'==typeof s&&'function'==typeof s.toJSON&&(s=s.toJSON(t)),typeof s){case'string':return quote(s);case'number':case'boolean':case'null':return String(s);case'object':if(!s)return'null';if(i=[],'[object Array]'===Object.prototype.toString.apply(s)){" & _
-                                          "for(r=s.length,u=0;u<r;u+=1)i[u]=str(u,s)||'null';return 0===i.length?'[]':'['+i.join(',')+']'}for(o in s)Object.prototype.hasOwnProperty.call(s,o)&&(n=str(o,s))&&i.push(quote(o)+':'+n);return 0===i.length?'{}':'{'+i.join(',')+'}'}}'function'!=typeof Date.prototype.toJSON&&(Date.prototype.toJSON=function(){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+f(this.getUTCMonth()+1)+'-'+f(this.getUTCDate())+'T'+f(this.getUTCHours())+':'+f(this.getUTCMinutes())+':'+f(this.getUTCSeconds())+'Z':null},Boolean.prototype.toJSON=this_value,Number.prototype.toJSON=this_value,String.prototype.toJSON=this_value),'function'!=typeof JSON.serialize&&(t={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','""':'\\""','\\':'\\\\'},JSON.serialize=function(t){return str('',{'':t})})}();"
-
-'
 ' Estructura de un array en formato SearchDefinition:
 ' SearchDefinition = Array(
 '    PatternMatching As PatternMatchingType,
@@ -74,12 +57,6 @@ Public Property Get AsArraySliceGroup(ByRef Value As ICollectionEx) As ArraySlic
         Case (TypeOf Value Is Array2dEx): Set AsArraySliceGroup = ArraySliceGroup.Create(Value)
         Case (TypeOf Value Is ArrayListEx): Set AsArraySliceGroup = ArraySliceGroup.Create(AsArray2dEx(Value))
         Case Else: Err.Raise 17, , "Not implemented."
-    End Select
-End Property
-
-Public Property Get JScriptCode(ByVal JScriptName As String) As String
-    Select Case JScriptName
-        Case "JSON.serialize": JScriptCode = JSON_SERIALIZER
     End Select
 End Property
 
@@ -199,56 +176,6 @@ Public Function TryMatchSearchCriteriaIn(ByRef SearchCriteria As Variant, ByRef 
     
     TryMatchSearchCriteriaIn = isMatch
 End Function
-
-
-' --- JAVASCRIPT FUNCTIONS ---
-
-' TODO: Retrieve function name of non-anonymous functions.
-Public Function TryParseAsJScriptFunction(ByRef CodeString As String, Optional ByVal FunctionName As String = "fn", Optional ByRef JScriptFunctionDefinition As Variant) As Boolean
-    Dim Item As Variant, fnArgs As String, fnBody As String, isValid As Boolean, bodyLines() As String
-    Dim regEx As Object: Set regEx = CreateObject("VBSCript.RegExp")
-    On Error GoTo Finally
-    
-    regEx.IgnoreCase = True
-    regEx.Global = True
-    regEx.Pattern = "^\s*\(*?([^\(]*?)\)?\s?=>(.*?);*\s*$"
-
-    For Each Item In regEx.Execute(CodeString)
-        fnArgs = Item.SubMatches.Item(0)
-        fnBody = Item.SubMatches.Item(1)
-        bodyLines = VBA.Split(fnBody, ";")
-        bodyLines(UBound(bodyLines)) = " return " & Trim(bodyLines(UBound(bodyLines))) & ";"
-        fnBody = Trim(VBA.Join(bodyLines, ";"))
-        isValid = True
-        Exit For
-    Next Item
-    
-    If Not isValid Then
-        regEx.Pattern = "^\s*(?:function)?.*?\((.*?)\)\s?\{(.*?);*\s*}\s*$"
-        For Each Item In regEx.Execute(CodeString)
-            fnArgs = Item.SubMatches.Item(0)
-            fnBody = Item.SubMatches.Item(1)
-            bodyLines = VBA.Split(fnBody, ";")
-            bodyLines(UBound(bodyLines)) = " return " & Trim(Replace(bodyLines(UBound(bodyLines)), "return", "")) & ";"
-            fnBody = Trim(VBA.Join(bodyLines, ";"))
-            isValid = True
-            Exit For
-        Next Item
-    End If
-
-Finally:
-    If isValid Then
-        TryParseAsJScriptFunction = True
-        If Not IsMissing(JScriptFunctionDefinition) Then
-            JScriptFunctionDefinition = Array("function " & FunctionName & "(" & fnArgs & ") { " & fnBody & " }", FunctionName, fnArgs)
-        End If
-    End If
-End Function
-
-
-
-
-
 
 
 ' --- PRIVATE SUBMATCHING FUNCTIONS ---
@@ -467,7 +394,7 @@ Public Function ArrayRange(ByVal Index As Long, ByVal GetCount As Long) As Long(
     For i = 0 To GetCount - 1
         t(i) = Index + i
     Next i
-    ArrayRange = t
+    MemoryLib.ReassignArrayTo ArrayRange, t
 End Function
 
 Public Function ColumnLetter(ByVal ColumnIndex As Long) As String

@@ -477,7 +477,7 @@ Private Type TViewportState
     PagePositionModY As Long
 End Type
 
-Private this As TViewportState
+Private This As TViewportState
 
 ' ---
 
@@ -493,7 +493,7 @@ Public Property Set WorksheetNumbers(ByRef Value As Form_DS_WORKSHEET_NUMBERS): 
 Public Property Get Scrollview() As Form_DS_SCROLLVIEW: Set Scrollview = pScrollview: End Property
 Public Property Set Scrollview(ByRef Value As Form_DS_SCROLLVIEW): Set pScrollview = Value: End Property
 
-Friend Property Get FirstColumnIndex() As Long: FirstColumnIndex = this.TrackIndex * this.ColumnsToLargeChangeTrack: End Property
+Friend Property Get FirstColumnIndex() As Long: FirstColumnIndex = This.TrackIndex * This.ColumnsToLargeChangeTrack: End Property
 
 Property Get IsSubform() As Boolean: On Error Resume Next: IsSubform = Len(Me.Parent.Name) > 0: End Property
 
@@ -512,7 +512,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ds3xGlobals.RECT, b As ds3xGlobals.BOUNDS, t As Long, c As Long
+    Dim r As ds3xGlobals.RECT, B As ds3xGlobals.BOUNDS, t As Long, c As Long
     
     Set Worksheet = Me.DS_WORKSHEET.Form
     Set pWorksheet.Viewport = Me
@@ -524,7 +524,7 @@ Public Sub Setup()
     pWorksheetNumbers.Setup PageSize * PageCount
     
     r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
-    b = ScreenLib.RectToBounds(r)
+    B = ScreenLib.RectToBounds(r)
     
     t = pWorksheet.MaxContentWidthLimit
     Me.Width = t
@@ -534,12 +534,12 @@ Public Sub Setup()
         .Width = t
         Me.FormHeaders.Height = .Height
     End With
-    Me.FormDetail.Height = CLng(Min(b.h * 1.95, 31500))
+    Me.FormDetail.Height = CLng(Min(B.h * 1.95, 31500))
     With Me.DS_WORKSHEET
         .Left = 0
         .Top = 0
         .Width = t
-        .Height = CLng(Min(b.h * 1.95, 31500))
+        .Height = CLng(Min(B.h * 1.95, 31500))
     End With
 End Sub
 
@@ -555,7 +555,7 @@ Public Sub ScrollTo(ByVal X As Double, ByVal Y As Double)
     Dim sView As TViewportState
     sView = GetViewportStateAt(X, Y)
     
-    If this.TrackIndex <> sView.TrackIndex Or this.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
+    If This.TrackIndex <> sView.TrackIndex Or This.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
         pWorksheet.Painting = False
         pWorksheetHeaders.Painting = False
         pWorksheetNumbers.Painting = False
@@ -575,7 +575,7 @@ Public Sub ScrollTo(ByVal X As Double, ByVal Y As Double)
         ScreenLib.WindowMoveTo pWorksheetHeaders, 0 - sView.TrackPositionModX, 0
         ScreenLib.WindowMoveTo pWorksheetNumbers, 0, 0 - sView.PagePositionModY
     End If
-    this = sView
+    This = sView
 End Sub
 
 
@@ -619,10 +619,10 @@ Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Double
     targetCellMinX = Max(X - CDbl(cellWidth), 0)
     targetCellMaxX = X + CDbl(3 * cellWidth)
     
-    curViewMinX = this.ScrollPosX
+    curViewMinX = This.ScrollPosX
     curViewMaxX = curViewMinX + CDbl(viewWidth)
     
-    X = this.ScrollPosX
+    X = This.ScrollPosX
     If curViewMinX > targetCellMinX Then
         X = targetCellMinX
     ElseIf curViewMaxX < targetCellMaxX Then
@@ -643,10 +643,10 @@ Public Function GetScrollYTo(ByVal RowIndex As Long) As Double
     targetCellMinY = Max(Y - CDbl(cellHeight), 0)
     targetCellMaxY = Y + CDbl(3 * cellHeight)
     
-    curViewMinY = this.ScrollPosY
+    curViewMinY = This.ScrollPosY
     curViewMaxY = curViewMinY + CDbl(viewHeight)
     
-    Y = this.ScrollPosY
+    Y = This.ScrollPosY
     If curViewMinY > targetCellMinY Then
         Y = targetCellMinY
     ElseIf curViewMaxY < targetCellMaxY Then
@@ -657,9 +657,9 @@ Public Function GetScrollYTo(ByVal RowIndex As Long) As Double
 End Function
 
 Public Sub OnSourceTableChange()
-    this.TrackIndex = -1
+    This.TrackIndex = -1
     If pScrollview.KeepScrollPositionOnTableChange Then
-        ScrollTo this.ScrollPosX, this.ScrollPosY
+        ScrollTo This.ScrollPosX, This.ScrollPosY
     Else
         On Error GoTo Finally
         pScrollview.IgnoreScrollingEvents = True

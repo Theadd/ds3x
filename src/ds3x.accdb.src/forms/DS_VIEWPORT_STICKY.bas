@@ -563,21 +563,21 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 ' --- SETUP / BINDING ---
 
 Public Sub Setup()
-    Dim r As ds3xGlobals.RECT, b As ds3xGlobals.BOUNDS, t As Long
+    Dim r As ds3xGlobals.RECT, B As ds3xGlobals.BOUNDS, t As Long
     
     Set WorksheetNumbers = Me.DS_WORKSHEET_NUMBERS.Form
     
     r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
-    b = ScreenLib.RectToBounds(r)
+    B = ScreenLib.RectToBounds(r)
     
     t = pWorksheetNumbers.MaxContentWidthLimit
     Me.Width = t
-    Me.FormDetail.Height = CLng(Min(b.h * 1.95, 31500))
+    Me.FormDetail.Height = CLng(Min(B.h * 1.95, 31500))
     With Me.DS_WORKSHEET_NUMBERS
         .Left = 0
         .Top = 0
         .Width = t
-        .Height = CLng(Min(b.h * 1.95, 31500))
+        .Height = CLng(Min(B.h * 1.95, 31500))
     End With
     Me.Width = t
 End Sub
