@@ -516,17 +516,6 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
     End If
 End Sub
 
-Private Function ValueToCSV(ByVal Value As Variant) As String
-    Select Case VarType(Value)
-        Case vbString
-            ValueToCSV = """" & Replace(CStr(Value), """", """""") & """"
-        Case vbNull
-            ValueToCSV = vbNullString
-        Case Else
-            ValueToCSV = CStr(Value)
-    End Select
-End Function
-
 Private Function CreateArrayListEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ArrayListEx
     Dim aX As ArrayListEx, i As Long
     Set aX = ArrayListEx.Create()

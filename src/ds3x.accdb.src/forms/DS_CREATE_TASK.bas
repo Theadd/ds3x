@@ -1465,7 +1465,10 @@ Private Sub RefillExistingParamValues(ByVal TaskName As String, ByVal ParamIndex
                     If IsArray(v) Then
                         MatchingValue = JSON.Stringify(v)
                     Else
-                        MatchingValue = CStr(v)
+                        Select Case VarType(v)
+                            Case vbBoolean: MatchingValue = IIf(v, "true", "false")
+                            Case Else: MatchingValue = CStr(v)
+                        End Select
                     End If
                 End If
             Else
