@@ -51,8 +51,6 @@ Attribute Item.VB_UserMemId = 0
     End If
 End Property
 
-
-
 Public Property Let Item(mKey As Variant, mVal As Variant)
     If VarType(mKey) = vbString Then
         If TrySetNestedItem(mKey, mVal) Then Exit Property
@@ -225,7 +223,7 @@ Public Function Keys() As Variant()
 End Function
 
 'Returns an iterable containing all the Key -> Value pair arrays in the Scripting.Dictionary.
-Public Function Entries() As Variant()
+Public Function Entries() As Variant
     Dim aX As ArrayListEx, dKey As Variant
     Set aX = ArrayListEx.Create()
     
@@ -234,16 +232,6 @@ Public Function Entries() As Variant()
     Next dKey
     
     Entries = aX.ToArray()
-End Function
-
-'@Enumerator
-Public Function NewEnum() As IUnknown
-Attribute NewEnum.VB_UserMemId = -4
-    Dim enumerator As IUnknown, aX As ArrayListEx
-    Set aX = ArrayListEx.Create(Entries())
-    
-    Set enumerator = aX.Instance.GetEnumerator(0, aX.Instance.Count)
-    Set NewEnum = enumerator
 End Function
 
 Public Function Clone() As DictionaryEx

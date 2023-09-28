@@ -12,14 +12,7 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
-'
-' @REQUIRES:
-'     1. ".NET Framework v3.5" installed and a reference to "mscorlib.dll" (by opening "mscorlib.tlb" from references window, usually found at "C:\Windows\Microsoft.NET\Framework\v4.0.30319" and checking "mscorlib.dll" from the references list after that)
-'        (The run-time error -2146232576(80131700) appears when there's no ".NET Framework v3.5" installed. Even if you have a newer ".NET Framework" version installed, the v3.5 must be installed also).
 
-Implements IEnumerable
-Implements ICollection
-Implements IList
 Implements ICollectionEx
 
 Public Instance As ArrayList
@@ -27,7 +20,7 @@ Public Instance As ArrayList
 Private Const dsChunkSize As Long = 1000
 
 
-' Gets the count of elements in the underlying mscorlib.ArrayList.
+' Gets the count of elements in the underlying ArrayList.
 Public Property Get Count() As Variant
 Attribute Count.VB_Description = "Gets the count of elements in the underlying mscorlib.ArrayList."
     Count = Instance.Count
@@ -107,11 +100,12 @@ Public Function Unbind() As ArrayListEx
 End Function
 
 '@Enumerator
-Public Function NewEnum() As IUnknown
+Public Function NewEnum() As IEnumVARIANT
 Attribute NewEnum.VB_UserMemId = -4
-    Dim enumerator As IUnknown
-    Set enumerator = Instance.GetEnumerator(0, Instance.Count)
-    Set NewEnum = enumerator
+'    Dim enumerator As IUnknown
+'    Set enumerator = Instance.GetEnumerator(0, Instance.Count)
+'    Set NewEnum = enumerator
+    Set NewEnum = Instance.GetEnumerator(0, Instance.Count)
 End Function
 
 ' Adds an element to the ArrayList (@see also: ArrayListEx.BinaryAdd).
@@ -129,12 +123,10 @@ Public Function AddRange(Optional ByRef ArrayLike As Variant) As ArrayListEx
     If IsObject(ArrayLike) Then
         If ArrayLike Is Nothing Then Exit Function
         
-        If TypeOf ArrayLike Is ICollection Then
-            If TypeOf ArrayLike Is ArrayListEx Then
-                Instance.AddRange ArrayLike.Instance
-            Else
-                Instance.AddRange C2ArrayList(ArrayLike)
-            End If
+        If TypeOf ArrayLike Is ArrayListEx Then
+            Instance.AddRange ArrayLike.Instance
+        ElseIf TypeOf ArrayLike Is ArrayList Then
+            Instance.AddRange C2ArrayList(ArrayLike)
         ElseIf TypeOf ArrayLike Is Excel.Range Then
             AddFromExcelRange C2ExcelRange(ArrayLike)
         ElseIf TypeOf ArrayLike Is Scripting.Dictionary Then
@@ -163,7 +155,7 @@ Public Function Insert(ByVal Index As Long, ByVal Value As Variant) As ArrayList
     Set Insert = Me
 End Function
 
-Public Function ToArray() As Variant
+Public Function ToArray() As Variant()
     ToArray = Instance.ToArray
 End Function
 
@@ -384,7 +376,7 @@ End Function
 
 ' --- IComparer ---
 
-Public Function Sort(Optional ByVal Comparer As mscorlib.IComparer = Nothing) As ArrayListEx
+Public Function Sort(Optional ByVal Comparer As IComparer = Nothing) As ArrayListEx
     If Comparer Is Nothing Then
         Instance.Sort
     Else
@@ -393,7 +385,7 @@ Public Function Sort(Optional ByVal Comparer As mscorlib.IComparer = Nothing) As
     Set Sort = Me
 End Function
 
-Public Function BinarySearch(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+Public Function BinarySearch(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As IComparer = Nothing) As Long
     If IsMissing(SearchCount) Then SearchCount = Instance.Count - startIndex
     If Comparer Is Nothing Then
         BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, dsComparer)
@@ -402,7 +394,7 @@ Public Function BinarySearch(ByVal Value As Variant, Optional ByVal startIndex A
     End If
 End Function
 
-Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal Comparer As IComparer = Nothing) As Long
     Dim r As Long
 
     If Comparer Is Nothing Then
@@ -422,7 +414,7 @@ Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal startIndex As L
     BinaryAdd = r
 End Function
 
-Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal Comparer As mscorlib.IComparer = Nothing) As Long
+Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal Comparer As IComparer = Nothing) As Long
     Dim r As Long
     
     If Comparer Is Nothing Then
@@ -515,17 +507,6 @@ Private Sub Assign(ByRef Target, Optional ByRef Value As Variant)
         End If
     End If
 End Sub
-
-Private Function ValueToCSV(ByVal Value As Variant) As String
-    Select Case VarType(Value)
-        Case vbString
-            ValueToCSV = """" & Replace(CStr(Value), """", """""") & """"
-        Case vbNull
-            ValueToCSV = vbNullString
-        Case Else
-            ValueToCSV = CStr(Value)
-    End Select
-End Function
 
 Private Function CreateArrayListEx(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As ArrayListEx
     Dim aX As ArrayListEx, i As Long
@@ -642,73 +623,6 @@ Finally:
 End Function
 
 
-' --- Interfaces ---
-
-Private Sub ICollection_CopyTo(ByVal Array_ As mscorlib.Array, ByVal Index As Long)
-    Instance.CopyTo Array_, Index
-End Sub
-
-Private Property Get ICollection_Count() As Long
-    ICollection_Count = Instance.Count
-End Property
-
-Private Property Get ICollection_IsSynchronized() As Boolean
-    ICollection_IsSynchronized = Instance.IsSynchronized
-End Property
-
-Private Property Get ICollection_SyncRoot() As Variant
-    ICollection_SyncRoot = Instance.SyncRoot
-End Property
-
-Private Function IEnumerable_GetEnumerator() As stdole.IEnumVARIANT
-    Set IEnumerable_GetEnumerator = Instance.GetEnumerator(0, Instance.Count)
-End Function
-
-Private Function IList_Add(ByVal Value As Variant) As Long
-    IList_Add = Instance.Add(Value)
-End Function
-
-Private Sub IList_Clear()
-    Instance.Clear
-End Sub
-
-Private Function IList_Contains(ByVal Value As Variant) As Boolean
-    IList_Contains = Instance.Contains(Value)
-End Function
-
-Private Function IList_IndexOf(ByVal Value As Variant) As Long
-    IList_IndexOf = Instance.IndexOf(Value)
-End Function
-
-Private Sub IList_Insert(ByVal Index As Long, ByVal Value As Variant)
-    Instance.Insert Index, Value
-End Sub
-
-Private Property Get IList_IsFixedSize() As Boolean
-    IList_IsFixedSize = False
-End Property
-
-Private Property Get IList_IsReadOnly() As Boolean
-    IList_IsReadOnly = False
-End Property
-
-Private Property Set IList_Item(ByVal Index As Long, ByVal RHS As Variant)
-    Set Instance(Index) = RHS
-End Property
-
-Private Property Get IList_Item(ByVal Index As Long) As Variant
-    Assign IList_Item, Instance(Index)
-End Property
-
-Private Sub IList_Remove(ByVal Value As Variant)
-    Instance.Remove Value
-End Sub
-
-Private Sub IList_RemoveAt(ByVal Index As Long)
-    Instance.RemoveAt Index
-End Sub
-
-
 ' --- ICollectionEx ---
 
 Private Property Get ICollectionEx_Count() As Long: ICollectionEx_Count = Count: End Property
@@ -727,8 +641,4 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", O
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject): End Function
-
-
-
-
 
