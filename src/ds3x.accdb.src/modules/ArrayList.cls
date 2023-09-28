@@ -136,14 +136,20 @@ Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
 End Sub
 
 Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ArrayList
-    Dim t() As Variant
+    Dim t() As Variant, sa As SAFEARRAY_1D
     Set GetRange = New ArrayList
     On Error GoTo Finally
-    MemoryLib.VariantArraySliceUnsafe VarPtr(pItems(Index)), GetCount, t
+    With sa
+        .cDims = 1
+        .cbElements = VARIANT_SIZE
+        .pvData = VarPtr(pItems(Index))
+        .rgsabound0.cElements = GetCount
+    End With
+    MemoryLib.MemLongPtr(MemoryLib.VarPtrArr(t)) = VarPtr(sa)
     GetRange.AddRange t
 Finally:
     On Error Resume Next
-    MemoryLib.DestroyArray t
+    MemoryLib.MemLongPtr(MemoryLib.VarPtrArr(t)) = CLngPtr(0)
 End Function
 
 Public Function GetEnumerator(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As IEnumVARIANT
