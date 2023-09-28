@@ -12,7 +12,7 @@ Option Compare Database
 Option Explicit
 Option Base 0
 
-Implements mscorlib.IComparer
+Implements IComparer
 
 
 Public Function Compare(ByVal X As Variant, ByVal Y As Variant) As Long: Compare = IComparer_Compare(X, Y): End Function

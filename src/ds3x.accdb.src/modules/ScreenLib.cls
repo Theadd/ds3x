@@ -232,10 +232,10 @@ Public Function GetPoint(Optional ByVal X As Long = 0, Optional ByVal Y As Long 
 Public Function GetRect(ByVal X As Long, ByVal Y As Long, ByVal X2 As Long, ByVal Y2 As Long) As RECT: GetRect.Left = X: GetRect.Top = Y: GetRect.Right = X2: GetRect.Bottom = Y2: End Function
 Public Function GetBounds(ByVal X As Long, ByVal Y As Long, ByVal W As Long, ByVal h As Long) As BOUNDS: GetBounds.X = X: GetBounds.Y = Y: GetBounds.W = W: GetBounds.h = h: End Function
 Public Function RectToBounds(r As RECT) As BOUNDS: RectToBounds.X = r.Left: RectToBounds.Y = r.Top: RectToBounds.W = (r.Right - r.Left): RectToBounds.h = (r.Bottom - r.Top): End Function
-Public Function BoundsToRect(b As BOUNDS) As RECT: BoundsToRect.Left = b.X: BoundsToRect.Top = b.Y: BoundsToRect.Right = (b.X + b.W): BoundsToRect.Bottom = (b.Y + b.h): End Function
+Public Function BoundsToRect(B As BOUNDS) As RECT: BoundsToRect.Left = B.X: BoundsToRect.Top = B.Y: BoundsToRect.Right = (B.X + B.W): BoundsToRect.Bottom = (B.Y + B.h): End Function
 
 Public Function RectAsBounds(r As RECT) As BOUNDS: RectAsBounds.X = r.Left: RectAsBounds.Y = r.Top: RectAsBounds.W = r.Right: RectAsBounds.h = r.Bottom: End Function
-Public Function BoundsAsRect(b As BOUNDS) As RECT: BoundsAsRect.Left = b.X: BoundsAsRect.Top = b.Y: BoundsAsRect.Right = b.W: BoundsAsRect.Bottom = b.h: End Function
+Public Function BoundsAsRect(B As BOUNDS) As RECT: BoundsAsRect.Left = B.X: BoundsAsRect.Top = B.Y: BoundsAsRect.Right = B.W: BoundsAsRect.Bottom = B.h: End Function
 
 Public Function InvertPoint(p As POINTAPI) As POINTAPI: InvertPoint.X = 0 - p.X: InvertPoint.Y = 0 - p.Y: End Function
 Public Function DirectionPoint(d As DirectionType) As POINTAPI: DirectionPoint.X = Clamp101((d And East) - (d And West)): DirectionPoint.Y = Clamp101((d And South) - (d And North)): End Function
@@ -452,12 +452,12 @@ Public Sub WindowSendToBack(f As Access.Form)
 End Sub
 
 Public Sub WindowCenterTo(f As Access.Form, r As RECT)
-    Dim c As POINTAPI, b As BOUNDS
+    Dim c As POINTAPI, B As BOUNDS
     
     c = PointInRect(r, DirectionType.Center)
-    b = RectToBounds(GetWindowRect(f))
+    B = RectToBounds(GetWindowRect(f))
 
-    SetWindowPos f.hWnd, HWND_TOP, CLng((c.X - (b.W / 2)) / TwipsPerPixelX), CLng((c.Y - (b.h / 2)) / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
+    SetWindowPos f.hWnd, HWND_TOP, CLng((c.X - (B.W / 2)) / TwipsPerPixelX), CLng((c.Y - (B.h / 2)) / TwipsPerPixelY), 0, 0, (SWP_NOSIZE Or SWP_NOZORDER Or SWP_NOACTIVATE)
 End Sub
 
 Public Sub WindowMaximize(f As Access.Form): SetShowWindow f.hWnd, SW_SHOWMAXIMIZED: End Sub
