@@ -435,6 +435,7 @@ Public Function ArrayItem(ByRef ArrayLike As Variant, ByVal Index As Long, Optio
     If Not IsMissing(ValueIfNull) Then Assign ArrayItem, ValueIfNull
     On Error Resume Next
     AssignWhenValid ArrayItem, ArrayLike(Index)
+    On Error GoTo 0
 End Function
 
 Private Sub AssignWhenValid(ByRef Target, ByRef Value As Variant)

@@ -22,11 +22,13 @@ Private pGroups As ArrayListEx
 Public Property Get Count() As Long
     On Error Resume Next
     Count = pGroups(0).Count
+    On Error GoTo 0
 End Property
 
 Public Property Get ColumnCount() As Long
     On Error Resume Next
     ColumnCount = pGroups.Count
+    On Error GoTo 0
 End Property
 
 '@DefaultMember
@@ -356,6 +358,7 @@ Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
     On Error Resume Next
     GetBaseRowIndexOfRange = 1
     GetBaseRowIndexOfRange = IIf(r.Range(r.Cells(0, 1), r.Cells(1, 2)).Rows.Count > 0, 0, 1)
+    On Error GoTo 0
 End Function
 
 Private Sub ToJaggedListLikeArray(ByRef t() As Variant)

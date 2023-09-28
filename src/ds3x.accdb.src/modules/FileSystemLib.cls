@@ -101,6 +101,7 @@ Public Property Get StreamReader(ByVal TargetFile As String) As ADODB.Stream
 Finally:
     On Error Resume Next
     StreamReader.Close
+    On Error GoTo 0
 End Property
 
 ' Multi-Byte file stream writer
@@ -115,6 +116,7 @@ Public Property Get StreamWriter() As ADODB.Stream
 Finally:
     On Error Resume Next
     StreamWriter.Close
+    On Error GoTo 0
 End Property
 
 Public Property Get PathSeparator() As String: PathSeparator = "\": End Property
@@ -498,9 +500,9 @@ Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As 
     
 ErrorHandler:
     On Error Resume Next
-    Resume Next
     TryWriteTextToFile = False
     If Not (Stream Is Nothing) Then Stream.Close
+    On Error GoTo 0
 End Function
 
 ' Reads all content from a text file in the most efficient way, using Scripting.TextStream for all supported encodings and ADODB.Stream for the rest.
@@ -558,6 +560,7 @@ ErrorHandler:
     On Error Resume Next
     TryAppendTextInFile = False
     If Not (Stream Is Nothing) Then Stream.Close
+    On Error GoTo 0
 End Function
 
 Public Function TryShellExecute(ByRef TargetFile As String, Optional ByVal ShowStyle As VbAppWinStyle = vbNormalFocus) As Boolean
@@ -609,6 +612,7 @@ Public Function GetFileCharset(ByRef TargetFile As String, Optional ByRef Traili
 Finally:
         On Error Resume Next
         .Close
+        On Error GoTo 0
     End With
 End Function
 
@@ -737,6 +741,7 @@ Private Function DecodeByteString(ByRef SourceString As String, ByRef LastBytes 
         End If
     End If
     DecodeByteString = r
+    On Error GoTo 0
 End Function
 
 

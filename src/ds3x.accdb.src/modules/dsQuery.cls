@@ -68,6 +68,7 @@ Public Property Let ConnectionString(ByVal Value As String)
         pConn.Close
         Set pConn = Nothing
     End If
+    On Error GoTo 0
 End Property
 
 '@DefaultMember
@@ -223,6 +224,7 @@ Private Sub Class_Terminate()
         If Not pNoCloseOnTerminate Then pConn.Close
         Set pConn = Nothing
     End If
+    On Error GoTo 0
 End Sub
 
 Private Sub OpenConnection(ByVal CursorLocation As ADODB.CursorLocationEnum)

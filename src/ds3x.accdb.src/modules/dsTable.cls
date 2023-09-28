@@ -21,12 +21,14 @@ Private pHeaders As ICollectionEx
 Public Property Get Count() As Long
     On Error Resume Next
     Count = Records.Count
+    On Error GoTo 0
 End Property
 
 Public Property Get ColumnCount() As Long
     On Error Resume Next
     ColumnCount = Records.ColumnCount
     ColumnCount = pHeaders.ColumnCount
+    On Error GoTo 0
 End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
@@ -116,6 +118,7 @@ Public Function Unbind() As dsTable
     Set pHeaders = Nothing
     Set pRecords = Nothing
     Set Unbind = Me
+    On Error GoTo 0
 End Function
 
 Public Sub Dispose()
@@ -312,6 +315,7 @@ End Function
 Private Sub Class_Terminate()
     On Error Resume Next
     Unbind
+    On Error GoTo 0
 End Sub
 
 Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable

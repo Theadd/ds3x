@@ -235,6 +235,7 @@ Public Sub Dispose()
     Set pGarbageCollector = Nothing
     Set pAvailableTasks.TaskController = Nothing
     Set pAvailableTasks = Nothing
+    On Error GoTo 0
 End Sub
 
 
@@ -297,6 +298,7 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
     End If
     
     RaiseEvent OnDataSourceChange(TaskId)
+    On Error GoTo 0
 End Sub
 
 Friend Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Long) As Boolean
@@ -359,6 +361,7 @@ Private Sub MakeRebuildSequenceDirtyOn(ByVal Index As Long)
         For i = pDirtyRebuildIndex To pRebuildSequence.Count - 1
             pTaskResults.Remove pRebuildSequence(i)("Id")
         Next i
+        On Error GoTo 0
     End If
 End Sub
 

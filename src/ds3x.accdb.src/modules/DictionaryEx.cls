@@ -155,6 +155,7 @@ Public Function Add(mKey As Variant, mVal As Variant) As DictionaryEx
     End If
     
     Set Add = Me
+    On Error GoTo 0
 End Function
 
 Public Function AddRange(ByVal Target As Variant) As DictionaryEx
@@ -386,6 +387,7 @@ End Sub
 Private Sub Class_Terminate()
     On Error Resume Next
     Set Instance = Nothing
+    On Error GoTo 0
 End Sub
 
 Public Sub Dispose(): Set Instance = Nothing: End Sub

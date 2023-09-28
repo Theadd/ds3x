@@ -24,10 +24,10 @@ Begin Form
     Width =3734
     DatasheetFontHeight =11
     ItemSuffix =1595
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8250
+    Top =3960
+    Right =23745
+    Bottom =14115
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
     End
@@ -912,6 +912,7 @@ Private pInitialized As Boolean
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property
@@ -924,6 +925,7 @@ Private Sub DS_CLOSE_BUTTON_Click()
     RemoveFocus
     On Error Resume Next
     Me.Parent.Dispose
+    On Error GoTo 0
 End Sub
 
 Private Sub DS_EDIT_BUTTON_Click()
@@ -938,6 +940,7 @@ Private Sub DS_GENERATE_BUTTON_Click()
     If Controller.TryGenerateAsExcel(xlSheet) Then
         xlSheet.WindowVisibility = True
     End If
+    On Error GoTo 0
 End Sub
 
 Private Sub DS_NEW_BUTTON_Click()
@@ -952,18 +955,21 @@ Private Sub DS_OPEN_BUTTON_Click()
     On Error Resume Next
     RemoveFocus
     Controller.ImportPreset
+    On Error GoTo 0
 End Sub
 
 Private Sub DS_SAVE_AS_BUTTON_Click()
     On Error Resume Next
     RemoveFocus
     Controller.SavePreset VBA.Environ$("USERPROFILE")
+    On Error GoTo 0
 End Sub
 
 Private Sub DS_SAVE_BUTTON_Click()
     On Error Resume Next
     RemoveFocus
     Controller.SavePreset
+    On Error GoTo 0
 End Sub
 
 Private Sub Form_Load()
@@ -999,6 +1005,7 @@ Public Function Focus(ByRef frm As Access.Form)
     On Error Resume Next
     frm.Controls("HiddenControl").SetFocus
     DoEvents
+    On Error GoTo 0
 End Function
 
 Private Sub SetButtonAsClickable(ByRef TargetControl As Access.CommandButton, ByVal Value As Boolean, Optional ByVal ThemeColorIndexOnNormal As Long = 8)
@@ -1015,4 +1022,5 @@ Finally:
     SetButtonAsClickable Me.DS_GENERATE_BUTTON, hasTasks, 8
     SetButtonAsClickable Me.DS_SAVE_BUTTON, hasTasks, 8
     SetButtonAsClickable Me.DS_SAVE_AS_BUTTON, hasTasks, 8
+    On Error GoTo 0
 End Sub

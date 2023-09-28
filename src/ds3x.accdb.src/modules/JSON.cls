@@ -505,6 +505,7 @@ Private Function RecordsetAsDictionaryArray(ByRef Instance As Variant) As Varian
     On Error Resume Next
     Instance.Bookmark = iBookmark
     RecordsetAsDictionaryArray = sRows
+    On Error GoTo 0
 End Function
 
 Private Function json_ParseObject(json_String As String, ByRef json_Index As Long) As Dictionary

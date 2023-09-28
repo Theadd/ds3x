@@ -21,10 +21,10 @@ Begin Form
     Width =14542
     DatasheetFontHeight =11
     ItemSuffix =1572
-    Left =3225
-    Top =3030
-    Right =28545
-    Bottom =15225
+    Left =8250
+    Top =3960
+    Right =23745
+    Bottom =14115
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x4a0577b4d2d8e540
@@ -499,6 +499,7 @@ Attribute pController.VB_VarHelpID = -1
 Property Get IsSubform() As Boolean
     On Error Resume Next
     IsSubform = Len(Me.Parent.Name) > 0
+    On Error GoTo 0
 End Property
 
 Public Property Get Controller() As dsLiveEd: Set Controller = pController: End Property
@@ -564,6 +565,7 @@ Private Sub Form_Unload(Cancel As Integer)
     On Error Resume Next
     pController.TriggerLiveEditorWindowClose True
     Set pController = Nothing
+    On Error GoTo 0
 End Sub
 
 Public Sub Dispose()
@@ -571,6 +573,7 @@ Public Sub Dispose()
     Focus Me
     Me.SetFocus
     DoCmd.Close
+    On Error GoTo 0
 End Sub
 
 Private Sub ResizeToFitAllControls()
@@ -600,4 +603,5 @@ Private Sub Focus(ByRef frm As Access.Form)
     On Error Resume Next
     frm.Controls("HiddenControl").SetFocus
     DoEvents
+    On Error GoTo 0
 End Sub
