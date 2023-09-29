@@ -22,13 +22,13 @@ Private pInstance() As Variant
 
 Public Property Get Count() As Long
     On Error Resume Next
-    Count = 1 + (UBound(Instance, 1) - LBound(Instance, 1))
+    Count = 1 + (UBound(pInstance, 1) - LBound(pInstance, 1))
     On Error GoTo 0
 End Property
 
 Public Property Get ColumnCount() As Long
     On Error Resume Next
-    ColumnCount = 1 + (UBound(Instance, 2) - LBound(Instance, 2)) + pColumnCountMod
+    ColumnCount = 1 + (UBound(pInstance, 2) - LBound(pInstance, 2)) + pColumnCountMod
     On Error GoTo 0
 End Property
 
@@ -37,18 +37,18 @@ Public Property Let ColumnCount(ByVal Value As Long): pColumnCountMod = IIf(IsEm
 '@DefaultMember
 Public Property Get Item(ByVal Index As Long, Optional ByVal ColumnIndex As Long = 0) As Variant
 Attribute Item.VB_UserMemId = 0
-    Item = Instance(Index, ColumnIndex)
+    Item = pInstance(Index, ColumnIndex)
 End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
     Dim t() As Variant, i As Long
-    ReDim t(0 To UBound(Instance, 2))
+    ReDim t(0 To UBound(pInstance, 2))
 
-    For i = 0 To UBound(Instance, 2)
-        If IsObject(Instance(Index, i)) Then
-            Set t(i) = Instance(Index, i)
+    For i = 0 To UBound(pInstance, 2)
+        If IsObject(pInstance(Index, i)) Then
+            Set t(i) = pInstance(Index, i)
         Else
-            t(i) = Instance(Index, i)
+            t(i) = pInstance(Index, i)
         End If
     Next i
     Row = t
@@ -56,7 +56,7 @@ End Property
 
 
 Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByVal TargetMemoryAddress As LongPtr)
-    MemoryLib.VariantArrayClone VarPtr(Instance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
+    MemoryLib.VariantArrayClone VarPtr(pInstance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
 End Sub
 
 Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
@@ -79,7 +79,9 @@ Public Function Create(Optional ByRef ArrayLike As Variant) As Array2dEx
     ElseIf IsArray(ArrayLike) Then
         If Is2dArray(ArrayLike) Then
             Set Create = New Array2dEx
-            Create.Instance = ArrayLike
+            Dim t() As Variant
+            t = ArrayLike
+            Create.SetInstanceByRef t
         ElseIf Is1dArray(ArrayLike) Then
             Set Create = CreateFromJaggedArray(ArrayLike)
         Else
@@ -132,12 +134,12 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
     Set CopyToRange = Me
     If Not Count > 0 Then Exit Function
 
-    With RangeObject.Resize(Me.Count, 1 + (UBound(Instance, 2) - LBound(Instance, 2)))
+    With RangeObject.Resize(Me.Count, 1 + (UBound(pInstance, 2) - LBound(pInstance, 2)))
         If ApplyUserLocale Then
             On Error GoTo UserLocaleFail
-            .FormulaR1C1Local = Instance
+            .FormulaR1C1Local = pInstance
         Else
-            .Value = Instance
+            .Value = pInstance
         End If
     End With
     
@@ -152,7 +154,7 @@ Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, By
     Set CopySliceToRange = Me
     If Not (Count > 0 And GetCount > 0) Then Exit Function
     ReDim t(0 To GetCount - 1, 0 To 0)
-    MemoryLib.VariantArrayClone VarPtr(Instance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
+    MemoryLib.VariantArrayClone VarPtr(pInstance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
     
     With RangeObject.Resize(GetCount, 1)
         If ApplyUserLocale Then
@@ -304,17 +306,17 @@ Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     
     For i = 0 To Me.Count - 1
         For c = 0 To uc1
-            If IsObject(Instance(i, c)) Then
-                Set t(i, c) = Instance(i, c)
+            If IsObject(pInstance(i, c)) Then
+                Set t(i, c) = pInstance(i, c)
             Else
-                t(i, c) = Instance(i, c)
+                t(i, c) = pInstance(i, c)
             End If
         Next c
         For c2 = 0 To uc2
-            If IsObject(TargetArray.Instance(i, c2)) Then
-                Set t(i, uc1 + 1 + c2) = TargetArray.Instance(i, c2)
+            If IsObject(TargetArray(i, c2)) Then
+                Set t(i, uc1 + 1 + c2) = TargetArray(i, c2)
             Else
-                t(i, uc1 + 1 + c2) = TargetArray.Instance(i, c2)
+                t(i, uc1 + 1 + c2) = TargetArray(i, c2)
             End If
         Next c2
     Next i
@@ -354,10 +356,10 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         For i = Index To Index + GetCount - 1
             c0 = 0
             For Each c In ColumnIndexes
-                If IsObject(Instance(i, CLng(c))) Then
-                    Set t(i - Index, c0) = Instance(i, CLng(c))
+                If IsObject(pInstance(i, CLng(c))) Then
+                    Set t(i - Index, c0) = pInstance(i, CLng(c))
                 Else
-                    t(i - Index, c0) = Instance(i, CLng(c))
+                    t(i - Index, c0) = pInstance(i, CLng(c))
                 End If
                 c0 = c0 + 1
             Next c
@@ -386,7 +388,7 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
         i = CLng(rIndex) + ModIndex
         If i >= 0 And i < nRows Then
             For c = 0 To nCols - 1
-                t(c) = Instance(i, c)
+                t(c) = pInstance(i, c)
             Next c
             aX.Add t
         End If
@@ -397,7 +399,7 @@ End Function
 
 Public Function Clone() As Array2dEx
     Dim t() As Variant
-    t = Instance
+    t = pInstance
     Set Clone = Array2dEx.Create(t)
 End Function
 
@@ -411,7 +413,7 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal I
     If InLocalFormat Then
         For i = 0 To UBound(t) - 1
             For c = 0 To uc
-                s(c) = CollectionsLib.ValueToLocalString(Instance(i, c))
+                s(c) = CollectionsLib.ValueToLocalString(pInstance(i, c))
             Next c
             t(i) = VBA.Join(s, Delimiter)
         Next i
@@ -419,7 +421,7 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal I
     Else
         For i = 0 To UBound(t) - 1
             For c = 0 To uc
-                s(c) = CollectionsLib.ValueToString(Instance(i, c))
+                s(c) = CollectionsLib.ValueToString(pInstance(i, c))
             Next c
             t(i) = VBA.Join(s, Delimiter)
         Next i
@@ -438,7 +440,10 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
+    On Error Resume Next
     Instance = Empty
+    Erase pInstance
+    On Error GoTo 0
 End Sub
 
 Public Sub Dispose()
@@ -463,18 +468,18 @@ End Function
 Public Function Transpose() As Array2dEx
     Dim cRow As Long, lbRow As Long, ubRow As Long, cCol As Long, lbCol As Long, ubCol As Long, t() As Variant
     
-    lbCol = LBound(Instance, 1)
-    ubCol = UBound(Instance, 1)
-    lbRow = LBound(Instance, 2)
-    ubRow = UBound(Instance, 2)
+    lbCol = LBound(pInstance, 1)
+    ubCol = UBound(pInstance, 1)
+    lbRow = LBound(pInstance, 2)
+    ubRow = UBound(pInstance, 2)
     ReDim t(lbRow To ubRow, lbCol To ubCol)
     
     For cRow = lbRow To ubRow
         For cCol = lbCol To ubCol
-            If IsObject(Instance(cCol, cRow)) Then
-                Set t(cRow, cCol) = Instance(cCol, cRow)
+            If IsObject(pInstance(cCol, cRow)) Then
+                Set t(cRow, cCol) = pInstance(cCol, cRow)
             Else
-                t(cRow, cCol) = Instance(cCol, cRow)
+                t(cRow, cCol) = pInstance(cCol, cRow)
             End If
         Next
     Next
