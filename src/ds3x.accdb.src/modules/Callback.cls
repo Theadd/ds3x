@@ -92,7 +92,7 @@ Attribute Execute.VB_UserMemId = 0
             Case Else: Assign Result, CArray(vArgs)
         End Select
     End If
-    
+
     Set Execute = Me
     RaiseEvent ExecuteComplete(Execute)
 End Function
@@ -136,7 +136,7 @@ Public Function ExecuteOnArray(ByRef vArgs() As Variant) As Callback
             Case Else: Assign Result, CArray(vArgs)
         End Select
     End If
-    
+
     Set ExecuteOnArray = Me
     RaiseEvent ExecuteComplete(ExecuteOnArray)
 End Function

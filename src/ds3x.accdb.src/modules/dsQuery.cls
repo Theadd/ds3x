@@ -84,7 +84,7 @@ Attribute Item.VB_UserMemId = 0
         .CursorType = adOpenStatic
         .Open CursorType:=adOpenStatic, Options:=adCmdText
     End With
-    
+
     Set Item = rs
 End Property
 
@@ -101,7 +101,7 @@ Public Function TryQuery(ByVal SqlQuery As String, Optional ByRef rs As ADODB.Re
         Me.Connection.Execute SqlQuery
     Else
         Set rs = New ADODB.Recordset
-        
+
         With rs
             Set .ActiveConnection = Me.Connection
             .Source = SqlQuery
@@ -110,13 +110,13 @@ Public Function TryQuery(ByVal SqlQuery As String, Optional ByRef rs As ADODB.Re
             .CursorType = adOpenStatic
             .Open
         End With
-        
+
         Set rs.ActiveConnection = Nothing
     End If
 
     TryQuery = True
     Exit Function
-    
+
 ErrorHandler:
     pLastError = Err.Description
     TryQuery = False
@@ -170,13 +170,13 @@ End Sub
 '
 Public Function Execute(ByRef SqlCommandOrRecordset As Variant, ParamArray CommandParameters() As Variant) As ADODB.Recordset
     Dim i As Long, cParams() As Variant
-    
+
     If UBound(CommandParameters) = 0 And IsArray(CommandParameters(0)) Then
         cParams = CommandParameters(0)
     Else
         cParams = CommandParameters
     End If
-    
+
     If IsObject(SqlCommandOrRecordset) Then
         Set SqlCommandOrRecordset.ActiveCommand.ActiveConnection = Me.Connection
         For i = 0 To UBound(cParams)
@@ -201,7 +201,7 @@ End Function
 
 Public Function CreateCommand(ByVal CommandText As String, Optional ByVal CommandType As ADODB.CommandTypeEnum = adCmdText, Optional ByVal CommandName As Variant) As ADODB.Command
     Set CreateCommand = New ADODB.Command
-    
+
     With CreateCommand
         .Prepared = True
         .CommandType = CommandType
@@ -219,7 +219,7 @@ End Function
 
 Private Sub Class_Terminate()
     On Error Resume Next
-    
+
     If Not pConn Is Nothing Then
         If Not pNoCloseOnTerminate Then pConn.Close
         Set pConn = Nothing

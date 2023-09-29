@@ -14,4 +14,3 @@ Option Explicit
 
 Public Function Compare(ByVal X As Variant, ByVal Y As Variant) As Long
 End Function
-

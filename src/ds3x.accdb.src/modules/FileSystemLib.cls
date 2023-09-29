@@ -43,7 +43,7 @@ Private Declare PtrSafe Sub CopyMemory Lib "Kernel32.dll" Alias "RtlMoveMemory" 
     End Type
 #Else
     Private Declare PtrSafe Sub GlobalMemoryStatus Lib "kernel32" (lpBuffer As MEMORYSTATUS)
-    
+
     Private Type MEMORYSTATUS
        dwLength As Long
        dwMemoryLoad As Long
@@ -62,7 +62,7 @@ Private Declare PtrSafe Sub CopyMemory Lib "Kernel32.dll" Alias "RtlMoveMemory" 
 Private Declare PtrSafe Function MultiByteToWideChar Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpMultiByteStr As LongPtr, ByVal cchMultiByte As Long, ByVal lpWideCharStr As LongPtr, ByVal cchWideChar As Long) As Long
 Private Const CP_UTF8 As Long = 65001
 
-    
+
 Private pFSO As Scripting.FileSystemObject
 
 
@@ -145,11 +145,11 @@ Public Property Get FileInAncestors(ByVal TargetFile As String, Optional ByVal B
 '
 Public Function TryWriteAccessOfSaveAsDialog(ByRef Path As String, Optional ByVal saveAsFileExtension As String = "*.xlsx", Optional ByVal windowTitle As String = "Save As", Optional ByVal retryAttempts As Integer = 100) As Boolean
     Dim success As Boolean: success = TrySaveAsDialog(Path, saveAsFileExtension, windowTitle)
-    
+
     If success Then
         success = TryWaitFileWriteAccess(Path, retryAttempts)
     End If
-    
+
     TryWriteAccessOfSaveAsDialog = success
 End Function
 
@@ -192,11 +192,11 @@ Public Function TryFileOpenDialog(ByRef Path As String, Optional ByVal initialPa
         .Filters.Clear
         filtersArray = Split(commaSeparatedStringFiltersPairs, ",")
         lastIndex = UBound(filtersArray)
-        
+
         For i = 0 To lastIndex Step 2
             .Filters.Add filtersArray(i), filtersArray(i + 1)
         Next i
-        
+
         If .Show Then
             'Step through eachString in the FileDialogSelectedItems collection.
             For Each selectedItem In .selectedItems
@@ -224,11 +224,11 @@ Public Function TryMultiSelectFileOpenDialog(ByRef paths As Collection, Optional
         .Filters.Clear
         filtersArray = Split(commaSeparatedStringFiltersPairs, ",")
         lastIndex = UBound(filtersArray)
-        
+
         For i = 0 To lastIndex Step 2
             .Filters.Add filtersArray(i), filtersArray(i + 1)
         Next i
-        
+
         If .Show Then
             'Step through eachString in the FileDialogSelectedItems collection.
             For Each selectedItem In .selectedItems
@@ -255,13 +255,13 @@ Public Function TryCreateFolder(ByVal TargetPath As String) As Boolean
         TryCreateFolder = False
         Exit Function
     End If
-    
+
     'If the path already exists as a folder, don't do anything and return success.
     If FSO.FolderExists(TargetPath) Then
         TryCreateFolder = True
         Exit Function
     End If
-    
+
     TryCreateFolder = (Not (FSO.CreateFolder(TargetPath) Is Nothing))
 CreateFolderError:
 End Function
@@ -271,17 +271,17 @@ End Function
 Public Function TryWaitFolderExists(ByVal TargetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
     On Error GoTo Finally
     Dim Exists As Boolean
-    
+
     'If the path exists as a file, it can't be a directory
     If FSO.FileExists(TargetPath) Then Exit Function
-    
+
     Exists = FSO.FolderExists(TargetPath)
     While Not Exists And retryAttempts > 0
         retryAttempts = retryAttempts - 1
         Sleep 100
         Exists = FSO.FolderExists(TargetPath)
     Wend
-    
+
     TryWaitFolderExists = Exists
 Finally:
 End Function
@@ -291,30 +291,30 @@ End Function
 ' pásale un 0 al segundo parámetro (retryAttempts).
 Public Function TryWaitFileExists(ByVal TargetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
     Dim Exists As Boolean
-    
+
     Exists = FSO.FileExists(TargetPath)
-    
+
     While Not Exists And retryAttempts > 0
         retryAttempts = retryAttempts - 1
         Sleep 100
         Exists = FSO.FileExists(TargetPath)
     Wend
-    
+
     TryWaitFileExists = Exists
 End Function
 
 Public Function TryWaitFileMatchingPatternExists(ByVal directoryPath As String, Optional ByVal filenamePattern As String = "*.csv", Optional ByVal retryAttempts As Integer = 100) As Boolean
     Dim Exists As Boolean, TargetPath As String
-    
+
     TargetPath = FSO.BuildPath(directoryPath, filenamePattern)
     Exists = (Dir(TargetPath) <> "")
-    
+
     While Not Exists And retryAttempts > 0
         retryAttempts = retryAttempts - 1
         Sleep 100
         Exists = (Dir(TargetPath) <> "")
     Wend
-    
+
     TryWaitFileMatchingPatternExists = Exists
 End Function
 
@@ -327,27 +327,27 @@ Public Function TryWaitFileWriteAccess(ByVal TargetPath As String, Optional ByVa
 
     If TryWaitFileExists(TargetPath, 0) Then
         If TryWaitFileExists(TargetPath & "~", 0) Then
-            
+
             Debug.Print "Error no contemplado, ya existe un archivo con el mismo nombre y acabado con '~' en el mismo directorio. " & TargetPath
             GoTo ExitFunction
         Else
             While True
-            
+
                 If TryMoveFile(TargetPath, TargetPath & "~") Then
                     GoTo MoveFileBack
                 End If
 
                 If retryAttempts = 0 Then GoTo ExitFunction
-                
+
                 Sleep 100
                 retryAttempts = retryAttempts - 1
-                
+
             Wend
 
 MoveFileBack:
             On Error GoTo HandleUnexpectedError
             FSO.MoveFile TargetPath & "~", TargetPath
-            
+
             If TryWaitFileExists(TargetPath, retryAttempts) Then
                 TryWaitFileWriteAccess = True
             End If
@@ -356,14 +356,14 @@ MoveFileBack:
         ' There's no existing file at targetPath, ensure write access
         Set Stream = FSO.CreateTextFile(TargetPath, overwrite:=False)
         Stream.Close
-        
+
         If TryWaitFileExists(TargetPath, retryAttempts) Then
-            
+
             If TryWaitFileWriteAccess(TargetPath, retryAttempts) Then
                 FSO.DeleteFile TargetPath, True
                 TryWaitFileWriteAccess = True
             End If
-            
+
         End If
     End If
 
@@ -377,7 +377,7 @@ End Function
 Public Function GetFileMatchingPattern(ByVal Pattern As String) As String
     Dim sPath As String, sName As String
     On Error GoTo Finally
-    
+
     sPath = FSO.GetParentFolderName(Pattern)
     sName = VBA.Dir(Pattern)
     If sName <> "" Then
@@ -389,9 +389,9 @@ End Function
 Public Function TryMoveFile(ByVal sourceFilePath As String, ByVal destinationFilePath As String) As Boolean
     On Error GoTo MoveFail
     TryMoveFile = True
-    
+
     FSO.MoveFile sourceFilePath, destinationFilePath
-    
+
     Exit Function
 MoveFail:
     TryMoveFile = False
@@ -400,9 +400,9 @@ End Function
 Public Function TryCopyFile(ByVal sourceFilePath As String, ByVal destinationFilePath As String, Optional ByVal overwriteExisting As Boolean = True) As Boolean
     On Error GoTo CopyFail
     TryCopyFile = True
-    
+
     FSO.CopyFile sourceFilePath, destinationFilePath, overwriteExisting
-    
+
     Exit Function
 CopyFail:
     TryCopyFile = False
@@ -410,7 +410,7 @@ End Function
 
 Public Function TryFollowHyperlink(ByVal TargetFile As String) As Boolean
     On Error GoTo Finally
-    
+
     Application.FollowHyperlink TargetFile
     TryFollowHyperlink = True
     Exit Function
@@ -419,7 +419,7 @@ End Function
 
 Public Function TryKill(ByVal TargetFile As String) As Boolean
     On Error GoTo Finally
-    
+
     Kill TargetFile
     TryKill = True
     Exit Function
@@ -444,19 +444,19 @@ Public Function TryGetFileWithoutExtension(ByVal targetDirectory As String, ByVa
     targetFilePath = PathCombine(targetDirectory, filenameWithoutExtension)
     TryGetFileWithoutExtension = False
     found = False
-    
+
     StrFile = Dir(targetFilePath & ".*")
-    
+
     Do While Len(StrFile) > 0
         found = True
         Exit Do
     Loop
-    
+
     If found Then
         targetFilePath = targetDirectory & StrFile
         TryGetFileWithoutExtension = True
     End If
-    
+
 End Function
 
 Public Function GetFileExtension(ByVal FilePath As String) As String
@@ -471,17 +471,17 @@ Public Function TryGetFileInAncestors(ByRef TargetFile As String, Optional ByVal
     Dim sName As String, sPath As String
     sName = GetFileName(TargetFile)
     sPath = TargetFile
-    
+
     Do
         sPath = FSO.GetParentFolderName(sPath)
         If sPath = vbNullString Then Exit Do
-        
+
         If TryWaitFileExists(PathCombine(sPath, sName), 0) Then
             TargetFile = PathCombine(sPath, sName)
             TryGetFileInAncestors = True
             Exit Do
         End If
-        
+
         BackwardMovesLimit = BackwardMovesLimit - 1
     Loop Until (BackwardMovesLimit = -1)
 End Function
@@ -490,14 +490,14 @@ End Function
 Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal overwriteIfAlreadyExists As Boolean = True, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
     Dim Stream As TextStream
-    
+
     Set Stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
     Stream.Write Content
     Stream.Close
-    
+
     TryWriteTextToFile = True
     Exit Function
-    
+
 ErrorHandler:
     On Error Resume Next
     TryWriteTextToFile = False
@@ -510,7 +510,7 @@ End Function
 Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content As String, Optional ByVal Charset As Variant) As Boolean
     On Error GoTo Finally
     Dim LastBytes As Variant
-    
+
     If IsMissing(Charset) Then Charset = GetFileCharset(TargetFile, LastBytes)
     Select Case Charset
         Case "ANSI"
@@ -548,14 +548,14 @@ End Function
 Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As String, Optional ByVal AsUnicode As Boolean = True) As Boolean
     On Error GoTo ErrorHandler
     Dim Stream As TextStream
-    
+
     Set Stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(AsUnicode, TristateTrue, TristateFalse))
     Stream.Write Content
     Stream.Close
-    
+
     TryAppendTextInFile = True
     Exit Function
-    
+
 ErrorHandler:
     On Error Resume Next
     TryAppendTextInFile = False
@@ -572,14 +572,14 @@ End Function
 
 Public Function GetAllFilesInPath(ByVal TargetPath As String, Optional ByVal FilePattern As String = "*") As Collection
     Dim allFiles As New Collection, aMatch As String
-    
+
     aMatch = Dir(PathCombine(TargetPath, FilePattern))
-    
+
     While aMatch <> ""
         allFiles.Add aMatch
         aMatch = Dir()
     Wend
-    
+
     Set GetAllFilesInPath = allFiles
 End Function
 
@@ -624,14 +624,14 @@ End Function
     Public Function GetAvailableVirtualMemory() As Long
         On Error GoTo Finally
         Dim Mem As MEMORYSTATUS
-    
+
         Mem.dwLength = LenB(Mem)
         GlobalMemoryStatusEx Mem
-    
+
         GetAvailableVirtualMemory = BytesToMB(Mem.dwAvailVirtual)
 Finally:
     End Function
-    
+
     Private Function LargeIntToCurrency(liInput As LARGE_INTEGER) As Currency
         CopyMemory LargeIntToCurrency, liInput, LenB(liInput)
         LargeIntToCurrency = LargeIntToCurrency * 10000
@@ -653,14 +653,14 @@ Finally:
     Public Function GetAvailableVirtualMemory() As Long
         On Error GoTo Finally
         Dim Mem As MEMORYSTATUS
-    
+
         Mem.dwLength = LenB(Mem)
         GlobalMemoryStatus Mem
-    
+
         GetAvailableVirtualMemory = BytesToMB(Mem.dwAvailVirtual)
 Finally:
     End Function
-    
+
     Private Function BytesToMB(Value As Long) As Long
         Select Case Value
             Case Is > (2 ^ 20)
@@ -726,7 +726,7 @@ Private Function DecodeByteString(ByRef SourceString As String, ByRef LastBytes 
         End If
         SourceString = SourceString & (ChrB(LastBytes(UBound(LastBytes))))
     End If
-    
+
     On Error Resume Next
     iSize = LenB(SourceString)
     If iSize = 0 Then Exit Function
@@ -743,7 +743,3 @@ Private Function DecodeByteString(ByRef SourceString As String, ByRef LastBytes 
     DecodeByteString = r
     On Error GoTo 0
 End Function
-
-
-
-

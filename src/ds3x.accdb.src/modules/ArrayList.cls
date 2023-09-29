@@ -106,7 +106,7 @@ End Sub
 
 Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     Dim v As Variant, GetCount As Long
-    
+
     If Not IsObject(ArrayLike) Then
         GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
         ReserveSpaceForInsert Index, GetCount
@@ -172,7 +172,7 @@ Public Function BinarySearch(ByVal Index As Long, ByVal GetCount As Long, ByRef 
     Dim lo As Long, hi As Long, i As Long
     lo = Index
     hi = Index + GetCount - 1
-    
+
     If Not (Comparer Is Nothing) Then
         Do While (lo <= hi)
             i = lo + ((hi - lo) \ 2)
@@ -457,4 +457,3 @@ Private Sub QuickSortV2(l As Long, r As Long)
 End Sub
 
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
-

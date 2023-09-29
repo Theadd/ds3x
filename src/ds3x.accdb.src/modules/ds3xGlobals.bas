@@ -97,34 +97,34 @@ End Function
         If IsEmpty(dsApp.ActiveTask) Then Exit Function
         IsTaskRunning = ((dsApp.ActiveTask(0) Like "*" & TaskNamePattern & "*") Or (dsApp.ActiveTask(1) Like "*" & TaskNamePattern & "*"))
     End Function
-    
+
     Public Function HasFailedToRunAllTasks() As Boolean
         HasFailedToRunAllTasks = Not (IsEmpty(dsApp.FailedTask))
     End Function
-    
+
     Public Sub SetCustomVar(ByVal VarName As String, ByVal VarValue As Variant)
         dsApp.CustomVar(VarName) = VarValue
     End Sub
-    
+
     ' Adds a preset file to the runnable tasks queue
     Public Sub AddRunnableTask(ByVal TargetPath As String, Optional ByVal RunnableTaskName As String = "", Optional ByVal OnErrorResumeNext As Boolean = False)
         dsApp.RunnableTasks.Add Array(TargetPath, RunnableTaskName, OnErrorResumeNext)
     End Sub
-    
+
     Public Sub ClearAllRunnableTasks()
         dsApp.RunnableTasks.Clear
     End Sub
-    
+
     ' Sequentially executes all runnable tasks in queue
     Public Sub RunAllAsync()
         DoCmd.OpenForm "DS_ASYNC_RUNNER", WindowMode:=acHidden
         Forms("DS_ASYNC_RUNNER").RunAsync
     End Sub
-    
+
     Public Function NumTasksInQueue() As Long
         NumTasksInQueue = dsApp.RunnableTasks.Count
     End Function
-    
+
 #End If
 
 
@@ -134,7 +134,7 @@ End Function
 Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As String
     Dim parts() As String: parts = Split(mask, "%")
     Dim i As Long, j As Long, isFound As Boolean, s As String
-    
+
     For i = LBound(parts) + 1 To UBound(parts)
         If LenB(parts(i)) = 0 Then
             parts(i) = "%"
@@ -153,7 +153,6 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
             End If
         End If
     Next i
-    
+
     Printf = Join(parts, vbNullString)
 End Function
-

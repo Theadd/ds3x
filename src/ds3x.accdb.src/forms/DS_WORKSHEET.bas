@@ -1271,14 +1271,14 @@ End Sub
 
 Private Sub SetupGridSizes()
     Dim i As Long
-    
+
     For i = 1 To pMaxAvailColumns
         If i = 1 Then
             Me.DS_RC_1_1.Left = 0
         End If
         Me.Controls("DS_RC_1_" & CStr(i)).Width = pGridCellSizeX
     Next i
-    
+
     Me.DS_PAGE_ROW_NUM.Left = 0
     Me.DS_PAGE_ROW_NUM.Width = pGridCellSizeX * pMaxAvailColumns
     Me.Width = pGridCellSizeX * pMaxAvailColumns
@@ -1311,14 +1311,14 @@ End Sub
 Public Function OnGridCellEnter()
     Dim rIndex As Long, cIndex As Long
     On Error GoTo Finally
-    
+
     rIndex = Me.SelTop - 1
     cIndex = Me.SelLeft - 2
-    
+
     If rIndex >= 0 And cIndex >= 0 Then
         RaiseEvent OnCellEnter(rIndex + pFirstRowIndex, cIndex + pFirstColumnIndex, GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
     End If
-    
+
 '    Debug.Print Printf("[ENTER] rowBookmark: %1, pageRowNum: %2, sLeftPos: %3, sTopPos: %4", rowBookmark, pageRowNum, sLeftPos, sTopPos)
 Finally:
 End Function

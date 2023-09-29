@@ -156,14 +156,14 @@ End Property
 
 Public Property Get Row(ByVal Index As Long) As Variant
     Dim aX As ArrayListEx, t As ADODB.Fields, i As Long
-    
+
     Set aX = ArrayListEx.Create()
     Set t = CreateShallowCopy(Index + 1).Fields
-    
+
     For i = 0 To ColumnCount - 1
         aX.Add t.Item(i).Value
     Next i
-    
+
     Row = aX.ToArray()
 End Property
 
@@ -192,7 +192,7 @@ Public Property Get ColumnNames() As Variant()
 Attribute ColumnNames.VB_Description = "Devuelve un array de strings con los nombres de las columnas del Recordset."
     Dim i As Long, sNames() As Variant
     ReDim sNames(Instance.Fields.Count - 1)
-    
+
     For i = 0 To Instance.Fields.Count - 1
         sNames(i) = Instance.Fields(i).Name
     Next i
@@ -227,7 +227,7 @@ Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long)
 Public Function Create(Optional ByVal RecordsetLike As Variant) As RecordsetEx
     Set Create = New RecordsetEx
     Set Create.Instance = Nothing
-    
+
     If Not IsMissing(RecordsetLike) Then
         If TypeOf RecordsetLike Is ADODB.Recordset Then
             Set Create.Instance = RecordsetLike
@@ -300,7 +300,7 @@ End Function
 
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
     Dim i As Long, c As Long, t() As Variant, r() As Variant
-    
+
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If Index >= Me.Count Then
         Index = IIf(Me.Count - 1 < 0, 0, Me.Count - 1)
@@ -312,7 +312,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     If IsMissing(ColumnIndexes) Or IsEmpty(ColumnIndexes) Then ColumnIndexes = CreateNumericIndexHeaders
     If GetCount <= 0 Then GoTo Finally
     ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes))
-    
+
     For c = 0 To UBound(ColumnIndexes)
         If Index > 0 Then
             Instance.AbsolutePosition = Index + 1
@@ -330,7 +330,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
             Next i
         End If
     Next c
-    
+
 Finally:
     Set GetRange = New Array2dEx
     GetRange.SetInstanceByRef t
@@ -339,7 +339,7 @@ End Function
 ' NOTICE: Returns a new RecordsetEx.
 Public Function AddRange(ByVal Target As Variant) As RecordsetEx
     Dim dsT As dsTable, dsT2 As dsTable
-    
+
     Set dsT = dsTable.Create(Me, True)
     Set dsT2 = dsTable.Create(Target, False).SetHeaders(Me)
     Set AddRange = RecordsetEx.Create(dsT.AddRange(dsT2).NamedRecordset)
@@ -354,7 +354,7 @@ End Function
 Public Function AsIterableDictionary(ParamArray QueryColumns() As Variant) As Variant()
 Attribute AsIterableDictionary.VB_Description = "Devuelve un Array() de Scripting.Dictionary (@SEE: RecordsetEx.AsIterableString)."
     Dim sValues As Variant, sRows() As Variant, Entry As Scripting.Dictionary, sColumns() As Variant, i As Long, c As Long
-    
+
     If Instance.RecordCount > 0 Then
         If UBound(QueryColumns) >= 0 Then
             sValues = Instance.GetRows(adGetRowsRest, adBookmarkFirst, QueryColumns)
@@ -363,22 +363,22 @@ Attribute AsIterableDictionary.VB_Description = "Devuelve un Array() de Scriptin
             sValues = Instance.GetRows(adGetRowsRest, adBookmarkFirst)
             sColumns = ColumnNames
         End If
-        
+
         ReDim sRows(UBound(sValues, 2) - LBound(sValues, 2))
-    
+
         For i = LBound(sValues, 2) To UBound(sValues, 2)
             Set Entry = New Scripting.Dictionary
-            
+
             For c = 0 To UBound(sColumns)
                 Entry(CStr(sColumns(c))) = sValues(c, i)
             Next c
-    
+
             Set sRows(i) = Entry
         Next i
     Else
         sRows = Array()
     End If
-    
+
     MoveFirst
     AsIterableDictionary = sRows
 End Function
@@ -387,7 +387,7 @@ End Function
 Public Function AsIterable(ParamArray QueryColumns() As Variant) As Variant()
 Attribute AsIterable.VB_Description = "Devuelve un Array() de Array()s (@SEE: RecordsetEx.AsIterableString)."
     Dim sValues As Variant, sRows() As Variant, Entry() As Variant, sColumns() As Variant, i As Long, c As Long
-    
+
     If Instance.RecordCount > 0 Then
         If UBound(QueryColumns) >= 0 Then
             sValues = Instance.GetRows(adGetRowsRest, adBookmarkFirst, QueryColumns)
@@ -396,21 +396,21 @@ Attribute AsIterable.VB_Description = "Devuelve un Array() de Array()s (@SEE: Re
             sValues = Instance.GetRows(adGetRowsRest, adBookmarkFirst)
             sColumns = ColumnNames
         End If
-        
+
         ReDim sRows(UBound(sValues, 2) - LBound(sValues, 2))
         ReDim Entry(UBound(sColumns))
-    
+
         For i = LBound(sValues, 2) To UBound(sValues, 2)
             For c = 0 To UBound(sColumns)
                 Entry(c) = sValues(c, i)
             Next c
-    
+
             sRows(i) = Entry
         Next i
     Else
         sRows = Array()
     End If
-    
+
     MoveFirst
     AsIterable = sRows
 End Function
@@ -435,7 +435,7 @@ End Function
 Public Function AsIterableString(ByVal StringDelimiter As String, ParamArray QueryColumns() As Variant) As Variant()
 Attribute AsIterableString.VB_Description = "Devuelve un Array() de Strings, compuestas por la concatenación de los campos mediante el separador StringDelimiter."
     Dim sValues As Variant, sRows() As Variant, Entry As String, sColumns() As Variant, i As Long, c As Long
-    
+
     If Instance.RecordCount > 0 Then
         If UBound(QueryColumns) >= 0 Then
             sValues = Instance.GetRows(adGetRowsRest, adBookmarkFirst, QueryColumns)
@@ -444,21 +444,21 @@ Attribute AsIterableString.VB_Description = "Devuelve un Array() de Strings, com
             sValues = Instance.GetRows(adGetRowsRest, adBookmarkFirst)
             sColumns = ColumnNames
         End If
-        
+
         ReDim sRows(UBound(sValues, 2) - LBound(sValues, 2))
-    
+
         For i = LBound(sValues, 2) To UBound(sValues, 2)
             Entry = ""
             For c = 0 To UBound(sColumns)
                 Entry = Entry & StringDelimiter & sValues(c, i)
             Next c
-    
+
             sRows(i) = VBA.Mid(Entry, Len(StringDelimiter) + 1)
         Next i
     Else
         sRows = Array()
     End If
-    
+
     MoveFirst
     AsIterableString = sRows
 End Function
@@ -498,7 +498,7 @@ Attribute IndexOf.VB_Description = "Devuelve la posición del primer registro en
         Instance.Find SearchCriteria, 0, adSearchForward, adBookmarkFirst
         If Instance.AbsolutePosition > 0 Then IndexOf = Instance.AbsolutePosition
     End If
-    
+
 Finally:
     MoveFirst
 End Function
@@ -513,7 +513,7 @@ Attribute LastIndexOf.VB_Description = "Devuelve la posición del último regist
         Instance.Find SearchCriteria, 0, adSearchBackward, adBookmarkLast
         If Instance.AbsolutePosition > 0 Then LastIndexOf = Instance.AbsolutePosition
     End If
-    
+
 Finally:
     MoveFirst
 End Function
@@ -543,13 +543,13 @@ End Function
 Public Function Duplicate() As RecordsetEx
 Attribute Duplicate.VB_Description = "Realiza y devuelve una copia entera del conjunto de datos, desvinculandolos del Recordset original."
     Dim xClone As New RecordsetEx, rsClone As New ADODB.Recordset, rStream As New ADODB.Stream
-    
+
     Instance.Save rStream
     rsClone.Open rStream
-    
+
     rStream.Close
     Set rStream = Nothing
-    
+
     Set Duplicate = xClone.Bind(rsClone)
     ' @SEE: You can populate the Fields collection before opening the Recordset by calling the Refresh method on the collection.
 End Function
@@ -568,12 +568,12 @@ Attribute Search.VB_Description = "Devuelve el Recordset.Bookmark del primer/sig
         If Instance.Bookmark <> ContinueBookmark Then Instance.Bookmark = ContinueBookmark
         If Not TryMoveIn(SearchDirection) Then GoTo SearchFailedToMatch
     End If
-    
+
     If ContinueBookmark = -1 Then
         MoveFirst
         If SearchDirection = adSearchBackward Then MoveLast
     End If
-    
+
     Search = -1
     If VarType(SearchCriteria) = vbString Then
         Do
@@ -590,7 +590,7 @@ Attribute Search.VB_Description = "Devuelve el Recordset.Bookmark del primer/sig
             End If
         Loop Until (Not TryMoveIn(SearchDirection))
     End If
-    
+
     Exit Function
 SearchFailedToMatch:
     Search = -1
@@ -635,11 +635,11 @@ Attribute PrintAll.VB_Description = "Imprime el recordset en formato Markdown Ta
             columnNamesCollection.Add ColumnName
             columnSizesDictionary(i + 1) = (Len(ColumnName) + (4 - (Len(ColumnName) Mod 4)))
         Next i
-        
+
         If Not .BOF And Not .EOF Then
             While (Not .EOF)
                 Set Entry = New Collection
-                
+
                 For i = 0 To ColumnCount - 1
                     itemStr = CStr(Nz(.Fields(i), ""))
                     itemLen = (Len(itemStr) + (4 - (Len(itemStr) Mod 4)))
@@ -648,14 +648,14 @@ Attribute PrintAll.VB_Description = "Imprime el recordset en formato Markdown Ta
                     End If
                     Entry.Add itemStr
                 Next i
-                
+
                 Entries.Add Entry
                 .MoveNext
             Wend
-            
+
             MoveFirst
         End If
-        
+
         ' PRINTING HEADERS
         accPosX = 0
         For k = 1 To columnNamesCollection.Count
@@ -669,7 +669,7 @@ Attribute PrintAll.VB_Description = "Imprime el recordset en formato Markdown Ta
         Next k
         Debug.Print ""; Tab(0);
         Debug.Print String(accPosX, "-")
-        
+
         ' PRINTING TABLE ROWS
         For i = 1 To Entries.Count
             accPosX = 0
@@ -722,23 +722,23 @@ End Function
 
 Private Function TryMoveIn(MoveDirection As SearchDirectionEnum) As Boolean
     On Error GoTo MoveFail
-    
+
     If MoveDirection = adSearchForward Then
         Instance.MoveNext
     Else
         Instance.MovePrevious
     End If
-    
+
     TryMoveIn = (Instance.AbsolutePosition >= 0)
 MoveFail:
 End Function
 
 Private Function CreateRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long) As ADODB.Recordset
     Dim rs As New ADODB.Recordset, iRow() As Variant, rValues() As Variant, i As Long
-    
+
     ReDim iRow(0 To ColumnsCount - 1)
     ReDim rValues(0 To ColumnsCount - 1)
-    
+
     With rs
         For i = LBound(iRow) To UBound(iRow)
             iRow(i) = CStr(ColumnStartIndex + i)
@@ -751,7 +751,7 @@ Private Function CreateRecordset(ByVal RowsCount As Long, ByVal ColumnStartIndex
         Next i
         .MoveFirst
     End With
-    
+
     Set CreateRecordset = rs
 End Function
 
@@ -759,18 +759,18 @@ Private Function CreateFromArrayList(ByRef ArrayLike As ArrayList) As ADODB.Reco
     Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant
     Set CreateFromArrayList = rs
     If ArrayLike.Count = 0 Then Exit Function
-    
+
     iRow = ArrayLike(0)
     cMax = UBound(iRow)
     cMin = LBound(iRow)
-    
+
     With rs
         For c = cMin To cMax
             .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable
         Next c
-        
+
         .Open
-        
+
         For i = 1 To ArrayLike.Count - 1
             .AddNew FieldList:=iRow, Values:=ArrayLike(i)
         Next i
@@ -782,11 +782,11 @@ Private Function CreateNumericIndexHeaders() As Variant
     Dim t As Variant, c As Long, cMax As Long
     cMax = Me.ColumnCount - 1
     ReDim t(0 To cMax)
-    
+
     For c = 0 To cMax
         t(c) = c
     Next c
-    
+
     CreateNumericIndexHeaders = t
 End Function
 
@@ -823,8 +823,3 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", O
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
-
-
-
-
-

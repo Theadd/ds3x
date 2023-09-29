@@ -981,4 +981,3 @@ End Sub
 Public Sub DestroyArray(ByRef TargetArray As Variant)
     MemLongPtr(VarPtrArr(TargetArray)) = CLngPtr(0)
 End Sub
-

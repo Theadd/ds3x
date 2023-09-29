@@ -506,8 +506,6 @@ Begin Form
                     GroupTable =3
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
                     Overlaps =1
                 End
                 Begin EmptyCell
@@ -1131,8 +1129,6 @@ Begin Form
                     GroupTable =3
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1187,8 +1183,6 @@ Begin Form
                     GroupTable =3
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
                     Overlaps =1
                 End
             End
@@ -1233,7 +1227,7 @@ End Sub
 
 Private Sub DS_LIST_ITEM_ADD_Click()
     Dim frm As Access.Form, ActiveTaskName As String
-    
+
     If pController.Initialized Then
         ActiveTaskName = pController.RebuildSequence(pController.SequenceIndex)("TaskName")
     Else
@@ -1256,7 +1250,7 @@ End Sub
 
 Private Sub ShowCreateTaskFormInEditMode(ByVal TaskIndex As Long)
     Dim frm As Access.Form, ActiveTaskName As String
-    
+
     If pController.Initialized Then
         ActiveTaskName = pController.RebuildSequence(TaskIndex)("TaskName")
     Else
@@ -1290,7 +1284,7 @@ End Sub
 
 Private Function CreateListItemHeader(Optional ByVal Title As String = "") As Variant
     pIndexCountdown = pIndexCountdown - 1
-    
+
     If Trim(Title) = "" Then
         CreateListItemHeader = Array(pIndexCountdown, Title, 4)
     Else
@@ -1330,7 +1324,7 @@ Public Sub RebuildSequenceList()
     Next i
     qList.Add CreateListItemHeader(" ")
     qList.RemoveAt 0
-    
+
     Set dsT = dsTable.Create(qList).SetHeaders(Array("DS_LIST_ITEM_INDEX", "DS_LIST_ITEM", "DS_LIST_ITEM_STATE"))
     Set rsX = RecordsetEx.Create(dsT.NamedRecordset)
     Set Me.DS_SEQUENCE_LIST.Form.Recordset = rsX.Instance

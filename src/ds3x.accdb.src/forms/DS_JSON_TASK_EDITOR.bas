@@ -541,7 +541,7 @@ End Sub
 Private Sub ResizeToFit(ByVal NumLines As Long)
     Const vPadding As Long = 120
     Const lineHeight As Long = 345
-    
+
     Me.DS_JSON_EDITOR.Height = NumLines * lineHeight
     Me.Detalle.Height = (2 * vPadding) + (NumLines * lineHeight)
     Me.DS_JSON_EDITOR.Height = NumLines * lineHeight
@@ -571,12 +571,12 @@ End Sub
 
 Private Sub pController_OnActiveSequenceIndexChange(ByVal TargetIndex As Long, ByVal HasFailed As Boolean)
     On Error GoTo Finally
-    
+
     pSequenceIndex = TargetIndex    ' Controller.SequenceIndex
     pOriginalValue = Encode(JSON.Stringify(Controller.RebuildSequence(pSequenceIndex)))
     Me.DS_JSON_EDITOR = pOriginalValue
     ScreenLib.SetGridlineAsValid Me.DS_JSON_EDITOR, True
-    
+
     Exit Sub
 Finally:
     Debug.Print "[UNHANDLED ERROR] @DS_JSON_TASK_EDITOR.pController_OnActiveSequenceIndexChange()"
@@ -604,7 +604,7 @@ End Sub
 
 Private Function TryParseJsonAsTask(ByVal JSONString As String, ByRef OutTask As Scripting.Dictionary) As Boolean
     On Error GoTo Finally
-    
+
     Set OutTask = JSON.Parse(JSONString, True, True)
     TryParseJsonAsTask = True
 Finally:
@@ -616,21 +616,21 @@ End Sub
 
 Private Function Encode(ByVal JSONString As String) As String
     Dim s As String
-    
+
     s = Replace(JSONString, """TaskName"":", "TaskName:")
     s = Replace(s, """Id"":", "Id:")
     s = Replace(s, """Values"":", "Values:")
     s = Replace(s, "\\", "\")
-    
+
     Encode = s
 End Function
 
 Private Function Decode(ByVal RenderedString As String) As String
     Dim s As String
-    
+
     s = RenderedString
     s = Replace(s, "\", "\\")
-    
+
     Decode = s
 End Function
 

@@ -677,7 +677,7 @@ End Property
 
 Public Sub SetActiveIndex(ByVal Index As Long, Optional ByVal SkipEventPropagation As Boolean = False)
     Dim TargetIndex As Long
-    
+
     TargetIndex = RecordsetEx.Bind(Me.Recordset.Clone).IndexOf("[DS_LIST_ITEM_INDEX] = " & CStr(Index), -1)
     If TargetIndex <> -1 Then
         Me.SelTop = TargetIndex
@@ -702,7 +702,7 @@ End Sub
 Private Sub SetCurrentAsActiveIndex(Optional ByVal SkipEventPropagation As Boolean = False)
     On Error GoTo Finally
     Dim cActiveIndex As Long
-    
+
     cActiveIndex = CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_INDEX))))
     If cActiveIndex <> pLastActiveIndex Then
         pLastActiveIndex = cActiveIndex
@@ -715,7 +715,7 @@ Private Sub SetCurrentAsActiveIndex(Optional ByVal SkipEventPropagation As Boole
             RaiseEvent OnNoActiveIndexChange(pLastActiveIndex)
         End If
     End If
-    
+
     Exit Sub
 Finally:
     Debug.Print "[ERROR] @DS_RICHTEXT_LIST.SetCurrentAsActiveIndex() - " & Err.Description
@@ -724,7 +724,7 @@ End Sub
 
 Private Sub DS_LIST_ITEM_OVERLAY_DblClick(Cancel As Integer)
     On Error Resume Next
-    
+
     If CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_STATE)))) = 4 Then Exit Sub
     RaiseEvent OnItemDoubleClick(CLng(Int(Val(Nz(Me.DS_LIST_ITEM_ROW_INDEX)))))
     On Error GoTo 0

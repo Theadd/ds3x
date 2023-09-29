@@ -449,7 +449,6 @@ Begin Form
                     GroupTable =4
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =1
                 End
                 Begin CommandButton
                     TabStop = NotDefault
@@ -501,7 +500,6 @@ Begin Form
                     GroupTable =4
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =5
                 End
                 Begin CommandButton
                     TabStop = NotDefault
@@ -656,8 +654,6 @@ Begin Form
                     GroupTable =6
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -709,8 +705,6 @@ Begin Form
                     GroupTable =6
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
                 End
                 Begin CommandButton
                     TabStop = NotDefault
@@ -762,8 +756,6 @@ Begin Form
                     GroupTable =6
                     QuickStyle =10
                     QuickStyleMask =-1009
-                    WebImagePaddingRight =-1
-                    WebImagePaddingBottom =-1
                     Overlaps =1
                 End
                 Begin Line
@@ -936,7 +928,7 @@ Private Sub DS_GENERATE_BUTTON_Click()
     On Error Resume Next
     RemoveFocus
     Dim xlSheet As xlSheetsEx
-    
+
     If Controller.TryGenerateAsExcel(xlSheet) Then
         xlSheet.WindowVisibility = True
     End If
@@ -946,7 +938,7 @@ End Sub
 Private Sub DS_NEW_BUTTON_Click()
     RemoveFocus
     Dim dsEditor As New dsLiveEd
-    
+
     dsEditor.Visible = True
     Set dsEditor.LiveEditor.Controller = dsEditor
 End Sub
@@ -988,7 +980,7 @@ Private Sub SetController(ByVal TargetController As dsLiveEd)
     Set pController = TargetController
     Set Me.DS_REBUILD_SEQUENCE.Form.GridController = pController.GridController
     Set Me.DS_REBUILD_SEQUENCE.Form.Controller = pController.TaskController
-    
+
     If pController.TaskController.Initialized Then Rebuild
 End Sub
 

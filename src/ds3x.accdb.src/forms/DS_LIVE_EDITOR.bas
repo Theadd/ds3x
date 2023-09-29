@@ -513,7 +513,7 @@ End Property
 
 Private Sub Form_Load()
     ScreenLib.ScreenLib_Resync
-    
+
     ScreenLib.WindowSizeTo Me, 22050, 11000
     ScreenLib.WindowCenterTo Me, ScreenLib.PrimaryScreen
 
@@ -521,7 +521,7 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Bind(ByVal TargetController As dsLiveEd)
-    
+
     If (Not TargetController Is Nothing) And (Not pController Is Nothing) Then
         ' More than one DS_LIVE_EDITOR windows can point to the same dsLiveEd controller
         ' But NOT more than one dsLiveEd instance can point to the same window, so:
@@ -578,10 +578,10 @@ End Sub
 
 Private Sub ResizeToFitAllControls()
     Dim parentWidth As Long, pSize As Long
-    
+
     Focus Me
     parentWidth = Me.InsideWidth
-    
+
     pSize = Me.DS_SIDE_PANEL.Width
     Me.DS_SIDE_PANEL.Left = parentWidth - pSize
     pSize = pSize + Me.DS_VERTICAL_SPLITTER.Width

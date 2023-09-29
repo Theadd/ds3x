@@ -26,7 +26,7 @@ Public Property Get Slices() As Variant: Slices = IIf(IsEmpty(pSlices), Array(),
 Public Property Let Slices(ByRef Value As Variant)
     Dim v As Variant, r As Long
     If Not IsEmpty(pSlices) Then Err.Raise 70
-    
+
     pSlices = Value
     For Each v In pSlices
         r = r + v(3)
@@ -111,7 +111,7 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
         ' ArrayLike, ColumnIndex, Index, GetCount
         For Each v In pSlices
             rMax = rMin + (v(3) - 1)
-            
+
             If iMin <= rMax And iMin >= rMin And iMax <= rMax Then
                 '    #rMin                  #rMax
                 ' ---|---------|------|-----|--------
@@ -119,33 +119,33 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
                 sMod = iMin - rMin
                 aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod - (rMax - iMax))
                 Exit For
-                
+
             ElseIf iMin <= rMax And iMin >= rMin And iMax > rMax Then
                 '    #rMin             #rMax
                 ' ---|---------|-------|-------|----
                 '              #iMin           #iMax
                 sMod = iMin - rMin
                 aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod)
-            
+
             ElseIf iMin <= rMin And iMax <= rMax Then
                 '           #rMin                  #rMax
                 ' ---|------|-------------|--------|-----
                 '    #iMin                #iMax
                 aX.Add Array(v(0), v(1), v(2), v(3) - (rMax - iMax))
                 Exit For
-                
+
             ElseIf iMin <= rMin And iMax > rMax Then
                 '           #rMin         #rMax
                 ' ---|------|-------------|--------|-----
                 '    #iMin                         #iMax
                 aX.Add Array(v(0), v(1), v(2), v(3))
-                
+
             End If
             rMin = rMin + v(3)
         Next v
         rMin = 0
     Next vRange
-    
+
     Set SliceAllRanges = New ArraySlice
     SliceAllRanges.Slices = aX.ToArray()
 End Function
@@ -198,7 +198,7 @@ End Sub
 Public Sub CloneInto2dArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As Long, ByVal TargetColumnIndex As Long)
     Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
     If pCount = 0 Then Exit Sub
-    
+
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx
@@ -221,7 +221,7 @@ End Sub
 Public Sub CloneIntoArray(ByRef TargetArray() As Variant, Optional ByVal TargetIndex As Long = 0)
     Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
     If pCount = 0 Then Exit Sub
-    
+
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx

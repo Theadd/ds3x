@@ -64,7 +64,7 @@ End Property
 
 Public Sub AddSource(ByRef SourceObject As Object, Optional ByVal TaskId As Variant)
     Dim rX As RecordsetEx, dsT As dsTable, xlS As xlSheetsEx
-    
+
     If TypeName(SourceObject) Like "*Recordset*" Then
         If TypeOf SourceObject Is ADODB.Recordset Then
             Set rX = RecordsetEx.Create(SourceObject.Clone)
@@ -100,15 +100,15 @@ Public Sub AddSource(ByRef SourceObject As Object, Optional ByVal TaskId As Vari
             Set TaskController.DataSource(TaskId) = xlS
         End If
     End If
-    
+
     RaiseEvent OnDataSourceChange
 End Sub
 
 Public Function TryGenerateAsExcel(Optional ByRef xlSheet As xlSheetsEx = Nothing, Optional ByRef xlRange As Excel.Range = Nothing) As Boolean
     Dim vGenerated As Variant, dsT As dsTable, xlSX As xlSheetsEx, xlR As Excel.Range
-    
+
     If TryRebuildAll Then
-        
+
         Assign vGenerated, TaskController.GeneratedValue
         If IsObject(vGenerated) Then
             If Not vGenerated Is Nothing Then
@@ -124,7 +124,7 @@ Public Function TryGenerateAsExcel(Optional ByRef xlSheet As xlSheetsEx = Nothin
                         dsT.CopyToRange xlRange, True
                         ' TODO: Apply basic in-Excel post processing tasks
                         TryGenerateAsExcel = True
-                        
+
                     Case "xlSheetsEx"
                         If xlSheet Is Nothing Then
                             Set xlSheet = vGenerated
@@ -142,7 +142,7 @@ Public Function TryGenerateAsExcel(Optional ByRef xlSheet As xlSheetsEx = Nothin
                             xlSheet.Instance.Paste
                         End If
                         TryGenerateAsExcel = True
-                        
+
                     Case Else
                         Debug.Print "[ERROR] @dsLiveEd.TryGenerate"
                 End Select
@@ -162,10 +162,10 @@ End Function
 
 Public Function TryApplyPresetOn(ByVal Preset As Variant, ByRef SourceInput As Variant, ByRef GeneratedOutput As Variant, Optional ByVal AutoHeaders As Boolean = True) As Boolean
     On Error GoTo Fallback
-    
+
     ImportPreset Preset
     TryApplyPresetOn = TryApplyOn(SourceInput, GeneratedOutput, AutoHeaders)
-    
+
 Finally:
     Exit Function
 Fallback:
@@ -176,12 +176,12 @@ End Function
 Public Function TryApplyOn(ByRef SourceInput As Variant, ByRef GeneratedOutput As Variant, Optional ByVal AutoHeaders As Boolean = True) As Boolean
     Dim srcType As String, inType As String, ds1Idx As Long, xs1Idx As Long, xlSheet As xlSheetsEx
     On Error GoTo Fallback
-    
+
     srcType = TypeName(SourceInput)
     If Not TaskController.TryGetIndexOfTaskId("DS1", ds1Idx) Then ds1Idx = 999
     If Not TaskController.TryGetIndexOfTaskId("XS1", xs1Idx) Then xs1Idx = 999
     inType = IIf(xs1Idx < ds1Idx, "Worksheet", "Table")
-    
+
     Select Case inType
         Case "Table"
             If srcType Like "*Recordset*" Then
@@ -209,9 +209,9 @@ Public Function TryApplyOn(ByRef SourceInput As Variant, ByRef GeneratedOutput A
         Case Else
             Err.Raise 17
     End Select
-    
+
     TryApplyOn = TryApply(GeneratedOutput)
-    
+
 Finally:
     Exit Function
 Fallback:
@@ -222,7 +222,7 @@ End Function
 ' Returns wether current dsLiveEd setup successfully applied or not. While GeneratedOutput references to the final object being generated.
 Public Function TryApply(Optional ByRef GeneratedOutput As Variant) As Boolean
     On Error GoTo Fallback
-    
+
     If TryRebuildAll Then
         If Not IsMissing(GeneratedOutput) Then
             Assign GeneratedOutput, TaskController.GeneratedValue
@@ -235,7 +235,7 @@ Public Function TryApply(Optional ByRef GeneratedOutput As Variant) As Boolean
             TryApply = True
         End If
     End If
-    
+
 Finally:
     Exit Function
 Fallback:
@@ -319,9 +319,9 @@ End Function
 ' Returns whether save succeeded or not
 Public Function SavePreset(Optional ByVal Target As Variant) As Boolean
     Dim TargetPath As String
-    
+
     If Not UpdatePresetObject Then Exit Function
-    
+
     If IsMissing(Target) Then Target = pPresetFile
     If Trim(Target) <> "" Then
         If FileSystemLib.TryWaitFolderExists(Target, 0) Then
@@ -333,7 +333,7 @@ Public Function SavePreset(Optional ByVal Target As Variant) As Boolean
         If Not FileSystemLib.TryWriteTextToFile(Target, JSON.Stringify(pPresetObject, 2), True) Then Exit Function
         pPresetFile = Target
     End If
-    
+
     RaiseEvent OnSave
     SavePreset = True
 End Function
@@ -347,7 +347,7 @@ End Function
 Public Function ImportPreset(Optional ByVal Target As Variant) As Boolean
     Dim TargetPath As String, Aux As String
     If IsMissing(Target) Then Target = VBA.Environ$("USERPROFILE")
-    
+
     If Not IsObject(Target) Then
         If Not Left(LTrim(Target), 1) = "{" Then
             If FileSystemLib.TryWaitFolderExists(Target, 0) Then
@@ -370,7 +370,7 @@ Public Function ImportPreset(Optional ByVal Target As Variant) As Boolean
             ImportPreset = SetPresetObject(Target)
         End If
     End If
-    
+
     If ImportPreset Then
         pPresetFile = TargetPath
     End If
@@ -380,22 +380,22 @@ Private Function SetPresetObject(ByVal Target As Scripting.Dictionary) As Boolea
     On Error GoTo Finally
     Dim dX As New DictionaryEx, rollbackDenied As Boolean, seqList As ArrayListEx, dEntry As Scripting.Dictionary, restoreGridController As Boolean
     If Target Is Nothing Then Set Target = DictionaryEx.Create().Instance
-    
+
     dX.Bind Target
     dX.Add "dsLiveEd", JSON.Parse(JSON.Stringify(dX.GetValue("dsLiveEd", GetDefaultDsLiveEdPreset)), True, True)
-    
+
     Set dEntry = GetNamedEntryFromEntries(dX)
     Set seqList = ArrayListEx.Create(JSON.Parse(JSON.Stringify(dEntry("RebuildSequence")), True, True))
-    
+
     ' Any errors that occur after this point will prevent restoring to the previous state, resetting the editor state
     rollbackDenied = True
-    
+
     Set TaskController.RebuildSequence = seqList
     ' TODO (no other config yet): load config values from preset
-    
+
     Set pPresetObject = dX.Instance
     SetPresetObject = True
-    
+
     Exit Function
 Finally:
     If rollbackDenied Then
@@ -412,18 +412,18 @@ End Function
 Private Function UpdatePresetObject() As Boolean
     Dim dX As New DictionaryEx, Entry As New DictionaryEx
     If pPresetObject Is Nothing Then Set pPresetObject = DictionaryEx.Create().Instance
-    
+
     dX.Bind pPresetObject
-    
+
     dX.Add "dsLiveEd", JSON.Parse(JSON.Stringify(dX.GetValue("dsLiveEd", GetDefaultDsLiveEdPreset)), True, True)
-    
+
     Entry.Bind GetNamedEntryFromEntries(dX)
     If Entry.Instance Is Nothing Then Entry.Bind DictionaryEx.Create().Instance
-    
+
     Entry.Add "RebuildSequence", TaskController.RebuildSequence
     ' TODO: Error handling / rollback
     If Not SetNamedEntryToEntries(dX, Entry) Then Exit Function
-    
+
     dX.Add "dsLiveEd", JSON.Parse(JSON.Stringify(dX("dsLiveEd")), True, True)
     UpdatePresetObject = True
 End Function
@@ -434,10 +434,10 @@ End Function
 
 Private Function GetNamedEntryFromEntries(ByRef dX As DictionaryEx, Optional ByVal EntryName As Variant) As Scripting.Dictionary
     Dim i As Long, eList As ArrayListEx
-    
+
     If IsMissing(EntryName) Then EntryName = dX("dsLiveEd")("Config")("EntryPoint")
     Set eList = ArrayListEx.Create(dX("dsLiveEd")("Entries"))
-    
+
     For i = 0 To eList.Count - 1
         If eList(i)("Name") = EntryName Then
             Set GetNamedEntryFromEntries = eList(i)
@@ -451,25 +451,25 @@ End Function
 Private Function SetNamedEntryToEntries(ByRef dX As DictionaryEx, ByRef Entry As DictionaryEx, Optional ByVal EntryName As Variant) As Boolean
     On Error GoTo Finally
     Dim i As Long, eList As ArrayListEx, isMatch As Boolean
-    
+
     If IsMissing(EntryName) Then EntryName = Entry.GetValue("Name", dX("dsLiveEd")("Config")("EntryPoint"))
     Entry.Add "Name", EntryName
-    
+
     Set eList = ArrayListEx.Create(dX("dsLiveEd")("Entries"))
-    
+
     For i = 0 To eList.Count - 1
         If eList(i)("Name") = EntryName Then
             Set eList(i) = Entry.Instance
             isMatch = True
         End If
     Next i
-    
+
     If Not isMatch Then
         eList.Add Entry.Instance
     End If
-    
+
     DictionaryEx.Bind(dX("dsLiveEd")).Add("Entries", eList).Unbind
-    
+
     SetNamedEntryToEntries = True
 Finally:
 End Function
@@ -479,14 +479,13 @@ End Function
 
 Friend Sub TriggerLiveEditorWindowClose(Optional ByVal SkipAutoClose As Boolean = False)
     On Error Resume Next
-    
+
     If Not SkipAutoClose Then
         pLiveEditor.Dispose
     End If
     Set pLiveEditor = Nothing
     Set pGridController = Nothing
-    
+
     RaiseEvent OnClose
     On Error GoTo 0
 End Sub
-

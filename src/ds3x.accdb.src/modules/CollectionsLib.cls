@@ -84,14 +84,14 @@ End Property
 '
 Public Function GenerateSearchDefinition(ByVal SearchString As String) As Variant()
     Dim i As Long, k As Long, nGroups() As String, oGroups() As String, PatternMatching As Long, Tokens() As Variant
-    
+
     nGroups = Split(TokenizeArgs(SearchString), Chr$(0))
     If UBound(nGroups) = -1 Then
         GenerateSearchDefinition = Array(PartialMatch, Array())
         Exit Function
     End If
     ReDim Tokens(UBound(nGroups))
-    
+
     ' Retrieving Pattern Matching Type
     If SearchString Like "*[*?#[]*" Then
         PatternMatching = LikePattern
@@ -102,7 +102,7 @@ Public Function GenerateSearchDefinition(ByVal SearchString As String) As Varian
             PatternMatching = PartialMatch
         End If
     End If
-    
+
     For i = LBound(nGroups) To UBound(nGroups)
         oGroups = Split(nGroups(i), "|")
         For k = LBound(oGroups) To UBound(oGroups)
@@ -116,7 +116,7 @@ Public Function GenerateSearchDefinition(ByVal SearchString As String) As Varian
         Next k
         Tokens(i) = oGroups
     Next i
-    
+
     GenerateSearchDefinition = Array(PatternMatching, Tokens)
 End Function
 
@@ -129,7 +129,7 @@ End Function
 ' Siendo Items una colección iterable como la propiedad .Fields de un Recordset o simplemente un Array de valores.
 Public Function TryMatchSearchDefinitionIn(ByRef SearchDefinition As Variant, ByRef Items As Variant) As Boolean
     Dim sTerm As Variant, orTerm As Variant, isMatch As Boolean
-    
+
     For Each sTerm In SearchDefinition(1)  '.Tokens
         isMatch = False
         For Each orTerm In sTerm
@@ -147,7 +147,7 @@ Public Function TryMatchSearchDefinitionIn(ByRef SearchDefinition As Variant, By
         Next orTerm
         If Not isMatch Then Exit For
     Next sTerm
-    
+
     TryMatchSearchDefinitionIn = isMatch
 End Function
 
@@ -158,7 +158,7 @@ End Function
 ' al operador lógico OR.
 Public Function TryMatchSearchCriteriaIn(ByRef SearchCriteria As Variant, ByRef Items As Variant) As Boolean
     Dim sTerm As Variant, orTerm As Variant, isMatch As Boolean
-    
+
     For Each sTerm In Split(CStr(SearchCriteria), " ")
         If Len(sTerm) > 0 Then
             isMatch = False
@@ -173,7 +173,7 @@ Public Function TryMatchSearchCriteriaIn(ByRef SearchCriteria As Variant, ByRef 
             If Not isMatch Then Exit For
         End If
     Next sTerm
-    
+
     TryMatchSearchCriteriaIn = isMatch
 End Function
 
@@ -200,7 +200,7 @@ End Function
 
 Private Function TryLikePatternMatchIn(ByRef sTerm As String, ByRef Items As Variant) As Boolean
     Dim Item As Variant
-    
+
     For Each Item In Items
         If VBA.Mid(CStr(Nz(Item, "")), 5, 1) = "-" Then
             If AsCurrentLocale(CStr(Item)) Like sTerm Then
@@ -218,7 +218,7 @@ End Function
 
 Private Function TryExactStringMatchIn(ByRef sTerm As String, ByRef Items As Variant) As Boolean
     Dim Item As Variant
-    
+
     For Each Item In Items
         If VBA.Mid(CStr(Nz(Item, "")), 5, 1) = "-" Then
             If AsCurrentLocale(CStr(Item)) = sTerm Then
@@ -239,12 +239,12 @@ End Function
 
 Private Function AsCurrentLocale(ByRef Value As String) As String
     On Error GoTo Fallback
-    
+
     If VBA.Mid(Value, 8, 1) = "-" Then
         AsCurrentLocale = DateValue(Value)
         Exit Function
     End If
-    
+
 Fallback:
     AsCurrentLocale = Value
 End Function
@@ -273,7 +273,7 @@ End Function
 
 Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitter As String = "=") As Variant
     Dim t(0 To 1) As Variant, r As Variant
-    
+
     r = VBA.Split(Target, Splitter, 2)
     t(0) = r(0)
     If UBound(r) = 1 Then
@@ -289,7 +289,7 @@ Public Function ParseTokenizedArg(ByVal Target As String, Optional ByVal Splitte
     Else
         t(1) = True
     End If
-    
+
     ParseTokenizedArg = t
 End Function
 
@@ -312,7 +312,7 @@ Public Function StringLineSlices(ByRef SearchString As String, ByRef Slices As A
     iMax = Len(SearchString)
     IncompleteSlice = Empty
     r = Index
-    
+
     For i = Index To iMax
         Select Case VBA.Mid$(SearchString, i, 1)
             Case cQuote: bQuotes = Not bQuotes
@@ -344,7 +344,7 @@ Public Function StringLineSlicesV2(ByRef SearchString As String, ByRef Slices As
                                    Optional ByVal cQuote As String = """") As Boolean
     Dim i As Long, iLf As Long, iQt As Long, uStr As String, nQt As Long
     IncompleteSlice = Empty
-    
+
     i = Index
     iLf = InStr(i, SearchString, vbLf, vbBinaryCompare)
     Do While (iLf > 0)
@@ -456,4 +456,3 @@ End Sub
 
 Private Function C2Array2dEx(ByRef Value As Variant) As Array2dEx: Set C2Array2dEx = Value: End Function
 Private Function C2ArraySliceGroup(ByRef Value As Variant) As ArraySliceGroup: Set C2ArraySliceGroup = Value: End Function
-

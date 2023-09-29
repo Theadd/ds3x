@@ -57,7 +57,7 @@ End Property
 Public Property Let SliceGroups(ByRef Value As Variant)
     Dim v As Variant, r As Long
     If Not pGroups Is Nothing Then Err.Raise 70
-    
+
     Set pGroups = ArrayListEx.Create(Value)
 End Property
 
@@ -109,24 +109,24 @@ End Function
 
 Public Function AddRange(ByRef Target As Variant) As ArraySliceGroup
     Dim t As ArraySliceGroup, c As Long, aX As ArrayListEx
-    
+
     If IsObject(Target) Then
         If TypeOf Target Is ArraySliceGroup Then Set t = C2ArraySliceGroup(Target)
     End If
     If t Is Nothing Then Set t = Create(Target)
     Set aX = ArrayListEx.Create()
-    
+
     For c = 0 To pGroups.Count - 1
         aX.Add C2ArraySlice(pGroups(c)).Add(t.SliceAt(c))
     Next c
-    
+
     Set AddRange = New ArraySliceGroup
     AddRange.SliceGroups = aX.ToArray()
 End Function
 
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As ArraySliceGroup
     Dim c As Variant, aX As ArrayListEx
-    
+
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If Index >= Count Then
         Index = IIf(Count - 1 < 0, 0, Count - 1)
@@ -141,7 +141,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array(ColumnIndexes)
     End If
     Set aX = ArrayListEx.Create()
-    
+
     If Index = 0 And GetCount = Count Then
         For Each c In ColumnIndexes
             aX.Add C2ArraySlice(pGroups(CLng(c)))
@@ -151,7 +151,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
             aX.Add C2ArraySlice(pGroups(CLng(c))).Slice(Index, GetCount)
         Next c
     End If
-    
+
     Set GetRange = New ArraySliceGroup
     GetRange.SliceGroups = aX.ToArray()
 End Function
@@ -174,13 +174,13 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
     nRows = Count: iLast = -16
     rMax = ArrayListEx.CountElementsIn(RowIndexes) - 1
     Set aX = ArrayListEx.Create()
-    
+
     For r = 0 To rMax
         wasValid = isValid
         i = CLng(RowIndexes(r)) + ModIndex
         isSequence = (r = 0 Or i - iLast = 1)
         isValid = (i >= 0 And i < nRows)
-        
+
         If wasValid Then
             If (Not isValid Or Not isSequence) Then
                 aX.Add Array(gStartIndex, iLast - gStartIndex + 1)
@@ -194,15 +194,15 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
                 If r = rMax Then aX.Add Array(gStartIndex, i - gStartIndex + 1)
             End If
         End If
-        
+
         iLast = i
     Next r
-    
+
     Set gX = ArrayListEx.Create()
     For Each vSlice In pGroups
         gX.Add C2ArraySlice(vSlice).SliceAllRanges(aX)
     Next vSlice
-    
+
     Set GetRows = New ArraySliceGroup
     GetRows.SliceGroups = gX.ToArray()
 End Function
@@ -265,7 +265,7 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal I
     ReDim t(0 To Count)
     ReDim s(0 To uc)
     t(UBound(t)) = ""
-    
+
     If InLocalFormat Then
         For i = 0 To UBound(t) - 1
             For c = 0 To uc
@@ -309,7 +309,7 @@ End Sub
 
 Private Function CreateSliceGroups(ByRef ArrayLike As Variant) As ArrayListEx
     Dim aX As ArrayListEx, nRows As Long, c As Long, iAux As Long
-    
+
     If IsObject(ArrayLike) Then
         Set aX = ArrayListEx.Create()
         If TypeOf ArrayLike Is ICollectionEx Then
@@ -339,7 +339,7 @@ Private Function GetSlicedExcelRangeColumn(ByRef Target As Excel.Range, ByVal In
     Dim sX As ArraySlice, ct As Long, ctCap As Long, nCts As Long
     Const dsChunkSize As Long = 50000
     nCts = CLng(Int((GetCount - 1) / dsChunkSize))
-    
+
     With Target
         For ct = 0 To nCts
             ctCap = IIf(ct = nCts, ((GetCount - 1) Mod dsChunkSize) + 1, dsChunkSize)
@@ -350,7 +350,7 @@ Private Function GetSlicedExcelRangeColumn(ByRef Target As Excel.Range, ByVal In
             End If
         Next ct
     End With
-    
+
     Set GetSlicedExcelRangeColumn = sX
 End Function
 
