@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "28/09/2023 23:28:56",
-    "ExportDate": "29/09/2023 0:52:40",
+    "ExportDate": "29/09/2023 20:02:44",
     "FullExportDate": "31/07/2023 23:15:04",
     "OptionsHash": "90acf76",
     "LastMergedCommit": "",
@@ -162,12 +162,12 @@
       },
       "Modules": {
         "Array2dEx.cls": {
-          "FileHash": "4e78130",
-          "ExportDate": "29/09/2023 0:52:40",
-          "SourceModified": "29/09/2023 0:52:40",
-          "FilePropertiesHash": "914c36a",
+          "FileHash": "f52cca1",
+          "ExportDate": "29/09/2023 20:02:44",
+          "SourceModified": "29/09/2023 20:02:44",
+          "FilePropertiesHash": "decef5c",
           "ImportDate": "28/09/2023 23:28:52",
-          "OtherHash": "ff3dde6"
+          "OtherHash": "8796fc0"
         },
         "ArrayList.cls": {
           "FileHash": "45ac76b",
