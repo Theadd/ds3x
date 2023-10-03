@@ -130,7 +130,7 @@ Public Function Unbind() As Array2dEx
     Err.Raise 17, , "Can't perform requested operation. Unbinding an Array2dEx can't be done."
 End Function
 
-Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
     Set CopyToRange = Me
     If Not Count > 0 Then Exit Function
 
@@ -149,7 +149,7 @@ UserLocaleFail:
     Resume Next
 End Function
 
-Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
+Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
     Dim t() As Variant
     Set CopySliceToRange = Me
     If Not (Count > 0 And GetCount > 0) Then Exit Function
