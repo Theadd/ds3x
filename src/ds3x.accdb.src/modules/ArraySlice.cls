@@ -180,7 +180,7 @@ Public Sub CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUse
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
                     ReDim t(0 To v(3) - 1, 0 To 0)
-                    MemoryLib.VariantArrayClone VarPtr(k(0, 0)), VarPtr(t(0, 0)), v(3)
+                    VariantArrayClone VarPtr(t(0, 0)), VarPtr(k(0, 0)), v(3)
                     If ApplyUserLocale Then
                         RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).FormulaR1C1Local = t
                     Else
@@ -208,7 +208,7 @@ Public Sub CloneInto2dArray(ByRef Target2dArray() As Variant, ByVal TargetIndex 
                     iAux = CLng(.Instance.AbsolutePosition)
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.VariantArrayClone VarPtr(k(0, 0)), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), v(3)
+                    VariantArrayClone VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), VarPtr(k(0, 0)), v(3)
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else
@@ -231,7 +231,7 @@ Public Sub CloneIntoArray(ByRef TargetArray() As Variant, Optional ByVal TargetI
                     iAux = CLng(.Instance.AbsolutePosition)
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.VariantArrayClone VarPtr(k(0, 0)), VarPtr(TargetArray(TargetIndex + r)), v(3)
+                    VariantArrayClone VarPtr(TargetArray(TargetIndex + r)), VarPtr(k(0, 0)), v(3)
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else

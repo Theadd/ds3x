@@ -394,7 +394,7 @@ Public Function ArrayRange(ByVal Index As Long, ByVal GetCount As Long) As Long(
     For i = 0 To GetCount - 1
         t(i) = Index + i
     Next i
-    MemoryLib.ReassignArrayTo ArrayRange, t
+    ReassignArrayTo ArrayRange, t
 End Function
 
 Public Function ColumnLetter(ByVal ColumnIndex As Long) As String

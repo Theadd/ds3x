@@ -56,14 +56,14 @@ End Property
 
 
 Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByVal TargetMemoryAddress As LongPtr)
-    MemoryLib.VariantArrayClone VarPtr(pInstance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
+    VariantArrayClone TargetMemoryAddress, VarPtr(pInstance(Index, ColumnIndex)), GetCount
 End Sub
 
 Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
     If IsEmpty(Instance) Then
         ReDim pInstance(0 To 0, 0 To 0)
-        Instance = MemoryLib.GetArrayByRef(pInstance)
-        MemoryLib.ReassignArrayTo Instance, TargetArray
+        Instance = GetArrayByRef(pInstance)
+        ReassignArrayTo Instance, TargetArray
     Else
         Err.Raise 13, , "Can't reassign an Array2dEx Instance to another 2D Array once initialized."
     End If
@@ -154,7 +154,7 @@ Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, By
     Set CopySliceToRange = Me
     If Not (Count > 0 And GetCount > 0) Then Exit Function
     ReDim t(0 To GetCount - 1, 0 To 0)
-    MemoryLib.VariantArrayClone VarPtr(pInstance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
+    VariantArrayClone VarPtr(t(0, 0)), VarPtr(pInstance(Index, ColumnIndex)), GetCount
 
     With RangeObject.Resize(GetCount, 1)
         If ApplyUserLocale Then
@@ -205,8 +205,8 @@ Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array
     Set CreateFromExcelRange = New Array2dEx
     t = TargetRange.Value
 
-    MemoryLib.UpdateLBound t, 1, 0
-    MemoryLib.UpdateLBound t, 2, 0
+    UpdateLBound t, 1, 0
+    UpdateLBound t, 2, 0
 
     CreateFromExcelRange.SetInstanceByRef t
 End Function

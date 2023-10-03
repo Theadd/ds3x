@@ -1177,14 +1177,14 @@ Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef L
 
     For r = 0 To rMax
         linePtr = sPtr + ((sLines(r)(0) - 1) * INT_SIZE) - 4
-        MemoryLib.MemLong(linePtr - 4) = (sLines(r)(1) * 2) + 4
-        MemoryLib.MemLongPtr(VarPtr(line)) = linePtr
+        MemLong(linePtr - 4) = (sLines(r)(1) * 2) + 4
+        MemLongPtr(VarPtr(line)) = linePtr
         i = 3
         c = 0
         iDel = InStr(i, line, Delimiter, vbBinaryCompare)
         Do While (iDel > 0)
-            MemoryLib.MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
-            MemoryLib.MemLongPtr(VarPtr(uStr)) = linePtr + ((i - 1) * INT_SIZE)
+            MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
+            MemLongPtr(VarPtr(uStr)) = linePtr + ((i - 1) * INT_SIZE)
             iQt = InStr(1, uStr, cQuote, vbBinaryCompare)
             nQt = Sgn(iQt)
             Do
@@ -1195,7 +1195,7 @@ Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef L
                 If (nQt Mod 2) = 1 Then
                     iQt = iDel - i
                     iDel = InStr(1 + i + iQt, line, Delimiter, vbBinaryCompare)
-                    MemoryLib.MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
+                    MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
                 End If
             Loop Until ((nQt Mod 2) = 0)
             If VBA.Mid$(uStr, 1, 1) = cQuote Then
@@ -1224,8 +1224,8 @@ Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef L
             End If
         Loop
     Next r
-    MemoryLib.MemLongPtr(VarPtr(uStr)) = CLngPtr(0)
-    MemoryLib.MemLongPtr(VarPtr(line)) = CLngPtr(0)
+    MemLongPtr(VarPtr(uStr)) = CLngPtr(0)
+    MemLongPtr(VarPtr(line)) = CLngPtr(0)
     a2X.SetInstanceByRef t
 End Sub
 
