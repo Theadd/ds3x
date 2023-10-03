@@ -438,7 +438,6 @@ Begin Form
                     PressedForeThemeColorIndex =7
                     PressedForeTint =100.0
                     GroupTable =6
-                    WebImagePaddingTop =1
                 End
             End
         End
@@ -565,12 +564,12 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 
 Public Sub Setup()
     Dim r As ds3xGlobals.RECT, B As ds3xGlobals.BOUNDS, t As Long
-    
+
     Set WorksheetNumbers = Me.DS_WORKSHEET_NUMBERS.Form
-    
+
     r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
     B = ScreenLib.RectToBounds(r)
-    
+
     t = pWorksheetNumbers.MaxContentWidthLimit
     Me.Width = t
     Me.FormDetail.Height = CLng(Min(B.h * 1.95, 31500))
@@ -593,7 +592,7 @@ End Sub
 Private Sub DS_FULL_AXIS_SCROLLING_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     Static lastPointerCapture As Long
     Dim pCaptured As Boolean: pCaptured = pScrollview.PointerCapture
-    
+
     If CLng(pCaptured) - 1 <> lastPointerCapture Then
         lastPointerCapture = CLng(pCaptured) - 1
         If pCaptured Then ScreenLib.MouseMoveCursor = True
@@ -619,7 +618,7 @@ End Sub
 Private Sub DS_HC_1_0_Click()
     Me.HiddenControl.SetFocus
     DoEvents
-    
+
     pScrollview.TriggerClickOnSelectAll
 End Sub
 

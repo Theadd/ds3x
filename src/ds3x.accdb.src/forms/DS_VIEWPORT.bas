@@ -514,7 +514,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer): pScrollview.OnKeyU
 
 Public Sub Setup()
     Dim r As ds3xGlobals.RECT, B As ds3xGlobals.BOUNDS, t As Long, c As Long
-    
+
     Set Worksheet = Me.DS_WORKSHEET.Form
     Set pWorksheet.Viewport = Me
     Set WorksheetHeaders = Me.DS_WORKSHEET_HEADERS.Form
@@ -523,10 +523,10 @@ Public Sub Setup()
     pWorksheet.Setup
     pWorksheetHeaders.Setup
     pWorksheetNumbers.Setup PageSize * PageCount
-    
+
     r = ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center), True)
     B = ScreenLib.RectToBounds(r)
-    
+
     t = pWorksheet.MaxContentWidthLimit
     Me.Width = t
     With Me.DS_WORKSHEET_HEADERS
@@ -556,7 +556,7 @@ End Function
 Public Sub ScrollTo(ByVal X As Double, ByVal Y As Double)
     Dim sView As TViewportState
     sView = GetViewportStateAt(X, Y)
-    
+
     If This.TrackIndex <> sView.TrackIndex Or This.PageIndex <> sView.PageIndex Or pTrackColumnSizesInCache <> sView.ColumnsToLargeChangeTrack Then
         pWorksheet.Painting = False
         pWorksheetHeaders.Painting = False
@@ -585,17 +585,17 @@ End Sub
 
 Private Function GetViewportStateAt(ByVal X As Double, ByVal Y As Double) As TViewportState
     Dim t As TViewportState, maxTrackWidth As Long, cellWidth As Long, viewWidth As Long, cellHeight As Long
-    
+
     t.ScrollPosX = X
     t.ScrollPosY = Y
-    
+
     maxTrackWidth = Worksheet.MaxContentWidthLimit
     cellWidth = Worksheet.GridCellSizeX
     cellHeight = Worksheet.GridCellSizeY
     viewWidth = Scrollview.ScrollPageSizeX
-    
+
     t.ColumnsToLargeChangeTrack = Max(CLng((maxTrackWidth - viewWidth) / cellWidth) - 1, 1)
-    
+
     t.FirstVisibleColumn = CLng(Int(X / CDbl(cellWidth)))
     t.FirstVisibleRow = CLng(Int(Y / CDbl(cellHeight)))
     t.FirstVisibleColumnPositionModX = CLng(ModFunc(X, CDbl(cellWidth)))
@@ -606,55 +606,55 @@ Private Function GetViewportStateAt(ByVal X As Double, ByVal Y As Double) As TVi
     t.FirstVisibleRowInPage = t.FirstVisibleRow - (t.PageIndex * PageSize * NumPagesInLargeChangeRows)
     t.TrackPositionModX = (t.FirstVisibleColumnInTrack * cellWidth) + t.FirstVisibleColumnPositionModX
     t.PagePositionModY = (t.FirstVisibleRowInPage * cellHeight) + t.FirstVisibleRowPositionModY
-    
+
     GetViewportStateAt = t
 End Function
 
 Public Function GetScrollXTo(ByVal ColumnIndex As Long) As Double
     Dim cellWidth As Long, viewWidth As Long, curViewMinX As Double, curViewMaxX As Double
     Dim targetCellMinX As Double, targetCellMaxX As Double, X As Double
-    
+
     cellWidth = Worksheet.GridCellSizeX
     viewWidth = Scrollview.ScrollPageSizeX
-    
+
     X = CDbl(cellWidth) * CDbl(ColumnIndex)
     targetCellMinX = Max(X - CDbl(cellWidth), 0)
     targetCellMaxX = X + CDbl(3 * cellWidth)
-    
+
     curViewMinX = This.ScrollPosX
     curViewMaxX = curViewMinX + CDbl(viewWidth)
-    
+
     X = This.ScrollPosX
     If curViewMinX > targetCellMinX Then
         X = targetCellMinX
     ElseIf curViewMaxX < targetCellMaxX Then
         X = targetCellMaxX - CDbl(viewWidth)
     End If
-    
+
     GetScrollXTo = X
 End Function
 
 Public Function GetScrollYTo(ByVal RowIndex As Long) As Double
     Dim cellHeight As Long, viewHeight As Long, curViewMinY As Double, curViewMaxY As Double
     Dim targetCellMinY As Double, targetCellMaxY As Double, Y As Double
-    
+
     cellHeight = Worksheet.GridCellSizeY
     viewHeight = Scrollview.ScrollPageSizeY
-    
+
     Y = CDbl(cellHeight) * CDbl(RowIndex)
     targetCellMinY = Max(Y - CDbl(cellHeight), 0)
     targetCellMaxY = Y + CDbl(3 * cellHeight)
-    
+
     curViewMinY = This.ScrollPosY
     curViewMaxY = curViewMinY + CDbl(viewHeight)
-    
+
     Y = This.ScrollPosY
     If curViewMinY > targetCellMinY Then
         Y = targetCellMinY
     ElseIf curViewMaxY < targetCellMaxY Then
         Y = targetCellMaxY - CDbl(viewHeight)
     End If
-    
+
     GetScrollYTo = Y
 End Function
 
@@ -679,7 +679,7 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
     Set dsT = Scrollview.Table
     ColumnStartIndex = TrackIndex * pTrackColumnSizesInCache
     nCols = Worksheet.MaxAvailColumns
-    
+
     If ColumnStartIndex >= dsT.ColumnCount Then
         Set rX = RecordsetEx.CreateBlank(PageSize * PageCount, nCols)
     Else
@@ -703,7 +703,7 @@ Private Function GetTrack(ByVal TrackIndex As Long, ByVal PageIndex As Long) As 
             Set rX = RecordsetEx.Create(dsT2.IndexRecordset)
         End If
     End If
-    
+
     Set GetTrack = rX
 End Function
 

@@ -78,13 +78,13 @@ Public Property Get GeneratedValue() As Variant: Assign GeneratedValue, pTaskRes
 
 Public Sub AddTask(ByVal TaskName As String, ByVal TaskValues As Variant, Optional ByVal TaskId As String = "")
     Dim sIndex As Long: sIndex = SequenceIndex
-    
+
     If sIndex < RebuildSequence.Count - 1 Then
         RebuildSequence().Insert sIndex + 1, GenerateTask(TaskName, TaskValues, TaskId)
     Else
         RebuildSequence().Add GenerateTask(TaskName, TaskValues, TaskId)
     End If
-    
+
     MakeRebuildSequenceDirtyOn sIndex + 1
 
     RaiseEvent OnRebuildSequenceChange
@@ -93,12 +93,12 @@ End Sub
 
 Public Sub RemoveTask(ByVal TaskId As String)
     Dim aX As ArrayListEx, TaskIndex As Long, iAux As Long
-    
+
     Set aX = ArrayListEx.Create(RebuildSequence)
     If TryGetIndexOfTaskId(TaskId, TaskIndex) Then
         aX.RemoveAt TaskIndex
         Set RebuildSequence = aX
-        
+
         If Not TryGetIndexOfTaskId(TaskId, iAux) Then
             If pTaskResults.Exists(TaskId) Then
                 Set pTaskResults(TaskId) = Nothing
@@ -113,14 +113,14 @@ Public Sub RemoveTask(ByVal TaskId As String)
             Rebuild -1
         End If
     End If
-    
+
 End Sub
 
 ' Used to update an existing task at specified index
 Public Sub SetTask(ByVal Task As Scripting.Dictionary, ByVal Index As Long)
     Set pRebuildSequence(Index) = Task
     MakeRebuildSequenceDirtyOn Index
-    
+
     RaiseEvent OnRebuildSequenceChange
     SequenceIndex = Index
 End Sub
@@ -134,7 +134,7 @@ End Sub
 
 Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
     Dim i As Long, oTable As dsTable, dX As New DictionaryEx, oWorksheet As xlSheetsEx, bFailed As Boolean
-    
+
     RaiseEvent OnBusyChange(True)
     If TargetIndex >= pDirtyRebuildIndex Then
         If TargetIndex > pRebuildSequence.Count - 1 Then Err.Raise 9, , "Subscript out of range (Array index out of bounds)"
@@ -152,7 +152,7 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
             pDirtyRebuildIndex = i + 1
         Next i
     End If
-    
+
     On Error GoTo 0
     If TryGetSourceTableForSequence(TargetIndex + 1, oTable) Then
         Set pTable = oTable
@@ -161,7 +161,7 @@ Private Function Rebuild(ByVal TargetIndex As Long) As Boolean
             Set pWorksheet = oWorksheet
         End If
     End If
-    
+
 ExitRebuild:
     RaiseEvent OnTableChange
     RaiseEvent OnBusyChange(False)
@@ -178,13 +178,13 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Static dX As New DictionaryEx
     Static cb As New Callback
     Dim t() As Variant, TaskName As String, TaskParams As Variant
-    
+
     dsApp.GlobalVMemAnalysis "", False
     dX.Bind Task
     TaskName = dX("TaskName")
     TaskParams = TaskInfo(TaskName)(DS_T_PARAMS)(2)
     cb.Bind pAvailableTasks, TaskName
-    
+
     If TryRebuildTaskValues(t, TaskParams, dX.GetValue("Values", Array())) Then
         Select Case GetReturnTypeOf(dX("TaskName"))
             Case "Table"
@@ -199,7 +199,7 @@ Private Sub RebuildTask(ByRef Task As Scripting.Dictionary)
     Else
         Err.Raise 13
     End If
-    
+
     dsApp.GlobalVMemAnalysis "@RebuildTask(" & dX("Id") & " " & TaskName & ")"
 End Sub
 
@@ -243,7 +243,7 @@ End Sub
 
 Private Sub SetRebuildSequence(ByRef Value As ArrayListEx)
     Dim ds1 As dsTable, rs1 As xlSheetsEx
-    
+
     If pDataSources.Exists("DS1") Then
         Set ds1 = pDataSources("DS1")
     End If
@@ -272,7 +272,7 @@ End Sub
 Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
     On Error Resume Next
     Dim Index As Long, dsT As dsTable, xlS As xlSheetsEx, sourceType As String
-    
+
     Select Case TypeName(Value)
         Case "dsTable"
             Set dsT = Value
@@ -283,7 +283,7 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
         Case Else
             Stop
     End Select
-    
+
     If TryGetIndexOfTaskId(TaskId, Index) Then
         MakeRebuildSequenceDirtyOn Index
         Select Case sourceType
@@ -296,7 +296,7 @@ Private Sub SetDataSource(ByVal TaskId As String, ByRef Value As Object)
     Else
         Err.Raise 327, , "DataSource """ & TaskId & """ not found."
     End If
-    
+
     RaiseEvent OnDataSourceChange(TaskId)
     On Error GoTo 0
 End Sub
@@ -304,7 +304,7 @@ End Sub
 Friend Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Long) As Boolean
     Dim i As Long
     On Error GoTo Finally
-    
+
     For i = 0 To pRebuildSequence.Count - 1
         If pRebuildSequence(i)("Id") = TaskId Then
             OutIndex = i
@@ -312,7 +312,7 @@ Friend Function TryGetIndexOfTaskId(ByVal TaskId As String, ByRef OutIndex As Lo
             Exit Function
         End If
     Next i
-    
+
 Finally:
 End Function
 
@@ -321,7 +321,7 @@ Private Sub SetActiveSequenceIndex(ByVal Value As Long)
     If Value < 0 Then Exit Sub
     If Value >= RebuildSequence.Count Then Exit Sub
     On Error GoTo Finally
-    
+
     pSequenceIndex = Value
     rebuildFail = Not Rebuild(Value)
 Finally:
@@ -331,7 +331,7 @@ End Sub
 
 Private Function GetNextSequenceId(ByVal IdPrefix As String) As String
     Dim Item As Variant, dX As New DictionaryEx, curId As Long, maxId As Long
-    
+
     For Each Item In RebuildSequence
         dX.Bind Item
         If dX("Id") Like IdPrefix & "*" Then
@@ -339,7 +339,7 @@ Private Function GetNextSequenceId(ByVal IdPrefix As String) As String
             If curId > maxId Then maxId = curId
         End If
     Next Item
-    
+
     GetNextSequenceId = IdPrefix & CStr(maxId + 1)
 End Function
 
@@ -353,10 +353,10 @@ End Function
 
 Private Sub MakeRebuildSequenceDirtyOn(ByVal Index As Long)
     Dim i As Long
-    
+
     If pDirtyRebuildIndex > Index Then
         pDirtyRebuildIndex = IIf(Index >= 0, Index, 0)
-        
+
         On Error Resume Next
         For i = pDirtyRebuildIndex To pRebuildSequence.Count - 1
             pTaskResults.Remove pRebuildSequence(i)("Id")
@@ -368,7 +368,7 @@ End Sub
 ' Provides the dsTable object from the previous sequence to be used at the specified sequence index or .DataSource("DS1") when Index is 0.
 Private Function TryGetSourceTableForSequence(ByVal Index As Long, ByRef OutTable As dsTable) As Boolean
     On Error GoTo Finally
-    
+
     Do While True
         If Index <= 0 Then
             Set OutTable = DataSource("DS1")
@@ -383,7 +383,7 @@ Private Function TryGetSourceTableForSequence(ByVal Index As Long, ByRef OutTabl
             Index = Index - 1
         End If
     Loop
-    
+
     TryGetSourceTableForSequence = Not (OutTable Is Nothing)
 Finally:
 End Function
@@ -391,7 +391,7 @@ End Function
 ' Provides the xlSheetsEx object from the previous sequence to be used at the specified sequence index.
 Private Function TryGetSourceWorksheetForSequence(ByVal Index As Long, ByRef OutWorksheet As xlSheetsEx) As Boolean
     On Error GoTo Finally
-    
+
     Do While True
         If Index <= 0 Then
             Set OutWorksheet = DataSource("XS1")
@@ -406,7 +406,7 @@ Private Function TryGetSourceWorksheetForSequence(ByVal Index As Long, ByRef Out
             Index = Index - 1
         End If
     Loop
-    
+
     TryGetSourceWorksheetForSequence = Not (OutWorksheet Is Nothing)
 Finally:
 End Function
@@ -435,13 +435,13 @@ End Sub
 Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As Variant, ByVal TaskValues As Variant) As Boolean
     On Error GoTo 0
     Dim i As Long, vItem As Variant, shouldGuessValue As Boolean
-    
+
     If UBound(TaskParams) < 0 Then
         t = Array()
     Else
         ReDim t(0 To UBound(TaskParams))
     End If
-    
+
     For i = 0 To UBound(TaskParams)
         shouldGuessValue = False
         If i > UBound(TaskValues) Then
@@ -496,7 +496,7 @@ Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As 
             Else
                 shouldGuessValue = True
             End If
-            
+
             If shouldGuessValue Then
                 Select Case TaskParams(i)(1)
                     Case "Table", "Worksheet"
@@ -523,7 +523,7 @@ Private Function TryRebuildTaskValues(ByRef t() As Variant, ByVal TaskParams As 
             End If
         End If
     Next i
-    
+
     TryRebuildTaskValues = True
 End Function
 
@@ -540,22 +540,22 @@ End Function
 Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
     Dim i As Long, gcKeys As Variant, iMax As Long, cKey As LongPtr, isMatch As Boolean
     Dim iTR As Long, iDS As Long, trKeys As Variant, dsKeys As Variant
-    
+
     gcKeys = pGarbageCollector.Keys()
     trKeys = pTaskResults.Keys()
     dsKeys = pDataSources.Keys()
     iMax = UBound(gcKeys)
-    
+
     On Error GoTo StopOnError
 '    Debug.Print "[DEBUG] Running GarbageCollector:"
 '    Debug.Print "    TaskResults.Keys: " & JSON.Stringify(trKeys)
 '    Debug.Print "    DataSources.Keys: " & JSON.Stringify(dsKeys)
 '    Debug.Print "    GarbageCollector.Keys: " & JSON.Stringify(gcKeys)
-    
+
     For i = iMax To 0 Step -1
         cKey = gcKeys(i)
         isMatch = False
-        
+
         For iTR = 0 To UBound(trKeys)
             If IsObject(pTaskResults(trKeys(iTR))) Then
                 If CStr(ObjPtr(pTaskResults(trKeys(iTR)))) = cKey Then
@@ -564,7 +564,7 @@ Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
                 End If
             End If
         Next iTR
-        
+
         If Not isMatch Then
             For iDS = 0 To UBound(dsKeys)
                 If IsObject(pDataSources(dsKeys(iDS))) Then
@@ -575,7 +575,7 @@ Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
                 End If
             Next iDS
         End If
-        
+
         If Not isMatch Then
             If SafeDisposeResource(pGarbageCollector(gcKeys(i)), DisposeAll) Then
                 On Error Resume Next
@@ -585,7 +585,7 @@ Public Sub FreeUnlinkedResources(Optional ByVal DisposeAll As Boolean = False)
             End If
         End If
     Next i
-    
+
     Exit Sub
 StopOnError:
     Debug.Print "[ERROR] @dsTaskController.FreeUnlinkedResources() - " & Err.Description
@@ -594,7 +594,7 @@ End Sub
 
 Private Function SafeDisposeResource(ByRef TargetResource As Object, Optional ByVal DisposeAll As Boolean = False) As Boolean
     On Error GoTo DisposeFailed
-    
+
     If Not DisposeAll And TypeOf TargetResource Is dsQuery Then Exit Function
     TargetResource.Dispose
 Finally:
@@ -604,5 +604,3 @@ DisposeFailed:
     Debug.Print "[ERROR] @dsTaskController.SafeDisposeResource() - TypeName: " & TypeName(TargetResource)
     Resume Finally
 End Function
-
-

@@ -180,7 +180,7 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
         Case VBA.vbDate
             ' Date
             json_DateStr = ConvertToIso(VBA.CDate(jsonValue))
-    
+
             Stringify = """" & json_DateStr & """"
         Case VBA.vbString
             ' String (or large number encoded as string)
@@ -205,17 +205,17 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                     json_InnerIndentation = VBA.Space$((json_CurrentIndentation + 2) * Whitespace)
                 End If
             End If
-    
+
             ' Array
             json_BufferAppend json_Buffer, "[", json_BufferPosition, json_BufferLength
-    
+
             On Error Resume Next
-    
+
             json_LBound = LBound(jsonValue, 1)
             json_UBound = UBound(jsonValue, 1)
             json_LBound2D = LBound(jsonValue, 2)
             json_UBound2D = UBound(jsonValue, 2)
-    
+
             If json_LBound >= 0 And json_UBound >= 0 Then
                 For json_Index = json_LBound To json_UBound
                     If json_IsFirstItem Then
@@ -224,14 +224,14 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         ' Append comma to previous line
                         json_BufferAppend json_Buffer, ", ", json_BufferPosition, json_BufferLength
                     End If
-    
+
                     If json_LBound2D >= 0 And json_UBound2D >= 0 Then
                         ' 2D Array
                         If json_PrettyPrint Then
                             json_BufferAppend json_Buffer, vbNewLine, json_BufferPosition, json_BufferLength
                         End If
                         json_BufferAppend json_Buffer, json_Indentation & "[", json_BufferPosition, json_BufferLength
-    
+
                         For json_Index2D = json_LBound2D To json_UBound2D
                             If json_IsFirstItem2D Then
                                 json_IsFirstItem2D = False
@@ -239,9 +239,9 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                             Else
                                 json_BufferAppend json_Buffer, ", ", json_BufferPosition, json_BufferLength
                             End If
-    
+
                             json_Converted = Stringify(jsonValue(json_Index, json_Index2D), , json_CurrentIndentation + 2)
-    
+
                             ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
                             If json_Converted = "" Then
                                 ' (nest to only check if converted = "")
@@ -249,21 +249,21 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                                     json_Converted = "null"
                                 End If
                             End If
-    
+
                             If json_PrettyPrint2D Then
                                 json_Converted = vbNewLine & json_InnerIndentation & json_Converted
                             End If
-    
+
                             json_BufferAppend json_Buffer, json_Converted, json_BufferPosition, json_BufferLength
                         Next json_Index2D
-    
+
                         If json_PrettyPrint2D Then
                             json_BufferAppend json_Buffer, vbNewLine, json_BufferPosition, json_BufferLength
                             json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
                         Else
                             json_BufferAppend json_Buffer, "]", json_BufferPosition, json_BufferLength
                         End If
-    
+
                         json_IsFirstItem2D = True
                     Else
                         ' 1D Array
@@ -276,7 +276,7 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         Else
                             json_Converted = Stringify(jsonValue(json_Index), , json_CurrentIndentation + 1)
                         End If
-                        
+
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
                         If json_Converted = "" Then
                             ' (nest to only check if converted = "")
@@ -284,31 +284,31 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                                 json_Converted = "null"
                             End If
                         End If
-    
+
                         If json_PrettyPrint Then
                             json_Converted = vbNewLine & json_Indentation & json_Converted
                         End If
-    
+
                         json_BufferAppend json_Buffer, json_Converted, json_BufferPosition, json_BufferLength
                     End If
                 Next json_Index
             End If
-    
+
             On Error GoTo 0
-    
+
             If json_PrettyPrint Then
                 json_BufferAppend json_Buffer, vbNewLine, json_BufferPosition, json_BufferLength
-    
+
                 If VBA.VarType(Whitespace) = VBA.vbString Then
                     json_Indentation = VBA.String$(json_CurrentIndentation, Whitespace)
                 Else
                     json_Indentation = VBA.Space$(json_CurrentIndentation * Whitespace)
                 End If
             End If
-    
+
             json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
             Stringify = json_BufferToString(json_Buffer, json_BufferPosition)
-    
+
         Case VBA.vbObject
             If json_PrettyPrint Then
                 If VBA.VarType(Whitespace) = VBA.vbString Then
@@ -317,7 +317,7 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                     json_Indentation = VBA.Space$((json_CurrentIndentation + 1) * Whitespace)
                 End If
             End If
-    
+
             ' Dictionary
             Select Case VBA.TypeName(jsonValue)
                 Case "Dictionary", "DictionaryEx"
@@ -330,49 +330,49 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         Else
                             json_SkipItem = False
                         End If
-        
+
                         If Not json_SkipItem Then
                             If json_IsFirstItem Then
                                 json_IsFirstItem = False
                             Else
                                 json_BufferAppend json_Buffer, ", ", json_BufferPosition, json_BufferLength
                             End If
-        
+
                             If json_PrettyPrint Then
                                 json_Converted = vbNewLine & json_Indentation & """" & json_Key & """: " & json_Converted
                             Else
                                 json_Converted = """" & json_Key & """: " & json_Converted
                             End If
-        
+
                             json_BufferAppend json_Buffer, json_Converted, json_BufferPosition, json_BufferLength
                         End If
                     Next json_Key
-        
+
                     If json_PrettyPrint Then
                         json_BufferAppend json_Buffer, vbNewLine, json_BufferPosition, json_BufferLength
-        
+
                         If VBA.VarType(Whitespace) = VBA.vbString Then
                             json_Indentation = VBA.String$(json_CurrentIndentation, Whitespace)
                         Else
                             json_Indentation = VBA.Space$(json_CurrentIndentation * Whitespace)
                         End If
                     End If
-        
+
                     json_BufferAppend json_Buffer, json_Indentation & "}", json_BufferPosition, json_BufferLength
-        
+
                 ' Collection
                 Case "Collection", "ArrayList", "Recordset", "Recordset2", "RecordsetEx", "ArrayListEx"
                     json_BufferAppend json_Buffer, "[", json_BufferPosition, json_BufferLength
                     If VBA.TypeName(jsonValue) = "RecordsetEx" Then Set jsonValue = jsonValue.Instance
                     If VBA.TypeName(jsonValue) = "Recordset" Or VBA.TypeName(jsonValue) = "Recordset2" Then jsonValue = RecordsetAsDictionaryArray(jsonValue)
-                    
+
                     For Each json_Value In jsonValue
                         If json_IsFirstItem Then
                             json_IsFirstItem = False
                         Else
                             json_BufferAppend json_Buffer, ", ", json_BufferPosition, json_BufferLength
                         End If
-                        
+
                         If IsObject(json_Value) Or IsArray(json_Value) Then
                             If HasNestedLevels(json_Value) Then
                                 json_Converted = Stringify(json_Value, Whitespace, json_CurrentIndentation + 1)
@@ -382,7 +382,7 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         Else
                             json_Converted = Stringify(json_Value, , json_CurrentIndentation + 1)
                         End If
-        
+
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
                         If json_Converted = "" Then
                             ' (nest to only check if converted = "")
@@ -390,17 +390,17 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                                 json_Converted = "null"
                             End If
                         End If
-        
+
                         If json_PrettyPrint Then
                             json_Converted = vbNewLine & json_Indentation & json_Converted
                         End If
-        
+
                         json_BufferAppend json_Buffer, json_Converted, json_BufferPosition, json_BufferLength
                     Next json_Value
-        
+
                     If json_PrettyPrint Then
                         json_BufferAppend json_Buffer, vbNewLine, json_BufferPosition, json_BufferLength
-        
+
                         If VBA.VarType(Whitespace) = VBA.vbString Then
                             json_Indentation = VBA.String$(json_CurrentIndentation, Whitespace)
                         Else
@@ -428,7 +428,7 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                         json_BufferAppend json_Buffer, json_Converted, json_BufferPosition, json_BufferLength
                     End If
             End Select
-    
+
             Stringify = json_BufferToString(json_Buffer, json_BufferPosition)
         Case VBA.vbInteger, VBA.vbLong, VBA.vbSingle, VBA.vbDouble, VBA.vbCurrency, VBA.vbDecimal
             ' Number (use decimals for numbers)
@@ -445,7 +445,7 @@ End Function
 Private Function HasNestedLevels(ByRef Target As Variant) As Boolean
     Dim i As Long, Item As Variant
     On Error GoTo Finally
-    
+
     If IsObject(Target) Then
         If VBA.Left$(TypeName(Target), 10) = "Dictionary" Then
             For Each Item In Target.Items()
@@ -472,7 +472,7 @@ End Function
 
 Private Function RecordsetAsDictionaryArray(ByRef Instance As Variant) As Variant()
     Dim sValues As Variant, sRows() As Variant, Entry As Scripting.Dictionary, sColumns() As Variant, i As Long, c As Long, iBookmark As Variant
-    
+
     iBookmark = Instance.Bookmark
     If Instance.RecordCount > 0 Then
         If TypeOf Instance Is DAO.Recordset Then
@@ -486,22 +486,22 @@ Private Function RecordsetAsDictionaryArray(ByRef Instance As Variant) As Varian
         For i = 0 To Instance.Fields.Count - 1
             sColumns(i) = Instance.Fields(i).Name
         Next i
-        
+
         ReDim sRows(UBound(sValues, 2) - LBound(sValues, 2))
-    
+
         For i = LBound(sValues, 2) To UBound(sValues, 2)
             Set Entry = New Scripting.Dictionary
-            
+
             For c = 0 To UBound(sColumns)
                 Entry(CStr(sColumns(c))) = sValues(c, i)
             Next c
-    
+
             Set sRows(i) = Entry
         Next i
     Else
         sRows = Array()
     End If
-    
+
     On Error Resume Next
     Instance.Bookmark = iBookmark
     RecordsetAsDictionaryArray = sRows
@@ -1033,14 +1033,14 @@ End Function
 
 Private Function Collection2Array(ByRef c As Collection) As Variant
     Dim t As Variant, Item As Variant, i As Long
-    
+
     If c.Count = 0 Then
         Collection2Array = Array()
         Exit Function
     End If
-    
+
     ReDim t(0 To c.Count - 1)
-    
+
     For Each Item In c
         If IsObject(Item) Then
             Set t(i) = Item
@@ -1049,7 +1049,7 @@ Private Function Collection2Array(ByRef c As Collection) As Variant
         End If
         i = i + 1
     Next Item
-    
+
     Collection2Array = t
 End Function
 
@@ -1067,4 +1067,3 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
     utc_SystemTimeToDate = DateSerial(utc_Value.utc_wYear, utc_Value.utc_wMonth, utc_Value.utc_wDay) + _
         TimeSerial(utc_Value.utc_wHour, utc_Value.utc_wMinute, utc_Value.utc_wSecond)
 End Function
-

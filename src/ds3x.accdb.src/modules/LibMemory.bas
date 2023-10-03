@@ -1,13 +1,4 @@
-﻿VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "MemoryLib"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = True
-Attribute VB_Exposed = True
-'@Folder "ds3x.Libraries"
+﻿Attribute VB_Name = "LibMemory"
 '''=============================================================================
 ''' VBA MemoryTools
 ''' -----------------------------------------------
@@ -37,6 +28,7 @@ Attribute VB_Exposed = True
 '''=============================================================================
 
 Option Explicit
+Option Private Module
 
 '*******************************************************************************
 '' Methods in this library module allow direct native memory manipulation in VBA
@@ -62,36 +54,86 @@ Option Explicit
 '*******************************************************************************
 
 'Used for raising errors
-Private Const MODULE_NAME As String = "MemoryLib"
+Private Const MODULE_NAME As String = "LibMemory"
 
-'https://msdn.microsoft.com/en-us/library/mt723419(v=vs.85).aspx
-Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
-Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
-
-#If Win64 Then
-    Private Const vbLongPtr As Long = vbLongLong
-#Else
-    Private Const vbLongLong As Long = 20 'Useful in Select Case logic
-    Private Const vbLongPtr As Long = vbLong
+#If Mac Then
+    #If VBA7 Then
+        Public Declare PtrSafe Function CopyMemory Lib "/usr/lib/libc.dylib" Alias "memmove" (Destination As Any, Source As Any, ByVal Length As LongPtr) As LongPtr
+    #Else
+        Public Declare Function CopyMemory Lib "/usr/lib/libc.dylib" Alias "memmove" (Destination As Any, Source As Any, ByVal Length As Long) As Long
+    #End If
+#Else 'Windows
+    'https://msdn.microsoft.com/en-us/library/mt723419(v=vs.85).aspx
+    #If VBA7 Then
+        Public Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+    #Else
+        Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
+    #End If
 #End If
 
-Private Type REMOTE_MEMORY
+#If VBA7 = 0 Then       'LongPtr trick discovered by @Greedo (https://github.com/Greedquest)
+    Public Enum LongPtr
+        [_]
+    End Enum
+#End If                 'https://github.com/cristianbuse/VBA-MemoryTools/issues/3
+
+#If Win64 Then
+    Public Const PTR_SIZE As Long = 8
+    Public Const VARIANT_SIZE As Long = 24
+#Else
+    Public Const PTR_SIZE As Long = 4
+    Public Const VARIANT_SIZE As Long = 16
+#End If
+
+Private Const BYTE_SIZE As Long = 1
+Private Const INT_SIZE As Long = 2
+Private Const VT_SPACING As Long = VARIANT_SIZE / INT_SIZE 'VarType spacing in an array of Variants
+
+#If Win64 Then
+    #If Mac Then
+        Public Const vbLongLong As Long = 20 'Apparently missing for x64 on Mac
+    #End If
+    Public Const vbLongPtr As Long = vbLongLong
+#Else
+    Public Const vbLongLong As Long = 20 'Useful in Select Case logic
+    Public Const vbLongPtr As Long = vbLong
+#End If
+
+Public Type REMOTE_MEMORY
     memValue As Variant
-    remoteVT As Variant
-    isInitialized As Boolean
+    remoteVT As Variant 'Will be linked to the first 2 bytes of 'memValue' - see 'InitRemoteMemory'
+    isInitialized As Boolean 'In case state is lost
 End Type
 
 'https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-oaut/3fe7db9f-5803-4dc4-9d14-5425d3f5461f
 'https://docs.microsoft.com/en-us/windows/win32/api/oaidl/ns-oaidl-variant?redirectedfrom=MSDN
 'Flag used to simulate ByRef Variants
-Private Const VT_BYREF As Long = &H4000
+Public Const VT_BYREF As Long = &H4000
+
+Public Type SAFEARRAYBOUND
+    cElements As Long
+    lLbound As Long
+End Type
+Public Type SAFEARRAY_1D
+    cDims As Integer
+    fFeatures As Integer
+    cbElements As Long
+    cLocks As Long
+    #If Win64 Then
+        dummyPadding As Long
+        pvData As LongLong
+    #Else
+        pvData As Long
+    #End If
+    rgsabound0 As SAFEARRAYBOUND
+End Type
 Private Const FADF_HAVEVARTYPE As Long = &H80
 
 '*******************************************************************************
 'Returns an initialized (linked) REMOTE_MEMORY struct
 'Links .remoteVt to the first 2 bytes of .memValue
 '*******************************************************************************
-Private Sub InitRemoteMemory(ByRef rm As REMOTE_MEMORY)
+Public Sub InitRemoteMemory(ByRef rm As REMOTE_MEMORY)
     rm.remoteVT = VarPtr(rm.memValue)
     MemIntAPI(VarPtr(rm.remoteVT)) = vbInteger + VT_BYREF
     rm.isInitialized = True
@@ -414,7 +456,7 @@ End Function
 
 '*******************************************************************************
 'Redirects the instance of a class to another instance of the same class within
-'   the scope of a private class Function (not Sub) where the call happens.
+'   the scope of a private class Function (not  Sub) where the call happens.
 '
 'Warning! ONLY call this method from a Private Function of a class!
 '
@@ -693,7 +735,7 @@ Private Sub CopyBytes(ByVal bytesCount As Long _
         End If
         '
         'Prepare destination BSTR
-        If rmDest.memValue + 4 > rmSrc.memValue Then
+        If rmDest.memValue > rmSrc.memValue Then
             hasOverlap = UnsignedAdd(rmSrc.memValue, tempSize + bstrPrefixSize) > rmDest.memValue
             If hasOverlap Then overlapOffset = rmDest.memValue - rmSrc.memValue
         Else
@@ -755,9 +797,9 @@ End Sub
 '*******************************************************************************
 Public Sub CloneParamArray(ByRef firstElem As Variant _
                          , ByVal elemCount As Long _
-                         , ByRef OutArray() As Variant)
-    ReDim OutArray(0 To elemCount - 1)
-    MemCopy VarPtr(OutArray(0)), VarPtr(firstElem), VARIANT_SIZE * elemCount
+                         , ByRef outArray() As Variant)
+    ReDim outArray(0 To elemCount - 1)
+    MemCopy VarPtr(outArray(0)), VarPtr(firstElem), VARIANT_SIZE * elemCount
     '
     Static sArr As SAFEARRAY_1D 'Fake array of VarTypes (Integers)
     Static rmArr As REMOTE_MEMORY
@@ -772,9 +814,9 @@ Public Sub CloneParamArray(ByRef firstElem As Variant _
         rmArr.memValue = VarPtr(sArr)
     End If
     sArr.rgsabound0.cElements = elemCount * VT_SPACING
-    sArr.pvData = VarPtr(OutArray(0))
+    sArr.pvData = VarPtr(outArray(0))
     '
-    FixByValElements OutArray, rmArr, rmArr.remoteVT
+    FixByValElements outArray, rmArr, rmArr.remoteVT
 End Sub
 
 '*******************************************************************************
@@ -819,11 +861,28 @@ End Function
 
 '*******************************************************************************
 'Reads the memory of a String to an Array of Integers
+'Notes:
+'   - Ignores the last byte if input has an odd number of bytes
+'   - If 'outLength' is -1 (default) then the remaining length is returned
+'   - Excess length is ignored
 '*******************************************************************************
 Public Function StringToIntegers(ByRef s As String _
-                               , Optional ByVal lowBound As Long = 0) As Integer()
+                               , Optional ByVal startIndex As Long = 1 _
+                               , Optional ByVal outLength As Long = -1 _
+                               , Optional ByVal outLowBound As Long = 0) As Integer()
     Static rm As REMOTE_MEMORY
     Static sArr As SAFEARRAY_1D
+    Const methodName As String = "StringToIntegers"
+    Dim cLen As Long: cLen = Len(s)
+
+    If startIndex < 1 Then
+        Err.Raise 9, methodName, "Invalid Start Index"
+    ElseIf outLength < -1 Then
+        Err.Raise 5, methodName, "Invalid Length for output"
+    ElseIf outLength = -1 Or startIndex + outLength - 1 > cLen Then
+        outLength = cLen - startIndex + 1 'Excess length is ignored
+        If outLength < 0 Then outLength = 0
+    End If
     '
     If Not rm.isInitialized Then
         InitRemoteMemory rm
@@ -834,11 +893,50 @@ Public Function StringToIntegers(ByRef s As String _
         End With
     End If
     '
-    sArr.pvData = StrPtr(s)
-    sArr.rgsabound0.lLbound = lowBound
-    sArr.rgsabound0.cElements = LenB(s) \ 2
+    sArr.pvData = StrPtr(s) + (startIndex - 1) * INT_SIZE
+    sArr.rgsabound0.lLbound = outLowBound
+    sArr.rgsabound0.cElements = outLength
     '
     RemoteAssign rm, VarPtr(sArr), rm.remoteVT, vbArray + vbInteger, StringToIntegers, rm.memValue
+End Function
+
+'*******************************************************************************
+'Reads the memory of an Array of Integers into a String
+'Notes:
+'   - If 'outLength' is -1 (default) then the remaining length is returned
+'   - Excess length is ignored
+'*******************************************************************************
+Public Function IntegersToString(ByRef ints() As Integer _
+                               , Optional ByVal startIndex As Long = 0 _
+                               , Optional ByVal outLength As Long = -1) As String
+    Static rm As REMOTE_MEMORY
+    Static sArr As SAFEARRAY_1D
+    Const methodName As String = "IntegersToString"
+
+    If GetArrayDimsCount(ints) <> 1 Then
+        Err.Raise 5, methodName, "Expected 1D Array of Integers"
+    ElseIf startIndex < LBound(ints) Then
+        Err.Raise 9, methodName, "Invalid Start Index"
+    ElseIf outLength < -1 Then
+        Err.Raise 5, methodName, "Invalid Length for output"
+    ElseIf outLength = -1 Or startIndex + outLength - 1 > UBound(ints) Then
+        outLength = UBound(ints) - startIndex + 1
+        If outLength < 0 Then Exit Function
+    End If
+    If Not rm.isInitialized Then
+        InitRemoteMemory rm
+        With sArr
+            .cDims = 1
+            .fFeatures = FADF_HAVEVARTYPE
+            .cbElements = BYTE_SIZE
+            .rgsabound0.lLbound = 0
+        End With
+    End If
+    '
+    sArr.pvData = VarPtr(ints(startIndex))
+    sArr.rgsabound0.cElements = outLength * INT_SIZE
+    '
+    RemoteAssign rm, VarPtr(sArr), rm.remoteVT, vbArray + vbByte, IntegersToString, rm.memValue
 End Function
 
 '*******************************************************************************
@@ -867,7 +965,7 @@ Public Function EmptyArray(ByVal numberOfDimensions As Long _
     #Else
         Const safeArraySize = 4
     #End If
-    'Const FADF_HAVEVARTYPE As Long = &H80
+    Const FADF_HAVEVARTYPE As Long = &H80
     Const fFeaturesHi As Long = FADF_HAVEVARTYPE * &H10000
     Dim i As Long
     '
@@ -930,55 +1028,3 @@ Private Function GetArrayDimsCount(ByRef arr As Variant) As Long
 FinalDimension:
     GetArrayDimsCount = dimension - 1
 End Function
-
-Public Sub VariantArrayClone(ByVal SourceAddress As LongPtr, ByVal DestinationAddress As LongPtr, ByVal GetCount As Long)
-    Dim t() As Variant, r() As Variant, sASrc As SAFEARRAY_1D, sADst As SAFEARRAY_1D, i As Long
-    With sASrc
-        .cDims = 1
-        .cbElements = VARIANT_SIZE
-        .pvData = SourceAddress
-        .rgsabound0.cElements = GetCount
-    End With
-    With sADst
-        .cDims = 1
-        .cbElements = VARIANT_SIZE
-        .pvData = DestinationAddress
-        .rgsabound0.cElements = GetCount
-    End With
-    MemLongPtr(VarPtrArr(t)) = VarPtr(sASrc)
-    MemLongPtr(VarPtrArr(r)) = VarPtr(sADst)
-    For i = 0 To UBound(t)
-        If IsObject(t(i)) Then
-            Set r(i) = t(i)
-        Else
-            r(i) = t(i)
-        End If
-    Next i
-    MemLongPtr(VarPtrArr(t)) = CLngPtr(0)
-    MemLongPtr(VarPtrArr(r)) = CLngPtr(0)
-End Sub
-
-Public Sub ReassignArrayTo(ByRef Destination As Variant, ByRef Source As Variant)
-    MemLongPtr(VarPtrArr(Destination)) = MemLongPtr(VarPtrArr(Source))
-    MemLongPtr(VarPtrArr(Source)) = CLngPtr(0)
-End Sub
-
-Public Sub ZeroMemory(ByVal TargetAddress As LongPtr, ByVal ByteCount As Long)
-    FillMemory ByVal TargetAddress, ByteCount, CByte(0)
-End Sub
-
-Public Sub VariantArraySliceUnsafe(ByVal SourceAddress As LongPtr, ByVal GetCount As Long, ByRef OutArray() As Variant)
-    Dim sa As SAFEARRAY_1D
-    With sa
-        .cDims = 1
-        .cbElements = VARIANT_SIZE
-        .pvData = SourceAddress
-        .rgsabound0.cElements = GetCount
-    End With
-    MemLongPtr(VarPtrArr(OutArray)) = VarPtr(sa)
-End Sub
-
-Public Sub DestroyArray(ByRef TargetArray As Variant)
-    MemLongPtr(VarPtrArr(TargetArray)) = CLngPtr(0)
-End Sub
-

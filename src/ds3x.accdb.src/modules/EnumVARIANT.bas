@@ -173,4 +173,3 @@ Private Function UnsignedAdd(ByVal Start As LongPtr, ByVal Incr As LongPtr) As L
         UnsignedAdd = ((Start Xor &H80000000) + Incr) Xor &H80000000
     #End If
 End Function
-

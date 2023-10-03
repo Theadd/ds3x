@@ -26,7 +26,7 @@ Public Property Get Slices() As Variant: Slices = IIf(IsEmpty(pSlices), Array(),
 Public Property Let Slices(ByRef Value As Variant)
     Dim v As Variant, r As Long
     If Not IsEmpty(pSlices) Then Err.Raise 70
-    
+
     pSlices = Value
     For Each v In pSlices
         r = r + v(3)
@@ -111,7 +111,7 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
         ' ArrayLike, ColumnIndex, Index, GetCount
         For Each v In pSlices
             rMax = rMin + (v(3) - 1)
-            
+
             If iMin <= rMax And iMin >= rMin And iMax <= rMax Then
                 '    #rMin                  #rMax
                 ' ---|---------|------|-----|--------
@@ -119,33 +119,33 @@ Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
                 sMod = iMin - rMin
                 aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod - (rMax - iMax))
                 Exit For
-                
+
             ElseIf iMin <= rMax And iMin >= rMin And iMax > rMax Then
                 '    #rMin             #rMax
                 ' ---|---------|-------|-------|----
                 '              #iMin           #iMax
                 sMod = iMin - rMin
                 aX.Add Array(v(0), v(1), v(2) + sMod, v(3) - sMod)
-            
+
             ElseIf iMin <= rMin And iMax <= rMax Then
                 '           #rMin                  #rMax
                 ' ---|------|-------------|--------|-----
                 '    #iMin                #iMax
                 aX.Add Array(v(0), v(1), v(2), v(3) - (rMax - iMax))
                 Exit For
-                
+
             ElseIf iMin <= rMin And iMax > rMax Then
                 '           #rMin         #rMax
                 ' ---|------|-------------|--------|-----
                 '    #iMin                         #iMax
                 aX.Add Array(v(0), v(1), v(2), v(3))
-                
+
             End If
             rMin = rMin + v(3)
         Next v
         rMin = 0
     Next vRange
-    
+
     Set SliceAllRanges = New ArraySlice
     SliceAllRanges.Slices = aX.ToArray()
 End Function
@@ -180,7 +180,7 @@ Public Sub CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUse
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
                     ReDim t(0 To v(3) - 1, 0 To 0)
-                    MemoryLib.VariantArrayClone VarPtr(k(0, 0)), VarPtr(t(0, 0)), v(3)
+                    VariantArrayClone VarPtr(t(0, 0)), VarPtr(k(0, 0)), v(3)
                     If ApplyUserLocale Then
                         RangeObject.Resize(v(3), 1).Offset(RowOffset:=r).FormulaR1C1Local = t
                     Else
@@ -198,7 +198,7 @@ End Sub
 Public Sub CloneInto2dArray(ByRef Target2dArray() As Variant, ByVal TargetIndex As Long, ByVal TargetColumnIndex As Long)
     Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
     If pCount = 0 Then Exit Sub
-    
+
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx
@@ -208,7 +208,7 @@ Public Sub CloneInto2dArray(ByRef Target2dArray() As Variant, ByVal TargetIndex 
                     iAux = CLng(.Instance.AbsolutePosition)
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.VariantArrayClone VarPtr(k(0, 0)), VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), v(3)
+                    VariantArrayClone VarPtr(Target2dArray(TargetIndex + r, TargetColumnIndex)), VarPtr(k(0, 0)), v(3)
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else
@@ -221,7 +221,7 @@ End Sub
 Public Sub CloneIntoArray(ByRef TargetArray() As Variant, Optional ByVal TargetIndex As Long = 0)
     Dim v As Variant, r As Long, iAux As Long, c As Long, k() As Variant
     If pCount = 0 Then Exit Sub
-    
+
     For Each v In pSlices
         Select Case True
             Case TypeOf v(0) Is Array2dEx
@@ -231,7 +231,7 @@ Public Sub CloneIntoArray(ByRef TargetArray() As Variant, Optional ByVal TargetI
                     iAux = CLng(.Instance.AbsolutePosition)
                     .Instance.AbsolutePosition = v(2)
                     k = .Instance.GetRows(v(3), adBookmarkCurrent, Array(v(1)))
-                    MemoryLib.VariantArrayClone VarPtr(k(0, 0)), VarPtr(TargetArray(TargetIndex + r)), v(3)
+                    VariantArrayClone VarPtr(TargetArray(TargetIndex + r)), VarPtr(k(0, 0)), v(3)
                     .Instance.AbsolutePosition = iAux
                 End With
             Case Else

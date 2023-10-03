@@ -120,12 +120,12 @@ Public Function Create(Optional ByVal WorksheetName As String = "Sheet%1", Optio
     Dim xlApp As Excel.Application, xWb As Excel.Workbook, xWs As Excel.Worksheet, sTarget As String
     Set Create = New xlSheetsEx
     If Options Is Nothing Then Set Options = DictionaryEx.Create()
-    
+
     On Error GoTo Fallback
     Set xlApp = New Excel.Application
     xlApp.DefaultSaveFormat = xlOpenXMLWorkbookMacroEnabled
     SetExcelApplicationVisibility xlApp, False
-    
+
     If Not IsMissing(TargetFile) Then
         sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
         If FileSystemLib.TryWaitFileExists(sTarget, 0) Then
@@ -140,10 +140,10 @@ Public Function Create(Optional ByVal WorksheetName As String = "Sheet%1", Optio
         Set xWs = xWb.Sheets(1)
         xWs.Name = Printf(WorksheetName, 1)
     End If
-    
+
     Set Create.Instance = xWs
     Create.AllSheets.Add Create
-    
+
     Exit Function
 Fallback:
     On Error Resume Next
@@ -159,7 +159,7 @@ End Function
 
 Private Function LoadWorkbookAt(ByRef xlApp As Excel.Application, ByVal TargetFile, ByVal Options As DictionaryEx) As Excel.Workbook
     Dim TTextQualifier As Long
-    
+
     If Options.GetValue("NoTextQualifier", True) Then
         TTextQualifier = xlTextQualifierNone
     Else
@@ -209,7 +209,7 @@ End Function
 Friend Sub Unbind()
     On Error Resume Next
     If pAllSheets Is Nothing Then Exit Sub
-    
+
     AllSheets.Remove Me
     Set Instance = Nothing
     Set pAllSheets = Nothing
@@ -219,7 +219,7 @@ End Sub
 Public Sub Dispose()
     On Error Resume Next
     Dim shouldContinue As Boolean
-    
+
     If Not Instance Is Nothing Then
         If Not pAllSheets Is Nothing Then
             If pAllSheets.Count > 1 Then
@@ -230,7 +230,7 @@ Public Sub Dispose()
         Else
             shouldContinue = True
         End If
-        
+
         If shouldContinue Then
             If WindowVisibility Then
                 ReleaseWorkbook
@@ -246,14 +246,14 @@ Public Sub ReleaseWorkbook()
     Me.WindowVisibility = True
     Me.Protected = False
     DoEvents
-    
+
     UnbindAllSheets
 End Sub
 
 Public Sub DiscardChangesAndExit()
     Dim xlApp As Excel.Application
     On Error Resume Next
-    
+
     If Not Instance Is Nothing Then
         Set xlApp = Instance.Application
         Me.Workbook.Close SaveChanges:=False
@@ -274,7 +274,7 @@ End Sub
 
 Public Function AutoSizeCells(ByVal TargetRange As Excel.Range) As xlSheetsEx
     Dim c As Long
-    
+
     With TargetRange
         .Cells.EntireColumn.AutoFit
         .HorizontalAlignment = xlGeneral
@@ -286,7 +286,7 @@ Public Function AutoSizeCells(ByVal TargetRange As Excel.Range) As xlSheetsEx
         .ShrinkToFit = False
         .ReadingOrder = xlContext
         .MergeCells = False
-        
+
         For c = 1 To .Columns.Count
             Select Case .Columns(c).ColumnWidth
                 Case Is >= 80: .Columns(c).ColumnWidth = 75
@@ -313,21 +313,21 @@ Public Function FreezeHeaders(Optional ByVal HeaderRows As Long = 1, Optional By
         .SplitRow = HeaderRows
         .FreezePanes = True
     End With
-    
+
     Set FreezeHeaders = Me
 End Function
 
 Public Function AutoFormatCells(Optional ByVal TargetRange As Excel.Range = Nothing) As xlSheetsEx
     Dim c As Long, res As Variant
     If TargetRange Is Nothing Then Set TargetRange = Me.UsedRange
-    
+
     For c = 1 To TargetRange.Columns.Count
         res = GetCommonFormatForRange(TargetRange.Columns(c))
         If res(0) <> "General" Then
             TargetRange.Columns(c).NumberFormatLocal = res(1)
         End If
     Next c
-    
+
     Set AutoFormatCells = Me
 End Function
 
@@ -335,11 +335,11 @@ Public Function GetColumnsAutoNumberFormats(Optional ByVal TargetRange As Excel.
     Dim c As Long, res As String, aX As ArrayListEx
     If TargetRange Is Nothing Then Set TargetRange = Me.UsedRange
     Set aX = ArrayListEx.Create()
-    
+
     For c = 1 To TargetRange.Columns.Count
         aX.Add GetCommonFormatForRange(TargetRange.Columns(c))
     Next c
-    
+
     GetColumnsAutoNumberFormats = aX.ToArray()
 End Function
 
@@ -352,7 +352,7 @@ Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As Variant
     GetCommonFormatForRange = Array("General", "General")
     Set nX = Rng.Rows.Item(1)
     endRow = Rng.Rows.Item(Rng.Rows.Count).Row
-    
+
     For k = 1 To 4
         Set nX = Rng.Rows.Item(nX.Row + 1)
         If nX.Text = "" Then Set nX = nX.End(xlDown)
@@ -366,7 +366,7 @@ Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As Variant
                 End If
                 isDefaultSet = True
             End If
-            
+
             If nX.Text <> nX.FormulaR1C1Local Then
                 If nX.NumberFormat = "General" Then
                     If nX.Text Like "*[,.]*E+*" Then
@@ -409,7 +409,7 @@ End Sub
 
 Private Sub UnbindAllSheets()
     Dim sItem As xlSheetsEx, i As Long, iStart As Long
-    
+
     On Error GoTo Finally
     iStart = AllSheets.Count - 1
     For i = iStart To 0 Step -1
@@ -435,4 +435,3 @@ Private Sub Class_Terminate()
         On Error GoTo 0
     End If
 End Sub
-

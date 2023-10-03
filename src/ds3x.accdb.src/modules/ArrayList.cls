@@ -35,6 +35,11 @@ Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     Set pItems(Index) = Value
 End Property
 
+Public Property Get Items() As Variant()
+    Static r As New ListRange
+    Items = r.Bind(pItems, 0, pIndex).Items
+End Property
+
 Public Property Get Count() As Long: Count = pIndex: End Property
 Public Property Get Capacity() As Long: Capacity = UBound(pItems) + 1: End Property
 Public Property Let Capacity(ByVal Value As Long): ReDim Preserve pItems(0 To Value - 1): End Property
@@ -81,7 +86,7 @@ Public Sub AddRange(ByRef ArrayLike As Variant)
         GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
         GrowCapacity GetCount
         If VarType(ArrayLike) = (vbArray + vbVariant) Then
-            MemoryLib.VariantArrayClone VarPtr(ArrayLike(LBound(ArrayLike))), VarPtr(pItems(pIndex)), GetCount
+            VariantArrayClone VarPtr(pItems(pIndex)), VarPtr(ArrayLike(LBound(ArrayLike))), GetCount
             pIndex = pIndex + GetCount
             Exit Sub
         End If
@@ -89,7 +94,7 @@ Public Sub AddRange(ByRef ArrayLike As Variant)
         GetCount = ArrayLike.Count
         GrowCapacity GetCount
         If TypeOf ArrayLike Is ArrayList Then
-            MemoryLib.VariantArrayClone C2ArrayList(ArrayLike).GetAddressOfItemAt(0), VarPtr(pItems(pIndex)), GetCount
+            VariantArrayClone VarPtr(pItems(pIndex)), C2ArrayList(ArrayLike).GetAddressOfItemAt(0), GetCount
             pIndex = pIndex + GetCount
             Exit Sub
         End If
@@ -106,12 +111,12 @@ End Sub
 
 Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     Dim v As Variant, GetCount As Long
-    
+
     If Not IsObject(ArrayLike) Then
         GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
         ReserveSpaceForInsert Index, GetCount
         If VarType(ArrayLike) = (vbArray + vbVariant) Then
-            MemoryLib.VariantArrayClone VarPtr(ArrayLike(LBound(ArrayLike))), VarPtr(pItems(Index)), GetCount
+            VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike(LBound(ArrayLike))), GetCount
             pIndex = pIndex + GetCount
             Exit Sub
         End If
@@ -119,7 +124,7 @@ Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
         GetCount = ArrayLike.Count
         ReserveSpaceForInsert Index, GetCount
         If TypeOf ArrayLike Is ArrayList Then
-            MemoryLib.VariantArrayClone C2ArrayList(ArrayLike).GetAddressOfItemAt(0), VarPtr(pItems(Index)), GetCount
+            VariantArrayClone VarPtr(pItems(Index)), C2ArrayList(ArrayLike).GetAddressOfItemAt(0), GetCount
             pIndex = pIndex + GetCount
             Exit Sub
         End If
@@ -145,11 +150,11 @@ Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ArrayLi
         .pvData = VarPtr(pItems(Index))
         .rgsabound0.cElements = GetCount
     End With
-    MemoryLib.MemLongPtr(MemoryLib.VarPtrArr(t)) = VarPtr(sa)
+    MemLongPtr(VarPtrArr(t)) = VarPtr(sa)
     GetRange.AddRange t
 Finally:
     On Error Resume Next
-    MemoryLib.MemLongPtr(MemoryLib.VarPtrArr(t)) = CLngPtr(0)
+    MemLongPtr(VarPtrArr(t)) = CLngPtr(0)
     On Error GoTo 0
 End Function
 
@@ -172,7 +177,7 @@ Public Function BinarySearch(ByVal Index As Long, ByVal GetCount As Long, ByRef 
     Dim lo As Long, hi As Long, i As Long
     lo = Index
     hi = Index + GetCount - 1
-    
+
     If Not (Comparer Is Nothing) Then
         Do While (lo <= hi)
             i = lo + ((hi - lo) \ 2)
@@ -263,8 +268,8 @@ Public Sub Remove(ByRef Value As Variant)
     For i = 0 To pIndex - 1
         If pItems(i) = Value Then
             pItems(i) = Empty
-            If i < pIndex - 1 Then MemoryLib.MemCopy VarPtr(pItems(i)), VarPtr(pItems(i + 1)), (pIndex - i - 1) * VARIANT_SIZE
-            MemoryLib.ZeroMemory VarPtr(pItems(pIndex - 1)), VARIANT_SIZE
+            If i < pIndex - 1 Then MemCopy VarPtr(pItems(i)), VarPtr(pItems(i + 1)), (pIndex - i - 1) * VARIANT_SIZE
+            ZeroMemory VarPtr(pItems(pIndex - 1)), VARIANT_SIZE
             pIndex = pIndex - 1
             Exit For
         End If
@@ -273,8 +278,8 @@ End Sub
 
 Public Sub RemoveAt(ByVal Index As Long)
     pItems(Index) = Empty
-    If Index < pIndex - 1 Then MemoryLib.MemCopy VarPtr(pItems(Index)), VarPtr(pItems(Index + 1)), (pIndex - Index - 1) * VARIANT_SIZE
-    MemoryLib.ZeroMemory VarPtr(pItems(pIndex - 1)), VARIANT_SIZE
+    If Index < pIndex - 1 Then MemCopy VarPtr(pItems(Index)), VarPtr(pItems(Index + 1)), (pIndex - Index - 1) * VARIANT_SIZE
+    ZeroMemory VarPtr(pItems(pIndex - 1)), VARIANT_SIZE
     pIndex = pIndex - 1
 End Sub
 
@@ -283,8 +288,8 @@ Public Sub RemoveRange(ByVal Index As Long, ByVal GetCount As Long)
     For i = 0 To GetCount - 1
         pItems(Index + i) = Empty
     Next i
-    If Index < pIndex - 1 Then MemoryLib.MemCopy VarPtr(pItems(Index)), VarPtr(pItems(Index + GetCount)), (pIndex - Index - GetCount) * VARIANT_SIZE
-    MemoryLib.ZeroMemory VarPtr(pItems(pIndex - GetCount)), GetCount * VARIANT_SIZE
+    If Index < pIndex - 1 Then MemCopy VarPtr(pItems(Index)), VarPtr(pItems(Index + GetCount)), (pIndex - Index - GetCount) * VARIANT_SIZE
+    ZeroMemory VarPtr(pItems(pIndex - GetCount)), GetCount * VARIANT_SIZE
     pIndex = pIndex - GetCount
 End Sub
 
@@ -314,8 +319,13 @@ Public Sub Reverse(Optional ByVal Index As Long = 0, Optional ByVal GetCount As 
 End Sub
 
 Public Sub SetRange(ByVal Index As Long, ByRef ArrayLike As Variant)
-    ' TODO
-    Err.Raise &H80004001
+    If IsObject(ArrayLike) Then
+        If Index < 0 Or Index > pIndex - ArrayLike.Count Then Err.Raise 9
+        VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike.Items(0)), ArrayLike.Count
+    Else
+        If Index < 0 Or Index > pIndex - (1 + UBound(ArrayLike)) Then Err.Raise 9
+        VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike(0)), 1 + UBound(ArrayLike)
+    End If
 End Sub
 
 Public Sub Sort_2(ByRef Comparer As IComparer): Sort 0, , Comparer: End Sub
@@ -329,20 +339,14 @@ Public Sub Sort(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Var
 End Sub
 
 Public Function ToArray() As Variant()
-    Dim t() As Variant, i As Long
+    Dim t() As Variant
     If pIndex = 0 Then
         ToArray = Array()
         Exit Function
     End If
     ReDim t(0 To pIndex - 1)
-    For i = 0 To pIndex - 1
-        If IsObject(pItems(i)) Then
-            Set t(i) = pItems(i)
-        Else
-            t(i) = pItems(i)
-        End If
-    Next i
-    MemoryLib.ReassignArrayTo ToArray, t
+    VariantArrayClone VarPtr(t(0)), VarPtr(pItems(0)), pIndex
+    ReassignArrayTo ToArray, t
 End Function
 
 Public Function GetAddressOfItemAt(ByVal Index As Long) As LongPtr
@@ -361,17 +365,17 @@ Private Sub Class_Terminate()
     On Error GoTo 0
 End Sub
 
-Private Sub Swap(ByRef a As Variant, ByRef B As Variant)
+Private Sub Swap(ByRef A As Variant, ByRef B As Variant)
     Dim v As Variant
-    If IsObject(a) Then
-        Set v = a
+    If IsObject(A) Then
+        Set v = A
     Else
-        v = a
+        v = A
     End If
     If IsObject(B) Then
-        Set a = B
+        Set A = B
     Else
-        a = B
+        A = B
     End If
     If IsObject(v) Then
         Set B = v
@@ -414,11 +418,11 @@ Private Sub ReserveSpaceForInsert(ByVal Index As Long, ByVal GetCount As Long)
     Dim t() As Variant, cap As Long
     cap = GetCapacityFor(GetCount)
     ReDim t(0 To cap)
-    If Index > 0 Then MemoryLib.MemCopy VarPtr(t(0)), VarPtr(pItems(0)), Index * VARIANT_SIZE
-    MemoryLib.MemCopy VarPtr(t(Index + GetCount)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
-    MemoryLib.ZeroMemory VarPtr(pItems(0)), pIndex * VARIANT_SIZE
+    If Index > 0 Then MemCopy VarPtr(t(0)), VarPtr(pItems(0)), Index * VARIANT_SIZE
+    MemCopy VarPtr(t(Index + GetCount)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+    ZeroMemory VarPtr(pItems(0)), pIndex * VARIANT_SIZE
     Erase pItems
-    MemoryLib.ReassignArrayTo pItems, t
+    ReassignArrayTo pItems, t
 End Sub
 
 Private Sub QuickSort(l As Long, r As Long, ByRef Comparer As IComparer)
@@ -457,4 +461,3 @@ Private Sub QuickSortV2(l As Long, r As Long)
 End Sub
 
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
-

@@ -56,14 +56,14 @@ End Property
 
 
 Public Sub CloneSliceTo(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByVal TargetMemoryAddress As LongPtr)
-    MemoryLib.VariantArrayClone VarPtr(pInstance(Index, ColumnIndex)), TargetMemoryAddress, GetCount
+    VariantArrayClone TargetMemoryAddress, VarPtr(pInstance(Index, ColumnIndex)), GetCount
 End Sub
 
 Public Sub SetInstanceByRef(ByRef TargetArray() As Variant)
     If IsEmpty(Instance) Then
         ReDim pInstance(0 To 0, 0 To 0)
-        Instance = MemoryLib.GetArrayByRef(pInstance)
-        MemoryLib.ReassignArrayTo Instance, TargetArray
+        Instance = GetArrayByRef(pInstance)
+        ReassignArrayTo Instance, TargetArray
     Else
         Err.Raise 13, , "Can't reassign an Array2dEx Instance to another 2D Array once initialized."
     End If
@@ -130,7 +130,7 @@ Public Function Unbind() As Array2dEx
     Err.Raise 17, , "Can't perform requested operation. Unbinding an Array2dEx can't be done."
 End Function
 
-Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
+Public Function CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
     Set CopyToRange = Me
     If Not Count > 0 Then Exit Function
 
@@ -142,20 +142,20 @@ Public Function CopyToRange(ByRef RangeObject As Range, Optional ByVal ApplyUser
             .Value = pInstance
         End If
     End With
-    
+
     Exit Function
 UserLocaleFail:
     Debug.Print "[ERROR] @Array2dEx.CopyToRange() -> ApplyUserLocale - " & Err.Description
     Resume Next
 End Function
 
-Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef RangeObject As Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
+Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, ByVal ColumnIndex As Long, ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True) As Array2dEx
     Dim t() As Variant
     Set CopySliceToRange = Me
     If Not (Count > 0 And GetCount > 0) Then Exit Function
     ReDim t(0 To GetCount - 1, 0 To 0)
-    MemoryLib.VariantArrayClone VarPtr(pInstance(Index, ColumnIndex)), VarPtr(t(0, 0)), GetCount
-    
+    VariantArrayClone VarPtr(t(0, 0)), VarPtr(pInstance(Index, ColumnIndex)), GetCount
+
     With RangeObject.Resize(GetCount, 1)
         If ApplyUserLocale Then
             On Error GoTo UserLocaleFail
@@ -164,7 +164,7 @@ Public Function CopySliceToRange(ByVal Index As Long, ByVal GetCount As Long, By
             .Value = t
         End If
     End With
-    
+
     Exit Function
 UserLocaleFail:
     Debug.Print "[ERROR] @Array2dEx.CopySliceToRange() -> ApplyUserLocale - " & Err.Description
@@ -173,14 +173,14 @@ End Function
 
 Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
     Dim r As Long, c As Long, t() As Variant, ubRows As Long, ubCols As Long, k() As Variant
-    
+
     ubRows = rs.RecordCount - 1
     ubCols = rs.Fields.Count - 1
     If ubRows >= 0 Then
         ' TODO: Restore rs.Bookmark instead of calling rs.MoveFirst below
         t = rs.GetRows(adGetRowsRest, adBookmarkFirst)
         ReDim k(0 To ubRows, 0 To ubCols)
-        
+
         rs.MoveFirst
         For c = 0 To ubCols
             If rs.Fields(c).Type = adVarWChar Then
@@ -194,19 +194,19 @@ Private Function CreateFromRecordset(ByRef rs As ADODB.Recordset) As Array2dEx
             End If
         Next c
     End If
-    
+
     Set CreateFromRecordset = New Array2dEx
     CreateFromRecordset.SetInstanceByRef k
 End Function
 
 Private Function CreateFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
     Dim t() As Variant
-    
+
     Set CreateFromExcelRange = New Array2dEx
     t = TargetRange.Value
 
-    MemoryLib.UpdateLBound t, 1, 0
-    MemoryLib.UpdateLBound t, 2, 0
+    UpdateLBound t, 1, 0
+    UpdateLBound t, 2, 0
 
     CreateFromExcelRange.SetInstanceByRef t
 End Function
@@ -214,11 +214,11 @@ End Function
 Private Function CreateFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx
     Dim i As Long, t() As Variant
     ReDim t(0 To 0, 0 To AllFields.Count - 1)
-    
+
     For i = 0 To AllFields.Count - 1
         t(0, i) = CStr(Nz(AllFields(i).Name))
     Next i
-    
+
     Set CreateFromRecordsetFields = New Array2dEx
     CreateFromRecordsetFields.SetInstanceByRef t
 End Function
@@ -226,7 +226,7 @@ End Function
 Private Function CreateFromArrayList(ByVal TargetArray As ArrayList) As Array2dEx
     Dim Entry As Variant, i As Long, c As Long, lc As Long, uc As Long, t() As Variant
     If TargetArray.Count = 0 Then Exit Function
-    
+
     lc = LBound(TargetArray(0))
     uc = UBound(TargetArray(0))
     ReDim t(0 To TargetArray.Count - 1, lc To uc)
@@ -250,7 +250,7 @@ Private Function CreateFromSingleColumnArrayListEx(ByVal TargetArray As ArrayLis
     Dim t() As Variant, i As Long, v As Variant
     If TargetArray.Count = 0 Then Exit Function
     ReDim t(0 To TargetArray.Count - 1, 0 To 0)
-    
+
     For Each v In TargetArray.ToArray()
         If IsObject(v) Then
             Set t(i, 0) = v
@@ -259,7 +259,7 @@ Private Function CreateFromSingleColumnArrayListEx(ByVal TargetArray As ArrayLis
         End If
         i = i + 1
     Next v
-    
+
     Set CreateFromSingleColumnArrayListEx = New Array2dEx
     CreateFromSingleColumnArrayListEx.SetInstanceByRef t
 End Function
@@ -268,7 +268,7 @@ Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dE
     Dim Entry As Variant, i As Long, c As Long, lc As Long, uc As Long, t() As Variant
     Set CreateFromJaggedArray = New Array2dEx
     If UBound(TargetArray) < 0 Then Exit Function
-    
+
     For Each Entry In TargetArray
         If IsArray(Entry) Then
             If UBound(Entry) - LBound(Entry) > uc Then
@@ -279,10 +279,10 @@ Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dE
         i = i + 1
         If i > 1000 Then Exit For
     Next Entry
-    
+
     ReDim t(LBound(TargetArray) To UBound(TargetArray), lc To uc)
     i = LBound(TargetArray)
-    
+
     For Each Entry In TargetArray
         If IsArray(Entry) Then
             For c = lc To UBound(Entry)
@@ -293,7 +293,7 @@ Private Function CreateFromJaggedArray(ByRef TargetArray As Variant) As Array2dE
         End If
         i = i + 1
     Next Entry
-    
+
     CreateFromJaggedArray.SetInstanceByRef t
 End Function
 
@@ -303,7 +303,7 @@ Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
     uc1 = Me.ColumnCount - 1
     uc2 = TargetArray.ColumnCount - 1
     ReDim t(0 To Me.Count - 1, 0 To (uc1 + uc2 + 1))
-    
+
     For i = 0 To Me.Count - 1
         For c = 0 To uc1
             If IsObject(pInstance(i, c)) Then
@@ -320,7 +320,7 @@ Public Function Join(ByVal TargetArray As Array2dEx) As Array2dEx
             End If
         Next c2
     Next i
-    
+
     Set Join = New Array2dEx
     Join.SetInstanceByRef t
 End Function
@@ -335,7 +335,7 @@ End Function
 Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCount As Variant, Optional ByVal ColumnIndexes As Variant) As Array2dEx
     Dim t() As Variant, i As Long, c As Variant, c0 As Long
     Set GetRange = New Array2dEx
-    
+
     If IsMissing(Index) Or IsEmpty(Index) Then Index = 0
     If Index >= Me.Count Then
         Index = IIf(Me.Count - 1 < 0, 0, Me.Count - 1)
@@ -349,7 +349,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
     Else
         If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array(ColumnIndexes)
     End If
-    
+
     If GetCount > 0 Then
         ReDim t(0 To GetCount - 1, 0 To UBound(ColumnIndexes) - LBound(ColumnIndexes))
 
@@ -368,7 +368,7 @@ Public Function GetRange(Optional ByVal Index As Variant, Optional ByVal GetCoun
         t = CreateBlank2dArray()
         GetRange.ColumnCount = -1
     End If
-    
+
     GetRange.SetInstanceByRef t
 End Function
 
@@ -383,7 +383,7 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
     nCols = Me.ColumnCount
     Set aX = ArrayListEx.Create()
     ReDim t(0 To nCols - 1)
-    
+
     For Each rIndex In RowIndexes
         i = CLng(rIndex) + ModIndex
         If i >= 0 And i < nRows Then
@@ -393,7 +393,7 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
             aX.Add t
         End If
     Next rIndex
-    
+
     Set GetRows = Array2dEx.Create(aX)
 End Function
 
@@ -409,7 +409,7 @@ Public Function ToCSV(Optional ByVal Delimiter As String = ",", Optional ByVal I
     ReDim t(0 To Count)
     ReDim s(0 To uc)
     t(UBound(t)) = ""
-    
+
     If InLocalFormat Then
         For i = 0 To UBound(t) - 1
             For c = 0 To uc
@@ -467,13 +467,13 @@ End Function
 '@Description("Transposes the values in a 2d array. Rows become columns, columns become rows.")
 Public Function Transpose() As Array2dEx
     Dim cRow As Long, lbRow As Long, ubRow As Long, cCol As Long, lbCol As Long, ubCol As Long, t() As Variant
-    
+
     lbCol = LBound(pInstance, 1)
     ubCol = UBound(pInstance, 1)
     lbRow = LBound(pInstance, 2)
     ubRow = UBound(pInstance, 2)
     ReDim t(lbRow To ubRow, lbCol To ubCol)
-    
+
     For cRow = lbRow To ubRow
         For cCol = lbCol To ubCol
             If IsObject(pInstance(cCol, cRow)) Then
@@ -483,7 +483,7 @@ Public Function Transpose() As Array2dEx
             End If
         Next
     Next
-    
+
     Set Transpose = New Array2dEx
     Transpose.SetInstanceByRef t
 End Function
@@ -509,7 +509,7 @@ Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Valu
 Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Finally
     Dim t As Long
-    
+
     t = UBound(ArrayLike, 1)
     t = UBound(ArrayLike, 2)
     Is2dArray = True
@@ -523,7 +523,7 @@ Public Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
 
     Is1dArray = Not (UBound(ArrayLike, 2) >= 0)
     Exit Function
-    
+
 Fallback:
     Is1dArray = IsArray(ArrayLike)
 End Function
@@ -562,11 +562,11 @@ Private Function CreateNumericIndexHeaders() As Variant
     Dim t As Variant, c As Long, cMax As Long
     cMax = Me.ColumnCount - 1
     ReDim t(0 To cMax)
-    
+
     For c = 0 To cMax
         t(c) = c
     Next c
-    
+
     CreateNumericIndexHeaders = t
 End Function
 
@@ -580,7 +580,7 @@ Private Function CreateArray2dEx(ByVal RowsCount As Long, ByVal ColumnsCount As 
         t = CreateBlank2dArray(RowsCount)
         CreateArray2dEx.ColumnCount = -1
     End If
-    
+
     CreateArray2dEx.SetInstanceByRef t
 End Function
 

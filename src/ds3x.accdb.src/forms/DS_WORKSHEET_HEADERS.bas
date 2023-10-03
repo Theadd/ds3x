@@ -434,7 +434,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin TextBox
@@ -591,7 +590,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -651,7 +649,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin TextBox
@@ -761,7 +758,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin TextBox
@@ -921,7 +917,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -981,7 +976,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1041,7 +1035,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin TextBox
@@ -1201,7 +1194,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1261,7 +1253,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1321,7 +1312,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1381,7 +1371,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1441,7 +1430,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1501,7 +1489,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin TextBox
@@ -1911,7 +1898,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -1971,7 +1957,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin CommandButton
@@ -2031,7 +2016,6 @@ Begin Form
                     PressedForeThemeColorIndex =-1
                     PressedForeTint =100.0
                     GroupTable =1
-                    WebImagePaddingTop =1
                     Overlaps =1
                 End
                 Begin TextBox
@@ -2202,7 +2186,7 @@ End Sub
 
 Private Sub SetupGridSizes()
     Dim i As Long
-    
+
     For i = 1 To pMaxAvailColumns
         If i = 1 Then
             Me.DS_HC_1_1.Left = 0
@@ -2211,7 +2195,7 @@ Private Sub SetupGridSizes()
         Me.Controls("DS_HC_1_" & CStr(i)).Width = pGridCellSizeX
         Me.Controls("DS_HC_2_" & CStr(i)).Width = pGridCellSizeX
     Next i
-    
+
     Me.DS_HR_BG.Left = 0
     Me.DS_HR_BG.Width = pGridCellSizeX * pMaxAvailColumns
     Me.Width = pGridCellSizeX * pMaxAvailColumns
@@ -2219,7 +2203,7 @@ End Sub
 
 Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long, ByRef dsT As dsTable)
     Dim i As Long, sNames As Variant
-    
+
     sNames = dsT.GetColumnNames(FirstColumnIndex, pMaxAvailColumns)
     For i = 1 To pMaxAvailColumns
         With Me.Controls("DS_HC_1_" & CStr(i))
@@ -2228,7 +2212,7 @@ Friend Sub SetupGrid(ByVal FirstColumnIndex As Long, ByVal FirstRowIndex As Long
         End With
         Me.Controls("DS_HC_2_" & CStr(i)) = sNames(i - 1)
     Next i
-    
+
     pFirstInactiveColumnIndex = Max(Min(dsT.ColumnCount - FirstColumnIndex, pMaxAvailColumns), 0)
     pFirstInactiveRowIndex = Max(dsT.Count - FirstRowIndex, 0)
 End Sub
@@ -2236,7 +2220,7 @@ End Sub
 
 Friend Sub SetSelectedColumns(ByRef aX As ArrayListEx)
     Dim FirstColumnIndex As Long, i As Long
-    
+
     Set pSelectedColumns = aX
     FirstColumnIndex = pViewport.FirstColumnIndex
     For i = 1 To pMaxAvailColumns
@@ -2249,7 +2233,7 @@ End Sub
 
 Public Function OnColumnHeaderClick()
     Dim cIndex As Long
-    
+
     cIndex = Me.SelLeft - 2
     Me.HiddenControl.SetFocus
     RaiseEvent OnColumnLetterClick(pViewport.FirstColumnIndex + cIndex, GetAsyncKeyState(vbKeyControl), GetAsyncKeyState(vbKeyShift))
@@ -2257,7 +2241,7 @@ End Function
 
 Public Function OnColumnNameChange()
     Dim Target As Access.TextBox
-    
+
     If TryGetActiveControl(Target) Then
         RaiseEvent OnColumnNameWillChange(pViewport.FirstColumnIndex + (Me.SelLeft - (pMaxAvailColumns + 0) - 2), GetControlText(Target))
     End If
@@ -2273,7 +2257,7 @@ End Function
 
 Public Sub RemoveFocus()
     If Not pRemoveFocusNeeded Then Exit Sub
-    
+
     pRemoveFocusNeeded = False
     Me.HiddenControl.SetFocus
 End Sub
@@ -2290,7 +2274,7 @@ End Function
 
 Private Function TryGetActiveControl(ByRef OutActiveControl As Variant) As Boolean
     On Error GoTo Finally
-    
+
     Set OutActiveControl = Screen.ActiveControl
     TryGetActiveControl = True
 Finally:

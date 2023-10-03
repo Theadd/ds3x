@@ -60,7 +60,7 @@ End Function
 
 Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Set Bind = Unbind
-    
+
     If Not IsMissing(TableLike) Then
         If Not IsObject(TableLike) Then
             If IsArray(TableLike) Then
@@ -110,7 +110,7 @@ Public Function Bind(Optional ByRef TableLike As Variant, Optional ByVal AutoHea
             End If
         End If
     End If
-    
+
 End Function
 
 Public Function Unbind() As dsTable
@@ -160,7 +160,7 @@ Public Function SetHeaders(ByRef AllHeaders As Variant) As dsTable
             End If
         End If
     End If
-    
+
     Set SetHeaders = Me
 End Function
 
@@ -200,7 +200,7 @@ Public Function ToMarkdownTable() As String
     Set cNamesX = ArrayListEx.Create(GetColumnNames())
     Set cSizes = ArrayListEx.Create()
     Set cX = pRecords
-    
+
     nCols = ColumnCount
     nRows = Count
 
@@ -217,7 +217,7 @@ Public Function ToMarkdownTable() As String
             If CLng(cSizes(i)) < itemLen Then cSizes(i) = itemLen
         Next i
     Next k
-    
+
     ' PRINTING HEADERS
     itemStr = vbNullString
     For k = 0 To nCols - 1
@@ -225,7 +225,7 @@ Public Function ToMarkdownTable() As String
     Next k
     aX.Add Mid$(itemStr, 4, Len(itemStr))
     aX.Add String(Len(aX(0)), "-")
-    
+
     ' PRINTING TABLE ROWS
     For k = 0 To nRows - 1
         vRow = cX.Row(k)
@@ -243,7 +243,7 @@ End Function
 
 Private Sub ApplyFormatToExcelRange(ByVal RangeObject As Excel.Range, ByVal RangeHasHeaders As Boolean)
     Dim r As Excel.Range, i As Long, iX As Variant
-    
+
     If RangeHasHeaders Then
         Set r = RangeObject.Range("A2").Resize(Count, ColumnCount)
     Else
@@ -276,7 +276,7 @@ End Function
 
 Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.Field) As Variant
     Dim d As Variant
-    
+
     With TargetField
         Select Case .Type
             Case adVarChar
@@ -304,7 +304,7 @@ Public Function CreateColumnHeaderFromRecordsetField(ByRef TargetField As ADODB.
             Case Else
                 d = CreateColumnHeader(Nz(.Name))
         End Select
-        
+
         CreateColumnHeaderFromRecordsetField = d
     End With
 End Function
@@ -320,7 +320,7 @@ End Sub
 
 Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long) As dsTable
     Dim t() As Variant, i As Long, k() As Variant, dsT As dsTable, aX As ArrayListEx
-    
+
     Set dsT = dsTable.Create(Array2dEx.CreateBlank(RowsCount, ColumnsCount), False)
 
     If ColumnsCount > 0 Then
@@ -332,7 +332,7 @@ Private Function CreateTable(ByVal RowsCount As Long, ByVal ColumnsCount As Long
     Else
         dsT.SetHeaders Array()
     End If
-    
+
     Set CreateTable = dsT
 End Function
 
@@ -345,14 +345,14 @@ Private Function CreateFromExcelRange(ByRef xlRange As Excel.Range, Optional ByV
             Set pRecords = ArraySliceGroup.Create(.Range(.Cells(1, 1), .Cells(.Rows.Count, .Columns.Count)))
         End If
     End With
-    
+
     Set CreateFromExcelRange = Me
 End Function
 
 Private Function CreateFromDictionary(ByRef Target As Scripting.Dictionary, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Dim dX As DictionaryEx
     On Error GoTo Fallback
-    
+
     Set dX = DictionaryEx.Create(Target)
     If Not dX.Exists("dsTable") Then
         Set CreateFromDictionary = CreateFromKeyValueDictionary(Target, AutoHeaders)
@@ -361,7 +361,7 @@ Private Function CreateFromDictionary(ByRef Target As Scripting.Dictionary, Opti
     Set dX = DictionaryEx.Create(dX("dsTable"))
     Set pRecords = ArraySliceGroup.Create(Array2dEx.Create(dX("Records")))
     Set pHeaders = Array2dEx.Create(ArrayListEx.Create().AddRange(dX("Headers")))
-    
+
     Set CreateFromDictionary = Me
     Exit Function
 Fallback:
@@ -371,7 +371,7 @@ End Function
 Private Function CreateFromKeyValueDictionary(ByRef Target As Scripting.Dictionary, Optional ByVal AutoHeaders As Boolean = False) As dsTable
     Dim dX As DictionaryEx, dKey As Variant, aX As ArrayListEx
     On Error GoTo Fallback
-    
+
     Set dX = DictionaryEx.Create(Target)
     Set aX = ArrayListEx.Create()
     For Each dKey In dX.Keys()
@@ -381,7 +381,7 @@ Private Function CreateFromKeyValueDictionary(ByRef Target As Scripting.Dictiona
     If AutoHeaders Then
         SetHeaders Array("Key", "Value")
     End If
-    
+
     Set CreateFromKeyValueDictionary = Me
     Exit Function
 Fallback:
@@ -395,7 +395,7 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
     cMin = LBound(iRow)
     CollectionsLib.AsArraySliceGroup(Records).SlicedJaggedArray AllValues
     vHeads = Headers.Row(0)
-    
+
     With rs
         For c = cMin To cMax
             Select Case CollectionsLib.ArrayItem(vHeads(c), 2, "Text")
@@ -416,7 +416,7 @@ Private Function CreateNamedRecordset() As ADODB.Recordset
         Next i
         If Count > 0 Then .MoveFirst
     End With
-    
+
     Set CreateNamedRecordset = rs
 End Function
 
@@ -430,18 +430,18 @@ Public Function CreateIndexRecordset( _
         Optional ByVal ColumnIndexStartsOnZero As Boolean = False _
         ) As ADODB.Recordset
     Dim rs As New ADODB.Recordset, i As Long, c As Long, cMax As Long, cMin As Long, iRow As Variant, AllValues As ArrayListEx, iMax As Long
-    
+
     If IsMissing(PageSize) Then PageSize = Count
     If IsMissing(PageIndex) Then PageIndex = 0
     If IsMissing(ColumnStartIndex) Then ColumnStartIndex = 0
     If IsMissing(ColumnsCount) Then ColumnsCount = ColumnCount - ColumnStartIndex
-    
+
     iRow = CreateIndexHeaders(ColumnStartIndex, ColumnsCount, ColumnIndexStartsOnZero)
     cMax = UBound(iRow)
     cMin = LBound(iRow)
     iMax = ((PageSize * (PageIndex + 1)) - 1) + ((PageCount - 1) * PageSize)
     If iMax > Count - 1 Then iMax = Count - 1
-        
+
     If ColumnStartIndex <> 0 Or ColumnsCount <> ColumnCount Then
         Set AllValues = CollectionsLib.AsArrayListEx( _
                             Records.GetRange( _
@@ -452,7 +452,7 @@ Public Function CreateIndexRecordset( _
         ' TODO: Slice rows up to requested ones
         Set AllValues = CollectionsLib.AsArrayListEx(Records)
     End If
-    
+
     With rs
         For c = cMin To cMax
             .Fields.Append CStr(iRow(c)), adLongVarWChar, -1, adFldIsNullable
@@ -463,30 +463,30 @@ Public Function CreateIndexRecordset( _
         Next i
         If Count > 0 Then .MoveFirst
     End With
-    
+
     Set CreateIndexRecordset = rs
 End Function
 
 Private Function CreateIndexHeaders(ByVal ColumnStartIndex As Long, ByVal ColumnsCount As Long, ByVal ColumnIndexStartsOnZero As Boolean) As Variant
     Dim t As Variant, c As Long, cMax As Long, cMin As Long
     cMax = (ColumnsCount - 1) ' + ColumnStartIndex
-    
+
     If Not ColumnIndexStartsOnZero Then
         cMin = ColumnStartIndex
     End If
-    
+
     ReDim t(0 To cMax)
-    
+
     For c = 0 To cMax
         t(c) = CStr(c + cMin)
     Next c
-    
+
     CreateIndexHeaders = t
 End Function
 
 Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Optional ByVal GetCount As Variant) As Variant
     Dim t As Variant, c As Long, hItems As Variant, sLimit As Long
-    
+
     If IsMissing(GetCount) Then GetCount = ColumnCount - FirstColumnIndex
     If GetCount = 0 Then
         GetColumnNames = Array()
@@ -495,7 +495,7 @@ Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Opti
     ReDim t(0 To GetCount - 1)
     hItems = Headers.Row(0)
     sLimit = IIf(ColumnCount - FirstColumnIndex < GetCount, ColumnCount - FirstColumnIndex, GetCount)
-    
+
     For c = 0 To sLimit - 1
         t(c) = CStr(CollectionsLib.ArrayItem(hItems(c + FirstColumnIndex), 0, vbNullString))
     Next c
@@ -503,7 +503,7 @@ Public Function GetColumnNames(Optional ByVal FirstColumnIndex As Long = 0, Opti
     For c = sLimit To GetCount - 1
         t(c) = vbNullString
     Next c
-    
+
     GetColumnNames = t
 End Function
 
@@ -513,7 +513,7 @@ End Function
 Private Function CreateColumnHeadersFromRecordsetFields(ByVal AllFields As ADODB.Fields) As Array2dEx
     Dim i As Long, t() As Variant
     ReDim t(0 To 0, 0 To AllFields.Count - 1)
-    
+
     For i = 0 To AllFields.Count - 1
         t(0, i) = CreateColumnHeaderFromRecordsetField(AllFields(i))
     Next i
@@ -524,13 +524,13 @@ End Function
 
 Private Function CreateColumnHeadersFromExcelRange(ByVal TargetRange As Excel.Range) As Array2dEx
     Dim i As Long, t() As Variant, cFormats As Variant, cNames As Variant
-    
+
     With TargetRange
         ReDim t(0 To 0, 0 To .Columns.Count - 1)
         cNames = ArrayListEx.Create(.Range(.Cells(1, 1), .Cells(1, .Columns.Count)))(0)
     End With
     cFormats = xlSheetsEx.GetColumnsAutoNumberFormats(TargetRange)
-    
+
     For i = 0 To UBound(cFormats)
         Select Case UCase(Left(CStr(cFormats(i)(0)), 1))
             Case "G"
@@ -553,7 +553,7 @@ End Function
 Private Sub MakeSureHeadersExist()
     If Not pHeaders Is Nothing Then Exit Sub
     Dim t() As Variant, i As Long
-    
+
     ReDim t(0 To 0, 0 To ColumnCount - 1)
     For i = 0 To ColumnCount - 1
         t(0, i) = Array()
@@ -591,4 +591,3 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", O
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
-

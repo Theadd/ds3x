@@ -92,7 +92,7 @@ Public Function CreateBlank(ByVal RowsCount As Long, ByVal ColumnsCount As Long)
 
 Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
     Set Create = New DictionaryEx
-    
+
     If Not IsMissing(DictionaryLike) Then
         If IsObject(DictionaryLike) Then
             If Not DictionaryLike Is Nothing Then
@@ -116,7 +116,7 @@ Public Function Create(Optional ByRef DictionaryLike As Variant) As DictionaryEx
             End If
         End If
     End If
-    
+
     Dim t As Scripting.Dictionary
     Set t = New Scripting.Dictionary
     Create.Bind t
@@ -153,7 +153,7 @@ Public Function Add(mKey As Variant, mVal As Variant) As DictionaryEx
             Instance.Item(mKey) = mVal
         End If
     End If
-    
+
     Set Add = Me
     On Error GoTo 0
 End Function
@@ -174,13 +174,13 @@ End Function
 'Appends another dictionary (Scripting.Dictionary or DictionaryEx) to the Scripting.Dictionary
 Public Function Append(Optional ByRef mOther As Variant) As DictionaryEx
     Dim mKey As Variant
-    
+
     If Not IsMissing(mOther) Then
         For Each mKey In mOther.Keys()
             Add mKey, mOther.Item(mKey)
         Next mKey
     End If
-    
+
     Set Append = Me
 End Function
 
@@ -227,18 +227,18 @@ End Function
 Public Function Entries() As Variant
     Dim aX As ArrayListEx, dKey As Variant
     Set aX = ArrayListEx.Create()
-    
+
     For Each dKey In Instance.Keys()
         aX.Add Array(dKey, Instance(dKey))
     Next dKey
-    
+
     Entries = aX.ToArray()
 End Function
 
 Public Function Clone() As DictionaryEx
     Dim t As New DictionaryEx
     Set t.Instance = ShallowCopyDictionary(Instance)
-    
+
     Set Clone = t
 End Function
 
@@ -282,21 +282,21 @@ End Function
 
 Private Function ShallowCopyDictionary(ByVal d As Scripting.Dictionary) As Scripting.Dictionary
     Dim s As New Scripting.Dictionary, k As Variant
-    
+
     s.CompareMode = d.CompareMode
     For Each k In d.Keys
         s.Add k, d(k)
     Next k
-    
+
     Set ShallowCopyDictionary = s
 End Function
 
 Private Function TrySetNestedItem(ByVal mKey As String, ByRef Value As Variant) As Boolean
     Dim t As Long, v As Variant, sAux As String
-    
+
     t = InStrRev(mKey, ".")
     If t = 0 Then Exit Function
-    
+
     Assign v, Item(VBA.Left$(mKey, t - 1))
     sAux = VBA.Mid$(mKey, t + 1, Len(mKey))
     If IsObject(Value) Then
@@ -310,7 +310,7 @@ End Function
 Private Function GetNestedItem(ByVal mKey As String) As Variant
     Dim t As Long, c As Long, c2 As Long, v As Variant, v2 As Variant, tEnd As Boolean, cEnd As Boolean
     On Error GoTo Finally
-    
+
     Do
         t = InStr(1 + t, mKey, ".", vbBinaryCompare)
         c = InStr(1 + c, mKey, "[", vbBinaryCompare)
@@ -372,7 +372,7 @@ End Sub
 Private Sub CreateFromIterable(ByRef Target As Variant)
     Dim i As Long
     Set Instance = New Scripting.Dictionary
-    
+
     If IsArray(Target(0)) Then
         For i = 0 To UBound(Target)
             Add Target(i)(0), Target(i)(1)
@@ -417,7 +417,3 @@ Private Function ICollectionEx_ToCSV(Optional ByVal Delimiter As String = ",", O
 Private Function ICollectionEx_ToJSON() As String: ICollectionEx_ToJSON = ToJSON(): End Function
 Private Function ICollectionEx_ToExcel() As String: ICollectionEx_ToExcel = ToExcel(): End Function
 Private Function ICollectionEx_CopyToRange(ByRef RangeObject As Excel.Range, Optional ByVal ApplyUserLocale As Boolean = True, Optional ByVal WriteHeaders As Boolean = True) As ICollectionEx: Set ICollectionEx_CopyToRange = CopyToRange(RangeObject, ApplyUserLocale, WriteHeaders): End Function
-
-
-
-

@@ -1288,7 +1288,7 @@ Public Sub RebuildTasksList()
     If pActiveTaskName <> vbNullString Then
         ActiveTaskType = pTasks(pActiveTaskName)(DS_T_TYPE)
     End If
-    
+
     For i = 0 To pTaskNames.Count - 1
         TaskName = pTaskNames(i)
         TaskType = pTasks(TaskName)(DS_T_TYPE)
@@ -1300,13 +1300,13 @@ Public Sub RebuildTasksList()
         ValidRequiredType = pEnableAllTasks Or pEditMode Or (ActiveTaskType Like RequiresPattern)
         pTaskGroups(TaskType).Add Array(i, TaskName, IIf(ValidRequiredType, 1, 4))
     Next i
-    
+
     For Each TListType In pTaskGroups.Keys
         TaskList.Add GetTaskTypeHeader(TListType)
         TaskList.AddRange pTaskGroups(TListType)
         TaskList.Add GetTaskTypeHeader("")
     Next TListType
-    
+
     Set dsT = dsTable.Create(TaskList).SetHeaders(Array("DS_LIST_ITEM_INDEX", "DS_LIST_ITEM", "DS_LIST_ITEM_STATE"))
     Set rsX = RecordsetEx.Create(dsT.NamedRecordset)
     Set Me.DS_CREATE_TASK_LIST.Form.Recordset = rsX.Instance
@@ -1320,7 +1320,7 @@ Private Function GetTaskTypeHeader(ByVal TaskType As String) As Variant
     Static IndexCountdown As Long
     Dim Title As String
     IndexCountdown = IndexCountdown - 1
-    
+
     Select Case TaskType
         Case "XL": Title = "XL FORMATTING"
         Case "XLG": Title = "XL GENERATION"
@@ -1332,7 +1332,7 @@ Private Function GetTaskTypeHeader(ByVal TaskType As String) As Variant
             GetTaskTypeHeader = Array(IndexCountdown, " ", 4)
             Exit Function
     End Select
-    
+
     GetTaskTypeHeader = Array(IndexCountdown, CreateListItemTextHeader(Title), 4)
 End Function
 
@@ -1353,7 +1353,7 @@ End Sub
 
 Private Sub DS_TASK_PARAM_0_Change()
     Dim Target As String
-    
+
     If GetControlText(Me.DS_TASK_PARAM_0) = "< Select... >" Then
         If FileSystemLib.TryFileOpenDialog(Target) Then
             SetControlText Me.DS_TASK_PARAM_0, Target
@@ -1365,7 +1365,7 @@ End Sub
 
 Private Sub DS_TASK_PARAM_1_Change()
     Dim Target As String, sExtension As String
-    
+
     If GetControlText(Me.DS_TASK_PARAM_1) = "< Select... >" Then
         If pSelectedTask Like "*JSON*" Then
             sExtension = "*.json"
@@ -1403,21 +1403,21 @@ End Function
 Private Sub RebuildUIForTask(ByVal TaskName As String)
     Dim Task As Variant, textContent As String, TaskParams As Variant, i As Long
     On Error GoTo Finally
-    
+
     ResetAllTaskParamTextFields
     Task = pTasks(TaskName)
-    
+
     Me.DS_TASK_DEFINITION_SYNTAX = Task(DS_T_NAME) & " (" & Task(DS_T_PARAMS)(0) & "): " & GetReturnTypeOf(TaskName)
     Me.DS_TASK_DEFINITION_SYNTAX.Visible = True
-    
+
     textContent = Task(DS_T_DESC)
     If Task(DS_T_USAGE) <> "" Then
         If textContent <> "" Then textContent = textContent & vbNewLine & " " & vbNewLine
         textContent = textContent & "<strong>Usage</strong>: " & Task(DS_T_USAGE)
     End If
-    
+
     Me.DS_TASK_TEXT_CONTENT = Replace(textContent, vbNewLine, "<br>")
-    
+
     TaskParams = Task(DS_T_PARAMS)(2)
     For i = 0 To UBound(TaskParams)
         RefillDefaultParamValues TaskName, i, TaskParams
@@ -1426,7 +1426,7 @@ Private Sub RebuildUIForTask(ByVal TaskName As String)
         End If
     Next i
     MoveTaskTextContentToFit UBound(TaskParams) + 1
-    
+
     For i = UBound(TaskParams) + 1 To 4
         Me.Controls("DS_TASK_PARAM_" & CStr(i)).Visible = False
         Me.Controls("DS_LABEL_TASK_PARAM_" & CStr(i)).Visible = False
@@ -1447,7 +1447,7 @@ End Sub
 Private Sub ResetAllTaskParamTextFields()
     Dim i As Long
     On Error Resume Next
-    
+
     For i = 0 To 4
         SetControlText Me.Controls("DS_TASK_PARAM_" & CStr(i)), ""
     Next i
@@ -1457,7 +1457,7 @@ End Sub
 Private Sub RefillExistingParamValues(ByVal TaskName As String, ByVal ParamIndex As Long, ByVal TaskParams As Variant, ByVal TaskIndex As Long)
     On Error GoTo 0
     Dim TaskValues As Variant, v As Variant, MatchingValue As String
-    
+
     TaskValues = pController.TaskController.RebuildSequence(TaskIndex)("Values")
     If IsArray(TaskValues) Then
         If ParamIndex <= UBound(TaskValues) Then
@@ -1489,7 +1489,7 @@ End Sub
 
 Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex As Long, ByVal TaskParams As Variant)
     Dim Item As Variant, isRequired As Boolean, ParamName As String
-    
+
     With Me.Controls("DS_TASK_PARAM_" & CStr(ParamIndex))
         .RowSourceType = "Value List"
         .RowSource = vbNullString
@@ -1497,7 +1497,7 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
         .Visible = True
         ParamName = TaskParams(ParamIndex)(0)
         isRequired = Not (VBA.Mid$(ParamName, 1, 1) = "[")
-        
+
         '"SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
 
         If ParamName Like "*ColumnIndexes*" Then
@@ -1575,16 +1575,16 @@ Private Sub RefillDefaultParamValues(ByVal TaskName As String, ByVal ParamIndex 
         .Visible = True
         .Caption = TaskParams(ParamIndex)(0)
     End With
-    
+
 End Sub
 
 Private Function GetListOfPreviousTaskResults(Optional ByVal TaskReturnType As String = "") As ArrayListEx
     Dim t As New ArrayListEx, i As Long, aList As ArrayListEx
-    
+
     On Error GoTo Finally
     With pController.TaskController
         Set aList = .RebuildSequence
-        
+
         For i = 0 To .SequenceIndex
             If TaskReturnType = "" Then
                 t.Add aList(i)("Id")
@@ -1603,12 +1603,12 @@ Private Sub AddTaskUsingCurrentValuesAs(ByVal TaskName As String)
     Dim Task As Variant, t() As Variant, TaskParams As Variant, i As Long, Item As Variant, TaskId As String
     Task = pTasks(TaskName)
     TaskParams = Task(DS_T_PARAMS)(2)
-    
+
     If UBound(TaskParams) < 0 Then
         t = Array()
     Else
         ReDim t(0 To UBound(TaskParams))
-        
+
         For i = 0 To UBound(TaskParams)
             If i < 5 Then
                 If Nz(Me.Controls("DS_TASK_PARAM_" & CStr(i)), "") <> "" Then
@@ -1630,7 +1630,7 @@ Private Sub AddTaskUsingCurrentValuesAs(ByVal TaskName As String)
             End If
         Next i
     End If
-    
+
     If EditMode Then
         TaskId = pController.TaskController.RebuildSequence(ActiveTaskIndex)("Id")
         pController.TaskController.SetTask pController.TaskController.GenerateTask(TaskName, t, TaskId).Instance, ActiveTaskIndex
@@ -1645,14 +1645,14 @@ End Sub
 
 Private Function ParseParamValue(ByVal Value As String) As Variant
     On Error GoTo Fallback
-    
+
     Select Case VBA.Mid$(LTrim(Value), 1, 1)
         Case "[", "{"
             Assign ParseParamValue, JSON.Parse(Value, True, True)
         Case Else
             ParseParamValue = Value
     End Select
-    
+
     Exit Function
 Fallback:
     ParseParamValue = Value
@@ -1695,7 +1695,7 @@ End Sub
 
 Private Function GetExcelTableStyles() As Variant
     Dim i As Long
-    
+
     With ArrayListEx.Create()
         For i = 1 To 21: .Add "TableStyleLight" & CStr(i): Next i
         For i = 1 To 28: .Add "TableStyleMedium" & CStr(i): Next i
@@ -1706,11 +1706,11 @@ End Function
 
 Private Sub ShowAvailableCustomVars()
     Dim dsT As dsTable, r As ds3xGlobals.RECT, rScreen As ds3xGlobals.RECT
-    
+
     If pCVarsScrollview Is Nothing Then
         Set pCVarsScrollview = New Form_DS_SCROLLVIEW
         Set dsT = dsTable.Create(dsApp.CustomVars).SetHeaders(Array("CustomVar", "Value"))
-        
+
         pCVarsScrollview.Visible = True
         ScreenLib.WindowSizeTo pCVarsScrollview, 5160, 8000
         ScreenLib.WindowAlwaysOnTop pCVarsScrollview
@@ -1760,14 +1760,14 @@ End Sub
 Private Function GetSelectedColumnNumberFormat() As String
     Dim cIndex As Long, cIndexValid As Boolean
     On Error GoTo Finally
-    
+
     With pController.SelectedColumnIndexes
         If .Count > 0 Then
             cIndex = CLng(.Item(0))
             cIndexValid = True
         End If
     End With
-    
+
     If cIndexValid Then
         GetSelectedColumnNumberFormat = CollectionsLib.ArrayItem(pController.Table.Headers.Row(0)(cIndex), 1, "General")
     End If

@@ -48,13 +48,13 @@ End Property
 Public Property Get ApplyCustomVarsOn(ByVal Target As Variant) As Variant
     If pCustomVars Is Nothing Then InitializeCustomVars
     If pCustomVars.Count = 0 Then GoTo NoCustomVars
-    
+
     If IsObject(Target) Then
         Set ApplyCustomVarsOn = ReplaceCustomVars(Target)
     Else
         ApplyCustomVarsOn = ReplaceCustomVars(Target)
     End If
-    
+
     Exit Property
 NoCustomVars:
     If IsObject(Target) Then
@@ -65,7 +65,7 @@ NoCustomVars:
 End Property
 
 #If AutomationSupport = 1 Then
-    
+
     Public Property Get ActiveTask() As Variant: ActiveTask = pActiveTask: End Property
     Public Property Get FailedTask() As Variant: FailedTask = pFailedTask: End Property
 
@@ -73,16 +73,16 @@ End Property
         If pRunnableTasks Is Nothing Then Set pRunnableTasks = ArrayListEx.Create()
         Set RunnableTasks = pRunnableTasks
     End Property
-    
+
     Public Property Get RunAll() As Boolean
         Dim t As Variant, shouldContinue As Boolean, sTarget As String
         On Error GoTo ErrorHandler
         pFailedTask = Empty
-        
+
         For Each t In RunnableTasks.ToArray()
             pActiveTask = t
             If Not pLiveEd Is Nothing Then pLiveEd.Dispose
-            
+
             Set pLiveEd = New dsLiveEd
             sTarget = FileSystemLib.Resolve(ApplyCustomVarsOn(CStr(t(0))))
             If CStr(t(1)) = "" Then
@@ -104,7 +104,7 @@ End Property
                 dsApp.Log("error") = "Failed to import preset at " & sTarget
             End If
             CustomVar("TaskName") = ""
-            
+
             If shouldContinue Then
                 pActiveTask = Empty
                 RunnableTasks.RemoveAt 0
@@ -115,7 +115,7 @@ End Property
                 Exit For
             End If
         Next t
-        
+
 Finally:
         On Error Resume Next
         If Not pLiveEd Is Nothing Then pLiveEd.Dispose
@@ -127,15 +127,15 @@ ErrorHandler:
         dsApp.Log("critical") = "Unhandled error @dsAppGlobals.RunAll() - " & Err.Description
         GoTo Finally
     End Property
-    
-    
+
+
     Public Sub ExecuteAutomationCommandArgs(ByVal sArgs As String)
         Dim vArgs As Variant, sArg As Variant, vArg As Variant, isAsync As Boolean, isExec As Boolean, isContinue As Boolean
         Dim aX As ArrayListEx, dX As DictionaryEx
-        
+
         sArgs = Trim(sArgs)
         If sArgs = "" Then Exit Sub
-        
+
         Set aX = ArrayListEx.Create()
         Set dX = DictionaryEx.Create()
         vArgs = CollectionsLib.Tokenize(sArgs)
@@ -161,15 +161,15 @@ ErrorHandler:
                     End If
             End Select
         Next sArg
-        
+
         For Each vArg In dX.Entries()
             CustomVar(vArg(0)) = vArg(1)
         Next vArg
-        
+
         For Each vArg In aX
             AddRunnableTask CStr(vArg(0)), CStr(vArg(1)), isContinue
         Next vArg
-        
+
         If isExec Then
             pQuitOnRunAll = True
             If isAsync Then
@@ -178,7 +178,7 @@ ErrorHandler:
                 Debug.Print "[INFO] RunAll = " & CStr(dsApp.RunAll())
             End If
         End If
-        
+
         Exit Sub
 HandleUnknownParamter:
         ' Abort
@@ -215,7 +215,7 @@ End Function
 Private Sub InitializeCustomVars()
     Dim s As String, dX As DictionaryEx, Item As Variant
     Set pCustomVars = DictionaryEx.Create()
-    
+
     pCustomVars.Add "${Timestamp}", CStr(DateDiff("s", DateValue("1970-01-01"), Now()))
     pCustomVars.Add "${Date}", VBA.Format$(Date, "yyyymmdd")
     pCustomVars.Add "${DateTime}", VBA.Format$(Now(), "yyyymmddhhMMss")
@@ -226,7 +226,7 @@ Private Sub InitializeCustomVars()
     pCustomVars.Add "${UserProfile}", VBA.Environ$("USERPROFILE")
     pCustomVars.Add "${Temp}", VBA.Environ$("TEMP")
     pCustomVars.Add "${ApplicationPath}", Application.CodeProject.Path
-    
+
     s = FileSystemLib.PathCombine(Application.CodeProject.Path, "package.json")
     If FileSystemLib.TryGetFileInAncestors(s, 3) Then
         If FileSystemLib.TryReadAllTextInFile(s, s) Then
@@ -258,23 +258,23 @@ End Function
 Private Function ReplaceCustomVarsOnIterable(ByVal Target As Variant) As Variant
     Dim aX As ArrayListEx, Item As Variant
     Set aX = ArrayListEx.Create()
-    
+
     For Each Item In Target
         aX.Add ReplaceCustomVars(Item)
     Next Item
-    
+
     ReplaceCustomVarsOnIterable = aX.ToArray()
 End Function
 
 Private Function ReplaceCustomVarsOnString(ByVal Target As String) As String
     Dim cKey As Variant
-    
+
     For Each cKey In pCustomVars.Keys()
         If InStr(1, Target, CStr(cKey), vbTextCompare) > 0 Then
             Target = Replace(Target, CStr(cKey), CStr(pCustomVars(cKey)), Compare:=vbTextCompare)
         End If
     Next cKey
-    
+
     ReplaceCustomVarsOnString = Target
 End Function
 
@@ -284,20 +284,20 @@ End Function
 Private Sub AppendToLogFile(ByVal LogLevel As String, ByVal LogMessage As String)
     Static sLogFile As String, isFileMissing As Boolean
     Dim sItem As String, sFile As Variant
-    
+
     sItem = Printf("[%1] %2%3 - %4", UCase(Left(LogLevel, 12)), VBA.Space$(13 - Len(Left(LogLevel, 12))), Time(), LogMessage)
     Debug.Print sItem
     If isFileMissing Then Exit Sub
-    
+
     On Error GoTo HandleFileMissing
     If sLogFile = vbNullString Then
         sFile = dsApp.LoadConfig("package.json")("ds3x.LogFile")
         If IsEmpty(sFile) Or Trim(CStr(sFile)) = "" Then GoTo HandleFileMissing
         sLogFile = FileSystemLib.Resolve(ApplyCustomVarsOn(sFile))
     End If
-    
+
     FileSystemLib.TryAppendTextInFile sLogFile, sItem & vbNewLine, False
-    
+
     Exit Sub
 HandleFileMissing:
     isFileMissing = True
@@ -307,7 +307,7 @@ Private Function GetConfigFromFile(Optional ByVal TargetFile As String = "packag
     Dim s As String
     On Error GoTo Finally
     Set GetConfigFromFile = DictionaryEx.Create()
-    
+
     s = FileSystemLib.Resolve(TargetFile)
     If FileSystemLib.TryGetFileInAncestors(s, 3) Then
         If FileSystemLib.TryReadAllTextInFile(s, s) Then
@@ -323,7 +323,7 @@ End Function
 Public Function TimerSpan() As Single
     Static cTimer As Single
     Dim t As Single
-    
+
     t = Timer()
     If cTimer = CSng(0) Then cTimer = t
     TimerSpan = CSng(CLng((t - cTimer) * 1000) / 1000)
@@ -333,16 +333,15 @@ End Function
 Public Sub GlobalVMemAnalysis(Optional ByVal Message As Variant, Optional ShowMessage As Boolean = True)
     Static LastVMemFree As Long, sVMemCallCount As Long
     Dim cVMemFree As Long, elapsedTime As String, sAux As String
-    
+
     cVMemFree = FileSystemLib.GetAvailableVirtualMemory()
     sVMemCallCount = sVMemCallCount + 1
     elapsedTime = CStr(TimerSpan())
     elapsedTime = String(8 - Len(elapsedTime), " ") & elapsedTime
-    
+
     If LastVMemFree <> 0 And ShowMessage Then
         If LastVMemFree - cVMemFree <> 0 Then sAux = " (" & CStr(0 - (LastVMemFree - cVMemFree)) & " MB)"
         Debug.Print Printf("%6 [Avail. VMem]%3 %2 MB %5", LastVMemFree, cVMemFree, sAux, sVMemCallCount, IIf(IsMissing(Message), "", "- " & CStr(Message)), elapsedTime)
     End If
     LastVMemFree = cVMemFree
 End Sub
-

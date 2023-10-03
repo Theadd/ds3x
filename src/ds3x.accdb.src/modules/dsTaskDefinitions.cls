@@ -26,7 +26,7 @@ Public Property Get AppExcelVisibilityAuto() As Boolean: AppExcelVisibilityAuto 
 Public Function AsRecordsetTable(ByRef TargetTable As Variant) As dsTable
     Dim Target As dsTable, rX As RecordsetEx
     Set Target = TargetTable
-    
+
     Set rX = RecordsetEx.Create(Target.NamedRecordset)
     Set AsRecordsetTable = pTaskController.AddResource(dsTable.Create(rX, True))
 End Function
@@ -37,7 +37,7 @@ Public Function CreateMassiveTable() As dsTable
     NumRows = 42000: NumRowSlices = 50000: NumColumns = 1000
     ReDim r(0 To NumColumns - 1)
     ReDim t(0 To NumRows - 1, 0 To 0)
-    
+
     For i = 0 To NumRows - 1
         t(i, 0) = i
     Next i
@@ -65,7 +65,7 @@ Public Function EnumerateRows(ByRef TargetTable As Variant, Optional ByVal FromN
     FromNum = CLng(GetParam(FromNumber, CLng(1)))
     ToNum = CLng(GetParam(ToNumber, CLng(-1)))
     ReDim t(0 To Target.Count - 1, 0 To 0)
-    
+
     n = FromNum
     For i = 0 To Target.Count - 1
         t(i, 0) = n
@@ -75,7 +75,7 @@ Public Function EnumerateRows(ByRef TargetTable As Variant, Optional ByVal FromN
             n = n + 1
         End If
     Next i
-    
+
     Set EnumerateRows = dsTable _
         .Create(Array2dEx.Create(t)) _
         .SetHeaders(ArrayListEx.Create(Array(Array(dsTable.CreateColumnHeader("#"))))) _
@@ -87,18 +87,18 @@ Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal Colum
     Dim sgX As ArraySliceGroup, sX As ArraySlice, v As Variant, cH As Variant, vItems As Variant
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     ColumnName = GetParam(ColumnName, "%1")
-    
+
     Set Target = TargetTable
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     Set sgX = ArraySliceGroup.Create(Target.Headers)
-    
+
     For Each cH In colIndexes
         v = sgX.SliceAt(CLng(cH)).Row(0)
         vItems = Array(dsApp.ApplyCustomVarsOn(Printf(ColumnName, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 1), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
         Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
         e = e + 1
     Next cH
-    
+
     Set SetColumnName = dsTable.Create(Target.Records).SetHeaders(sgX.Instance)
 End Function
 
@@ -107,18 +107,18 @@ Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal Col
     Dim sgX As ArraySliceGroup, v As Variant, cH As Variant, vItems As Variant
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     NumberFormat = GetParam(NumberFormat, "General")
-    
+
     Set Target = TargetTable
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     Set sgX = ArraySliceGroup.Create(Target.Headers)
-    
+
     For Each cH In colIndexes
         v = sgX.SliceAt(CLng(cH)).Row(0)
         vItems = Array(CollectionsLib.ArrayItem(v, 0), dsApp.ApplyCustomVarsOn(Printf(NumberFormat, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
         Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
         e = e + 1
     Next cH
-    
+
     Set SetNumberFormat = dsTable.Create(Target.Records).SetHeaders(sgX.Instance)
 End Function
 
@@ -151,7 +151,7 @@ Public Function FilterValue(ByRef TargetTable As Variant, ByVal ColumnIndex As V
             If CStr(Nz(t(i, 0), vbNullString)) = sValue Then aX.Add i
         Next i
     End If
-    
+
     Set FilterValue = dsTable.Create(sgX.GetRows(aX.ToArray()), False).SetHeaders(Target.Headers)
 End Function
 
@@ -161,9 +161,9 @@ Public Function GetRange(ByRef TargetTable As Variant, Optional ByVal Index As V
     Index = GetParam(Index, 0)
     GetCount = GetParam(GetCount, Target.Count - Index)
     ColumnIndexes = GetParam(ColumnIndexes, Array())
-    
+
     If Not IsArray(ColumnIndexes) Then ColumnIndexes = Array()
-    
+
     If ArrayListEx.CountElementsIn(ColumnIndexes) > 0 Then
         Set GetRange = pTaskController.AddResource(Target.GetRange(Index, GetCount, ColumnIndexes))
     Else
@@ -203,7 +203,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
         colIndexes.Add CLng(v)
     Next v
     Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
-    
+
     If TypeName(Replacer) Like "*Dictionary*" Then
         Set dRepl = DictionaryEx.Create(Replacer)
         For Each v In colIndexes
@@ -233,7 +233,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
             Set sgX = sgX.Replace(ArraySlice.Create(t), c)
         Next v
     End If
-    
+
     Set ReplaceValues = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
 End Function
 
@@ -247,7 +247,7 @@ Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal C
     End If
     kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
     Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
-    
+
     For k = 0 To kMax
         c = CLng(ColumnIndexes(k))
         sgX.SliceAt(c).SlicedArray vSliced
@@ -259,7 +259,7 @@ Public Function StringValuesToHex(ByRef TargetTable As Variant, Optional ByVal C
         Next i
         Set sgX = sgX.Replace(ArraySlice.Create(t), c)
     Next k
-    
+
     Set StringValuesToHex = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
 End Function
 
@@ -273,7 +273,7 @@ Public Function HexToStringValues(ByRef TargetTable As Variant, Optional ByVal C
     End If
     kMax = ArrayListEx.CountElementsIn(ColumnIndexes) - 1
     Set sgX = CollectionsLib.AsArraySliceGroup(Target.Records)
-    
+
     For k = 0 To kMax
         c = CLng(ColumnIndexes(k))
         sgX.SliceAt(c).SlicedArray vSliced
@@ -285,7 +285,7 @@ Public Function HexToStringValues(ByRef TargetTable As Variant, Optional ByVal C
         Next i
         Set sgX = sgX.Replace(ArraySlice.Create(t), c)
     Next k
-    
+
     Set HexToStringValues = pTaskController.AddResource(dsTable.Create(sgX, False).SetHeaders(Target.Headers.GetRange(0, Target.ColumnCount)))
 End Function
 
@@ -324,20 +324,20 @@ End Function
 Public Function RemoveColumns(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
     Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant
     Set Target = TargetTable
-    
+
     Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target)))
     For Each c In ColumnIndexes
         aX.Remove CLng(c)
     Next c
     t = aX.ToArray
-    
+
     Set RemoveColumns = Target.GetRange(, , t)
 End Function
 
 Public Function MoveColumnsToTheEnd(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
     Dim t() As Variant, i As Long, Target As dsTable, aX As ArrayListEx, c As Variant, cX As ArrayListEx
     Dim TableA As dsTable, TableB As dsTable
-    
+
     Set Target = TargetTable
     Set TableA = RemoveColumns(Target, ColumnIndexes)
     Set TableB = Target.GetRange(, , ColumnIndexes)
@@ -348,7 +348,7 @@ End Function
 Public Function MoveColumnsToTheStart(ByRef TargetTable As Variant, ByVal ColumnIndexes As Variant) As dsTable
     Dim TableA As dsTable, TableB As dsTable, Target As dsTable
     Set Target = TargetTable
-    
+
     Set TableA = RemoveColumns(Target, ColumnIndexes)
     Set TableB = Target.GetRange(, , ColumnIndexes)
 
@@ -363,7 +363,7 @@ Public Function MoveColumn(ByRef TargetTable As Variant, ByVal ColumnIndex As Va
     Set aX = ArrayListEx.Create(CollectionsLib.ArrayRange(0, ColumnCount(Target)))
     aX.RemoveAt CLng(ColumnIndex)
     aX.Insert ColumnIndex + MoveCount, CLng(ColumnIndex)
-    
+
     Set MoveColumn = Target.GetRange(, , aX.ToArray)
 End Function
 
@@ -386,7 +386,7 @@ End Function
 Public Function LoadFromExcelFile(ByVal TargetFile As Variant, Optional ByVal WorksheetNameOrIndex As Variant, Optional ByVal FirstRowHasHeaders As Variant, Optional ByVal Options As Variant, Optional ByVal DisableCache As Variant) As dsTable
     Dim dsT As dsTable, xlX As xlSheetsEx, xlRange As Excel.Range
     DisableCache = GetParam(DisableCache, False)
-    
+
     If Not DisableCache Then
         On Error GoTo LoadTableFromFileFallback
         Set dsT = TaskController().DataSource(ActiveTaskId())
@@ -395,12 +395,12 @@ Public Function LoadFromExcelFile(ByVal TargetFile As Variant, Optional ByVal Wo
             Exit Function
         End If
     End If
-    
+
 LoadTableFromFileFallback:
     On Error GoTo 0
     FirstRowHasHeaders = GetParam(FirstRowHasHeaders, True)
     WorksheetNameOrIndex = GetParam(WorksheetNameOrIndex, 0)
-    
+
     Set xlX = OpenWorksheetFromFile(TargetFile, Options)
     On Error GoTo Finally
     If WorksheetNameOrIndex <> 0 Then
@@ -419,7 +419,7 @@ End Function
 
 Public Function OpenWorksheetFromFile(ByVal TargetFile As Variant, Optional ByVal Options As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx, dX As DictionaryEx
-    
+
     Set Options = GetParamAsDictionaryEx(Options)
     ' {"UpdateLinks": false, "ReadOnly": true, "Local": true, "UTF8": false, "NoTextQualifier": true}
     Set dX = DictionaryEx.Create() _
@@ -428,7 +428,7 @@ Public Function OpenWorksheetFromFile(ByVal TargetFile As Variant, Optional ByVa
                          .Add("Local", Options.GetValue("Local", True)) _
                          .Add("UTF8", Options.GetValue("UTF8", False)) _
                          .Add("NoTextQualifier", Options.GetValue("NoTextQualifier", True))
-                         
+
     Set xlSheet = xlSheetsEx.Create(, TargetFile, dX)
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
 
@@ -439,7 +439,7 @@ Public Function LoadFromRange(ByRef SourceSheet As Variant, Optional ByVal Range
     Dim xlSheet As xlSheetsEx, xlRange As Excel.Range
     Set xlSheet = SourceSheet
     FirstRowHasHeaders = GetParam(FirstRowHasHeaders, True)
-    
+
     If IsObject(RangeAddress) Then
         Set xlRange = RangeAddress
     Else
@@ -460,7 +460,7 @@ End Function
 Public Function LoadFromFileAsJSON(ByVal TargetFile As Variant, Optional ByVal DisableCache As Variant) As dsTable
     Dim dsT As dsTable, sContent As String, sTarget As String
     DisableCache = GetParam(DisableCache, False)
-    
+
     If Not DisableCache Then
         On Error GoTo LoadFromFileAsJSONFallback
         Set dsT = TaskController().DataSource(ActiveTaskId())
@@ -469,12 +469,12 @@ Public Function LoadFromFileAsJSON(ByVal TargetFile As Variant, Optional ByVal D
             Exit Function
         End If
     End If
-    
+
 LoadFromFileAsJSONFallback:
     On Error GoTo 0
     TargetFile = GetParam(TargetFile, "")
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
-    
+
     If Not FileSystemLib.TryReadAllTextInFile(sTarget, sContent) Then
         Err.Raise 17, , "Unable to read text from provided file"
     End If
@@ -497,7 +497,7 @@ Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Op
         .Add("InLocalFormat", Options.GetValue("InLocalFormat", False)) _
         .Add("AutoHeaders", Options.GetValue("AutoHeaders", True)) _
         .Add("TextQualifier", Options.GetValue("TextQualifier", """"))
-    
+
     If Not DisableCache Then
         On Error GoTo LoadFromFileAsCSVFallback
         Set dsT = TaskController().DataSource(ActiveTaskId())
@@ -506,12 +506,12 @@ Public Function LoadFromFileAsCSV(ByVal TargetFile As Variant, Optional ByVal Op
             Exit Function
         End If
     End If
-    
+
 LoadFromFileAsCSVFallback:
     On Error GoTo 0
     TargetFile = GetParam(TargetFile, "")
     sTarget = FileSystemLib.GetFileMatchingPattern(FileSystemLib.Resolve(TargetFile))
-    
+
     Set dsT = LoadFromCSV(sTarget, dX("Delimiter"), dX("InLocalFormat"), dX("AutoHeaders"), dX("TextQualifier"))
     If Not DisableCache Then
         Set TaskController().DataSource(ActiveTaskId()) = dsT
@@ -523,7 +523,7 @@ End Function
 Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal ConnectionString As Variant, Optional ByVal DisableCache As Variant) As dsTable
     Dim dsT As dsTable, dbQ As dsQuery
     DisableCache = GetParam(DisableCache, False)
-    
+
     If Not DisableCache Then
         On Error GoTo LoadFromSQLFallback
         Set dsT = TaskController().DataSource(ActiveTaskId())
@@ -532,7 +532,7 @@ Public Function LoadFromSQL(ByVal QueryString As Variant, Optional ByVal Connect
             Exit Function
         End If
     End If
-    
+
 LoadFromSQLFallback:
     On Error GoTo 0
     ConnectionString = GetParam(ConnectionString, "")
@@ -569,7 +569,7 @@ Public Function SaveToFileAsCSV(ByRef SourceTable As Variant, ByVal FilePath As 
     InLocalFormat = GetParam(InLocalFormat, False)
     OverWriteIfExists = GetParam(OverWriteIfExists, True)
     Set Target = SourceTable
-    
+
     With FileSystemLib.StreamWriter()
         .WriteText Target.ToCSV(Delimiter, InLocalFormat)
         If OverWriteIfExists Then
@@ -589,10 +589,10 @@ End Function
 Public Function CreateNewExcelApp(Optional ByVal WorksheetName As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx
     WorksheetName = GetParam(WorksheetName, "Sheet%1")
-    
+
     Set xlSheet = xlSheetsEx.Create(WorksheetName)
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
-    
+
     Set CreateNewExcelApp = pTaskController.AddResource(xlSheet)
 End Function
 
@@ -600,13 +600,13 @@ Public Function CopyToRangeInNewExcelApp(ByRef SourceTable As Variant, Optional 
     Dim Target As dsTable, xlSheet As xlSheetsEx, xlRange As Excel.Range
     Assign RangeAddress, GetParam(RangeAddress, "A1")
     WorksheetName = GetParam(WorksheetName, "Sheet%1")
-    
+
     Set Target = SourceTable
     Set xlSheet = pTaskController.AddResource(xlSheetsEx.Create(WorksheetName))
     xlSheet.WindowVisibility = AppExcelVisibilityAuto
     Set xlRange = xlSheet.Range(RangeAddress)
     Target.CopyToRange xlRange, True
-    
+
     Set CopyToRangeInNewExcelApp = xlSheet
 End Function
 
@@ -615,7 +615,7 @@ Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As V
     Assign RangeAddress, GetParam(RangeAddress, "A1")
     WriteHeaders = GetParam(WriteHeaders, True)
     ApplyUserLocale = GetParam(ApplyUserLocale, True)
-    
+
     Set Target = SourceTable
     Set xlSheet = TargetSheet
     If IsObject(RangeAddress) Then
@@ -624,14 +624,14 @@ Public Function CopyToRange(ByRef SourceTable As Variant, ByRef TargetSheet As V
         Set xlRange = xlSheet.Range(RangeAddress)
     End If
     Target.CopyToRange xlRange, CBool(ApplyUserLocale), CBool(WriteHeaders)
-    
+
     Set CopyToRange = xlSheet
 End Function
 
 Public Function CopyRange(ByRef SourceSheet As Variant, ByRef TargetSheet As Variant, Optional ByVal SourceRangeAddress As Variant, Optional ByVal TargetRangeAddress As Variant) As xlSheetsEx
     Dim Source As xlSheetsEx, sourceRange As Excel.Range, xlSheet As xlSheetsEx, xlRange As Excel.Range
     Assign TargetRangeAddress, GetParam(TargetRangeAddress, "A1")
-    
+
     Set Source = SourceSheet
     Source.Instance.Select
     If IsObject(SourceRangeAddress) Then
@@ -640,7 +640,7 @@ Public Function CopyRange(ByRef SourceSheet As Variant, ByRef TargetSheet As Var
         Set sourceRange = GetRangeInWorksheet(Source, SourceRangeAddress)
     End If
     sourceRange.Copy
-    
+
     Set xlSheet = TargetSheet
     xlSheet.Instance.Select
     If IsObject(TargetRangeAddress) Then
@@ -650,28 +650,28 @@ Public Function CopyRange(ByRef SourceSheet As Variant, ByRef TargetSheet As Var
     End If
     xlRange.Select
     xlSheet.Instance.Paste
-    
+
     Set CopyRange = xlSheet
 End Function
 
 Public Function AddWorksheet(ByRef SourceSheet As Variant, Optional ByVal WorksheetName As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx
     WorksheetName = GetParam(WorksheetName, "Sheet%1")
-    
+
     Set xlSheet = SourceSheet
     Set AddWorksheet = pTaskController.AddResource(xlSheet.AddSheet(WorksheetName))
 End Function
 
 Public Function GetWorksheet(ByRef SourceSheet As Variant, ByVal WorksheetNameOrIndex As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx
-    
+
     Set xlSheet = SourceSheet
     Set GetWorksheet = pTaskController.AddResource(xlSheet.GetSheet(WorksheetNameOrIndex))
 End Function
 
 Public Function SaveWorkbook(ByRef SourceSheet As Variant, ByVal FilePath As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx
-    
+
     Set xlSheet = SourceSheet
     Set SaveWorkbook = pTaskController.AddResource(xlSheet.SaveWorkbook(CStr(FileSystemLib.Resolve(FilePath))))
 End Function
@@ -683,13 +683,13 @@ End Function
 Public Function AutoSizeCells(ByRef SourceSheet As Variant, Optional ByVal RangeAddress As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx, xlRange As Excel.Range
     Set xlSheet = SourceSheet
-    
+
     If IsObject(RangeAddress) Then
         Set xlRange = RangeAddress
     Else
         Set xlRange = GetRangeInWorksheet(xlSheet, RangeAddress)
     End If
-    
+
     Set AutoSizeCells = xlSheet.AutoSizeCells(xlRange)
 End Function
 
@@ -714,13 +714,13 @@ End Function
 Public Function AutoFormatCells(ByRef SourceSheet As Variant, Optional ByVal RangeAddress As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx, xlRange As Excel.Range
     Set xlSheet = SourceSheet
-    
+
     If IsObject(RangeAddress) Then
         Set xlRange = RangeAddress
     Else
         Set xlRange = GetRangeInWorksheet(xlSheet, RangeAddress)
     End If
-    
+
     Set AutoFormatCells = xlSheet.AutoFormatCells(xlRange)
 End Function
 
@@ -729,7 +729,7 @@ Public Function WindowVisibility(ByRef SourceSheet As Variant, Optional ByVal Vi
     Set xlSheet = SourceSheet
 
     xlSheet.WindowVisibility = GetParam(Visible, True)
-    
+
     Set WindowVisibility = xlSheet
 End Function
 
@@ -767,18 +767,18 @@ End Sub
 
 Private Function TokenizeParameters(ByVal TaskParameters As String) As Variant()
     Dim t() As String, Tokens() As Variant, i As Long
-    
+
     t = VBA.Split(TaskParameters, ", ")
     If Not UBound(t) >= 0 Then
         TokenizeParameters = Array("", 0, Array())
         Exit Function
     End If
     ReDim Tokens(UBound(t))
-    
+
     For i = LBound(t) To UBound(t)
         Tokens(i) = VBA.Split(t(i), ": ", 2)
     Next i
-    
+
     TokenizeParameters = Array(TaskParameters, 1 + UBound(Tokens) - LBound(Tokens), Tokens)
 End Function
 
@@ -787,7 +787,7 @@ Private Sub AddAllTasks()
     AddTask "EnumerateRows", "[Source]: Table, [FromNumber = 1]: Long, [ToNumber = -1]: Long", _
             Description:=StringLines( _
                 "Inserts a new column at the beginning of the table by enumerating its values from <b>FromNumber</b> to <b>ToNumber</b> repeatedly until the end. Ignores the value of <b>ToNumber</b> if it is less than <b>FromNumber</b>.")
-    
+
     AddTask "SetColumnName", "[Source]: Table, [ColumnIndexes]: Long|Array(), [ColumnName]: String", _
             Description:=StringLines( _
                 "@param [<b>ColumnIndexes</b>] - A column index position or an array of indexes. When no value is provided, all columns are included.", _
@@ -795,7 +795,7 @@ Private Sub AddAllTasks()
                 "    <b>%1</b>: The column index.", _
                 "    <b>%2</b>: the column index within the <b>ColumnIndexes</b> array.", _
                 "    <b>%3</b> and <b>%4</b>: Position instead of index for <b>%1</b> and <b>%2</b> respectively.")
-    
+
     AddTask "SetNumberFormat", "[Source]: Table, [ColumnIndexes]: Long|Array(), [NumberFormat]: String", _
             Description:=StringLines( _
                 "Select a single Column before picking this task to see it's current <b>NumberFormat</b>.", _
@@ -807,12 +807,12 @@ Private Sub AddAllTasks()
                 "    <b>%3</b> and <b>%4</b>: Position instead of index for <b>%1</b> and <b>%2</b> respectively.", _
                 "", _
                 "NOTE: This task will&nbsp;<u>only</u> apply <b>NumberFormat</b> to corresponding columns in an <b>Excel.Worksheet</b> <u>just before</u> copying the data to the specified <b>Excel.Range</b>.")
-                    
+
     AddTask "FilterQuery", "[Source]: Table, QueryFilter: String", _
             Usage:="{...TaskName: 'FilterQuery', Values: [, ""REPORT_DATE < '20/04/2023' AND REPORT_STATUS = 'RESUELTA'""]}"
-    
+
     AddTask "FilterValue", "[Source]: Table, ColumnIndex: Long, [Value]: Variant, [FilterOut = False]: Boolean"
-    
+
     AddTask "GetRange", "[Source]: Table, [Index]: Long, [GetCount]: Long, [ColumnIndexes]: Array()", _
             Description:=StringLines( _
                 "Returns a subset of rows and/or columns from the Source Table. The ColumnIndexes Array can contain sparse elements.", _
@@ -823,7 +823,7 @@ Private Sub AddAllTasks()
 
     AddTask "Join", "[Source]: Table, Target: Table", _
             Description:="Concatenate all elements of <b>Target</b> Table as additional columns into <b>Source</b> Table."
-            
+
     AddTask "Append", "[Source]: Table, Target: Table", _
             Description:="Appends all rows in <b>Target</b> Table the end of <b>Source</b> Table."
 
@@ -834,96 +834,96 @@ Private Sub AddAllTasks()
                 "@param Replacer - A name to a global function or a Scripting.Dictionary in JSON format.", _
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included."), _
             Usage:="{...TaskName: 'ReplaceValues', Values: [, 'SecondsToHMS']}"
-            
+
     AddTask "StringValuesToHex", "[Source]: Table, [ColumnIndexes]: Array()", _
             Description:=StringLines( _
                 "Returns a copy of the provided Source Table with the <b>string</b> values within the provided ColumnIndexes being replaced by it's corresponding hex string.", _
                 "", _
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
-    
+
     AddTask "HexToStringValues", "[Source]: Table, [ColumnIndexes]: Array()", _
             Description:=StringLines( _
                 "Returns a copy of the provided Source Table with the <b>hex</b> values within the provided ColumnIndexes being replaced by it's corresponding <b>ascii</b> string.", _
                 "", _
                 "@param [ColumnIndexes] - If specified, an array of column indexes to include in the range, otherwise, all columns are included.")
-            
+
     ' TODO: AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
-    
+
     AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()"
-    
+
     AddTask "MoveColumnsToTheEnd", "[Source]: Table, ColumnIndexes: Array()"
-    
+
     AddTask "MoveColumnsToTheStart", "[Source]: Table, ColumnIndexes: Array()"
-    
+
     AddTask "MoveColumn", "[Source]: Table, ColumnIndex: Long, [MoveCount = 1]: Long"
 
     ' --- DATA SOURCE TASKS ---
-    
+
     AddTask "DataSource", "", _
             Description:="Provides an empty data source for programmatic use in code.", _
             TaskType:="DS", Requires:="*"
-    
+
     AddTask "WorksheetSource", "", _
             Description:="Provides an empty worksheet for programmatic use in code.", _
             TaskType:="XS", Requires:="*"
-    
+
     AddTask "LoadFromRange", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range, [FirstRowHasHeaders = True]: Boolean", TaskType:="DS", Requires:="X*"
-    
+
     AddTask "LoadFromExcelFile", "TargetFile: String, [WorksheetNameOrIndex]: String|Long, [FirstRowHasHeaders = True]: Boolean, " & _
                                  "[Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
-                                 
+
     AddTask "LoadFromFileAsJSON", "TargetFile: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
 
     AddTask "LoadFromFileAsCSV", "TargetFile: String, [Options]: String|Dictionary, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
-    
+
     AddTask "LoadFromSQL", "QueryString: String, [ConnectionString]: String, [DisableCache = False]: Boolean", TaskType:="DS", Requires:="*"
-    
+
     ' --- GENERATION TASKS ---
-    
+
     AddTask "SaveToFileAsJSON", "[Source]: Table, TargetFile: String", TaskType:="DSG"
-    
+
     AddTask "SaveToFileAsCSV", "[Source]: Table, TargetFile: String, [Delimiter = ',']: String, [InLocalFormat = False]: Boolean, [OverWriteIfExists = True]: Boolean", TaskType:="DSG"
-    
+
     ' --- XL GENERATION TASKS ---
-    
+
     AddTask "OpenWorksheetFromFile", "TargetFile: String, [Options]: String|Dictionary", TaskType:="XLG", Requires:="*"
-    
+
     AddTask "CreateNewExcelApp", "[WorksheetName = 'Sheet%1']: String", TaskType:="XLG", Requires:="*"
-    
+
     AddTask "CopyToRangeInNewExcelApp", "[Source]: Table, [RangeAddress = 'A1']: String, [WorksheetName = 'Sheet%1']: String", TaskType:="XLG", Requires:="[TD]*"
 
     AddTask "CopyToRange", "[Source]: Table, Target: Worksheet, [RangeAddress = 'A1']: String, [WriteHeaders = True]: Boolean, [ApplyUserLocale = True]: Boolean", TaskType:="XLG"
-    
+
     AddTask "CopyRange", "[Source]: Worksheet, Target: Worksheet, [SourceRangeAddress = .UsedRange()]: String|Excel.Range, [TargetRangeAddress = 'A1']: String|Excel.Range", TaskType:="XLG"
-    
+
     AddTask "AddWorksheet", "[Source]: Worksheet, [WorksheetName = 'Sheet%1']: String", TaskType:="XLG"
-    
+
     AddTask "GetWorksheet", "[Source]: Worksheet, WorksheetNameOrIndex: String|Long", TaskType:="XLG"
-    
+
     AddTask "SaveWorkbook", "[Source]: Worksheet, TargetFile: String", TaskType:="XLG"
-    
+
     ' --- XL FORMATTING TASKS ---
-    
+
     AddTask "AutoSizeCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
-    
+
     AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, TableStyle: String", TaskType:="XL"
-    
+
     AddTask "FreezeHeaders", "[Source]: Worksheet, [HeaderRows = 1]: Long, [HeaderColumns = 0]: Long", TaskType:="XL"
-    
+
     AddTask "AutoFormatCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
 
     AddTask "WindowVisibility", "[Source]: Worksheet, [Visible = True]: Boolean", TaskType:="XL"
-    
+
     ' --- DEV / DEBUG ---
-    
+
     AddTask "AsRecordsetTable", "[Source]: Table", _
             Description:="<b><font color=#AA0000>ONLY FOR DEVELOPMENT / DEBUGGING PURPOSES, WILL BE REMOVED SHORTLY.</font></b>", _
             TaskType:="DBG", Requires:="*"
-    
+
     AddTask "CreateMassiveTable", "", _
             Description:="Quickly provides a new Table generated with <b>2.100.000.000</b> rows * <b>1.000</b> columns of sample data.", _
             TaskType:="DBG", Requires:="*"
-    
+
 End Sub
 
 
@@ -944,7 +944,7 @@ End Function
 Public Function GetRangeInWorksheet(ByRef SourceSheet As Variant, Optional ByVal RangeAddress As Variant) As Excel.Range
     Dim xlSheet As xlSheetsEx, xlRange As Excel.Range
     Set xlSheet = SourceSheet
-    
+
     If IsMissing(RangeAddress) Then
         Set xlRange = xlSheet.UsedRange
     Else
@@ -957,9 +957,9 @@ Public Function GetRangeInWorksheet(ByRef SourceSheet As Variant, Optional ByVal
             End If
         End If
     End If
-    
+
     If xlRange Is Nothing Then Set xlRange = xlSheet.UsedRange
-    
+
     Set GetRangeInWorksheet = xlRange
 End Function
 
@@ -968,7 +968,7 @@ Private Function AsListOfColumnIndexes(ByRef TargetTable As Variant, Optional By
     ColumnIndexes = GetParam(ColumnIndexes, Array())
     Set Target = TargetTable
     Set colIndexes = ArrayListEx.Create()
-    
+
     If Not IsArray(ColumnIndexes) Then
         If CStr(ColumnIndexes) = "" Then
             ColumnIndexes = Array()
@@ -982,7 +982,7 @@ Private Function AsListOfColumnIndexes(ByRef TargetTable As Variant, Optional By
     For Each v In ColumnIndexes
         colIndexes.Add CLng(v)
     Next v
-    
+
     Set AsListOfColumnIndexes = colIndexes
 End Function
 
@@ -1025,7 +1025,7 @@ Private Function GetParamAsDictionaryEx(Optional ByVal Value As Variant) As Dict
     Else
         GoTo Fallback
     End If
-    
+
     Exit Function
 Fallback:
     Set GetParamAsDictionaryEx = DictionaryEx.Create()
@@ -1045,11 +1045,11 @@ Private Function AsciiToHex(ByVal Value As String) As String
     Dim i As Long, iMax As Long, t() As String
     iMax = Len(Value)
     ReDim t(1 To iMax)
-    
+
     For i = 1 To iMax
         t(i) = Right("0" & VBA.Hex$(VBA.AscW(VBA.Mid$(Value, i, 1))), 2)
     Next i
-    
+
     AsciiToHex = VBA.Join(t, "")
 End Function
 
@@ -1057,11 +1057,11 @@ Private Function HexToAscii(ByVal Value As String) As String
     Dim i As Long, iMax As Long, t() As String
     iMax = CLng(Len(Value) / 2) - 1
     ReDim t(0 To iMax)
-    
+
     For i = 0 To iMax
         t(i) = VBA.ChrW(CLng("&H" & VBA.Mid$(Value, 1 + (2 * i), 2)))
     Next i
-    
+
     HexToAscii = VBA.Join(t, "")
 End Function
 
@@ -1083,7 +1083,7 @@ Private Function LoadFromCSV(ByRef TargetFile As String, Optional ByVal Delimite
     Set colHeaders = ArrayListEx.Create(Split(CollectionsLib.TokenizeArgs(VBA.Mid$(ContentString, sLines(0)(0), sLines(0)(1)), Delimiter), vbNullChar))
     If AutoHeaders Then sLines.RemoveAt 0
     nCols = colHeaders.Count
-    
+
     Set a2X = Array2dEx.Create()
     If sLines.Count > 0 Then
         If sLines(0)(0) > 8 Then
@@ -1114,7 +1114,7 @@ Private Sub DelimitedLineSlicesTo2dArray(ByRef SearchString As String, ByRef Lin
     rMax = LineSlices.Count - 1
     ReDim t(0 To rMax, 0 To nCols - 1)
     sLines = LineSlices.ToArray()
-    
+
     For r = 0 To rMax
         line = VBA.Mid$(SearchString, sLines(r)(0), sLines(r)(1))
         i = 1
@@ -1169,22 +1169,22 @@ Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef L
     Dim r As Long, i As Long, iDel As Long, iQt As Long, uStr As String, nQt As Long
     Dim t() As Variant, line As String, c As Long, sPtr As LongPtr, rMax As Long
     Dim e As Long, wStr As String, sLines() As Variant, linePtr As LongPtr
-    
+
     rMax = LineSlices.Count - 1
     ReDim t(0 To rMax, 0 To nCols - 1)
     sLines = LineSlices.ToArray()
     sPtr = StrPtr(SearchString)
-    
+
     For r = 0 To rMax
         linePtr = sPtr + ((sLines(r)(0) - 1) * INT_SIZE) - 4
-        MemoryLib.MemLong(linePtr - 4) = (sLines(r)(1) * 2) + 4
-        MemoryLib.MemLongPtr(VarPtr(line)) = linePtr
+        MemLong(linePtr - 4) = (sLines(r)(1) * 2) + 4
+        MemLongPtr(VarPtr(line)) = linePtr
         i = 3
         c = 0
         iDel = InStr(i, line, Delimiter, vbBinaryCompare)
         Do While (iDel > 0)
-            MemoryLib.MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
-            MemoryLib.MemLongPtr(VarPtr(uStr)) = linePtr + ((i - 1) * INT_SIZE)
+            MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
+            MemLongPtr(VarPtr(uStr)) = linePtr + ((i - 1) * INT_SIZE)
             iQt = InStr(1, uStr, cQuote, vbBinaryCompare)
             nQt = Sgn(iQt)
             Do
@@ -1195,7 +1195,7 @@ Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef L
                 If (nQt Mod 2) = 1 Then
                     iQt = iDel - i
                     iDel = InStr(1 + i + iQt, line, Delimiter, vbBinaryCompare)
-                    MemoryLib.MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
+                    MemLong(linePtr + ((i - 1) * INT_SIZE) - 4) = (iDel - i) * 2
                 End If
             Loop Until ((nQt Mod 2) = 0)
             If VBA.Mid$(uStr, 1, 1) = cQuote Then
@@ -1224,8 +1224,8 @@ Private Sub DelimitedLineSlicesTo2dArrayV2(ByRef SearchString As String, ByRef L
             End If
         Loop
     Next r
-    MemoryLib.MemLongPtr(VarPtr(uStr)) = CLngPtr(0)
-    MemoryLib.MemLongPtr(VarPtr(line)) = CLngPtr(0)
+    MemLongPtr(VarPtr(uStr)) = CLngPtr(0)
+    MemLongPtr(VarPtr(line)) = CLngPtr(0)
     a2X.SetInstanceByRef t
 End Sub
 
@@ -1244,5 +1244,3 @@ Private Function AutoDetectDelimiterInCSV(ByRef ContentString As String) As Stri
 End Function
 
 Private Function C2ArraySlice(ByRef Value As Variant) As ArraySlice: Set C2ArraySlice = Value: End Function
-
-

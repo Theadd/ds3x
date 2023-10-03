@@ -959,11 +959,11 @@ Private Sub Form_Load()
     Set pSelectedColumns = ArrayListEx.Create()
     Set pSelectedRows = ArrayListEx.Create()
     Setup
-    
+
     If Not IsSubform Then
         ScreenLib.WindowSizeTo Me, 12000, 8000
         ScreenLib.WindowCenterTo Me, ScreenLib.GetScreenRectOfPoint(ScreenLib.PointInRect(ScreenLib.GetWindowRect(Me), DirectionType.Center))
-        
+
         SetupDevelopmentEnvironment
     End If
     Me.TimerInterval = 1
@@ -1075,11 +1075,11 @@ End Sub
 
 Private Sub ResizeFormContent()
     Dim mW As Long, mH As Long, c As Long, t As Long
-    
+
     mW = Me.InsideWidth
     mH = Me.InsideHeight + 15
     c = Me.DS_VIEWPORT_STICKY.Form.DS_WORKSHEET_NUMBERS.Form.MaxContentWidthLimit
-    
+
     With Me.SCROLLBAR_X
         .Height = 270
         .Left = 0
@@ -1108,7 +1108,7 @@ End Sub
 
 Private Sub ScrollUsingLastCapturedPointerPosition()
     Dim p As ds3xGlobals.POINTAPI, X As Long, Y As Long
-    
+
     ScreenLib.MouseMoveCursor = True
     p = ScreenLib.GetCursorPosition
     X = p.X - pCapturedPointerPosition.X
@@ -1129,10 +1129,10 @@ End Sub
 Public Function PropagateMouseWheel(ByVal Page As Boolean, ByVal Count As Long)
     Dim sAxisX As Boolean, sMod As Long
     sAxisX = pInvertScrollInputAxis
-    
+
     sMod = IIf(GetAsyncKeyState(vbKeyShift), 3, 1)
     sAxisX = IIf(GetAsyncKeyState(vbKeyControl) And GetAsyncKeyState(vbKeyControl), Not sAxisX, sAxisX)
-    
+
     If sAxisX Then
         ScrollPosX = ScrollPosX + CDbl(Count * sMod * Fix(CDbl(Worksheet.GridCellSizeX) / 5#))
     Else
@@ -1148,7 +1148,7 @@ Private Sub SCROLLBAR_Y_Scroll(): QueueDelayedScrollY: End Sub
 Public Sub ApplyScrollbarY(Optional ByVal Value As Variant, Optional ByVal ExplicitCall As Boolean = False)
     If (Not Me.SCROLLBAR_Y.Visible) Or (Not pInitialized) Then Exit Sub
     Dim rawMax As Long, yVal As Double, nY As Double
-    
+
     With Me.SCROLLBAR_Y
         nY = ScrollPosY
         yVal = CDbl(IIf(IsMissing(Value), nY, CDbl(Value)) / pScrollFactorPosY)
@@ -1185,7 +1185,7 @@ End Sub
 Public Sub ApplyScrollbarX(Optional ByVal Value As Variant, Optional ByVal ExplicitCall As Boolean = False)
     If (Not Me.SCROLLBAR_X.Visible) Or (Not pInitialized) Then Exit Sub
     Dim rawMax As Long, xVal As Double, nX As Double
-    
+
     With Me.SCROLLBAR_X
         nX = ScrollPosX
         xVal = CDbl(IIf(IsMissing(Value), nX, CDbl(Value)) / pScrollFactorPosX)
@@ -1228,7 +1228,7 @@ Private Sub UpdateScrollbarY(Optional ByVal ExplicitCall As Boolean = False)
     pMaxContentSizeY = CDbl(pTable.Count * CDbl(cellSizeY)) + CDbl(pWorksheetHeadersSizeY)
     pScrollFactorPosY = IIf(pMaxContentSizeY + CDbl(OutOfBoundsScrollY) > 2 ^ 30, 1000, 1)
     yMax = CLng(Fix(Max((pMaxContentSizeY + CDbl(OutOfBoundsScrollY)) - CDbl(Me.InsideHeight - 270), 0) / pScrollFactorPosY))
-    
+
     With Me.SCROLLBAR_Y
         .Max = yMax
         .LargeChange = IIf(CLng(pScrollPageSizeY / pScrollFactorPosY) > yMax, yMax, CLng(pScrollPageSizeY / pScrollFactorPosY))
@@ -1246,14 +1246,14 @@ End Sub
 
 Private Sub UpdateScrollbarX(Optional ByVal ExplicitCall As Boolean = False)
     If Not Me.SCROLLBAR_X.Visible Then Exit Sub
-    
+
     ' ____________* ScrollView.ScrollPageSizeX _______* ScrollView.OutOfBoundsScrollX
     '|____________|___________________________|_______|
     '|________________________________________|
     '                                         * Viewport.ViewportContentFullWidth
-    
+
     Dim xMax As Long, cellSizeX As Long, viewSizeX As Long, nX As Double
-    
+
     viewSizeX = Me.InsideWidth - 270 - Me.DS_VIEWPORT.Left
     cellSizeX = Worksheet.GridCellSizeX
     pScrollPageSizeX = CLng(Int(viewSizeX / cellSizeX)) * cellSizeX
@@ -1281,7 +1281,7 @@ End Sub
 
 Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional ByVal PropagateEvent As Boolean = True)
     Dim X As Double, Y As Double
-    
+
     Select Case CLng(0 - 1)
         Case RowIndex
             Y = ScrollPosY
@@ -1293,9 +1293,9 @@ Public Sub MoveTo(ByVal RowIndex As Long, ByVal ColumnIndex As Long, Optional By
             X = pViewport.GetScrollXTo(ColumnIndex)
             Y = pViewport.GetScrollYTo(RowIndex)
     End Select
-    
+
     ScrollTo X, Y
-    
+
     If PropagateEvent Then
         Select Case CLng(0 - 1)
             Case RowIndex
@@ -1326,7 +1326,7 @@ End Sub
 
 Private Sub pWorksheetHeaders_OnColumnNameWillChange(ByVal ColumnIndex As Long, ByVal Value As String)
     Dim oldValue As String
-    
+
     On Error GoTo Finally
     oldValue = CollectionsLib.ArrayItem(Table().Headers.Row(0)(ColumnIndex), 0)
     If StrComp(oldValue, Value, vbBinaryCompare) <> 0 Then
@@ -1354,7 +1354,7 @@ Public Sub OnKeyDownHandler(KeyCode As Integer, Shift As Integer)
         Case vbKeyUp, vbKeyRight, vbKeyDown, vbKeyLeft, vbKeyPageUp, vbKeyPageDown, vbKeyHome, vbKeyEnd, vbKeyEscape, vbKeyTab, vbKeyReturn
             RaiseEvent OnSelectionControlKeyDown(KeyCode, Shift)
     End Select
-    
+
     Select Case True
         Case (KeyCode = 0): ' Ignore
         Case (KeyCode = vbKeyDown And Shift = 2): KeyCode = 0
@@ -1398,7 +1398,7 @@ Private Sub CopySelectionToClipboard(Optional ByVal IncludeHeaders As Boolean = 
     pSelectedColumns.Sort
     sCols = Empty
     If pSelectedColumns.Count > 0 Then sCols = pSelectedColumns.ToArray()
-    
+
     If pSelectedRows.Count > 0 Then
         pSelectedRows.Sort
         rStart = pSelectedRows(0)
@@ -1410,7 +1410,7 @@ Private Sub CopySelectionToClipboard(Optional ByVal IncludeHeaders As Boolean = 
         rEnd = 0
     End If
     iMax = Int(CLng(nRows - 1) / dsChunkSize)
-    
+
     For i = 0 To iMax
         rTake = IIf(i = iMax, nRows - (dsChunkSize * i), dsChunkSize)
         rTakeFrom = rStart + (i * dsChunkSize)

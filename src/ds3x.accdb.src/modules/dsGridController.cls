@@ -79,5 +79,3 @@ Friend Sub TriggerOnChangeEvent()
         Set pScrollview.Table = dsTable.CreateBlank(100, 0)
     End If
 End Sub
-
-

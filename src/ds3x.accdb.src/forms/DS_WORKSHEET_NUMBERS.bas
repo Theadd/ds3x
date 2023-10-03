@@ -626,7 +626,7 @@ End Function
 
 Public Function GetRowSelectedValue() As Long
     On Error GoTo Finally
-    
+
     If pSelectedRows.Contains(CLng(Me.Bookmark(0)) + pFirstRowIndex - 1) Then
         GetRowSelectedValue = 1
     End If

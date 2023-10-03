@@ -129,7 +129,7 @@ End Sub
 Private Sub pScrollview_OnInvertSelectionRequest()
     Dim i As Long, iMax As Long
     iMax = pScrollview.Table.ColumnCount - 1
-    
+
     For i = 0 To iMax
         SelectionToggleColumn i
     Next i
@@ -190,9 +190,9 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
     Dim sView As TScrollviewState: sView = GetScrollviewState(Shift)
     Dim iAux As Long, cIndex As Long, rIndex As Long, sKeyCode As Integer: sKeyCode = KeyCode
     KeyCode = 0
-    
+
 '    Debug.Print Printf("%1 %2 CALLING OnSelectionControlKeyDown(%3, %4)", TimerSpan, vbTab, sKeyCode, Shift)
-    
+
     ' NOTE: use KeyCode = sKeyCode to avoid "preventing default action"
     With sView
         Select Case sKeyCode
@@ -356,7 +356,7 @@ Private Sub pScrollview_OnSelectionControlKeyDown(KeyCode As Integer, Shift As I
                 KeyCode = sKeyCode
         End Select
     End With
-    
+
     ' Update last clicked/entered row/col/cell for those calls to MoveTo without event propagation.
     If KeyCode = 0 Then UpdateSelectionStateAfterMoveTo sView, rIndex, cIndex, sKeyCode
 End Sub
@@ -393,7 +393,7 @@ End Sub
 
 Private Function GetNextRowIndexInFullJump(ByRef sView As TScrollviewState) As Long
     Dim rIndex As Long
-    
+
     With sView
         rIndex = IIf(.IsRowTrigger, .RowIndex, .Cell(0))
         If rIndex >= .LastRowIndex Then
@@ -410,7 +410,7 @@ End Function
 
 Private Function GetNextColumnIndexInFullJump(ByRef sView As TScrollviewState) As Long
     Dim cIndex As Long
-    
+
     With sView
         cIndex = IIf(.IsColumnTrigger, .ColumnIndex, .Cell(1))
         If cIndex >= .LastColumnIndex Then
@@ -427,7 +427,7 @@ End Function
 
 Private Function GetScrollviewState(ByVal Shift As Integer) As TScrollviewState
     Dim t As TScrollviewState
-    
+
     With pScrollview.Table
         t.LastRowIndex = .Count - 1
         t.LastColumnIndex = .ColumnCount - 1
@@ -442,13 +442,13 @@ Private Function GetScrollviewState(ByVal Shift As Integer) As TScrollviewState
     t.IsColumnTrigger = (pLastSelectionTrigger = pST_COLUMN)
     t.IsRowTrigger = (pLastSelectionTrigger = pST_ROW)
     t.IsCellTrigger = (pLastSelectionTrigger = pST_CELL)
-    
+
     GetScrollviewState = t
 End Function
 
 Private Sub AddAllNonExistingInRange(ByRef aX As ArrayListEx, ByVal FromIndex As Long, ByVal ToIndex As Long)
     Dim i As Long, r As Long, c As Long: c = -1
-    
+
     If ToIndex < FromIndex Then
         i = FromIndex
         FromIndex = ToIndex
@@ -477,7 +477,7 @@ End Sub
 
 Private Sub ToggleElementInList(ByRef aX As ArrayListEx, ByVal Value As Long)
     Dim r As Long
-    
+
     r = aX.BinarySearch(Value, 0, , dsComparer)
     If r < 0 Then
         r = (Not r)
@@ -493,7 +493,7 @@ End Sub
 
 Private Sub AddElementIfNotExists(ByRef aX As ArrayListEx, ByVal Value As Long)
     Dim r As Long
-    
+
     r = aX.BinarySearch(Value, 0, , dsComparer)
     If r < 0 Then
         r = (Not r)
@@ -504,5 +504,3 @@ Private Sub AddElementIfNotExists(ByRef aX As ArrayListEx, ByVal Value As Long)
         End If
     End If
 End Sub
-
-

@@ -173,7 +173,7 @@ End Property
 Public Property Get IsVBEMainWindowVisible() As Boolean
     On Error Resume Next
     Dim uHwnd As Long: uHwnd = Application.VBE.MainWindow.hWnd
-    
+
     If uHwnd > 0 Then
         IsVBEMainWindowVisible = ((GetWindowLong(uHwnd, GWL_STYLE) And WS_VISIBLE) > 0)
     End If
@@ -183,7 +183,7 @@ End Property
 Public Property Let IsVBEMainWindowVisible(ByVal ShouldBeVisible As Boolean)
     On Error Resume Next
     Dim uHwnd As Long: uHwnd = Application.VBE.MainWindow.hWnd
-    
+
     If uHwnd > 0 Then
         SetShowWindow uHwnd, IIf(ShouldBeVisible, SW_SHOW, SW_HIDE)
     End If
@@ -286,7 +286,7 @@ Public Function GetWindowRect(f As Access.Form) As RECT: GetWindowRect32 f.hWnd,
 
 Public Function GetFormInnerRect(f As Access.Form) As RECT
     Dim p As POINTAPI, r As RECT, r2 As RECT
-    
+
     GetWindowRect32 f.hWnd, r
     p = GetPoint(r.Left, r.Top)
     ScreenToClient f.hWnd, p
@@ -318,18 +318,18 @@ End Function
 
 Public Function TrySetForegroundWindow(ByVal hWnd As Long) As Boolean
     On Error GoTo Finally
-    
+
     TrySetForegroundWindow = (SetForegroundWindow(hWnd) <> 0)
-    
+
 Finally:
 End Function
 
 Public Function TryGetForegroundWindow(ByRef hWnd As LongPtr) As Boolean
     On Error GoTo Finally
-    
+
     hWnd = GetForegroundWindow()
     TryGetForegroundWindow = True
-    
+
 Finally:
 End Function
 
@@ -363,7 +363,7 @@ Public Function HideAppWindow(frm As Access.Form)
 Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWindow As Boolean = True)
     Dim f As Access.Form, i As Long
     On Error Resume Next
-    
+
     For i = Forms.Count - 1 To 0 Step -1
         If i < Forms.Count Then
             Set f = Forms(i)
@@ -373,9 +373,9 @@ Public Sub RestoreTaskbarIconForAllOpenWindows(Optional ByVal HideMainAccessWind
             End If
         End If
     Next i
-    
+
     If HideMainAccessWindow Then SetShowWindow Application.hWndAccessApp, SW_HIDE
-    
+
     For i = Forms.Count - 1 To 0 Step -1
         If i < Forms.Count Then
             If Forms(i).Name <> "F_TIMER" Then
@@ -397,7 +397,7 @@ End Sub
 
 Public Function GetAnchoredRectRelativeTo(r As RECT, sizeW As Long, sizeH As Long, Optional ByVal dAnchor As DirectionType = NorthEast) As RECT
     Dim success As Boolean, rAnchored As RECT, pAnchor As POINTAPI, rSize As SIZE, rX As RECT, aFlags As Long
-    
+
     rX = RectInPixels(r)
     pAnchor = PointInRect(rX, dAnchor)
     rSize = PointToSize(PointInPixels(GetPoint(sizeW, sizeH)))
@@ -459,7 +459,7 @@ End Sub
 
 Public Sub WindowCenterTo(f As Access.Form, r As RECT)
     Dim c As POINTAPI, B As BOUNDS
-    
+
     c = PointInRect(r, DirectionType.Center)
     B = RectToBounds(GetWindowRect(f))
 
@@ -480,15 +480,15 @@ End Sub
 
 Private Function GetTopParentForm(ByRef TargetForm As Access.Form, Optional ByRef UpToParentHwnd As Long = -1) As Access.Form
     On Error GoTo Finally
-    
+
     If TargetForm.hWnd = UpToParentHwnd Then GoTo Finally
-    
+
     If TypeOf TargetForm.Parent Is Form Then
         Set GetTopParentForm = GetTopParentForm(TargetForm.Parent, UpToParentHwnd)
     Else
         Set GetTopParentForm = GetTopParentForm(TargetForm.Parent.Parent, UpToParentHwnd)
     End If
-    
+
     Exit Function
 Finally:
     Set GetTopParentForm = TargetForm
@@ -499,7 +499,7 @@ End Function
 
 Public Sub ScreenLib_Resync()
     Dim lgDC As LongPtr
-    
+
     pMdiHwnd = GetMDIClientHwnd
     pDesktopHwnd = GetDesktopWindow
     lgDC = GetDC(pDesktopHwnd)
@@ -524,55 +524,55 @@ End Sub
 Private Function GetControlRectInForm(t As Access.Control) As RECT
     Dim p As POINTAPI: p = GetPoint
     Dim f As Access.Form: Set f = GetParentForm(t)
-    
+
     If t.Section <> acHeader Then
         p = AddOffsetToPoint(p, GetFormSectionAsOffset(f, acHeader))
         If t.Section <> acDetail Then
             p = AddOffsetToPoint(p, GetFormSectionAsOffset(f, acDetail))
         End If
     End If
-    
+
     GetControlRectInForm = AddOffsetToRect(GetControlRectInSection(t, f), p)
 End Function
 
 Private Function GetControlRectInSection(t As Access.Control, f As Access.Form) As RECT
     Dim lMod As Long, wMod As Long, tMod As Long, hMod As Long
-    
+
     Select Case t.HorizontalAnchor
         Case acHorizontalAnchorRight: wMod = Max(f.InsideWidth, f.Width) - f.Width: lMod = wMod
         Case acHorizontalAnchorBoth: wMod = Max(f.InsideWidth, f.Width) - f.Width: lMod = 0
         Case Else: lMod = 0: wMod = 0
     End Select
-    
+
     Select Case t.VerticalAnchor
         Case acVerticalAnchorBottom: hMod = Max(f.InsideHeight, f.Height) - f.Height: tMod = hMod
         Case acVerticalAnchorBoth: hMod = Max(f.InsideHeight, f.Height) - f.Height: tMod = 0
         Case Else: tMod = 0: hMod = 0
     End Select
-    
+
     GetControlRectInSection = GetRect(t.Left + lMod, t.Top + tMod, t.Left + wMod + t.Width, t.Top + hMod + t.Height)
 End Function
 
 
 Private Function GetFormSectionAsOffset(f As Access.Form, t As AcSection) As POINTAPI
     On Error GoTo Finally
-    
+
     GetFormSectionAsOffset = GetPoint
     With f.Section(t)
         If .Visible Then GetFormSectionAsOffset.Y = .Height
     End With
-    
+
 Finally:
 End Function
 
 Private Function GetParentForm(ByRef bControl As Access.Control) As Access.Form
     On Error GoTo HandleError
     Dim bForm As Access.Form
-    
+
     Set bForm = bControl.Parent
     Set GetParentForm = bForm
     Exit Function
-    
+
 HandleError:
     Set bForm = GetParentForm(bControl.Parent)
     Set GetParentForm = bForm
@@ -581,14 +581,14 @@ End Function
 ' DEPRECATED, BETTER USE Control.Section INSTEAD.
 Private Function IsControlInFormSection(f As Access.Form, t As AcSection, c As Access.Control) As Boolean
     On Error GoTo Finally
-    
+
     For Each pItem In f.Section(t).Controls
         If pItem.Name = c.Name Then
             IsControlInFormSection = True
             Exit For
         End If
     Next pItem
-    
+
 Finally:
 End Function
 
@@ -600,7 +600,7 @@ End Function
 
 Private Function GetAlignmentFlagsFromAnchorDirection(ByVal d As DirectionType) As Long
     Dim v As Long
-    
+
     Select Case d
         Case DirectionType.North: v = (TPM_BOTTOMALIGN Or TPM_CENTERALIGN)
         Case DirectionType.NorthEast: v = (TPM_BOTTOMALIGN Or TPM_LEFTALIGN)
@@ -611,7 +611,7 @@ Private Function GetAlignmentFlagsFromAnchorDirection(ByVal d As DirectionType) 
         Case DirectionType.West: v = (TPM_VCENTERALIGN Or TPM_RIGHTALIGN)
         Case DirectionType.NorthWest: v = (TPM_BOTTOMALIGN Or TPM_RIGHTALIGN)
     End Select
-    
+
     GetAlignmentFlagsFromAnchorDirection = v
 End Function
 
@@ -619,7 +619,7 @@ Private Function GetMDIClientHwnd() As LongPtr
     'Returns the handle of Access's MDI background
     Dim lgHwnd As LongPtr, stName As String
     lgHwnd = GetWindow(Application.hWndAccessApp, GW_CHILD)
-    
+
     'Get class name of child windows
     Do
         stName = GetClassName(lgHwnd)
@@ -629,7 +629,7 @@ Private Function GetMDIClientHwnd() As LongPtr
         End If
         lgHwnd = GetWindow(lgHwnd, GW_HWNDNEXT)
     Loop While lgHwnd <> 0
-    
+
 End Function
 
 Private Function GetClassName(ByVal lgHwnd As LongPtr) As String
@@ -658,18 +658,18 @@ End Function
 Private Function GetSecondaryScreenRect() As RECT
     Dim vBounds As BOUNDS, pBounds As BOUNDS, sBounds As BOUNDS
     If Not CLng(SecondaryScreenDirection) > CLng(DirectionType.Center) Then Exit Function
-    
+
     pBounds = RectToBounds(PrimaryScreenRect)
     vBounds = RectToBounds(VirtualScreenRect)
     sBounds = GetBounds(0, 0, vBounds.W - pBounds.W, vBounds.h - pBounds.h)
     If sBounds.W = 0 Then sBounds.W = pBounds.W
     If sBounds.h = 0 Then sBounds.h = pBounds.h
-    
+
     If TotalScreenMonitors > 2 Then
         sBounds.W = Min(Max(pBounds.W, CLng(sBounds.W / (TotalScreenMonitors - 1))), sBounds.W)
         sBounds.h = Min(Max(pBounds.h, CLng(sBounds.h / (TotalScreenMonitors - 1))), sBounds.h)
     End If
-    
+
     Select Case SecondaryScreenDirection
         Case DirectionType.North: GetSecondaryScreenRect = GetRect(0, 0 - sBounds.h, sBounds.W, 0)
         Case DirectionType.West: GetSecondaryScreenRect = GetRect(0 - sBounds.W, 0, 0, sBounds.h)
@@ -681,7 +681,7 @@ End Function
 Private Function GetSecondaryScreenDirection() As DirectionType
     GetSecondaryScreenDirection = DirectionType.Center
     If TotalScreenMonitors <= 1 Then Exit Function
-    
+
     Select Case True
         Case (VirtualScreenRect.Left < 0 And VirtualScreenRect.Top = 0): GetSecondaryScreenDirection = DirectionType.West
         Case (VirtualScreenRect.Left = 0 And VirtualScreenRect.Top < 0): GetSecondaryScreenDirection = DirectionType.North
@@ -694,12 +694,12 @@ End Function
 
 Private Function GetMonitorDirectionOfPoint(p As POINTAPI) As DirectionType
     GetMonitorDirectionOfPoint = DirectionType.Center
-    
+
     Select Case p.X
         Case Is < PrimaryScreenRect.Left: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.West
         Case Is > PrimaryScreenRect.Right: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.East
     End Select
-    
+
     Select Case p.Y
         Case Is < PrimaryScreenRect.Top: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.North
         Case Is > PrimaryScreenRect.Bottom: GetMonitorDirectionOfPoint = GetMonitorDirectionOfPoint Or DirectionType.South
@@ -713,11 +713,11 @@ Private Function SetGrayedStyle(ByRef TargetControl As Access.Control, ByVal asG
     Dim TargetLabel As Access.Label, styleLabel As Boolean
 
     If TargetControl.BackColor <> IIf(asGrayed, SC_WHITE_COLOR, SC_GRAYED_COLOR) Then Exit Function
-    
+
     If TryGetAttachedLabel(TargetControl, TargetLabel) Then
         styleLabel = (TargetLabel.BackColor = TargetControl.BackColor)
     End If
-    
+
     With TargetControl
         .BackColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
         .BackShade = IIf(asGrayed, SC_GRAYED_SHADE, SC_WHITE_SHADE)
@@ -728,7 +728,7 @@ Private Function SetGrayedStyle(ByRef TargetControl As Access.Control, ByVal asG
         .BorderThemeColorIndex = IIf(asGrayed, SC_GRAYED_THEME, SC_WHITE_THEME)
         .BorderTint = IIf(asGrayed, SC_GRAYED_TINT, SC_WHITE_TINT)
     End With
-    
+
     If styleLabel Then
         With TargetLabel
             .BackColor = IIf(asGrayed, SC_GRAYED_COLOR, SC_WHITE_COLOR)
@@ -746,7 +746,7 @@ End Function
 Public Function SetGridlineAsValid(ByRef TargetControl As Access.Control, Optional ByVal esValido As Boolean = True) As Boolean
     Dim TargetLabel As Access.Label
     On Error GoTo Finally
-    
+
     If Not esValido Then
         If TargetControl.GridlineColor <> SC_INVALID_COLOR Then
             TargetControl.Tag = CStr(TargetControl.GridlineColor)
@@ -764,7 +764,7 @@ Public Function SetGridlineAsValid(ByRef TargetControl As Access.Control, Option
             TargetControl.Tag = ""
         End If
     End If
-    
+
 Finally:
     SetGridlineAsValid = esValido
 End Function
@@ -781,7 +781,7 @@ End Function
 
 Public Function TryGetAttachedLabel(ByRef TargetControl As Access.Control, ByRef AttachedLabel As Access.Label) As Boolean
     On Error GoTo MissingLabel
-    
+
     If TypeName(TargetControl.Controls(0)) = "Label" Then
         Set AttachedLabel = TargetControl.Controls(0)
         TryGetAttachedLabel = True
@@ -820,7 +820,3 @@ End Sub
 
 Private Function Max(X As Variant, Y As Variant) As Variant: Max = IIf(X > Y, X, Y): End Function
 Private Function Min(X As Variant, Y As Variant) As Variant: Min = IIf(X < Y, X, Y): End Function
-
-
-
-
