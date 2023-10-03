@@ -60,6 +60,10 @@ Public Property Set Item(ByVal Index As Variant, Value As Variant)
     Set Instance(CLng(Index)) = Value
 End Property
 
+Public Property Get Items() As Variant()
+    Items = Instance.Items()
+End Property
+
 Public Property Get Row(ByVal Index As Long) As Variant
     Row = Instance(Index)
 End Property
@@ -238,7 +242,7 @@ Attribute RemoveAt.VB_Description = "Removes the element at Index from the Array
 End Function
 
 ' Copies all elements from the ArrayList to the specified Range object. The Array2dEx.CopyToRange implementation is vastly more efficient than this one.
-Public Function CopyToRange(ByRef RangeObject As Range) As ArrayListEx
+Public Function CopyToRange(ByRef RangeObject As Excel.Range) As ArrayListEx
 Attribute CopyToRange.VB_Description = "Copies all elements from the ArrayList to the specified Range object. The Array2dEx.CopyToRange implementation is vastly more efficient than this one."
     Dim Entry As Variant, i As Long, c As Long
 
@@ -519,7 +523,7 @@ Private Function CreateArrayListEx(ByVal RowsCount As Long, ByVal ColumnsCount A
 End Function
 
 Private Sub AddFromExcelRange(ByRef r As Excel.Range)
-    Dim Items As Variant, i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
+    Dim vItems As Variant, i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
     Dim g As Long, gNumRows As Long, rCount As Long, rng2 As Excel.Range, rBase As Long
 
     rCount = r.Rows.Count
@@ -530,21 +534,21 @@ Private Sub AddFromExcelRange(ByRef r As Excel.Range)
 
     Do While (gNumRows > 0)
         Set rng2 = r.Range(r.Cells(rBase + (g * dsChunkSize), 1), r.Cells((rBase + (g * dsChunkSize)) + (gNumRows - 1), r.Columns.Count))
-        Items = Empty
-        Items = rng2.Value
-        lc = LBound(Items, 2)
-        uc = UBound(Items, 2)
-        ui = UBound(Items, 1)
+        vItems = Empty
+        vItems = rng2.Value
+        lc = LBound(vItems, 2)
+        uc = UBound(vItems, 2)
+        ui = UBound(vItems, 1)
         ReDim vRow(0 To (uc - lc))
 
-        For i = LBound(Items, 1) To ui
+        For i = LBound(vItems, 1) To ui
             For c = lc To uc - 1
-                vRow(c - lc) = Items(i, c)
+                vRow(c - lc) = vItems(i, c)
             Next c
-            If VarType(Items(i, uc)) = vbString Then
-                vRow(uc - lc) = Trim(Items(i, uc))
+            If VarType(vItems(i, uc)) = vbString Then
+                vRow(uc - lc) = Trim(vItems(i, uc))
             Else
-                vRow(uc - lc) = Items(i, uc)
+                vRow(uc - lc) = vItems(i, uc)
             End If
             Instance.Add vRow
         Next i
@@ -553,7 +557,7 @@ Private Sub AddFromExcelRange(ByRef r As Excel.Range)
         gNumRows = rCount - (g * dsChunkSize)
         If gNumRows > dsChunkSize Then gNumRows = dsChunkSize
     Loop
-    Items = Empty
+    vItems = Empty
 End Sub
 
 Private Function GetBaseRowIndexOfRange(ByRef r As Excel.Range) As Long
@@ -565,20 +569,20 @@ Fallback:
     GetBaseRowIndexOfRange = 1
 End Function
 
-Private Function AddFrom2dArray(ByRef Items As Variant) As ArrayListEx
+Private Function AddFrom2dArray(ByRef vItems As Variant) As ArrayListEx
     Dim i As Long, c As Long, lc As Long, uc As Long, ui As Long, vRow As Variant
 
-    lc = LBound(Items, 2)
-    uc = UBound(Items, 2)
-    ui = UBound(Items, 1)
+    lc = LBound(vItems, 2)
+    uc = UBound(vItems, 2)
+    ui = UBound(vItems, 1)
     ReDim vRow(0 To (uc - lc))
 
-    For i = LBound(Items, 1) To ui
+    For i = LBound(vItems, 1) To ui
         For c = lc To uc
-            If IsObject(Items(i, c)) Then
-                Set vRow(c - lc) = Items(i, c)
+            If IsObject(vItems(i, c)) Then
+                Set vRow(c - lc) = vItems(i, c)
             Else
-                vRow(c - lc) = Items(i, c)
+                vRow(c - lc) = vItems(i, c)
             End If
         Next c
         Instance.Add vRow
