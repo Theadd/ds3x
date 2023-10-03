@@ -36,7 +36,8 @@ Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
 End Property
 
 Public Property Get Items() As Variant()
-    Items = ToArray()
+    Static r As New ListRange
+    Items = r.Bind(pItems, 0, pIndex).Items
 End Property
 
 Public Property Get Count() As Long: Count = pIndex: End Property
@@ -318,8 +319,13 @@ Public Sub Reverse(Optional ByVal Index As Long = 0, Optional ByVal GetCount As 
 End Sub
 
 Public Sub SetRange(ByVal Index As Long, ByRef ArrayLike As Variant)
-    ' TODO
-    Err.Raise &H80004001
+    If IsObject(ArrayLike) Then
+        If Index < 0 Or Index > pIndex - ArrayLike.Count Then Err.Raise 9
+        VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike.Items(0)), ArrayLike.Count
+    Else
+        If Index < 0 Or Index > pIndex - (1 + UBound(ArrayLike)) Then Err.Raise 9
+        VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike(0)), 1 + UBound(ArrayLike)
+    End If
 End Sub
 
 Public Sub Sort_2(ByRef Comparer As IComparer): Sort 0, , Comparer: End Sub
@@ -333,19 +339,13 @@ Public Sub Sort(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Var
 End Sub
 
 Public Function ToArray() As Variant()
-    Dim t() As Variant, i As Long
+    Dim t() As Variant
     If pIndex = 0 Then
         ToArray = Array()
         Exit Function
     End If
     ReDim t(0 To pIndex - 1)
-    For i = 0 To pIndex - 1
-        If IsObject(pItems(i)) Then
-            Set t(i) = pItems(i)
-        Else
-            t(i) = pItems(i)
-        End If
-    Next i
+    VariantArrayClone VarPtr(t(0)), VarPtr(pItems(0)), pIndex
     ReassignArrayTo ToArray, t
 End Function
 
@@ -365,17 +365,17 @@ Private Sub Class_Terminate()
     On Error GoTo 0
 End Sub
 
-Private Sub Swap(ByRef a As Variant, ByRef B As Variant)
+Private Sub Swap(ByRef A As Variant, ByRef B As Variant)
     Dim v As Variant
-    If IsObject(a) Then
-        Set v = a
+    If IsObject(A) Then
+        Set v = A
     Else
-        v = a
+        v = A
     End If
     If IsObject(B) Then
-        Set a = B
+        Set A = B
     Else
-        a = B
+        A = B
     End If
     If IsObject(v) Then
         Set B = v
