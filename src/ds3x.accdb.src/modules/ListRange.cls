@@ -57,6 +57,7 @@ Public Property Get Items() As Variant()
 End Property
 
 Public Property Get Count() As Long: Count = pIndex: End Property
+Private Property Let Count(ByVal Value As Long): pIndex = Value: SafeArraySetElementsCount pItems, Value: End Property
 Public Property Get Capacity() As Long: Capacity = pList.Capacity: End Property
 Public Property Let Capacity(ByVal Value As Long): End Property
 Public Property Get IsFixedSize() As Boolean: IsFixedSize = (pFlags And 2 <> 0): End Property
@@ -64,7 +65,7 @@ Public Property Get IsReadOnly() As Boolean: IsReadOnly = (pFlags And 1 <> 0): E
 
 
 Public Function Bind(ByRef TargetList As IList, Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant, Optional ByVal ArrayElementSize As Long = VARIANT_SIZE) As ListRange
-    Dim sa As SAFEARRAY_1D
+    Static sa As SAFEARRAY_1D
     If IsMissing(GetCount) Then GetCount = TargetList.Count - Index
     pBaseIndex = Index
     pIndex = GetCount
@@ -76,6 +77,7 @@ Public Function Bind(ByRef TargetList As IList, Optional ByVal Index As Long = 0
         .cDims = 1
         .cbElements = ArrayElementSize
         .fFeatures = IIf(ArrayElementSize = VARIANT_SIZE, FADF_VARIANT Or FADF_EMBEDDED, FADF_EMBEDDED)
+        .cLocks = 10
         .pvData = TargetList.GetAddressOfItemAt(Index)
         .rgsabound0.cElements = GetCount
     End With
@@ -91,7 +93,7 @@ End Function
 Public Function Add(ByRef Value As Variant) As Long
     InternalUpdateRange
     pList.Insert pBaseIndex + pIndex, Value
-    pIndex = pIndex + 1
+    Count = pIndex + 1
     Add = pIndex
     pVersion = pVersion + 1
 End Function
@@ -99,7 +101,7 @@ End Function
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
     InternalUpdateRange
     pList.Insert pBaseIndex + Index, Value
-    pIndex = pIndex + 1
+    Count = pIndex + 1
     pVersion = pVersion + 1
 End Sub
 
@@ -113,7 +115,7 @@ Public Sub AddRange(ByRef ArrayLike As Variant)
     End If
     If GetCount > 0 Then
         pList.InsertRange pBaseIndex + pIndex, ArrayLike
-        pIndex = pIndex + GetCount
+        Count = pIndex + GetCount
         pVersion = pVersion + 1
     End If
 End Sub
@@ -128,7 +130,7 @@ Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     End If
     If GetCount > 0 Then
         pList.InsertRange pBaseIndex + Index, ArrayLike
-        pIndex = pIndex + GetCount
+        Count = pIndex + GetCount
         pVersion = pVersion + 1
     End If
 End Sub
@@ -162,7 +164,7 @@ Public Sub Clear()
     If pIndex > 0 Then
         pList.RemoveRange pBaseIndex, pIndex
         pVersion = pVersion + 1
-        pIndex = 0
+        Count = 0
     End If
 End Sub
 
@@ -271,7 +273,7 @@ Public Sub RemoveAt(ByVal Index As Long)
     InternalUpdateRange
     If Index < 0 Or Index >= pIndex Then Err.Raise 9
     pList.RemoveAt pBaseIndex + Index
-    pIndex = pIndex - 1
+    Count = pIndex - 1
     pVersion = pVersion + 1
 End Sub
 
@@ -280,7 +282,7 @@ Public Sub RemoveRange(ByVal Index As Long, ByVal GetCount As Long)
     If Index < 0 Or GetCount < 0 Or (pIndex - Index < GetCount) Then Err.Raise 9
     If GetCount > 0 Then
         pList.RemoveRange pBaseIndex + Index, GetCount
-        pIndex = pIndex - GetCount
+        Count = pIndex - GetCount
         pVersion = pVersion + 1
     End If
 End Sub
@@ -324,6 +326,7 @@ End Function
 Private Sub Class_Terminate()
     On Error Resume Next
     MemLongPtr(VarPtrArr(pItems)) = CLngPtr(0)
+    Set pList = Nothing
     On Error GoTo 0
 End Sub
 
@@ -351,6 +354,10 @@ Private Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal
     pFlags = Flags
     pIndex = GetCount
 End Function
+
+Private Sub SafeArraySetElementsCount(ByRef TargetArray() As Variant, ByVal Value As Long)
+    MemLong((Not Not TargetArray) + (VARIANT_SIZE / INT_SIZE) + 4 + PTR_SIZE) = Value
+End Sub
 
 
 Private Function C2IList(ByRef Value As Variant) As IList: Set C2IList = Value: End Function
