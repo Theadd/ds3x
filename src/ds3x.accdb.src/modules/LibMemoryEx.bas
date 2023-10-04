@@ -8,6 +8,10 @@ Option Explicit
 Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare PtrSafe Function SafeArrayCopyData Lib "oleaut32" (ByRef psaSource As Any, ByRef psaTarget As Any) As Long
 
+Private Declare PtrSafe Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (ByRef Destination As Any, ByRef Source As Any, ByVal Length As Long)
+Private Declare PtrSafe Function CoTaskMemAlloc Lib "ole32.dll" (ByVal cb As Long) As LongPtr
+Private Declare PtrSafe Sub CoTaskMemFree Lib "ole32.dll" (ByVal pv As LongPtr)
+
 Public Const FADF_AUTO As Long = &H1            ' An array that is allocated on the stack.
 Public Const FADF_VARIANT As Long = &H800       ' An array of VARIANTs.
 Public Const FADF_EMBEDDED As Long = &H4        ' An array that is embedded in a structure.
@@ -16,6 +20,18 @@ Public Const FADF_HAVEVARTYPE As Long = &H80    ' An array that has a variant ty
 
 Public Const INT_SIZE As Long = 2
 
+
+Public Function CreateMemoryCopy(ByRef TargetAddress As LongPtr, ByVal SourceAddress As LongPtr, ByVal ByteCount As Long) As Boolean
+    TargetAddress = CoTaskMemAlloc(ByteCount)
+    If TargetAddress <> 0 Then
+        CopyMemory ByVal TargetAddress, ByVal SourceAddress, ByteCount
+        CreateMemoryCopy = True
+    End If
+End Function
+
+Public Sub FreeMemoryCopy(ByRef TargetAddress As LongPtr)
+    If TargetAddress <> 0 Then CoTaskMemFree TargetAddress
+End Sub
 
 Public Sub ReassignArrayTo(ByRef Destination As Variant, ByRef Source As Variant)
     MemLongPtr(VarPtrArr(Destination)) = MemLongPtr(VarPtrArr(Source))
