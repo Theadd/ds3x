@@ -171,7 +171,7 @@ End Sub
 '// Clones this ListRange as an ArrayList, doing a shallow copy.
 Public Function Clone() As ArrayList
     Dim Target As New ArrayList
-    CloneTo Target, C2IList(Me), 0, pIndex, pFlags
+    C2IList(Target).CloneTo Target, C2IList(Me), 0, pIndex, pFlags
     Set Clone = Target
 End Function
 
@@ -347,12 +347,7 @@ Private Sub Assign(ByRef Target As Variant, ByRef Value As Variant)
 End Sub
 
 Private Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean
-    RedirectInstance VarPtr(CloneTo), Me, Target
-    pVersion = Source.Version
-    Capacity = GetCount
-    VariantArrayClone VarPtr(pItems(0)), Source.GetAddressOfItemAt(Index), GetCount
-    pFlags = Flags
-    pIndex = GetCount
+    Err.Raise &H80004001
 End Function
 
 Private Sub SafeArraySetElementsCount(ByRef TargetArray() As Variant, ByVal Value As Long)
@@ -428,3 +423,5 @@ Private Sub IList_Sort(Optional ByVal Index As Long = 0&, Optional ByVal GetCoun
 Private Function IList_ToArray() As Variant(): IList_ToArray = ToArray: End Function
 
 Private Function IList_GetAddressOfItemAt(ByVal Index As Long) As LongPtr: IList_GetAddressOfItemAt = GetAddressOfItemAt(Index): End Function
+
+Private Function IList_CloneTo(ByVal Target As ArrayList, Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean: IList_CloneTo = CloneTo(Target, Source, Index, GetCount, Flags): End Function

@@ -606,3 +606,5 @@ Private Sub IList_Sort(Optional ByVal Index As Long = 0&, Optional ByVal GetCoun
 Private Function IList_ToArray() As Variant(): IList_ToArray = ToArray: End Function
 
 Private Function IList_GetAddressOfItemAt(ByVal Index As Long) As LongPtr: IList_GetAddressOfItemAt = GetAddressOfItemAt(Index): End Function
+
+Private Function IList_CloneTo(ByVal Target As ArrayList, Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean: IList_CloneTo = CloneTo(Target, Source, Index, GetCount, Flags): End Function

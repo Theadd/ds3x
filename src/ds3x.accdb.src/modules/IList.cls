@@ -111,3 +111,6 @@ End Function
 
 Public Function GetAddressOfItemAt(ByVal Index As Long) As LongPtr
 End Function
+
+Public Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean
+End Function
