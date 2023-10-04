@@ -7,6 +7,7 @@ Option Explicit
 Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare PtrSafe Function SafeArrayCopyData Lib "oleaut32" (ByRef psaSource As Any, ByRef psaTarget As Any) As Long
 
+Public Const FADF_AUTO As Long = &H1            ' An array that is allocated on the stack.
 Public Const FADF_VARIANT As Long = &H800       ' An array of VARIANTs.
 Public Const FADF_EMBEDDED As Long = &H4        ' An array that is embedded in a structure.
 

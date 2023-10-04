@@ -36,8 +36,16 @@ Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
 End Property
 
 Public Property Get Items() As Variant()
-    Static r As New ListRange
-    Items = r.Bind(pItems, 0, pIndex).Items
+    Static sa As SAFEARRAY_1D
+    With sa
+        .cDims = 1
+        .cbElements = VARIANT_SIZE
+        .fFeatures = FADF_VARIANT Or FADF_AUTO
+        .cLocks = 10
+        .pvData = VarPtr(pItems(0))
+        .rgsabound0.cElements = pIndex
+    End With
+    MemLongPtr(VarPtrArr(Items)) = VarPtr(sa)
 End Property
 
 Public Property Get Count() As Long: Count = pIndex: End Property
