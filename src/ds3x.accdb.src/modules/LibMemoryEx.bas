@@ -1,4 +1,5 @@
 ﻿Attribute VB_Name = "LibMemoryEx"
+'@Folder "ds3x.Libraries"
 Option Compare Database
 Option Private Module
 Option Explicit

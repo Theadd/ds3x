@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 '// Implements a variable-size List that uses an array of variants to store the
 '// elements. A ArrayList has a capacity, which is the allocated length
 '// of the internal array. As elements are added to a ArrayList, the capacity
