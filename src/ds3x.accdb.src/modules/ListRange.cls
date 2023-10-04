@@ -22,7 +22,9 @@ Private pFlags As Byte
 
 
 
+'@DefaultMember
 Public Property Get Item(ByVal Index As Long) As Variant
+Attribute Item.VB_UserMemId = 0
     InternalUpdateRange
     Assign Item, pItems(Index)
 End Property
@@ -164,15 +166,11 @@ Public Sub Clear()
     End If
 End Sub
 
-Public Function Clone() As ArrayList    ' Should we create an ArrayList or a ListRange?
-    ' TODO
-    Err.Raise &H80004001
-'    public override Object Clone() {
-'         InternalUpdateRange();
-'         Range arrayList = new Range(_baseList,_baseIndex,_baseSize);
-'         arrayList._baseList = (ArrayList)_baseList.Clone();
-'         return arrayList;
-'     }
+'// Clones this ListRange as an ArrayList, doing a shallow copy.
+Public Function Clone() As ArrayList
+    Dim Target As New ArrayList
+    CloneTo Target, C2IList(Me), 0, pIndex, pFlags
+    Set Clone = Target
 End Function
 
 Public Function Contains(ByRef Value As Variant) As Boolean
@@ -344,6 +342,15 @@ Private Sub Assign(ByRef Target As Variant, ByRef Value As Variant)
         Target = Value
     End If
 End Sub
+
+Private Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean
+    RedirectInstance VarPtr(CloneTo), Me, Target
+    pVersion = Source.Version
+    Capacity = GetCount
+    VariantArrayClone VarPtr(pItems(0)), Source.GetAddressOfItemAt(Index), GetCount
+    pFlags = Flags
+    pIndex = GetCount
+End Function
 
 
 Private Function C2IList(ByRef Value As Variant) As IList: Set C2IList = Value: End Function
