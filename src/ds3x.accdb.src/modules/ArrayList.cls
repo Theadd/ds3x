@@ -22,8 +22,6 @@ Implements IList
 
 Private pItems() As Variant
 Private pIndex As Long
-'Private pBaseIndex As Long
-'Private pBaseList As ArrayList
 Private pVersion As Long
 Private pFlags As Byte
 
@@ -100,36 +98,7 @@ Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
 End Sub
 
 Public Sub AddRange(ByRef ArrayLike As Variant)
-    Dim v As Variant, GetCount As Long
-
-    If Not IsObject(ArrayLike) Then
-        GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
-        GrowCapacity GetCount
-        If VarType(ArrayLike) = (vbArray + vbVariant) Then
-            VariantArrayClone VarPtr(pItems(pIndex)), VarPtr(ArrayLike(LBound(ArrayLike))), GetCount
-            pIndex = pIndex + GetCount
-            pVersion = pVersion + 1
-            Exit Sub
-        End If
-    Else
-        GetCount = ArrayLike.Count
-        GrowCapacity GetCount
-        If TypeOf ArrayLike Is ArrayList Then
-            VariantArrayClone VarPtr(pItems(pIndex)), C2IList(ArrayLike).GetAddressOfItemAt(0), GetCount
-            pIndex = pIndex + GetCount
-            pVersion = pVersion + 1
-            Exit Sub
-        End If
-    End If
-    For Each v In ArrayLike
-        If IsObject(v) Then
-            Set pItems(pIndex) = v
-        Else
-            pItems(pIndex) = v
-        End If
-        pIndex = pIndex + 1
-    Next v
-    pVersion = pVersion + 1
+    InsertRange pIndex, ArrayLike
 End Sub
 
 Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
@@ -147,7 +116,7 @@ Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     Else
         GetCount = ArrayLike.Count
         ReserveSpaceForInsert Index, GetCount
-        If TypeOf ArrayLike Is ArrayList Then
+        If TypeOf ArrayLike Is IList Then
             VariantArrayClone VarPtr(pItems(Index)), C2IList(ArrayLike).GetAddressOfItemAt(0), GetCount
             pIndex = pIndex + GetCount
             pVersion = pVersion + 1
@@ -166,22 +135,10 @@ Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     pVersion = pVersion + 1
 End Sub
 
-Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ArrayList
-    Dim t() As Variant, sa As SAFEARRAY_1D
-    Set GetRange = New ArrayList
-    On Error GoTo Finally
-    With sa
-        .cDims = 1
-        .cbElements = VARIANT_SIZE
-        .pvData = VarPtr(pItems(Index))
-        .rgsabound0.cElements = GetCount
-    End With
-    MemLongPtr(VarPtrArr(t)) = VarPtr(sa)
-    GetRange.AddRange t
-Finally:
-    On Error Resume Next
-    MemLongPtr(VarPtrArr(t)) = CLngPtr(0)
-    On Error GoTo 0
+Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ListRange
+    If Index < 0 Or GetCount < 0 Or pIndex - Index < GetCount Then Err.Raise 9
+    Set GetRange = New ListRange
+    GetRange.Bind Me, Index, GetCount
 End Function
 
 Public Function GetEnumerator(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As IEnumVARIANT
@@ -237,22 +194,13 @@ Public Sub Clear()
     pVersion = pVersion + 1
 End Sub
 
+'// Clones this ArrayList, doing a shallow copy.  (A copy is made of all
+'// Object references in the ArrayList, but the Objects pointed to
+'// are not cloned).
 Public Function Clone() As ArrayList
-    Set Clone = New ArrayList
-    Clone.AddRange Me
-    ' TODO: FIXME
-'    // Clones this ArrayList, doing a shallow copy.  (A copy is made of all
-'    // Object references in the ArrayList, but the Objects pointed to
-'    // are not cloned).
-'    public virtual Object Clone()
-'    {
-'        Contract.Ensures(Contract.Result<Object>() != null);
-'        ArrayList la = new ArrayList(_size);
-'        la._size = _size;
-'        la._version = _version;
-'        Array.Copy(_items, 0, la._items, 0, _size);
-'        return la;
-'    }
+    Dim Target As New ArrayList
+    CloneTo Target, C2IList(Me), 0, pIndex, pFlags
+    Set Clone = Target
 End Function
 
 Public Function Contains(ByRef Value As Variant) As Boolean
@@ -551,6 +499,16 @@ Private Sub QuickSortV2(l As Long, r As Long)
     If (l < r0) Then QuickSortV2 l, r0
     If (l0 < r) Then QuickSortV2 l0, r
 End Sub
+
+Private Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean
+    RedirectInstance VarPtr(CloneTo), Me, Target
+    pVersion = Source.Version
+    Capacity = GetCount
+    VariantArrayClone VarPtr(pItems(0)), Source.GetAddressOfItemAt(Index), GetCount
+    pFlags = Flags
+    pIndex = GetCount
+End Function
+
 
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
 Private Function C2IList(ByRef Value As Variant) As IList: Set C2IList = Value: End Function
