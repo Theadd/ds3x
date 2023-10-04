@@ -102,35 +102,36 @@ Public Sub AddRange(ByRef ArrayLike As Variant)
 End Sub
 
 Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
-    Dim v As Variant, GetCount As Long
+    Dim v As Variant, GetCount As Long, isPending As Boolean
 
     If Not IsObject(ArrayLike) Then
         GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
-        ReserveSpaceForInsert Index, GetCount
         If VarType(ArrayLike) = (vbArray + vbVariant) Then
+            ' TODO: ReserveSpaceForInsert deallocates current pItems invalidating any ListRange of it
+            ReserveSpaceForInsert Index, GetCount
             VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike(LBound(ArrayLike))), GetCount
-            pIndex = pIndex + GetCount
-            pVersion = pVersion + 1
-            Exit Sub
+        Else
+            isPending = True
         End If
     Else
         GetCount = ArrayLike.Count
-        ReserveSpaceForInsert Index, GetCount
         If TypeOf ArrayLike Is IList Then
-            VariantArrayClone VarPtr(pItems(Index)), C2IList(ArrayLike).GetAddressOfItemAt(0), GetCount
-            pIndex = pIndex + GetCount
-            pVersion = pVersion + 1
-            Exit Sub
+            InsertListTo Index, ArrayLike
+        Else
+            isPending = True
         End If
     End If
-    For Each v In ArrayLike
-        If IsObject(v) Then
-            Set pItems(Index) = v
-        Else
-            pItems(Index) = v
-        End If
-        Index = Index + 1
-    Next v
+    If isPending Then
+        ReserveSpaceForInsert Index, GetCount
+        For Each v In ArrayLike
+            If IsObject(v) Then
+                Set pItems(Index) = v
+            Else
+                pItems(Index) = v
+            End If
+            Index = Index + 1
+        Next v
+    End If
     pIndex = pIndex + GetCount
     pVersion = pVersion + 1
 End Sub
@@ -463,6 +464,32 @@ Private Sub ReserveSpaceForInsert(ByVal Index As Long, ByVal GetCount As Long)
     ZeroMemory VarPtr(pItems(0)), pIndex * VARIANT_SIZE
     Erase pItems
     ReassignArrayTo pItems, t
+End Sub
+
+Private Function IsContainedInMemoryRange(ByRef TargetList As IList, Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As Boolean
+    If IsMissing(GetCount) Then GetCount = pIndex - Index
+    IsContainedInMemoryRange = (TargetList.GetAddressOfItemAt(0) <= VarPtr(pItems(Index + GetCount - 1)) _
+                                And TargetList.GetAddressOfItemAt(TargetList.Count - 1) >= VarPtr(pItems(Index)))
+End Function
+
+Private Sub InsertListTo(ByVal Index As Long, ByVal Target As IList)
+    Dim pv0 As LongPtr, bFree As Boolean
+    If Target.Count > 0 Then
+        pv0 = Target.GetAddressOfItemAt(0)
+        If IsContainedInMemoryRange(Target, Index) Then
+            bFree = CreateMemoryCopy(pv0, pv0, Target.Count * VARIANT_SIZE)
+        End If
+        GrowCapacity Target.Count
+        If Index < pIndex Then
+            ' Move memory `Target.Count` positions to the right from `Index` position.
+            MemCopy VarPtr(pItems(Index + Target.Count)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+            ' SafeArrayCopyData releases any resources in destination array and those, if present, were just copied to the right without increasing reference count, ZeroMemory prevents this
+            ZeroMemory VarPtr(pItems(Index)), Target.Count * VARIANT_SIZE
+        End If
+        ' Copy `Target` IList into this one at `Index`.
+        VariantArrayClone VarPtr(pItems(Index)), pv0, Target.Count
+        If bFree Then FreeMemoryCopy pv0
+    End If
 End Sub
 
 Private Sub QuickSort(l As Long, r As Long, ByRef Comparer As IComparer)
