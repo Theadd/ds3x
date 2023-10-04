@@ -11,6 +11,8 @@ Private Declare PtrSafe Function SafeArrayCopyData Lib "oleaut32" (ByRef psaSour
 Public Const FADF_AUTO As Long = &H1            ' An array that is allocated on the stack.
 Public Const FADF_VARIANT As Long = &H800       ' An array of VARIANTs.
 Public Const FADF_EMBEDDED As Long = &H4        ' An array that is embedded in a structure.
+Public Const FADF_FIXEDSIZE As Long = &H10      ' An array that may not be resized or reallocated.
+Public Const FADF_HAVEVARTYPE As Long = &H80    ' An array that has a variant type. The variant type can be retrieved with SafeArrayGetVartype.
 
 Public Const INT_SIZE As Long = 2
 
