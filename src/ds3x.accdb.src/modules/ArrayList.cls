@@ -485,9 +485,9 @@ Private Sub InsertListTo(ByVal Index As Long, ByVal GetCount As Long, ByVal Targ
         End If
         GrowCapacity GetCount
         If Index < pIndex Then
-            ' Move memory `Target.Count` positions to the right from `Index` position, due to memory overlapping
-            ' it's done using a separate memory region as helper. MemCopy automatically solves by itself the memory
-            ' overlapping problem but I was getting app crashes when copying large memory regions.
+            ' Move memory `Target.Count` positions to the right, from `Index` position, due to memory overlapping,
+            ' it is done using a separate memory region as a helper. MemCopy automatically solves the memory
+            ' overlapping problem itself but I was getting app crashes when copying very large regions of memory.
             If CreateMemoryCopy(pvIdx, VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE) Then
                 ' SafeArrayCopyData releases any resources in destination array and those, if present, were
                 ' just copied to the right without increasing reference count so, we clear it beforehand.
