@@ -116,7 +116,7 @@ Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
     Else
         GetCount = ArrayLike.Count
         If TypeOf ArrayLike Is IList Then
-            InsertListTo Index, ArrayLike
+            InsertListTo Index, GetCount, ArrayLike
         Else
             isPending = True
         End If
@@ -472,23 +472,38 @@ Private Function IsContainedInMemoryRange(ByRef TargetList As IList, Optional By
                                 And TargetList.GetAddressOfItemAt(TargetList.Count - 1) >= VarPtr(pItems(Index)))
 End Function
 
-Private Sub InsertListTo(ByVal Index As Long, ByVal Target As IList)
-    Dim pv0 As LongPtr, bFree As Boolean
-    If Target.Count > 0 Then
+Private Sub InsertListTo(ByVal Index As Long, ByVal GetCount As Long, ByVal Target As IList)
+    Dim pv0 As LongPtr, pv0base As LongPtr, pvIdx As LongPtr, t() As Variant, isContained As Boolean
+    If GetCount > 0 Then
         pv0 = Target.GetAddressOfItemAt(0)
+        pv0base = VarPtr(pItems(0))
         If IsContainedInMemoryRange(Target, Index) Then
-            bFree = CreateMemoryCopy(pv0, pv0, Target.Count * VARIANT_SIZE)
+            t = Target.ToArray()
+            pv0 = VarPtr(t(0))
+        Else
+            isContained = IsContainedInMemoryRange(Target)
         End If
-        GrowCapacity Target.Count
+        GrowCapacity GetCount
         If Index < pIndex Then
-            ' Move memory `Target.Count` positions to the right from `Index` position.
-            MemCopy VarPtr(pItems(Index + Target.Count)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
-            ' SafeArrayCopyData releases any resources in destination array and those, if present, were just copied to the right without increasing reference count, ZeroMemory prevents this
-            ZeroMemory VarPtr(pItems(Index)), Target.Count * VARIANT_SIZE
+            ' Move memory `Target.Count` positions to the right from `Index` position, due to memory overlapping
+            ' it's done using a separate memory region as helper. MemCopy automatically solves by itself the memory
+            ' overlapping problem but I was getting app crashes when copying large memory regions.
+            If CreateMemoryCopy(pvIdx, VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE) Then
+                ' SafeArrayCopyData releases any resources in destination array and those, if present, were
+                ' just copied to the right without increasing reference count so, we clear it beforehand.
+                ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
+                ' Copy back the elements from the temporal memory region to it's final position within the list.
+                CopyMemory ByVal VarPtr(pItems(Index + GetCount)), ByVal pvIdx, (pIndex - Index) * VARIANT_SIZE
+                FreeMemoryCopy pvIdx
+            Else
+                Err.Raise 7
+            End If
         End If
-        ' Copy `Target` IList into this one at `Index`.
-        VariantArrayClone VarPtr(pItems(Index)), pv0, Target.Count
-        If bFree Then FreeMemoryCopy pv0
+        If VarPtr(pItems(0)) <> pv0base And isContained Then
+            ' TODO: UNSIGNED PTRS
+            pv0 = VarPtr(pItems(0)) + (pv0 - pv0base)
+        End If
+        VariantArrayClone VarPtr(pItems(Index)), pv0, GetCount
     End If
 End Sub
 
