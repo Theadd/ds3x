@@ -332,6 +332,7 @@ End Sub
 
 Private Sub InternalUpdateRange()
     If pVersion <> pList.Version Then Err.Raise vbObjectError + 988425, , "This ArrayList range is no longer valid."
+    ' This array is fixed or temporarily locked (Error 10)
 End Sub
 
 Private Function GetAddressOfItemAt(ByVal Index As Long) As LongPtr

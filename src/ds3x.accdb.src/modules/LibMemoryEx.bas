@@ -8,7 +8,6 @@ Option Explicit
 Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare PtrSafe Function SafeArrayCopyData Lib "oleaut32" (ByRef psaSource As Any, ByRef psaTarget As Any) As Long
 
-Private Declare PtrSafe Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (ByRef Destination As Any, ByRef Source As Any, ByVal Length As Long)
 Private Declare PtrSafe Function CoTaskMemAlloc Lib "ole32.dll" (ByVal cb As Long) As LongPtr
 Private Declare PtrSafe Sub CoTaskMemFree Lib "ole32.dll" (ByVal pv As LongPtr)
 
@@ -29,7 +28,7 @@ Public Function CreateMemoryCopy(ByRef TargetAddress As LongPtr, ByVal SourceAdd
     End If
 End Function
 
-Public Sub FreeMemoryCopy(ByRef TargetAddress As LongPtr)
+Public Sub FreeMemoryCopy(ByVal TargetAddress As LongPtr)
     If TargetAddress <> 0 Then CoTaskMemFree TargetAddress
 End Sub
 
