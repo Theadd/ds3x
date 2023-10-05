@@ -46,7 +46,7 @@ Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLong
 Private Declare PtrSafe Function SetWindowPos Lib "user32" (ByVal hWnd As LongPtr, ByVal hWndInsertAfter As LongPtr, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long) As Long
 Private Declare PtrSafe Function GetDesktopWindow Lib "user32" () As LongPtr
 
-Private Declare PtrSafe Function CalculatePopupWindowPosition Lib "user32" (anchorPoint As POINTAPI, windowSize As SIZE, ByVal flags As Long, excludeRect As RECT, outPosition As RECT) As Boolean  ' https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-calculatepopupwindowposition
+Private Declare PtrSafe Function CalculatePopupWindowPosition Lib "user32" (anchorPoint As POINTAPI, windowSize As SIZE, ByVal Flags As Long, excludeRect As RECT, outPosition As RECT) As Boolean  ' https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-calculatepopupwindowposition
 Private Declare PtrSafe Function SetLayeredWindowAttributes Lib "user32" (ByVal hWnd As LongPtr, ByVal crKey As Long, ByVal bAlpha As Byte, ByVal dwFlags As Long) As Long
 
 Private Declare PtrSafe Function LockWindowUpdate Lib "user32" (ByVal hWndLock As Long) As Long

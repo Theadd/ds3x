@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+'@Folder "ds3x.Collections"
 '// Implements a variable-size List that uses an array of variants to store the
 '// elements. A ArrayList has a capacity, which is the allocated length
 '// of the internal array. As elements are added to a ArrayList, the capacity
@@ -17,8 +18,12 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
+Implements IList
+
 Private pItems() As Variant
 Private pIndex As Long
+Private pVersion As Long
+Private pFlags As Byte
 
 
 '@DefaultMember
@@ -29,25 +34,36 @@ End Property
 
 Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
     pItems(Index) = Value
+    pVersion = pVersion + 1
 End Property
 
 Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     Set pItems(Index) = Value
+    pVersion = pVersion + 1
 End Property
 
 Public Property Get Items() As Variant()
-    Static r As New ListRange
-    Items = r.Bind(pItems, 0, pIndex).Items
+    Static sa As SAFEARRAY_1D
+    With sa
+        .cDims = 1
+        .cbElements = VARIANT_SIZE
+        .fFeatures = FADF_VARIANT Or FADF_AUTO
+        .cLocks = 10
+        .pvData = VarPtr(pItems(0))
+        .rgsabound0.cElements = pIndex
+    End With
+    MemLongPtr(VarPtrArr(Items)) = VarPtr(sa)
 End Property
 
 Public Property Get Count() As Long: Count = pIndex: End Property
 Public Property Get Capacity() As Long: Capacity = UBound(pItems) + 1: End Property
 Public Property Let Capacity(ByVal Value As Long): ReDim Preserve pItems(0 To Value - 1): End Property
-Public Property Get IsFixedSize() As Boolean: IsFixedSize = False: End Property
-Public Property Get IsReadOnly() As Boolean: IsReadOnly = False: End Property
+Public Property Get IsFixedSize() As Boolean: IsFixedSize = (pFlags And 2 <> 0): End Property
+Public Property Get IsReadOnly() As Boolean: IsReadOnly = (pFlags And 1 <> 0): End Property
 Public Property Get IsSynchronized() As Boolean: IsSynchronized = False: End Property
 Public Property Get SyncRoot() As Object: End Property
 
+'@Deprecated
 Public Function Create() As ArrayList
     Set Create = New ArrayList
 End Function
@@ -67,6 +83,7 @@ Public Function Add(ByRef Value As Variant) As Long
     End If
     Add = pIndex
     pIndex = pIndex + 1
+    pVersion = pVersion + 1
 End Function
 
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
@@ -77,85 +94,52 @@ Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
         pItems(Index) = Value
     End If
     pIndex = pIndex + 1
+    pVersion = pVersion + 1
 End Sub
 
 Public Sub AddRange(ByRef ArrayLike As Variant)
-    Dim v As Variant, GetCount As Long
-
-    If Not IsObject(ArrayLike) Then
-        GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
-        GrowCapacity GetCount
-        If VarType(ArrayLike) = (vbArray + vbVariant) Then
-            VariantArrayClone VarPtr(pItems(pIndex)), VarPtr(ArrayLike(LBound(ArrayLike))), GetCount
-            pIndex = pIndex + GetCount
-            Exit Sub
-        End If
-    Else
-        GetCount = ArrayLike.Count
-        GrowCapacity GetCount
-        If TypeOf ArrayLike Is ArrayList Then
-            VariantArrayClone VarPtr(pItems(pIndex)), C2ArrayList(ArrayLike).GetAddressOfItemAt(0), GetCount
-            pIndex = pIndex + GetCount
-            Exit Sub
-        End If
-    End If
-    For Each v In ArrayLike
-        If IsObject(v) Then
-            Set pItems(pIndex) = v
-        Else
-            pItems(pIndex) = v
-        End If
-        pIndex = pIndex + 1
-    Next v
+    InsertRange pIndex, ArrayLike
 End Sub
 
 Public Sub InsertRange(ByVal Index As Long, ByRef ArrayLike As Variant)
-    Dim v As Variant, GetCount As Long
+    Dim v As Variant, GetCount As Long, isPending As Boolean
 
     If Not IsObject(ArrayLike) Then
         GetCount = (UBound(ArrayLike) - LBound(ArrayLike)) + 1
-        ReserveSpaceForInsert Index, GetCount
         If VarType(ArrayLike) = (vbArray + vbVariant) Then
+            ' TODO: ReserveSpaceForInsert deallocates current pItems invalidating any ListRange of it
+            ReserveSpaceForInsert Index, GetCount
             VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike(LBound(ArrayLike))), GetCount
-            pIndex = pIndex + GetCount
-            Exit Sub
+        Else
+            isPending = True
         End If
     Else
         GetCount = ArrayLike.Count
-        ReserveSpaceForInsert Index, GetCount
-        If TypeOf ArrayLike Is ArrayList Then
-            VariantArrayClone VarPtr(pItems(Index)), C2ArrayList(ArrayLike).GetAddressOfItemAt(0), GetCount
-            pIndex = pIndex + GetCount
-            Exit Sub
+        If TypeOf ArrayLike Is IList Then
+            InsertListTo Index, GetCount, ArrayLike
+        Else
+            isPending = True
         End If
     End If
-    For Each v In ArrayLike
-        If IsObject(v) Then
-            Set pItems(Index) = v
-        Else
-            pItems(Index) = v
-        End If
-        Index = Index + 1
-    Next v
+    If isPending Then
+        ReserveSpaceForInsert Index, GetCount
+        For Each v In ArrayLike
+            If IsObject(v) Then
+                Set pItems(Index) = v
+            Else
+                pItems(Index) = v
+            End If
+            Index = Index + 1
+        Next v
+    End If
     pIndex = pIndex + GetCount
+    pVersion = pVersion + 1
 End Sub
 
-Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ArrayList
-    Dim t() As Variant, sa As SAFEARRAY_1D
-    Set GetRange = New ArrayList
-    On Error GoTo Finally
-    With sa
-        .cDims = 1
-        .cbElements = VARIANT_SIZE
-        .pvData = VarPtr(pItems(Index))
-        .rgsabound0.cElements = GetCount
-    End With
-    MemLongPtr(VarPtrArr(t)) = VarPtr(sa)
-    GetRange.AddRange t
-Finally:
-    On Error Resume Next
-    MemLongPtr(VarPtrArr(t)) = CLngPtr(0)
-    On Error GoTo 0
+Public Function GetRange(ByVal Index As Long, ByVal GetCount As Long) As ListRange
+    If Index < 0 Or GetCount < 0 Or pIndex - Index < GetCount Then Err.Raise 9
+    Set GetRange = New ListRange
+    GetRange.Bind Me, Index, GetCount
 End Function
 
 Public Function GetEnumerator(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As IEnumVARIANT
@@ -208,28 +192,82 @@ Public Sub Clear()
     Erase pItems
     ReDim pItems(0 To 1)
     pIndex = 0
+    pVersion = pVersion + 1
 End Sub
 
+'// Clones this ArrayList, doing a shallow copy.  (A copy is made of all
+'// Object references in the ArrayList, but the Objects pointed to
+'// are not cloned).
 Public Function Clone() As ArrayList
-    Set Clone = New ArrayList
-    Clone.AddRange Me
+    Dim Target As New ArrayList
+    CloneTo Target, C2IList(Me), 0, pIndex, pFlags
+    Set Clone = Target
 End Function
 
 Public Function Contains(ByRef Value As Variant) As Boolean
     Dim i As Long
-    For i = 0 To pIndex - 1
-        If pItems(i) = Value Then
-            Contains = True
-            Exit For
+    If IsNull(Value) Then
+        For i = 0 To pIndex - 1
+            If IsNull(pItems(i)) Then
+                Contains = True
+                Exit For
+            End If
+        Next i
+    ElseIf IsEmpty(Value) Then
+        For i = 0 To pIndex - 1
+            If IsEmpty(pItems(i)) Then
+                Contains = True
+                Exit For
+            End If
+        Next i
+    ElseIf IsObject(Value) Then
+        If Value Is Nothing Then
+            For i = 0 To pIndex - 1
+                If IsObject(pItems(i)) Then
+                    If pItems(i) Is Nothing Then
+                        Contains = True
+                        Exit For
+                    End If
+                End If
+            Next i
+        Else
+            For i = 0 To pIndex - 1
+                If IsObject(pItems(i)) Then
+                    If ObjPtr(pItems(i)) = ObjPtr(Value) Then
+                        Contains = True
+                        Exit For
+                    End If
+                End If
+            Next i
         End If
-    Next i
+    Else
+        For i = 0 To pIndex - 1
+            If pItems(i) = Value Then
+                Contains = True
+                Exit For
+            End If
+        Next i
+    End If
 End Function
 
+'// Copies a section of this list to the given array at the given index.
 Public Sub CopyTo(Optional ByVal Index As Long = 0, Optional ByRef TargetArray As Variant, Optional ByVal TargetIndex As Long = 0, Optional ByVal GetCount As Variant)
     ' TODO
     Err.Raise &H80004001
 End Sub
 
+'// Returns a list wrapper that is fixed at the current size. Operations
+'// that add or remove items will fail, however, replacing items is allowed.
+Public Function FixedSize(ByRef ArrayLike As Variant) As ListRange
+    ' TODO
+    Err.Raise &H80004001
+End Function
+
+'// Returns a read-only ArrayList wrapper for the given ArrayList.
+Public Function ReadOnly(ByRef ArrayLike As Variant) As ListRange
+    ' TODO
+    Err.Raise &H80004001
+End Function
 
 '// Searches for the specified Value and returns the zero-based index of the
 '// first occurrence within the range of elements in the ArrayList that starts
@@ -264,26 +302,24 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByVal Index As Long
 End Function
 
 Public Sub Remove(ByRef Value As Variant)
-    Dim i As Long
-    For i = 0 To pIndex - 1
-        If pItems(i) = Value Then
-            pItems(i) = Empty
-            If i < pIndex - 1 Then MemCopy VarPtr(pItems(i)), VarPtr(pItems(i + 1)), (pIndex - i - 1) * VARIANT_SIZE
-            ZeroMemory VarPtr(pItems(pIndex - 1)), VARIANT_SIZE
-            pIndex = pIndex - 1
-            Exit For
-        End If
-    Next i
+    Dim Index As Long
+    Index = IndexOf(Value)
+    If Index >= 0 Then RemoveAt Index
 End Sub
 
+'// Removes the element at the given index.
 Public Sub RemoveAt(ByVal Index As Long)
+    If Index < 0 Or Index >= pIndex Then Err.Raise 9
     pItems(Index) = Empty
     If Index < pIndex - 1 Then MemCopy VarPtr(pItems(Index)), VarPtr(pItems(Index + 1)), (pIndex - Index - 1) * VARIANT_SIZE
     ZeroMemory VarPtr(pItems(pIndex - 1)), VARIANT_SIZE
     pIndex = pIndex - 1
+    pVersion = pVersion + 1
 End Sub
 
+'// Removes a range of elements from this list.
 Public Sub RemoveRange(ByVal Index As Long, ByVal GetCount As Long)
+    If Index < 0 Or GetCount < 0 Or (pIndex - Index < GetCount) Then Err.Raise 9
     Dim i As Long
     For i = 0 To GetCount - 1
         pItems(Index + i) = Empty
@@ -291,6 +327,7 @@ Public Sub RemoveRange(ByVal Index As Long, ByVal GetCount As Long)
     If Index < pIndex - 1 Then MemCopy VarPtr(pItems(Index)), VarPtr(pItems(Index + GetCount)), (pIndex - Index - GetCount) * VARIANT_SIZE
     ZeroMemory VarPtr(pItems(pIndex - GetCount)), GetCount * VARIANT_SIZE
     pIndex = pIndex - GetCount
+    pVersion = pVersion + 1
 End Sub
 
 Public Function Repeat(ByRef Value As Variant, ByVal GetCount As Long) As ArrayList
@@ -312,10 +349,12 @@ End Function
 Public Sub Reverse(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant)
     Dim i As Long, iMax As Long
     If IsMissing(GetCount) Then GetCount = pIndex - Index
+    If Index < 0 Or GetCount < 0 Or (pIndex - Index < GetCount) Then Err.Raise 9
     iMax = GetCount \ 2
     For i = 0 To iMax
         Swap pItems(Index + i), pItems(Index + (GetCount - 1) - i)
     Next i
+    pVersion = pVersion + 1
 End Sub
 
 Public Sub SetRange(ByVal Index As Long, ByRef ArrayLike As Variant)
@@ -326,6 +365,7 @@ Public Sub SetRange(ByVal Index As Long, ByRef ArrayLike As Variant)
         If Index < 0 Or Index > pIndex - (1 + UBound(ArrayLike)) Then Err.Raise 9
         VariantArrayClone VarPtr(pItems(Index)), VarPtr(ArrayLike(0)), 1 + UBound(ArrayLike)
     End If
+    pVersion = pVersion + 1
 End Sub
 
 Public Sub Sort_2(ByRef Comparer As IComparer): Sort 0, , Comparer: End Sub
@@ -336,6 +376,7 @@ Public Sub Sort(Optional ByVal Index As Long = 0, Optional ByVal GetCount As Var
     Else
         QuickSort Index, Index + GetCount - 1, Comparer
     End If
+    pVersion = pVersion + 1
 End Sub
 
 Public Function ToArray() As Variant()
@@ -349,10 +390,6 @@ Public Function ToArray() As Variant()
     ReassignArrayTo ToArray, t
 End Function
 
-Public Function GetAddressOfItemAt(ByVal Index As Long) As LongPtr
-    GetAddressOfItemAt = VarPtr(pItems(Index))
-End Function
-
 
 Private Sub Class_Initialize()
     ReDim pItems(0 To 1)
@@ -364,6 +401,10 @@ Private Sub Class_Terminate()
     Erase pItems
     On Error GoTo 0
 End Sub
+
+Private Function GetAddressOfItemAt(ByVal Index As Long) As LongPtr
+    GetAddressOfItemAt = VarPtr(pItems(Index))
+End Function
 
 Private Sub Swap(ByRef A As Variant, ByRef B As Variant)
     Dim v As Variant
@@ -425,6 +466,47 @@ Private Sub ReserveSpaceForInsert(ByVal Index As Long, ByVal GetCount As Long)
     ReassignArrayTo pItems, t
 End Sub
 
+Private Function IsContainedInMemoryRange(ByRef TargetList As IList, Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As Boolean
+    If IsMissing(GetCount) Then GetCount = pIndex - Index
+    IsContainedInMemoryRange = (TargetList.GetAddressOfItemAt(0) <= VarPtr(pItems(Index + GetCount - 1)) _
+                                And TargetList.GetAddressOfItemAt(TargetList.Count - 1) >= VarPtr(pItems(Index)))
+End Function
+
+Private Sub InsertListTo(ByVal Index As Long, ByVal GetCount As Long, ByVal Target As IList)
+    Dim pv0 As LongPtr, pv0base As LongPtr, pvIdx As LongPtr, t() As Variant, isContained As Boolean
+    If GetCount > 0 Then
+        pv0 = Target.GetAddressOfItemAt(0)
+        pv0base = VarPtr(pItems(0))
+        If IsContainedInMemoryRange(Target, Index) Then
+            t = Target.ToArray()
+            pv0 = VarPtr(t(0))
+        Else
+            isContained = IsContainedInMemoryRange(Target)
+        End If
+        GrowCapacity GetCount
+        If Index < pIndex Then
+            ' Move memory `Target.Count` positions to the right, from `Index` position, due to memory overlapping,
+            ' it is done using a separate memory region as a helper. MemCopy automatically solves the memory
+            ' overlapping problem itself but I was getting app crashes when copying very large regions of memory.
+            If CreateMemoryCopy(pvIdx, VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE) Then
+                ' SafeArrayCopyData releases any resources in destination array and those, if present, were
+                ' just copied to the right without increasing reference count so, we clear it beforehand.
+                ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
+                ' Copy back the elements from the temporal memory region to it's final position within the list.
+                CopyMemory ByVal VarPtr(pItems(Index + GetCount)), ByVal pvIdx, (pIndex - Index) * VARIANT_SIZE
+                FreeMemoryCopy pvIdx
+            Else
+                Err.Raise 7
+            End If
+        End If
+        If VarPtr(pItems(0)) <> pv0base And isContained Then
+            ' TODO: UNSIGNED PTRS
+            pv0 = VarPtr(pItems(0)) + (pv0 - pv0base)
+        End If
+        VariantArrayClone VarPtr(pItems(Index)), pv0, GetCount
+    End If
+End Sub
+
 Private Sub QuickSort(l As Long, r As Long, ByRef Comparer As IComparer)
     Dim p As Variant, l0 As Long, r0 As Long
     l0 = l: r0 = r
@@ -460,4 +542,84 @@ Private Sub QuickSortV2(l As Long, r As Long)
     If (l0 < r) Then QuickSortV2 l0, r
 End Sub
 
+Private Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean
+    RedirectInstance VarPtr(CloneTo), Me, Target
+    pVersion = Source.Version
+    Capacity = GetCount
+    VariantArrayClone VarPtr(pItems(0)), Source.GetAddressOfItemAt(Index), GetCount
+    pFlags = Flags
+    pIndex = GetCount
+End Function
+
+
 Private Function C2ArrayList(ByRef Value As Variant) As ArrayList: Set C2ArrayList = Value: End Function
+Private Function C2IList(ByRef Value As Variant) As IList: Set C2IList = Value: End Function
+
+
+' --- IList Interface ---
+
+Private Property Get IList_Count() As Long: IList_Count = Count: End Property
+
+Private Property Get IList_Capacity() As Long: IList_Capacity = Capacity: End Property
+
+Private Property Let IList_Capacity(ByVal RHS As Long): Capacity = RHS: End Property
+
+Private Property Get IList_IsFixedSize() As Boolean: IList_IsFixedSize = IsFixedSize: End Property
+
+Private Property Get IList_IsReadOnly() As Boolean: IList_IsReadOnly = IsReadOnly: End Property
+
+Private Property Get IList_IsSynchronized() As Boolean: IList_IsSynchronized = IsSynchronized: End Property
+
+Private Property Set IList_Item(ByVal Index As Long, RHS As Variant): Set Item(Index) = RHS: End Property
+
+Private Property Let IList_Item(ByVal Index As Long, RHS As Variant): Item(Index) = RHS: End Property
+
+Private Property Get IList_Item(ByVal Index As Long) As Variant: Assign IList_Item, Item(Index): End Property
+
+Private Property Get IList_Items() As Variant(): IList_Items = Items(): End Property
+
+Private Property Get IList_SyncRoot() As Object: Set IList_SyncRoot = SyncRoot: End Property
+
+Private Property Get IList_Version() As Long: IList_Version = pVersion: End Property
+
+Private Function IList_Add(Value As Variant) As Long: IList_Add = Add(Value): End Function
+
+Private Sub IList_AddRange(ArrayLike As Variant): AddRange ArrayLike: End Sub
+
+Private Function IList_BinarySearch(ByVal Index As Long, ByVal GetCount As Long, Value As Variant, Optional Comparer As IComparer = Nothing) As Long: IList_BinarySearch = BinarySearch(Index, GetCount, Value, Comparer): End Function
+
+Private Sub IList_Clear(): Clear: End Sub
+
+Private Function IList_Clone() As IList: Set IList_Clone = Clone: End Function
+
+Private Function IList_Contains(Value As Variant) As Boolean: IList_Contains = Contains(Value): End Function
+
+Private Sub IList_CopyTo(Optional ByVal Index As Long = 0&, Optional TargetArray As Variant, Optional ByVal TargetIndex As Long = 0&, Optional ByVal GetCount As Variant): CopyTo Index, TargetArray, TargetIndex, GetCount: End Sub
+
+Private Function IList_GetRange(ByVal Index As Long, ByVal GetCount As Long) As IList: Set IList_GetRange = GetRange(Index, GetCount): End Function
+
+Private Function IList_IndexOf(Value As Variant, Optional ByVal Index As Long = 0&, Optional ByVal GetCount As Variant) As Long: IList_IndexOf = IndexOf(Value, Index, GetCount): End Function
+
+Private Sub IList_Insert(ByVal Index As Long, Value As Variant): Insert Index, Value: End Sub
+
+Private Sub IList_InsertRange(ByVal Index As Long, ArrayLike As Variant): InsertRange Index, ArrayLike: End Sub
+
+Private Function IList_LastIndexOf(Value As Variant, Optional ByVal Index As Long = 0&, Optional ByVal GetCount As Variant) As Long: IList_LastIndexOf = LastIndexOf(Value, Index, GetCount): End Function
+
+Private Sub IList_Remove(Value As Variant): Remove Value: End Sub
+
+Private Sub IList_RemoveAt(ByVal Index As Long): RemoveAt Index: End Sub
+
+Private Sub IList_RemoveRange(ByVal Index As Long, ByVal GetCount As Long): RemoveRange Index, GetCount: End Sub
+
+Private Sub IList_Reverse(Optional ByVal Index As Long = 0&, Optional ByVal GetCount As Variant): Reverse Index, GetCount: End Sub
+
+Private Sub IList_SetRange(ByVal Index As Long, ArrayLike As Variant): SetRange Index, ArrayLike: End Sub
+
+Private Sub IList_Sort(Optional ByVal Index As Long = 0&, Optional ByVal GetCount As Variant, Optional Comparer As IComparer = Nothing): Sort Index, GetCount, Comparer: End Sub
+
+Private Function IList_ToArray() As Variant(): IList_ToArray = ToArray: End Function
+
+Private Function IList_GetAddressOfItemAt(ByVal Index As Long) As LongPtr: IList_GetAddressOfItemAt = GetAddressOfItemAt(Index): End Function
+
+Private Function IList_CloneTo(ByVal Target As ArrayList, Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean: IList_CloneTo = CloneTo(Target, Source, Index, GetCount, Flags): End Function
