@@ -200,7 +200,7 @@ End Sub
 '// are not cloned).
 Public Function Clone() As ArrayList
     Dim Target As New ArrayList
-    CloneTo Target, C2IList(Me), 0, pIndex, pFlags
+    C2IList(Target).CloneTo Target, C2IList(Me), 0, pIndex, pFlags
     Set Clone = Target
 End Function
 
@@ -240,11 +240,22 @@ Public Function Contains(ByRef Value As Variant) As Boolean
                 End If
             Next i
         End If
+    ElseIf IsError(Value) Then
+        For i = 0 To pIndex - 1
+            If IsError(pItems(i)) Then
+                If pItems(i) = Value Then
+                    Contains = True
+                    Exit For
+                End If
+            End If
+        Next i
     Else
         For i = 0 To pIndex - 1
-            If pItems(i) = Value Then
-                Contains = True
-                Exit For
+            If Not (IsObject(pItems(i)) Or IsError(pItems(i)) Or IsArray(pItems(i))) Then
+                If pItems(i) = Value Then
+                    Contains = True
+                    Exit For
+                End If
             End If
         Next i
     End If
@@ -485,24 +496,42 @@ Private Sub InsertListTo(ByVal Index As Long, ByVal GetCount As Long, ByVal Targ
         End If
         GrowCapacity GetCount
         If Index < pIndex Then
-            ' Move memory `Target.Count` positions to the right, from `Index` position, due to memory overlapping,
-            ' it is done using a separate memory region as a helper. MemCopy automatically solves the memory
-            ' overlapping problem itself but I was getting app crashes when copying very large regions of memory.
-            If CreateMemoryCopy(pvIdx, VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE) Then
-                ' SafeArrayCopyData releases any resources in destination array and those, if present, were
-                ' just copied to the right without increasing reference count so, we clear it beforehand.
-                ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
-                ' Copy back the elements from the temporal memory region to it's final position within the list.
-                CopyMemory ByVal VarPtr(pItems(Index + GetCount)), ByVal pvIdx, (pIndex - Index) * VARIANT_SIZE
-                FreeMemoryCopy pvIdx
-            Else
-                Err.Raise 7
-            End If
+            Select Case MemoryMovingMode
+                Case MemoryMoveMode.MemCopyMode
+                    MemCopy VarPtr(pItems(Index + GetCount)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+                    ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
+                Case MemoryMoveMode.CopyMemoryMode
+                    CopyMemory ByVal VarPtr(pItems(Index + GetCount)), ByVal VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+                    ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
+                Case Else
+                    ' Move memory `Target.Count` positions to the right, from `Index` position, due to memory overlapping,
+                    ' it is done using a separate memory region as a helper. MemCopy automatically solves the memory
+                    ' overlapping problem itself but I was getting app crashes when copying very large regions of memory.
+                    If CreateMemoryCopy(pvIdx, VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE) Then
+                        ' SafeArrayCopyData releases any resources in destination array and those, if present, are
+                        ' just copied to the right without increasing reference count so, we clear it beforehand to prevent
+                        ' SafeArrayCopyData to release those resources.
+                        ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
+                        ' Copy back the elements from the temporal memory region to it's final position within the list.
+                        Select Case MemoryMovingMode
+                            Case MemoryMoveMode.MemAllocMemCopyMode
+                                MemCopy VarPtr(pItems(Index + GetCount)), pvIdx, (pIndex - Index) * VARIANT_SIZE
+                            Case MemoryMoveMode.MemAllocCopyMemoryMode
+                                CopyMemory ByVal VarPtr(pItems(Index + GetCount)), ByVal pvIdx, (pIndex - Index) * VARIANT_SIZE
+                            Case Else: Err.Raise 9, "ArrayList.InsertListTo", "Unexpected MemoryMoveMode"
+                        End Select
+                        FreeMemoryCopy pvIdx
+                    Else
+                        Err.Raise 7
+                    End If
+            End Select
         End If
         If VarPtr(pItems(0)) <> pv0base And isContained Then
-            ' TODO: UNSIGNED PTRS
+            ' When `Target` derived from an array range contained within this list and, due to `Redim Preserve` from
+            ' `GrowCapacity` above, the array gets reallocated to a different memory region, we've to update the pointer.
             pv0 = VarPtr(pItems(0)) + (pv0 - pv0base)
         End If
+        ' Finally, insert (copy) all items in `Target` list to the region we just cleared for them.
         VariantArrayClone VarPtr(pItems(Index)), pv0, GetCount
     End If
 End Sub
@@ -543,7 +572,6 @@ Private Sub QuickSortV2(l As Long, r As Long)
 End Sub
 
 Private Function CloneTo(ByVal Target As ArrayList, ByRef Source As IList, ByVal Index As Long, ByVal GetCount As Long, ByVal Flags As Byte) As Boolean
-    RedirectInstance VarPtr(CloneTo), Me, Target
     pVersion = Source.Version
     Capacity = GetCount
     VariantArrayClone VarPtr(pItems(0)), Source.GetAddressOfItemAt(Index), GetCount

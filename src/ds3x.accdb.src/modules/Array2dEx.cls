@@ -77,16 +77,17 @@ Public Function Create(Optional ByRef ArrayLike As Variant) As Array2dEx
     ElseIf IsObject(ArrayLike) Then
         Set Create = CreateFromObject(C2Object(ArrayLike))
     ElseIf IsArray(ArrayLike) Then
-        If Is2dArray(ArrayLike) Then
-            Set Create = New Array2dEx
-            Dim t() As Variant
-            t = ArrayLike
-            Create.SetInstanceByRef t
-        ElseIf Is1dArray(ArrayLike) Then
-            Set Create = CreateFromJaggedArray(ArrayLike)
-        Else
-            Err.Raise 13
-        End If
+        Select Case GetArrayDimsCount(ArrayLike)
+            Case 2
+                Set Create = New Array2dEx
+                Dim t() As Variant
+                t = ArrayLike
+                Create.SetInstanceByRef t
+            Case 1
+                Set Create = CreateFromJaggedArray(ArrayLike)
+            Case Else
+                Err.Raise 13
+        End Select
     Else
         Err.Raise 13
     End If
@@ -506,6 +507,7 @@ Private Function C2ArrayList(ByVal Value As Variant) As ArrayList: Set C2ArrayLi
 Private Function C2ArrayListEx(ByVal Value As Variant) As ArrayListEx: Set C2ArrayListEx = Value: End Function
 Private Function C2Object(ByRef Value As Variant) As Object: Set C2Object = Value: End Function
 
+'@Deprecated
 Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Finally
     Dim t As Long
@@ -518,6 +520,7 @@ Public Function Is2dArray(ByRef ArrayLike As Variant) As Boolean
 Finally:
 End Function
 
+'@Deprecated
 Public Function Is1dArray(ByRef ArrayLike As Variant) As Boolean
     On Error GoTo Fallback
 
