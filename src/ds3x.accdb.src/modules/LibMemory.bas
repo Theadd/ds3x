@@ -58,16 +58,20 @@ Private Const MODULE_NAME As String = "LibMemory"
 
 #If Mac Then
     #If VBA7 Then
-        Public Declare PtrSafe Function CopyMemory Lib "/usr/lib/libc.dylib" Alias "memmove" (Destination As Any, Source As Any, ByVal Length As LongPtr) As LongPtr
+        Private Declare PtrSafe Function CopyMemory Lib "/usr/lib/libc.dylib" Alias "memmove" (Destination As Any, Source As Any, ByVal Length As LongPtr) As LongPtr
+        Private Declare PtrSafe Function FillMemory Lib "/usr/lib/libc.dylib" Alias "memset" (Destination As Any, ByVal Fill As Byte, ByVal Length As LongPtr) As LongPtr
     #Else
-        Public Declare Function CopyMemory Lib "/usr/lib/libc.dylib" Alias "memmove" (Destination As Any, Source As Any, ByVal Length As Long) As Long
+        Private Declare Function CopyMemory Lib "/usr/lib/libc.dylib" Alias "memmove" (Destination As Any, Source As Any, ByVal Length As Long) As Long
+        Private Declare Function FillMemory Lib "/usr/lib/libc.dylib" Alias "memset" (Destination As Any, ByVal Fill As Byte, ByVal Length As Long) As Long
     #End If
 #Else 'Windows
     'https://msdn.microsoft.com/en-us/library/mt723419(v=vs.85).aspx
     #If VBA7 Then
-        Public Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+        Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+        Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As LongPtr, ByVal Fill As Byte)
     #Else
-        Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
+        Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
+        Private Declare Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
     #End If
 #End If
 
@@ -176,7 +180,7 @@ End Sub
 'Read/Write a Byte from/to memory
 '*******************************************************************************
 Public Property Get MemByte(ByVal memAddress As LongPtr) As Byte
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemByte, ByVal memAddress, 1
     #Else
         Static rm As REMOTE_MEMORY
@@ -184,7 +188,7 @@ Public Property Get MemByte(ByVal memAddress As LongPtr) As Byte
     #End If
 End Property
 Public Property Let MemByte(ByVal memAddress As LongPtr, ByVal newValue As Byte)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 1
     #Else
         Static rm As REMOTE_MEMORY
@@ -196,7 +200,7 @@ End Property
 'Read/Write 2 Bytes (Integer) from/to memory
 '*******************************************************************************
 Public Property Get MemInt(ByVal memAddress As LongPtr) As Integer
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemInt, ByVal memAddress, 2
     #Else
         Static rm As REMOTE_MEMORY
@@ -204,7 +208,7 @@ Public Property Get MemInt(ByVal memAddress As LongPtr) As Integer
     #End If
 End Property
 Public Property Let MemInt(ByVal memAddress As LongPtr, ByVal newValue As Integer)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 2
     #Else
         Static rm As REMOTE_MEMORY
@@ -216,7 +220,7 @@ End Property
 'Read/Write 2 Bytes (Boolean) from/to memory
 '*******************************************************************************
 Public Property Get MemBool(ByVal memAddress As LongPtr) As Boolean
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemBool, ByVal memAddress, 2
     #Else
         Static rm As REMOTE_MEMORY
@@ -224,7 +228,7 @@ Public Property Get MemBool(ByVal memAddress As LongPtr) As Boolean
     #End If
 End Property
 Public Property Let MemBool(ByVal memAddress As LongPtr, ByVal newValue As Boolean)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 2
     #Else
         Static rm As REMOTE_MEMORY
@@ -236,7 +240,7 @@ End Property
 'Read/Write 4 Bytes (Long) from/to memory
 '*******************************************************************************
 Public Property Get MemLong(ByVal memAddress As LongPtr) As Long
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemLong, ByVal memAddress, 4
     #Else
         Static rm As REMOTE_MEMORY
@@ -244,7 +248,7 @@ Public Property Get MemLong(ByVal memAddress As LongPtr) As Long
     #End If
 End Property
 Public Property Let MemLong(ByVal memAddress As LongPtr, ByVal newValue As Long)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 4
     #Else
         Static rm As REMOTE_MEMORY
@@ -256,7 +260,7 @@ End Property
 'Read/Write 4 Bytes (Single) from/to memory
 '*******************************************************************************
 Public Property Get MemSng(ByVal memAddress As LongPtr) As Single
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemSng, ByVal memAddress, 4
     #Else
         Static rm As REMOTE_MEMORY
@@ -264,7 +268,7 @@ Public Property Get MemSng(ByVal memAddress As LongPtr) As Single
     #End If
 End Property
 Public Property Let MemSng(ByVal memAddress As LongPtr, ByVal newValue As Single)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 4
     #Else
         Static rm As REMOTE_MEMORY
@@ -277,7 +281,7 @@ End Property
 '*******************************************************************************
 #If Win64 Then
 Public Property Get MemLongLong(ByVal memAddress As LongLong) As LongLong
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemLongLong, ByVal memAddress, 8
     #Else
         'Cannot set Variant/LongLong ByRef so we cannot use 'RemoteAssign'
@@ -286,7 +290,7 @@ Public Property Get MemLongLong(ByVal memAddress As LongLong) As LongLong
     #End If
 End Property
 Public Property Let MemLongLong(ByVal memAddress As LongLong, ByVal newValue As LongLong)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 8
     #Else
         'Cannot set Variant/LongLong ByRef so we use Currency instead
@@ -326,7 +330,7 @@ End Sub
 '   extra stack frame! Performance was chosen over code repetition!
 '*******************************************************************************
 Public Property Get MemLongPtr(ByVal memAddress As LongPtr) As LongPtr
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemLongPtr, ByVal memAddress, PTR_SIZE
     #ElseIf Win64 Then
         Static rm As REMOTE_MEMORY: rm.memValue = memAddress
@@ -337,7 +341,7 @@ Public Property Get MemLongPtr(ByVal memAddress As LongPtr) As LongPtr
     #End If
 End Property
 Public Property Let MemLongPtr(ByVal memAddress As LongPtr, ByVal newValue As LongPtr)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, PTR_SIZE
     #ElseIf Win64 Then
         Static rmSrc As REMOTE_MEMORY: rmSrc.memValue = VarPtr(newValue)
@@ -353,7 +357,7 @@ End Property
 'Read/Write 8 Bytes (Currency) from/to memory
 '*******************************************************************************
 Public Property Get MemCur(ByVal memAddress As LongPtr) As Currency
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemCur, ByVal memAddress, 8
     #Else
         Static rm As REMOTE_MEMORY
@@ -361,7 +365,7 @@ Public Property Get MemCur(ByVal memAddress As LongPtr) As Currency
     #End If
 End Property
 Public Property Let MemCur(ByVal memAddress As LongPtr, ByVal newValue As Currency)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 8
     #Else
         Static rm As REMOTE_MEMORY
@@ -373,7 +377,7 @@ End Property
 'Read/Write 8 Bytes (Date) from/to memory
 '*******************************************************************************
 Public Property Get MemDate(ByVal memAddress As LongPtr) As Date
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemDate, ByVal memAddress, 8
     #Else
         Static rm As REMOTE_MEMORY
@@ -381,7 +385,7 @@ Public Property Get MemDate(ByVal memAddress As LongPtr) As Date
     #End If
 End Property
 Public Property Let MemDate(ByVal memAddress As LongPtr, ByVal newValue As Date)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 8
     #Else
         Static rm As REMOTE_MEMORY
@@ -393,7 +397,7 @@ End Property
 'Read/Write 8 Bytes (Double) from/to memory
 '*******************************************************************************
 Public Property Get MemDbl(ByVal memAddress As LongPtr) As Double
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory MemDbl, ByVal memAddress, 8
     #Else
         Static rm As REMOTE_MEMORY
@@ -401,7 +405,7 @@ Public Property Get MemDbl(ByVal memAddress As LongPtr) As Double
     #End If
 End Property
 Public Property Let MemDbl(ByVal memAddress As LongPtr, ByVal newValue As Double)
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         CopyMemory ByVal memAddress, newValue, 8
     #Else
         Static rm As REMOTE_MEMORY
@@ -415,7 +419,7 @@ End Property
 Public Function MemObj(ByVal memAddress As LongPtr) As Object
     If memAddress = 0 Then Exit Function
     '
-    #If Mac Then
+    #If Mac Or TWINBASIC Or (VBA7 = 0) Then
         Dim obj As Object
         CopyMemory obj, memAddress, PTR_SIZE
         Set MemObj = obj
@@ -569,14 +573,14 @@ End Function
 
 '*******************************************************************************
 'Returns the memory address of a variable of array type
-'Returns error 5 for a non-array or an array wrapped in a Variant
+'Returns error 5 for a non-array
 '*******************************************************************************
 Public Function VarPtrArr(ByRef arr As Variant) As LongPtr
-    Const vtArrByRef As Long = vbArray + VT_BYREF
     Dim vt As VbVarType: vt = MemInt(VarPtr(arr)) 'VarType(arr) ignores VT_BYREF
-    If (vt And vtArrByRef) = vtArrByRef Then
+    If vt And vbArray Then
         Const pArrayOffset As Long = 8
-        VarPtrArr = MemLongPtr(VarPtr(arr) + pArrayOffset)
+        VarPtrArr = VarPtr(arr) + pArrayOffset
+        If vt And VT_BYREF Then VarPtrArr = MemLongPtr(VarPtrArr)
     Else
         Err.Raise 5, "VarPtrArr", "Array required"
     End If
@@ -601,25 +605,21 @@ End Function
 'Alternative for CopyMemory - not affected by API speed issues on Windows
 '--------------------------
 'Mac - wrapper around CopyMemory/memmove
-'Win - bytesCount 1 to 2147483647 - no API calls. Uses a combination of
+'Win - bytesCount 1 to 16777216 - no API calls. Uses a combination of
 '      REMOTE_MEMORY/SAFEARRAY_1D structs as well as native Strings and Arrays
-'      to manipulate memory. Works within size limitation of Strings in VBA
+'      to manipulate memory.
 '      For some smaller sizes (<=5) optimizes via MemLong, MemInt, MemByte etc.
-'    - bytesCount < 0 or > 2147483647 - wrapper around CopyMemory/RtlMoveMemory
+'    - bytesCount < 0 or > 16777216 - wrapper around CopyMemory/RtlMoveMemory
 '*******************************************************************************
 Public Sub MemCopy(ByVal destinationPtr As LongPtr _
                  , ByVal sourcePtr As LongPtr _
                  , ByVal bytesCount As LongPtr)
     If destinationPtr = sourcePtr Then Exit Sub
-#If Mac Then
+#If Mac Or TWINBASIC Or (VBA7 = 0) Then
     CopyMemory ByVal destinationPtr, ByVal sourcePtr, bytesCount
 #Else
-    #If Win64 Then
-        Const maxLong As Long = &H7FFFFFFF
-        If bytesCount < 0 Or bytesCount > maxLong Then
-    #Else
-        If bytesCount < 0 Then
-    #End If
+    Const maxSizeSpeedGain As Long = &H1000000 'Beyond this use API directly
+    If bytesCount < 0 Or bytesCount > maxSizeSpeedGain Then
         CopyMemory ByVal destinationPtr, ByVal sourcePtr, bytesCount
         Exit Sub
     End If
@@ -685,111 +685,83 @@ Private Sub CopyBytes(ByVal bytesCount As Long _
     Dim bytes As Long: bytes = bytesCount - bstrPrefixSize
     Dim bstrLength As Long
     Dim s As String 'Must not be Variant so that LSet is faster
-    Dim tempSize As Long
     Dim useBSTR As Boolean
     Dim hasOverlap As Boolean
     Dim overlapBSTRLen As Long
     Dim overlapOffset As LongPtr
     '
-    Do
-        vtSrc = vbLong + VT_BYREF
-        bstrLength = rmSrc.memValue 'Copy first 4 bytes froum source
-        vtSrc = vbLongPtr
-        '
-        Const maxMidBs As Long = 2 ^ 5 'Use SAFEARRAY and MidB below this value
-        useBSTR = (bstrLength >= bytes Or bstrLength < 0) And bytes > maxMidBs
-        If useBSTR Then 'Prepare source BSTR
-            rmBSTR.memValue = VarPtr(s)
-            #If Win64 Then
-                Const curBSTRPrefixSize As Currency = 0.0004
-                vtSrc = vbCurrency
-                vtBSTR = vbCurrency + VT_BYREF
-                bstrPtrValue = rmSrc.memValue + curBSTRPrefixSize
-                vtSrc = vbLongPtr
-            #Else
-                vtBSTR = vbLong + VT_BYREF
-                bstrPtrValue = rmSrc.memValue + bstrPrefixSize
-            #End If
-            Const maxStartMidB As Long = 2 ^ 30 'MidB second param limit (bug)
-            If bytes > maxStartMidB And bytes Mod 2 = 1 Then
-                tempSize = maxStartMidB
-                bytes = bytes - maxStartMidB
-            Else
-                tempSize = bytes
-                bytes = 0
-            End If
-        Else 'Prepare source SAFEARRAY
-            'For large amounts it is faster to copy memory in smaller chunks
-            Const chunkSize As Long = 2 ^ 16 'Similar performance with 2 ^ 17
-            '
-            If bytes > chunkSize + bstrPrefixSize + 1 Then
-                tempSize = chunkSize
-                bytes = bytes - chunkSize - bstrPrefixSize
-            Else
-                tempSize = bytes
-                bytes = 0
-            End If
-            sArr.pvData = rmSrc.memValue + bstrPrefixSize
-            sArr.rgsabound0.cElements = tempSize
-            vtArr = vbArray + vbByte
+    vtSrc = vbLong + VT_BYREF
+    bstrLength = rmSrc.memValue 'Copy first 4 bytes froum source
+    vtSrc = vbLongPtr
+    '
+    Const maxMidBs As Long = 2 ^ 5 'Use SAFEARRAY and MidB below this value
+    useBSTR = (bstrLength >= bytes Or bstrLength < 0) And bytes > maxMidBs
+    If useBSTR Then 'Prepare source BSTR
+        rmBSTR.memValue = VarPtr(s)
+        #If Win64 Then
+            Const curBSTRPrefixSize As Currency = 0.0004
+            vtSrc = vbCurrency
+            vtBSTR = vbCurrency + VT_BYREF
+            bstrPtrValue = rmSrc.memValue + curBSTRPrefixSize
+            vtSrc = vbLongPtr
+        #Else
+            vtBSTR = vbLong + VT_BYREF
+            bstrPtrValue = rmSrc.memValue + bstrPrefixSize
+        #End If
+    Else 'Prepare source SAFEARRAY
+        sArr.pvData = rmSrc.memValue + bstrPrefixSize
+        sArr.rgsabound0.cElements = bytes
+        vtArr = vbArray + vbByte
+    End If
+    '
+    'Prepare destination BSTR
+    If rmDest.memValue > rmSrc.memValue Then
+        hasOverlap = UnsignedAdd(rmSrc.memValue, bytes + bstrPrefixSize) > rmDest.memValue
+        If hasOverlap Then overlapOffset = rmDest.memValue - rmSrc.memValue
+    Else
+        hasOverlap = False
+    End If
+    vtDest = vbLong + VT_BYREF
+    If hasOverlap Then overlapBSTRLen = destValue
+    destValue = bytes
+    vtDest = vbLongPtr
+    rmDest.memValue = rmDest.memValue + bstrPrefixSize
+    vtDest = vbString
+    '
+    'Copy and clean
+    If useBSTR Then
+        LSet destValue = s 'LSet cannot copy an odd number of bytes
+        If bytes Mod 2 = 1 Then
+            MidB(destValue, bytes, 1) = MidB$(s, bytes, 1)
         End If
-        '
-        'Prepare destination BSTR
-        If rmDest.memValue > rmSrc.memValue Then
-            hasOverlap = UnsignedAdd(rmSrc.memValue, tempSize + bstrPrefixSize) > rmDest.memValue
-            If hasOverlap Then overlapOffset = rmDest.memValue - rmSrc.memValue
+        bstrPtrValue = 0
+        vtBSTR = vbEmpty
+    Else
+        Const maxMidBa As Long = maxMidBs * 2 ^ 3
+        If bytes > maxMidBa Then
+            LSet destValue = arrBytes
+            If bytes Mod 2 = 1 Then
+                Static lastByte(0 To 0) As Byte
+                lastByte(0) = arrBytes(UBound(arrBytes))
+                MidB(destValue, bytes, 1) = lastByte
+            End If
         Else
-            hasOverlap = False
+            MidB(destValue, 1) = arrBytes
         End If
+        vtArr = vbEmpty
+    End If
+    '
+    vtDest = vbLongPtr
+    rmDest.memValue = rmDest.memValue - bstrPrefixSize
+    vtDest = vbLong + VT_BYREF
+    destValue = bstrLength 'Copy the correct 'BSTR length' bytes
+    vtDest = vbLongPtr
+    If hasOverlap Then
+        rmDest.memValue = rmDest.memValue + overlapOffset
         vtDest = vbLong + VT_BYREF
-        If hasOverlap Then overlapBSTRLen = destValue
-        destValue = tempSize
+        destValue = overlapBSTRLen
         vtDest = vbLongPtr
-        rmDest.memValue = rmDest.memValue + bstrPrefixSize
-        vtDest = vbString
-        '
-        'Copy and clean
-        If useBSTR Then
-            LSet destValue = s 'LSet cannot copy an odd number of bytes
-            If tempSize Mod 2 = 1 Then
-                MidB(destValue, tempSize, 1) = MidB$(s, tempSize, 1)
-            End If
-            bstrPtrValue = 0
-            vtBSTR = vbEmpty
-        Else
-            Const maxMidBa As Long = maxMidBs * 2 ^ 3
-            If tempSize > maxMidBa Then
-                LSet destValue = arrBytes
-                If tempSize Mod 2 = 1 Then
-                    Static lastByte(0 To 0) As Byte
-                    lastByte(0) = arrBytes(UBound(arrBytes))
-                    MidB(destValue, tempSize, 1) = lastByte
-                End If
-            Else
-                MidB(destValue, 1) = arrBytes
-            End If
-            vtArr = vbEmpty
-        End If
-        '
-        vtDest = vbLongPtr
-        rmDest.memValue = rmDest.memValue - bstrPrefixSize
-        vtDest = vbLong + VT_BYREF
-        destValue = bstrLength 'Copy the correct 'BSTR length' bytes
-        vtDest = vbLongPtr
-        If hasOverlap Then
-            rmDest.memValue = rmDest.memValue + overlapOffset
-            vtDest = vbLong + VT_BYREF
-            destValue = overlapBSTRLen
-            vtDest = vbLongPtr
-            rmDest.memValue = rmDest.memValue - overlapOffset
-        End If
-        '
-        If bytes > 0 Then 'Advance address for next chunk
-            Dim bytesOffset As Long: bytesOffset = chunkSize + bstrPrefixSize
-            rmDest.memValue = UnsignedAdd(rmDest.memValue, bytesOffset)
-            rmSrc.memValue = UnsignedAdd(rmSrc.memValue, bytesOffset)
-        End If
-    Loop Until bytes = 0
+    End If
 End Sub
 
 '*******************************************************************************
@@ -1028,3 +1000,130 @@ Private Function GetArrayDimsCount(ByRef arr As Variant) As Long
 FinalDimension:
     GetArrayDimsCount = dimension - 1
 End Function
+
+'*******************************************************************************
+'Fills target memory with zero
+'*******************************************************************************
+Public Sub MemZero(ByVal destinationPtr As LongPtr, ByVal bytesCount As LongPtr)
+    MemFill destinationPtr, bytesCount, 0
+End Sub
+
+'*******************************************************************************
+'Fills target memory with the specified Byte value
+'*******************************************************************************
+Public Sub MemFill(ByVal destinationPtr As LongPtr _
+                 , ByVal bytesCount As LongPtr _
+                 , ByVal fillByte As Byte)
+#If Mac Then
+    FillMemory ByVal destinationPtr, fillByte, bytesCount
+#ElseIf TWINBASIC Or (VBA7 = 0) Then
+    FillMemory ByVal destinationPtr, bytesCount, fillByte
+#Else
+    If bytesCount = 0 Then Exit Sub
+    Const maxSizeSpeedGain As Long = &H100000 'Beyond this use API directly
+    If bytesCount < 0 Or bytesCount > maxSizeSpeedGain Then
+        FillMemory ByVal destinationPtr, bytesCount, fillByte
+        Exit Sub
+    End If
+    '
+    Const maxSizeMidB As Long = &H2000 'Beyond this use MemCopy
+    Dim bytesLeft As Long
+    Dim bytes As Long
+    Dim chunk As Long
+    Static rm As REMOTE_MEMORY
+    If Not rm.isInitialized Then InitRemoteMemory rm
+    '
+    If bytesCount > maxSizeMidB Then
+        bytes = maxSizeMidB
+        bytesLeft = CLng(bytesCount) - maxSizeMidB
+        chunk = maxSizeMidB
+    Else
+        bytes = CLng(bytesCount)
+    End If
+    FillBytes destinationPtr, bytes, fillByte, rm.remoteVT, rm.memValue
+    '
+    Do While bytesLeft > 0
+        If chunk > bytesLeft Then bytes = bytesLeft Else bytes = chunk
+        MemCopy destinationPtr + chunk, destinationPtr, bytes
+        bytesLeft = bytesLeft - bytes
+        chunk = chunk * 2
+    Loop
+#End If
+End Sub
+Private Sub FillBytes(ByVal destinationPtr As LongPtr _
+                    , ByVal bytesCount As Long _
+                    , ByVal fillByte As Byte _
+                    , ByRef vt As Variant _
+                    , ByRef rmValue As Variant)
+    rmValue = destinationPtr
+    If bytesCount > 5 Then
+        Const bstrPrefixSize As Long = 4
+        Dim s As String
+        '
+        vt = vbLong + VT_BYREF
+        rmValue = bytesCount - bstrPrefixSize 'Write BSTR LenB
+        '
+        vt = vbLongPtr
+        rmValue = destinationPtr + bstrPrefixSize 'Move address to byte 5
+        '
+        #If Win64 Then
+            Dim bstrPtr As Currency: vt = vbCurrency
+        #Else
+            Dim bstrPtr As Long:     vt = vbLong
+        #End If
+        bstrPtr = rmValue
+        '
+        vt = vbByte + VT_BYREF
+        rmValue = fillByte 'Copy fill byte to byte 5
+        '
+        vt = vbLongPtr
+        rmValue = VarPtr(s)
+        '
+        #If Win64 Then
+            vt = vbCurrency + VT_BYREF
+        #Else
+            vt = vbLong + VT_BYREF
+        #End If
+        rmValue = bstrPtr 'Redirect to fake BSTR
+        '
+        MidB$(s, 2) = s 'The actual fill
+        rmValue = 0     'Clear BSTR
+        '
+        vt = vbLongPtr
+        rmValue = destinationPtr
+    Else
+        Dim extraByte As Boolean: extraByte = (bytesCount Mod 2) = 1
+    End If
+    '
+    Select Case bytesCount
+    Case 1
+    Case 2, 3
+        vt = vbInteger + VT_BYREF
+        If fillByte And &H80 Then
+            rmValue = fillByte Or (fillByte Xor &H80) * &H100 Or &H8000
+        Else
+            rmValue = fillByte * &H101
+        End If
+        If extraByte Then
+            vt = vbLongPtr
+            rmValue = rmValue + 2
+        End If
+    Case Else
+        vt = vbLong + VT_BYREF
+        If fillByte And &H80 Then
+            rmValue = fillByte * &H10101 Or (fillByte Xor &H80) _
+                    * &H1000000 Or &H80000000
+        Else
+            rmValue = fillByte * &H1010101
+        End If
+        If extraByte Then
+            vt = vbLongPtr
+            rmValue = rmValue + 4
+        End If
+    End Select
+    If extraByte Then
+        vt = vbByte + VT_BYREF
+        rmValue = fillByte
+    End If
+    vt = vbEmpty
+End Sub

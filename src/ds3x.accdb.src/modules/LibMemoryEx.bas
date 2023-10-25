@@ -5,6 +5,7 @@ Option Explicit
 
 Private Declare PtrSafe Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare PtrSafe Function SafeArrayCopyData Lib "oleaut32" (ByRef psaSource As Any, ByRef psaTarget As Any) As Long
+Public Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
 
 Private Declare PtrSafe Function CoTaskMemAlloc Lib "ole32.dll" (ByVal cb As Long) As LongPtr
 Private Declare PtrSafe Sub CoTaskMemFree Lib "ole32.dll" (ByVal pv As LongPtr)
@@ -16,6 +17,7 @@ Public Const FADF_FIXEDSIZE As Long = &H10      ' An array that may not be resiz
 Public Const FADF_HAVEVARTYPE As Long = &H80    ' An array that has a variant type. The variant type can be retrieved with SafeArrayGetVartype.
 
 Public Const INT_SIZE As Long = 2
+Public Const NULL_PTR As LongPtr = 0
 
 Public Enum MemoryMoveMode
     MemAllocCopyMemoryMode
@@ -75,6 +77,31 @@ Public Sub VariantArrayClone(ByVal DestinationAddress As LongPtr, ByVal SourceAd
         .pvData = CLngPtr(0)
         .rgsabound0.cElements = 0
     End With
+End Sub
+
+Public Sub ChunkMemCopy(ByVal DestinationAddress As LongPtr, ByVal SourceAddress As LongPtr, ByVal ByteCount As LongPtr)
+#If Win64 Then
+    Const chunkSize As Long = VARIANT_SIZE * 2625
+#Else
+    Const chunkSize As Long = VARIANT_SIZE * 4000
+#End If
+    If ByteCount <= chunkSize Then
+        MemCopy DestinationAddress, SourceAddress, ByteCount
+        Exit Sub
+    End If
+    Dim c As Long, nChunks As Long
+    nChunks = CLng((ByteCount - 1) \ chunkSize)
+    If DestinationAddress > SourceAddress Then
+        MemCopy DestinationAddress + (nChunks * chunkSize), SourceAddress + (nChunks * chunkSize), ByteCount - nChunks * chunkSize
+        For c = nChunks - 1 To 0 Step -1
+            MemCopy DestinationAddress + (c * chunkSize), SourceAddress + (c * chunkSize), chunkSize
+        Next c
+    Else
+        For c = 0 To nChunks - 1
+            MemCopy DestinationAddress + (c * chunkSize), SourceAddress + (c * chunkSize), chunkSize
+        Next c
+        MemCopy DestinationAddress + (nChunks * chunkSize), SourceAddress + (nChunks * chunkSize), ByteCount - nChunks * chunkSize
+    End If
 End Sub
 
 #If Win64 Then

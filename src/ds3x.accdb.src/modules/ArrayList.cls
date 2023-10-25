@@ -466,19 +466,31 @@ Private Function GetCapacityFor(ByVal Increment As Long) As Long
     End If
 End Function
 
+'Private Sub ReserveSpaceForInsert(ByVal Index As Long, ByVal GetCount As Long)
+'    Dim t() As Variant, cap As Long
+'    cap = GetCapacityFor(GetCount)
+'    ReDim t(0 To cap)
+'    If Index > 0 Then MemCopy VarPtr(t(0)), VarPtr(pItems(0)), Index * VARIANT_SIZE
+'    MemCopy VarPtr(t(Index + GetCount)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+'    ZeroMemory VarPtr(pItems(0)), pIndex * VARIANT_SIZE
+'    Erase pItems
+'    ReassignArrayTo pItems, t
+'End Sub
+
 Private Sub ReserveSpaceForInsert(ByVal Index As Long, ByVal GetCount As Long)
-    Dim t() As Variant, cap As Long
-    cap = GetCapacityFor(GetCount)
-    ReDim t(0 To cap)
-    If Index > 0 Then MemCopy VarPtr(t(0)), VarPtr(pItems(0)), Index * VARIANT_SIZE
-    MemCopy VarPtr(t(Index + GetCount)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
-    ZeroMemory VarPtr(pItems(0)), pIndex * VARIANT_SIZE
-    Erase pItems
-    ReassignArrayTo pItems, t
+    If pIndex + GetCount >= UBound(pItems) Then GrowCapacity GetCount
+    ' CopyMemory ByVal VarPtr(pItems(Index + GetCount)), ByVal VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+    ChunkMemCopy VarPtr(pItems(Index + GetCount)), VarPtr(pItems(Index)), (pIndex - Index) * VARIANT_SIZE
+    If GetCount = 1 Then
+        MemInt(VarPtr(pItems(Index))) = vbEmpty
+    Else
+        ZeroMemory VarPtr(pItems(Index)), GetCount * VARIANT_SIZE
+    End If
 End Sub
 
 Private Function IsContainedInMemoryRange(ByRef TargetList As IList, Optional ByVal Index As Long = 0, Optional ByVal GetCount As Variant) As Boolean
     If IsMissing(GetCount) Then GetCount = pIndex - Index
+    If GetCount = 0 Then Exit Function
     IsContainedInMemoryRange = (TargetList.GetAddressOfItemAt(0) <= VarPtr(pItems(Index + GetCount - 1)) _
                                 And TargetList.GetAddressOfItemAt(TargetList.Count - 1) >= VarPtr(pItems(Index)))
 End Function

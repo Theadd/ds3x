@@ -93,8 +93,8 @@ End Function
 Public Function Add(ByRef Value As Variant) As Long
     InternalUpdateRange
     pList.Insert pBaseIndex + pIndex, Value
-    Count = pIndex + 1
     Add = pIndex
+    Count = pIndex + 1
     pVersion = pVersion + 1
 End Function
 

@@ -3,5 +3,6 @@ Build.log
 *.accdb
 *.laccdb
 \samples
+\tests
 dsCodeSandbox.bas
 package.json
