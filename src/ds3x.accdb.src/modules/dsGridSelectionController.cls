@@ -457,7 +457,7 @@ Private Sub AddAllNonExistingInRange(ByRef aX As ArrayListEx, ByVal FromIndex As
 
     With aX
         For i = FromIndex To ToIndex
-            r = .BinarySearch(i, r, , dsComparer)
+            r = .BinarySearch(i, r, , Comparer)
             If r < 0 Then
                 r = (Not r)
                 If r = .Instance.Count Then
@@ -478,7 +478,7 @@ End Sub
 Private Sub ToggleElementInList(ByRef aX As ArrayListEx, ByVal Value As Long)
     Dim r As Long
 
-    r = aX.BinarySearch(Value, 0, , dsComparer)
+    r = aX.BinarySearch(Value, 0, , Comparer)
     If r < 0 Then
         r = (Not r)
         If r = aX.Instance.Count Then
@@ -494,7 +494,7 @@ End Sub
 Private Sub AddElementIfNotExists(ByRef aX As ArrayListEx, ByVal Value As Long)
     Dim r As Long
 
-    r = aX.BinarySearch(Value, 0, , dsComparer)
+    r = aX.BinarySearch(Value, 0, , Comparer)
     If r < 0 Then
         r = (Not r)
         If r = aX.Instance.Count Then

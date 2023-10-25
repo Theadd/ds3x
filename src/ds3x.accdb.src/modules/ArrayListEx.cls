@@ -391,7 +391,7 @@ End Function
 Public Function BinarySearch(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As IComparer = Nothing) As Long
     If IsMissing(SearchCount) Then SearchCount = Instance.Count - startIndex
     If Comparer Is Nothing Then
-        BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, dsComparer)
+        BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, Comparer)
     Else
         BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, Comparer)
     End If
@@ -401,7 +401,7 @@ Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal startIndex As L
     Dim r As Long
 
     If Comparer Is Nothing Then
-        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, dsComparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     Else
         r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     End If
@@ -421,7 +421,7 @@ Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal startIndex A
     Dim r As Long
 
     If Comparer Is Nothing Then
-        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, dsComparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     Else
         r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     End If

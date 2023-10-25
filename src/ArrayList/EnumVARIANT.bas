@@ -1,4 +1,4 @@
-﻿Attribute VB_Name = "EnumVARIANT"
+Attribute VB_Name = "EnumVARIANT"
 ' Source: https://github.com/Kr00l/VBCCR - VB Common Controls Replacement Library
 ' MIT License
 ' Copyright (c) 2012-present Krool
