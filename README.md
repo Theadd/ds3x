@@ -3,12 +3,14 @@
 
 This repository contains both; [ds3x](./docs/ds3x-lib/README.md), a **lightweight MSAccess (VBA) shared library** providing a dead simple <u>abstraction</u> over operating on lists and table-like types of data collections and, the [dsLiveEd](./docs/live-editor-app/README.md), a **PowerQuery-like MSAccess Application** for managing automation tasks of data manipulation or direct-data manipulation with it's **Live Editor** interface. 
 
+[![No Maintenance Intended](https://unmaintained.tech/badge.svg)](https://unmaintained.tech/)
+
 <blockquote>
-Current releases are pretty stable but this is still in <b>active development</b>, being released earlier than planned so <b>anything can be subject to change</b>. Also, I'm still considering to use a custom <b>ArrayList</b> implementation to get rid of the <code>.NET Framework v3.5</code> dependency.
+Current releases are pretty stable but this is still in <s><b>active development</b></s>, so <b><s>anything can be subject to change</s></b>. Also, I'm still considering to use a custom <b>ArrayList</b> implementation to get rid of the <code>.NET Framework v3.5</code> dependency.
 </blockquote>
 <br/>
 
-This documentation is still largely incomplete.
+This documentation is as-is, largely incomplete.
 <br/><br/>
 
 ### __dsLiveEd__
