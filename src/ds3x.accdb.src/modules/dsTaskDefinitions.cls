@@ -1,4 +1,4 @@
-﻿VERSION 1.0 CLASS
+﻿﻿VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
@@ -851,13 +851,21 @@ Private Sub AddAllTasks()
 
     ' TODO: AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
 
-    AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()"
+    AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()", _
+            Description:="Removes the specified columns from the Source Table.", _
+            Usage:=""
 
-    AddTask "MoveColumnsToTheEnd", "[Source]: Table, ColumnIndexes: Array()"
+    AddTask "MoveColumnsToTheEnd", "[Source]: Table, ColumnIndexes: Array()", _
+            Description:="Moves the specified columns to the end of the Source Table.", _
+            Usage:=""
 
-    AddTask "MoveColumnsToTheStart", "[Source]: Table, ColumnIndexes: Array()"
+    AddTask "MoveColumnsToTheStart", "[Source]: Table, ColumnIndexes: Array()", _
+            Description:="Moves the specified columns to the start of the Source Table.", _
+            Usage:=""
 
-    AddTask "MoveColumn", "[Source]: Table, ColumnIndex: Long, [MoveCount = 1]: Long"
+    AddTask "MoveColumn", "[Source]: Table, ColumnIndex: Long, [MoveCount = 1]: Long", _
+            Description:="Moves a single column a specified number of positions within the Source Table.", _
+            Usage:=""
 
     ' --- DATA SOURCE TASKS ---
 
@@ -906,15 +914,25 @@ Private Sub AddAllTasks()
 
     ' --- XL FORMATTING TASKS ---
 
-    AddTask "AutoSizeCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
+    AddTask "AutoSizeCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", _
+            Description:="Formats the cells in the specified range to automatically adjust their width and height to fit the content.", _
+            TaskType:="XL", Requires:="X*", Usage:=""
 
-    AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, TableStyle: String", TaskType:="XL"
+    AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, TableStyle: String", _
+            Description:="Applies a predefined table style to the specified range in the worksheet.", _
+            TaskType:="XL", Requires:="X*", Usage:=""
 
-    AddTask "FreezeHeaders", "[Source]: Worksheet, [HeaderRows = 1]: Long, [HeaderColumns = 0]: Long", TaskType:="XL"
+    AddTask "FreezeHeaders", "[Source]: Worksheet, [HeaderRows = 1]: Long, [HeaderColumns = 0]: Long", _
+            Description:="Freezes the specified number of header rows and columns in the worksheet, so they remain visible while scrolling.", _
+            TaskType:="XL", Usage:=""
 
-    AddTask "AutoFormatCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
+    AddTask "AutoFormatCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", _
+            Description:="Applies a predefined autoformat to the cells in the specified range.", _
+            TaskType:="XL", Usage:=""
 
-    AddTask "WindowVisibility", "[Source]: Worksheet, [Visible = True]: Boolean", TaskType:="XL"
+    AddTask "WindowVisibility", "[Source]: Worksheet, [Visible = True]: Boolean", _
+            Description:="Sets the visibility of the Excel application window.", _
+            TaskType:="XL", Usage:=""
 
     ' --- DEV / DEBUG ---
 
