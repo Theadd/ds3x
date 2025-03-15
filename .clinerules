@@ -1,0 +1,15 @@
+# .clinerules
+
+## Patterns to Follow
+- **Data Import**: Prefer `dsTable.CreateFromExcelRange` over manual array parsing
+- **Performance**: Use `Array2dEx` for Excel interactions instead of cell-by-cell updates
+- **Error Handling**: Wrap all COM interactions in error handlers
+
+## Implementation Notes
+- **ArrayListLib**: Always use `CreateBlank` for large datasets instead of `Add` loops
+- **JSON**: Use `JSON.Stringify(dsTable, 2)` for readable exports
+- **Live Editor Tasks**: Store presets as `.ds3x` files in `/presets/`
+
+## Known Pitfalls
+- Avoid `Scripting.Dictionary` for >10k entries - use `dsTable` instead
+- 64-bit builds require manual recompilation of `ArrayListLib`
