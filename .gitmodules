@@ -1,3 +1,7 @@
 [submodule "libs/VBA-MemoryTools"]
 	path = libs/VBA-MemoryTools
 	url = https://github.com/cristianbuse/VBA-MemoryTools.git
+[submodule "libs/ArrayList"]
+	path = libs/ArrayList
+	url = https://github.com/Theadd/ArrayList.git
+	branch = main
