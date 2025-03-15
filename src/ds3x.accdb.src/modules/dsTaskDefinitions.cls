@@ -92,7 +92,7 @@ Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal Colum
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     Set sgX = ArraySliceGroup.Create(Target.Headers)
 
-    For Each cH In colIndexes
+    For Each cH In colIndexes.Items()
         v = sgX.SliceAt(CLng(cH)).Row(0)
         vItems = Array(dsApp.ApplyCustomVarsOn(Printf(ColumnName, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 1), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
         Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
@@ -112,7 +112,7 @@ Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal Col
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     Set sgX = ArraySliceGroup.Create(Target.Headers)
 
-    For Each cH In colIndexes
+    For Each cH In colIndexes.Items()
         v = sgX.SliceAt(CLng(cH)).Row(0)
         vItems = Array(CollectionsLib.ArrayItem(v, 0), dsApp.ApplyCustomVarsOn(Printf(NumberFormat, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
         Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
@@ -206,7 +206,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
 
     If TypeName(Replacer) Like "*Dictionary*" Then
         Set dRepl = DictionaryEx.Create(Replacer)
-        For Each v In colIndexes
+        For Each v In colIndexes.Items()
             c = CLng(v)
             sgX.SliceAt(c).SlicedArray vSliced
             t = vSliced
@@ -220,7 +220,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
         Next v
     Else
         Set cb = Replacer
-        For Each v In colIndexes
+        For Each v In colIndexes.Items()
             c = CLng(v)
             sgX.SliceAt(c).SlicedArray vSliced
             t = vSliced
@@ -664,6 +664,8 @@ End Function
 
 Public Function GetWorksheet(ByRef SourceSheet As Variant, ByVal WorksheetNameOrIndex As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx
+
+    If IsNumeric(WorksheetNameOrIndex) Then WorksheetNameOrIndex = CInt(WorksheetNameOrIndex)
 
     Set xlSheet = SourceSheet
     Set GetWorksheet = pTaskController.AddResource(xlSheet.GetSheet(WorksheetNameOrIndex))

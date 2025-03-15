@@ -366,6 +366,10 @@ Public Function Stringify(ByVal jsonValue As Variant, Optional ByVal Whitespace 
                     If VBA.TypeName(jsonValue) = "RecordsetEx" Then Set jsonValue = jsonValue.Instance
                     If VBA.TypeName(jsonValue) = "Recordset" Or VBA.TypeName(jsonValue) = "Recordset2" Then jsonValue = RecordsetAsDictionaryArray(jsonValue)
 
+                    If VBA.TypeName(jsonValue) = "ArrayListEx" Then
+                        jsonValue = jsonValue.Instance.ToArray
+                    End If
+
                     For Each json_Value In jsonValue
                         If json_IsFirstItem Then
                             json_IsFirstItem = False

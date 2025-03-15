@@ -1,7 +1,7 @@
 ﻿{
   "Info": {
-    "AddinVersion": "4.0.21",
-    "AccessVersion": "16.0 64-bit"
+    "AddinVersion": "4.1.0",
+    "AccessVersion": "16.0 32-bit"
   },
   "Options": {
     "ExportFolder": "",
@@ -36,11 +36,21 @@
     "FormatSQL": true,
     "ForceImportOriginalQuerySQL": false,
     "SaveTableSQL": true,
+    "SplitLayoutFromVBA": true,
     "StripPublishOption": true,
     "SanitizeColors": 1,
     "SanitizeLevel": 2,
     "ExtractThemeFiles": true,
     "TablesToExportData": {
+      "T_ATM_ISCS_APP_CONTENT_STRINGS": {
+        "Format": "XML Format"
+      },
+      "T_ATM_ISCS_APP_CUSTOM_FIELDS": {
+        "Format": "XML Format"
+      },
+      "T_ATM_ISCS_SLA": {
+        "Format": "XML Format"
+      },
       "USysRegInfo": {
         "Format": "Tab Delimited"
       },

@@ -190,12 +190,22 @@ Public Function AddSheet(Optional ByVal WorksheetName As String = "Sheet%1") As 
     End With
 End Function
 
-Public Function SaveWorkbook(ByVal TargetPath As String, Optional ByVal EnableMacros As Boolean = False) As xlSheetsEx
+Public Function SaveWorkbook(ByVal targetPath As String, Optional ByVal EnableMacros As Boolean = False) As xlSheetsEx
+    Dim oLabelInfo As Office.LabelInfo, wasVisible As Boolean
+    wasVisible = WindowVisibility
+    WindowVisibility = True
+    DoEvents
+    Set oLabelInfo = Set_Label(Me.Workbook, "Pública")
+    Me.Workbook.SensitivityLabel.SetLabel oLabelInfo, oLabelInfo
+
     If EnableMacros Then
-        Me.Workbook.SaveAs TargetPath, FileFormat:=xlOpenXMLWorkbookMacroEnabled, Local:=True
+        Me.Workbook.SaveAs targetPath, FileFormat:=xlOpenXMLWorkbookMacroEnabled, Local:=True
     Else
-        Me.Workbook.SaveAs TargetPath, FileFormat:=xlOpenXMLWorkbook, Local:=True
+        Me.Workbook.SaveAs targetPath, FileFormat:=xlOpenXMLWorkbook, Local:=True
     End If
+
+    WindowVisibility = wasVisible
+    DoEvents
     Set SaveWorkbook = Me
 End Function
 
@@ -346,6 +356,28 @@ End Function
 
 
 ' --- PRIVATE ---
+
+Private Function Set_Label(ByVal wb As Workbook, Optional ByVal lblName As String = "") As Office.LabelInfo
+    Dim Label_Info As Office.LabelInfo
+
+    If lblName = "" Then lblName = "5d86bc70-2a05-490c-b199-8f0f8e614d89"
+
+    Set Label_Info = wb.SensitivityLabel.CreateLabelInfo
+    With Label_Info
+        .ActionId = "7384759f-6ad4-4f00-bb28-c14f83ce0602"
+        .AssignmentMethod = MsoAssignmentMethod.PRIVILEGED
+        .ContentBits = 0
+        '.Creator = 1480803660
+        .IsEnabled = True
+        .Justification = ""
+        .LabelId = "5d86bc70-2a05-490c-b199-8f0f8e614d89"
+        .LabelName = lblName
+        .SetDate = Now()
+        .SiteId = "5d86bc70-2a05-490c-b199-8f0f8e614d88"
+    End With
+
+    Set Set_Label = Label_Info
+End Function
 
 Private Function GetCommonFormatForRange(ByVal Rng As Excel.Range) As Variant
     Dim Item As Variant, i As Long, k As Long, isDefaultSet As Boolean, sAux As String, nX As Excel.Range, endRow As Long

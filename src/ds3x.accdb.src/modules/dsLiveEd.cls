@@ -318,16 +318,16 @@ End Function
 '   - A full path to a JSON file or directory
 ' Returns whether save succeeded or not
 Public Function SavePreset(Optional ByVal Target As Variant) As Boolean
-    Dim TargetPath As String
+    Dim targetPath As String
 
     If Not UpdatePresetObject Then Exit Function
 
     If IsMissing(Target) Then Target = pPresetFile
     If Trim(Target) <> "" Then
         If FileSystemLib.TryWaitFolderExists(Target, 0) Then
-            TargetPath = Target
-            If Not FileSystemLib.TryWriteAccessOfSaveAsDialog(TargetPath, "*.json", "Save As") Then Exit Function
-            Target = TargetPath
+            targetPath = Target
+            If Not FileSystemLib.TryWriteAccessOfSaveAsDialog(targetPath, "*.json", "Save As") Then Exit Function
+            Target = targetPath
         End If
         If Not FileSystemLib.TryWaitFileWriteAccess(Target, 20) Then Exit Function
         If Not FileSystemLib.TryWriteTextToFile(Target, JSON.Stringify(pPresetObject, 2), True) Then Exit Function
@@ -345,17 +345,17 @@ End Function
 '   - A Dictionary/DictionaryEx object  -> The preset itself
 ' Returns true if preset import was a success, false otherwise
 Public Function ImportPreset(Optional ByVal Target As Variant) As Boolean
-    Dim TargetPath As String, Aux As String
+    Dim targetPath As String, Aux As String
     If IsMissing(Target) Then Target = VBA.Environ$("USERPROFILE")
 
     If Not IsObject(Target) Then
         If Not Left(LTrim(Target), 1) = "{" Then
             If FileSystemLib.TryWaitFolderExists(Target, 0) Then
-                If Not FileSystemLib.TryFileOpenDialog(TargetPath, Target) Then Exit Function
-                Target = TargetPath
+                If Not FileSystemLib.TryFileOpenDialog(targetPath, Target) Then Exit Function
+                Target = targetPath
             End If
             If Not FileSystemLib.TryWaitFileExists(Target, 10) Then Exit Function
-            TargetPath = "" & Target
+            targetPath = "" & Target
             If Not FileSystemLib.TryReadAllTextInFile(Target, Aux) Then Exit Function
             Target = Aux
         End If
@@ -372,7 +372,7 @@ Public Function ImportPreset(Optional ByVal Target As Variant) As Boolean
     End If
 
     If ImportPreset Then
-        pPresetFile = TargetPath
+        pPresetFile = targetPath
     End If
 End Function
 

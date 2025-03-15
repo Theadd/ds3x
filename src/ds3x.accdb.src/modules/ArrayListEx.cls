@@ -195,7 +195,6 @@ End Function
 
 ' Removes each element found in ArrayLike from the ArrayList.
 Public Function RemoveFrom(Optional ByVal ArrayLike As Variant) As ArrayListEx
-Attribute RemoveFrom.VB_Description = "Removes each element found in ArrayLike from the ArrayList."
     Dim Item As Variant
     Set RemoveFrom = Me
 
@@ -205,9 +204,15 @@ Attribute RemoveFrom.VB_Description = "Removes each element found in ArrayLike f
     End If
 
     If IsObject(ArrayLike) Or IsArray(ArrayLike) Then
-        For Each Item In ArrayLike
-            Instance.Remove Item
-        Next Item
+        If TypeOf ArrayLike Is ArrayListEx Then
+            For Each Item In ArrayLike.Items()
+                Instance.Remove Item
+            Next Item
+        Else
+            For Each Item In ArrayLike
+                Instance.Remove Item
+            Next Item
+        End If
     End If
 End Function
 
@@ -227,7 +232,7 @@ Attribute Unique.VB_Description = "Removes all duplicated elements from the Arra
     Set oArray = ArrayListEx.Create(Instance)
     Instance.Clear
 
-    For Each Item In oArray
+    For Each Item In oArray.Items()
         If Not Instance.Contains(Item) Then
             Instance.Add Item
         End If
@@ -391,7 +396,7 @@ End Function
 Public Function BinarySearch(ByVal Value As Variant, Optional ByVal startIndex As Long = 0, Optional ByVal SearchCount As Variant, Optional ByVal Comparer As IComparer = Nothing) As Long
     If IsMissing(SearchCount) Then SearchCount = Instance.Count - startIndex
     If Comparer Is Nothing Then
-        BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, dsComparer)
+        BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, Comparer)
     Else
         BinarySearch = Instance.BinarySearch(startIndex, SearchCount, Value, Comparer)
     End If
@@ -401,7 +406,7 @@ Public Function BinaryAdd(ByVal Value As Variant, Optional ByVal startIndex As L
     Dim r As Long
 
     If Comparer Is Nothing Then
-        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, dsComparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     Else
         r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     End If
@@ -421,7 +426,7 @@ Public Function BinaryToggle(ByVal Value As Variant, Optional ByVal startIndex A
     Dim r As Long
 
     If Comparer Is Nothing Then
-        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, dsComparer)
+        r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     Else
         r = Instance.BinarySearch(startIndex, Instance.Count - startIndex, Value, Comparer)
     End If

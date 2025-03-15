@@ -68,9 +68,9 @@ Private pFSO As Scripting.FileSystemObject
 
 ' --- PUBLIC PROPERTIES ---
 
-Public Property Get FSO() As Scripting.FileSystemObject
+Public Property Get fso() As Scripting.FileSystemObject
     If pFSO Is Nothing Then Set pFSO = New Scripting.FileSystemObject
-    Set FSO = pFSO
+    Set fso = pFSO
 End Property
 
 ' Multi-Byte file stream reader
@@ -243,43 +243,43 @@ End Function
 
 ' Devuelve el resultado normalizado de combinar la ruta de un directorio con un archivo en ese directorio.
 Public Function PathCombine(ByVal directoryPath As String, ByVal filename As String) As String
-    PathCombine = FSO.BuildPath(directoryPath, filename)
+    PathCombine = fso.BuildPath(directoryPath, filename)
 End Function
 
 ' Si no existe el directorio en `targetPath` lo crea y devuelve true, si `targetPath` corresponde a un archivo
 ' o se produce un error, devuelve false.
-Public Function TryCreateFolder(ByVal TargetPath As String) As Boolean
+Public Function TryCreateFolder(ByVal targetPath As String) As Boolean
     On Error GoTo CreateFolderError
     'If the path exists as a file, the function fails.
-    If FSO.FileExists(TargetPath) Then
+    If fso.FileExists(targetPath) Then
         TryCreateFolder = False
         Exit Function
     End If
 
     'If the path already exists as a folder, don't do anything and return success.
-    If FSO.FolderExists(TargetPath) Then
+    If fso.FolderExists(targetPath) Then
         TryCreateFolder = True
         Exit Function
     End If
 
-    TryCreateFolder = (Not (FSO.CreateFolder(TargetPath) Is Nothing))
+    TryCreateFolder = (Not (fso.CreateFolder(targetPath) Is Nothing))
 CreateFolderError:
 End Function
 
 ' Devuelve si existe o no el directorio especificado, esperando 0.1 segundos a cada intento fallido,
 ' @SEE: FileSystemLib.TryWaitFileExists
-Public Function TryWaitFolderExists(ByVal TargetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
+Public Function TryWaitFolderExists(ByVal targetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
     On Error GoTo Finally
     Dim Exists As Boolean
 
     'If the path exists as a file, it can't be a directory
-    If FSO.FileExists(TargetPath) Then Exit Function
+    If fso.FileExists(targetPath) Then Exit Function
 
-    Exists = FSO.FolderExists(TargetPath)
+    Exists = fso.FolderExists(targetPath)
     While Not Exists And retryAttempts > 0
         retryAttempts = retryAttempts - 1
         Sleep 100
-        Exists = FSO.FolderExists(TargetPath)
+        Exists = fso.FolderExists(targetPath)
     Wend
 
     TryWaitFolderExists = Exists
@@ -289,30 +289,30 @@ End Function
 ' Devuelve si existe o no el archivo especificado, esperando 0.1 segundos a cada intento fallido,
 ' si no estás creando dicho archivo en este momento, no hay razón para repetir ningún intento,
 ' pásale un 0 al segundo parámetro (retryAttempts).
-Public Function TryWaitFileExists(ByVal TargetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
+Public Function TryWaitFileExists(ByVal targetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
     Dim Exists As Boolean
 
-    Exists = FSO.FileExists(TargetPath)
+    Exists = fso.FileExists(targetPath)
 
     While Not Exists And retryAttempts > 0
         retryAttempts = retryAttempts - 1
         Sleep 100
-        Exists = FSO.FileExists(TargetPath)
+        Exists = fso.FileExists(targetPath)
     Wend
 
     TryWaitFileExists = Exists
 End Function
 
 Public Function TryWaitFileMatchingPatternExists(ByVal directoryPath As String, Optional ByVal filenamePattern As String = "*.csv", Optional ByVal retryAttempts As Integer = 100) As Boolean
-    Dim Exists As Boolean, TargetPath As String
+    Dim Exists As Boolean, targetPath As String
 
-    TargetPath = FSO.BuildPath(directoryPath, filenamePattern)
-    Exists = (Dir(TargetPath) <> "")
+    targetPath = fso.BuildPath(directoryPath, filenamePattern)
+    Exists = (Dir(targetPath) <> "")
 
     While Not Exists And retryAttempts > 0
         retryAttempts = retryAttempts - 1
         Sleep 100
-        Exists = (Dir(TargetPath) <> "")
+        Exists = (Dir(targetPath) <> "")
     Wend
 
     TryWaitFileMatchingPatternExists = Exists
@@ -321,19 +321,19 @@ End Function
 ' Al escribir en una unidad de red y una vez el archivo en questión exista, se esperará, un número máximo
 ' de intentos, hasta que el archivo sea liberado (escrito por completo y cerrado).
 ' Si el archivo especificado no existe, se asegurará de que podamos crear ese fichero, de lo contrario devolverá false.
-Public Function TryWaitFileWriteAccess(ByVal TargetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
+Public Function TryWaitFileWriteAccess(ByVal targetPath As String, Optional ByVal retryAttempts As Integer = 100) As Boolean
     Dim Stream As TextStream
     TryWaitFileWriteAccess = False
 
-    If TryWaitFileExists(TargetPath, 0) Then
-        If TryWaitFileExists(TargetPath & "~", 0) Then
+    If TryWaitFileExists(targetPath, 0) Then
+        If TryWaitFileExists(targetPath & "~", 0) Then
 
-            Debug.Print "Error no contemplado, ya existe un archivo con el mismo nombre y acabado con '~' en el mismo directorio. " & TargetPath
+            Debug.Print "Error no contemplado, ya existe un archivo con el mismo nombre y acabado con '~' en el mismo directorio. " & targetPath
             GoTo ExitFunction
         Else
             While True
 
-                If TryMoveFile(TargetPath, TargetPath & "~") Then
+                If TryMoveFile(targetPath, targetPath & "~") Then
                     GoTo MoveFileBack
                 End If
 
@@ -346,21 +346,21 @@ Public Function TryWaitFileWriteAccess(ByVal TargetPath As String, Optional ByVa
 
 MoveFileBack:
             On Error GoTo HandleUnexpectedError
-            FSO.MoveFile TargetPath & "~", TargetPath
+            fso.MoveFile targetPath & "~", targetPath
 
-            If TryWaitFileExists(TargetPath, retryAttempts) Then
+            If TryWaitFileExists(targetPath, retryAttempts) Then
                 TryWaitFileWriteAccess = True
             End If
         End If
     Else
         ' There's no existing file at targetPath, ensure write access
-        Set Stream = FSO.CreateTextFile(TargetPath, overwrite:=False)
+        Set Stream = fso.CreateTextFile(targetPath, overwrite:=False)
         Stream.Close
 
-        If TryWaitFileExists(TargetPath, retryAttempts) Then
+        If TryWaitFileExists(targetPath, retryAttempts) Then
 
-            If TryWaitFileWriteAccess(TargetPath, retryAttempts) Then
-                FSO.DeleteFile TargetPath, True
+            If TryWaitFileWriteAccess(targetPath, retryAttempts) Then
+                fso.DeleteFile targetPath, True
                 TryWaitFileWriteAccess = True
             End If
 
@@ -371,17 +371,17 @@ ExitFunction:
     Exit Function
 HandleUnexpectedError:
     TryWaitFileWriteAccess = False
-    Debug.Print "Error inesperado al devolver un archivo a su nombre original. " & TargetPath
+    Debug.Print "Error inesperado al devolver un archivo a su nombre original. " & targetPath
 End Function
 
 Public Function GetFileMatchingPattern(ByVal Pattern As String) As String
     Dim sPath As String, sName As String
     On Error GoTo Finally
 
-    sPath = FSO.GetParentFolderName(Pattern)
+    sPath = fso.GetParentFolderName(Pattern)
     sName = VBA.Dir(Pattern)
     If sName <> "" Then
-        GetFileMatchingPattern = FSO.BuildPath(sPath, sName)
+        GetFileMatchingPattern = fso.BuildPath(sPath, sName)
     End If
 Finally:
 End Function
@@ -390,7 +390,7 @@ Public Function TryMoveFile(ByVal sourceFilePath As String, ByVal destinationFil
     On Error GoTo MoveFail
     TryMoveFile = True
 
-    FSO.MoveFile sourceFilePath, destinationFilePath
+    fso.MoveFile sourceFilePath, destinationFilePath
 
     Exit Function
 MoveFail:
@@ -401,7 +401,7 @@ Public Function TryCopyFile(ByVal sourceFilePath As String, ByVal destinationFil
     On Error GoTo CopyFail
     TryCopyFile = True
 
-    FSO.CopyFile sourceFilePath, destinationFilePath, overwriteExisting
+    fso.CopyFile sourceFilePath, destinationFilePath, overwriteExisting
 
     Exit Function
 CopyFail:
@@ -439,13 +439,13 @@ End Function
 
 ' Devuelve si existe o no un archivo en el directorio especificado sin importar su extensión y asigna
 ' la ruta completa de ese archivo al tercer parametro, targetFilePath, que es pasado por referencia
-Public Function TryGetFileWithoutExtension(ByVal targetDirectory As String, ByVal filenameWithoutExtension As String, ByRef targetFilePath As String) As Boolean
+Public Function TryGetFileWithoutExtension(ByVal targetDirectory As String, ByVal filenameWithoutExtension As String, ByRef targetFilepath As String) As Boolean
     Dim StrFile As String, found As Boolean
-    targetFilePath = PathCombine(targetDirectory, filenameWithoutExtension)
+    targetFilepath = PathCombine(targetDirectory, filenameWithoutExtension)
     TryGetFileWithoutExtension = False
     found = False
 
-    StrFile = Dir(targetFilePath & ".*")
+    StrFile = Dir(targetFilepath & ".*")
 
     Do While Len(StrFile) > 0
         found = True
@@ -453,18 +453,18 @@ Public Function TryGetFileWithoutExtension(ByVal targetDirectory As String, ByVa
     Loop
 
     If found Then
-        targetFilePath = targetDirectory & StrFile
+        targetFilepath = targetDirectory & StrFile
         TryGetFileWithoutExtension = True
     End If
 
 End Function
 
 Public Function GetFileExtension(ByVal FilePath As String) As String
-    GetFileExtension = FSO.GetExtensionName(FilePath)
+    GetFileExtension = fso.GetExtensionName(FilePath)
 End Function
 
 Public Function GetFileName(ByVal FilePath As String) As String
-    GetFileName = FSO.GetFileName(FilePath)
+    GetFileName = fso.GetFileName(FilePath)
 End Function
 
 Public Function TryGetFileInAncestors(ByRef TargetFile As String, Optional ByVal BackwardMovesLimit As Long = -1) As Boolean
@@ -473,7 +473,7 @@ Public Function TryGetFileInAncestors(ByRef TargetFile As String, Optional ByVal
     sPath = TargetFile
 
     Do
-        sPath = FSO.GetParentFolderName(sPath)
+        sPath = fso.GetParentFolderName(sPath)
         If sPath = vbNullString Then Exit Do
 
         If TryWaitFileExists(PathCombine(sPath, sName), 0) Then
@@ -491,7 +491,7 @@ Public Function TryWriteTextToFile(ByVal TargetFile As String, ByRef Content As 
     On Error GoTo ErrorHandler
     Dim Stream As TextStream
 
-    Set Stream = FSO.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
+    Set Stream = fso.CreateTextFile(FileSystemLib.Resolve(TargetFile), overwriteIfAlreadyExists, AsUnicode)
     Stream.Write Content
     Stream.Close
 
@@ -514,27 +514,27 @@ Public Function TryReadAllTextInFile(ByVal TargetFile As String, ByRef Content A
     If IsMissing(Charset) Then Charset = GetFileCharset(TargetFile, LastBytes)
     Select Case Charset
         Case "ANSI"
-            With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateFalse)
+            With fso.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateFalse)
                 Content = .ReadAll
                 .Close
             End With
         Case "UTF-8"
-            With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
+            With fso.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
                 Content = DecodeByteString(.ReadAll, LastBytes)
                 .Close
             End With
         Case "UTF-16", "UTF-16LE", "UTF-16BE"
-            With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
+            With fso.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
                 Content = .ReadAll
                 .Close
             End With
         Case "UTF-8-BOM"
-            With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
+            With fso.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
                 Content = VBA.Mid$(DecodeByteString(.ReadAll, LastBytes), 2)
                 .Close
             End With
         Case "UTF-8/ANSI"
-            With FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
+            With fso.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForReading, False, TristateTrue)
                 Content = DecodeByteString(.ReadAll, LastBytes, True)
                 .Close
             End With
@@ -549,7 +549,7 @@ Public Function TryAppendTextInFile(ByVal TargetFile As String, ByVal Content As
     On Error GoTo ErrorHandler
     Dim Stream As TextStream
 
-    Set Stream = FSO.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(AsUnicode, TristateTrue, TristateFalse))
+    Set Stream = fso.OpenTextFile(FileSystemLib.Resolve(TargetFile), ForAppending, True, IIf(AsUnicode, TristateTrue, TristateFalse))
     Stream.Write Content
     Stream.Close
 
@@ -570,10 +570,10 @@ Public Function TryShellExecute(ByRef TargetFile As String, Optional ByVal ShowS
 Finally:
 End Function
 
-Public Function GetAllFilesInPath(ByVal TargetPath As String, Optional ByVal FilePattern As String = "*") As Collection
+Public Function GetAllFilesInPath(ByVal targetPath As String, Optional ByVal FilePattern As String = "*") As Collection
     Dim allFiles As New Collection, aMatch As String
 
-    aMatch = Dir(PathCombine(TargetPath, FilePattern))
+    aMatch = Dir(PathCombine(targetPath, FilePattern))
 
     While aMatch <> ""
         allFiles.Add aMatch
@@ -584,10 +584,10 @@ Public Function GetAllFilesInPath(ByVal TargetPath As String, Optional ByVal Fil
 End Function
 
 Private Function PathResolve(ByVal Path As String, Optional ByVal RelativeTo As Variant) As String
-    PathResolve = FSO.GetAbsolutePathName(Path)
+    PathResolve = fso.GetAbsolutePathName(Path)
     If VBA.Left$(PathResolve, 2) <> VBA.UCase$(VBA.Left$(Path, 2)) Then
         If IsMissing(RelativeTo) Then RelativeTo = Application.CodeProject.Path
-        PathResolve = FSO.GetAbsolutePathName(FSO.BuildPath(RelativeTo, Path))
+        PathResolve = fso.GetAbsolutePathName(fso.BuildPath(RelativeTo, Path))
     End If
 End Function
 
@@ -700,12 +700,12 @@ End Sub
 
 ' Read/Write to Clipboard. Source: ExcelHero.com (Daniel Ferry)
 Public Function SystemClipboard(Optional StoreText As String) As String
-    Dim X As Variant: X = StoreText ' 64-bit support
+    Dim x As Variant: x = StoreText ' 64-bit support
 
     With CreateObject("htmlfile")
         With .parentWindow.clipboardData
             Select Case True
-                Case Len(StoreText): .SetData "text", X
+                Case Len(StoreText): .SetData "text", x
                 Case Else: SystemClipboard = .GetData("text")
             End Select
         End With
