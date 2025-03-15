@@ -1,0 +1,5 @@
+src/ds3x.accdb.src/themes/
+src/ds3x.accdb.src/*.json
+src/ds3x.accdb.src/*.log
+*.accdb
+
