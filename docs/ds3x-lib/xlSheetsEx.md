@@ -2,8 +2,6 @@
 
 _A **lightweight** wrapper around `Excel.Worksheet` objects._
 
-Implements __[ICollectionEx](./ICollectionEx.md)__.
-
 ---
 
 - `xlSheetsEx` instances provide extended operations for Excel worksheets and workbooks.

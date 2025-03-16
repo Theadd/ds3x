@@ -108,3 +108,37 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
 
     Printf = Join(parts, vbNullString)
 End Function
+
+Public Function HttpGetRequest(url As String, Optional headers As Variant) As String
+  Dim objHTTP As Object
+  Dim strResponse As String
+  
+  On Error GoTo ErrorHandler
+  
+  Set objHTTP = CreateObject("MSXML2.XMLHTTP")
+  objHTTP.Open "GET", url, False
+  
+  If Not IsMissing(headers) Then
+    Dim key As Variant
+    For Each key In headers
+      objHTTP.setRequestHeader key, headers(key)
+    Next key
+  End If
+  
+  objHTTP.send
+  
+  If objHTTP.Status = 200 Then
+    strResponse = objHTTP.responseText
+  Else
+    strResponse = "Error: " & objHTTP.Status & " - " & objHTTP.statusText
+  End If
+  
+  HttpGetRequest = strResponse
+  
+  Set objHTTP = Nothing
+  Exit Function
+  
+ErrorHandler:
+  HttpGetRequest = "Error: " & Err.Number & " - " & Err.Description
+  Set objHTTP = Nothing
+End Function
