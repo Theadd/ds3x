@@ -1,4 +1,4 @@
-﻿VERSION 1.0 CLASS
+﻿﻿VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
@@ -92,7 +92,7 @@ Public Function SetColumnName(ByRef TargetTable As Variant, Optional ByVal Colum
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     Set sgX = ArraySliceGroup.Create(Target.Headers)
 
-    For Each cH In colIndexes
+    For Each cH In colIndexes.Items()
         v = sgX.SliceAt(CLng(cH)).Row(0)
         vItems = Array(dsApp.ApplyCustomVarsOn(Printf(ColumnName, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 1), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
         Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
@@ -112,7 +112,7 @@ Public Function SetNumberFormat(ByRef TargetTable As Variant, Optional ByVal Col
     Set colIndexes = AsListOfColumnIndexes(Target, ColumnIndexes)
     Set sgX = ArraySliceGroup.Create(Target.Headers)
 
-    For Each cH In colIndexes
+    For Each cH In colIndexes.Items()
         v = sgX.SliceAt(CLng(cH)).Row(0)
         vItems = Array(CollectionsLib.ArrayItem(v, 0), dsApp.ApplyCustomVarsOn(Printf(NumberFormat, cH, e, cH + 1, e + 1)), CollectionsLib.ArrayItem(v, 2), CollectionsLib.ArrayItem(v, 3))
         Set sgX = sgX.Replace(ArraySlice.Create(Array2dEx.Create(Array(Array(vItems)))), CLng(cH))
@@ -206,7 +206,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
 
     If TypeName(Replacer) Like "*Dictionary*" Then
         Set dRepl = DictionaryEx.Create(Replacer)
-        For Each v In colIndexes
+        For Each v In colIndexes.Items()
             c = CLng(v)
             sgX.SliceAt(c).SlicedArray vSliced
             t = vSliced
@@ -220,7 +220,7 @@ Public Function ReplaceValues(ByRef TargetTable As Variant, ByRef Replacer As Va
         Next v
     Else
         Set cb = Replacer
-        For Each v In colIndexes
+        For Each v In colIndexes.Items()
             c = CLng(v)
             sgX.SliceAt(c).SlicedArray vSliced
             t = vSliced
@@ -665,6 +665,8 @@ End Function
 Public Function GetWorksheet(ByRef SourceSheet As Variant, ByVal WorksheetNameOrIndex As Variant) As xlSheetsEx
     Dim xlSheet As xlSheetsEx
 
+    If IsNumeric(WorksheetNameOrIndex) Then WorksheetNameOrIndex = CInt(WorksheetNameOrIndex)
+
     Set xlSheet = SourceSheet
     Set GetWorksheet = pTaskController.AddResource(xlSheet.GetSheet(WorksheetNameOrIndex))
 End Function
@@ -849,13 +851,21 @@ Private Sub AddAllTasks()
 
     ' TODO: AddTask "ReplaceColumnNames", "[Source]: Table, Replacer: Callable|Dictionary"
 
-    AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()"
+    AddTask "RemoveColumns", "[Source]: Table, ColumnIndexes: Array()", _
+            Description:="Removes the specified columns from the Source Table.", _
+            Usage:=""
 
-    AddTask "MoveColumnsToTheEnd", "[Source]: Table, ColumnIndexes: Array()"
+    AddTask "MoveColumnsToTheEnd", "[Source]: Table, ColumnIndexes: Array()", _
+            Description:="Moves the specified columns to the end of the Source Table.", _
+            Usage:=""
 
-    AddTask "MoveColumnsToTheStart", "[Source]: Table, ColumnIndexes: Array()"
+    AddTask "MoveColumnsToTheStart", "[Source]: Table, ColumnIndexes: Array()", _
+            Description:="Moves the specified columns to the start of the Source Table.", _
+            Usage:=""
 
-    AddTask "MoveColumn", "[Source]: Table, ColumnIndex: Long, [MoveCount = 1]: Long"
+    AddTask "MoveColumn", "[Source]: Table, ColumnIndex: Long, [MoveCount = 1]: Long", _
+            Description:="Moves a single column a specified number of positions within the Source Table.", _
+            Usage:=""
 
     ' --- DATA SOURCE TASKS ---
 
@@ -904,15 +914,25 @@ Private Sub AddAllTasks()
 
     ' --- XL FORMATTING TASKS ---
 
-    AddTask "AutoSizeCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
+    AddTask "AutoSizeCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", _
+            Description:="Formats the cells in the specified range to automatically adjust their width and height to fit the content.", _
+            TaskType:="XL", Requires:="X*", Usage:=""
 
-    AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, TableStyle: String", TaskType:="XL"
+    AddTask "FormatAsTable", "[Source]: Worksheet, [TableName = 'xlSheetTable%1']: String, TableStyle: String", _
+            Description:="Applies a predefined table style to the specified range in the worksheet.", _
+            TaskType:="XL", Requires:="X*", Usage:=""
 
-    AddTask "FreezeHeaders", "[Source]: Worksheet, [HeaderRows = 1]: Long, [HeaderColumns = 0]: Long", TaskType:="XL"
+    AddTask "FreezeHeaders", "[Source]: Worksheet, [HeaderRows = 1]: Long, [HeaderColumns = 0]: Long", _
+            Description:="Freezes the specified number of header rows and columns in the worksheet, so they remain visible while scrolling.", _
+            TaskType:="XL", Usage:=""
 
-    AddTask "AutoFormatCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", TaskType:="XL"
+    AddTask "AutoFormatCells", "[Source]: Worksheet, [RangeAddress = .UsedRange()]: String|Excel.Range", _
+            Description:="Applies a predefined autoformat to the cells in the specified range.", _
+            TaskType:="XL", Usage:=""
 
-    AddTask "WindowVisibility", "[Source]: Worksheet, [Visible = True]: Boolean", TaskType:="XL"
+    AddTask "WindowVisibility", "[Source]: Worksheet, [Visible = True]: Boolean", _
+            Description:="Sets the visibility of the Excel application window.", _
+            TaskType:="XL", Usage:=""
 
     ' --- DEV / DEBUG ---
 

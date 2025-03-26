@@ -105,7 +105,7 @@ End Function
 Public Function SliceAllRanges(ByVal AllRanges As ArrayListEx) As ArraySlice
     Dim aX As New ArrayListEx, v As Variant, rMin As Long, rMax As Long, iMin As Long, iMax As Long, sMod As Long, vRange As Variant
 
-    For Each vRange In AllRanges
+    For Each vRange In AllRanges.Items()
         iMin = vRange(0)
         iMax = iMin + (vRange(1) - 1)
         ' ArrayLike, ColumnIndex, Index, GetCount

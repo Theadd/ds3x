@@ -239,8 +239,10 @@ Private Sub OpenConnection(ByVal CursorLocation As ADODB.CursorLocationEnum)
 End Sub
 
 Public Sub Dispose()
+    On Error Resume Next
     If Not pConn Is Nothing Then
         pConn.Close
         Set pConn = Nothing
     End If
+    On Error GoTo 0
 End Sub

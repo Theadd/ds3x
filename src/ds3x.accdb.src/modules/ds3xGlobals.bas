@@ -16,7 +16,7 @@ Public Const SW_SHOW = 5
 ' --- ScreenLib Types ---
 
 Public Type POINTAPI
-    X As Long
+    x As Long
     Y As Long
 End Type
 
@@ -28,7 +28,7 @@ Public Type RECT
 End Type
 
 Public Type BOUNDS
-    X As Long
+    x As Long
     Y As Long
     W As Long
     h As Long
@@ -59,8 +59,8 @@ End Function
     End Sub
 
     ' Adds a preset file to the runnable tasks queue
-    Public Sub AddRunnableTask(ByVal TargetPath As String, Optional ByVal RunnableTaskName As String = "", Optional ByVal OnErrorResumeNext As Boolean = False)
-        dsApp.RunnableTasks.Add Array(TargetPath, RunnableTaskName, OnErrorResumeNext)
+    Public Sub AddRunnableTask(ByVal targetPath As String, Optional ByVal RunnableTaskName As String = "", Optional ByVal OnErrorResumeNext As Boolean = False)
+        dsApp.RunnableTasks.Add Array(targetPath, RunnableTaskName, OnErrorResumeNext)
     End Sub
 
     Public Sub ClearAllRunnableTasks()
@@ -107,4 +107,38 @@ Public Function Printf(ByVal mask As String, ParamArray Tokens() As Variant) As 
     Next i
 
     Printf = Join(parts, vbNullString)
+End Function
+
+Public Function HttpGetRequest(url As String, Optional headers As Variant) As String
+  Dim objHTTP As Object
+  Dim strResponse As String
+  
+  On Error GoTo ErrorHandler
+  
+  Set objHTTP = CreateObject("MSXML2.XMLHTTP")
+  objHTTP.Open "GET", url, False
+  
+  If Not IsMissing(headers) Then
+    Dim key As Variant
+    For Each key In headers
+      objHTTP.setRequestHeader key, headers(key)
+    Next key
+  End If
+  
+  objHTTP.send
+  
+  If objHTTP.Status = 200 Then
+    strResponse = objHTTP.responseText
+  Else
+    strResponse = "Error: " & objHTTP.Status & " - " & objHTTP.statusText
+  End If
+  
+  HttpGetRequest = strResponse
+  
+  Set objHTTP = Nothing
+  Exit Function
+  
+ErrorHandler:
+  HttpGetRequest = "Error: " & Err.Number & " - " & Err.Description
+  Set objHTTP = Nothing
 End Function

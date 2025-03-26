@@ -72,6 +72,10 @@
       "Value": true,
       "Type": 1
     },
+    "DocUICustomization": {
+      "Value": "<mso:customUI xmlns:mso=\"http://schemas.microsoft.com/office/2006/01/customui\"><mso:ribbon><mso:qat><mso:documentControls><mso:control idQ=\"mso:PasteSpecial\" visible=\"true\"/></mso:documentControls></mso:qat></mso:ribbon></mso:customUI>\r\n",
+      "Type": 10
+    },
     "HasOfflineLists": {
       "Value": 70,
       "Type": 3
@@ -97,7 +101,7 @@
       "Type": 4
     },
     "NavPane Width": {
-      "Value": 215,
+      "Value": 394,
       "Type": 4
     },
     "Never Cache": {

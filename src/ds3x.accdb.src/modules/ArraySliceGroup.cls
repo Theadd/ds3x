@@ -199,7 +199,7 @@ Public Function GetRows(ByRef RowIndexes As Variant, Optional ByVal ModIndex As 
     Next r
 
     Set gX = ArrayListEx.Create()
-    For Each vSlice In pGroups
+    For Each vSlice In pGroups.Items()
         gX.Add C2ArraySlice(vSlice).SliceAllRanges(aX)
     Next vSlice
 

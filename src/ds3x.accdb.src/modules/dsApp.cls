@@ -86,7 +86,7 @@ End Property
             Set pLiveEd = New dsLiveEd
             sTarget = FileSystemLib.Resolve(ApplyCustomVarsOn(CStr(t(0))))
             If CStr(t(1)) = "" Then
-                CustomVar("TaskName") = FileSystemLib.FSO.GetBaseName(sTarget)
+                CustomVar("TaskName") = FileSystemLib.fso.GetBaseName(sTarget)
             Else
                 CustomVar("TaskName") = ApplyCustomVarsOn(CStr(t(1)))
             End If
@@ -120,7 +120,7 @@ Finally:
         On Error Resume Next
         If Not pLiveEd Is Nothing Then pLiveEd.Dispose
         RunAll = shouldContinue
-        If pQuitOnRunAll Then Application.Quit acQuitPrompt
+        If pQuitOnRunAll Then Application.Quit acQuitSaveNone 'acQuitPrompt
         On Error GoTo 0
         Exit Property
 ErrorHandler:
@@ -166,7 +166,7 @@ ErrorHandler:
             CustomVar(vArg(0)) = vArg(1)
         Next vArg
 
-        For Each vArg In aX
+        For Each vArg In aX.Items()
             AddRunnableTask CStr(vArg(0)), CStr(vArg(1)), isContinue
         Next vArg
 
@@ -202,7 +202,7 @@ Public Function Create(ByVal TargetType As String) As Object
         Case "DS_SCROLLVIEW": Set Create = New Form_DS_SCROLLVIEW
         Case "DS_LIVE_EDITOR": Set Create = New Form_DS_LIVE_EDITOR
         Case "dsQuery": Set Create = New dsQuery
-        Case "dsComparer": Set Create = New dsComparer
+        Case "Comparer": Set Create = New Comparer
         Case "dsGridSelectionController": Set Create = New dsGridSelectionController
         Case Else
             Err.Raise 17, , "TargetType " & TargetType & " is invalid in dsApp.Create()."

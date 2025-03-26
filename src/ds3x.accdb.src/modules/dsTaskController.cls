@@ -332,7 +332,7 @@ End Sub
 Private Function GetNextSequenceId(ByVal IdPrefix As String) As String
     Dim Item As Variant, dX As New DictionaryEx, curId As Long, maxId As Long
 
-    For Each Item In RebuildSequence
+    For Each Item In RebuildSequence.Items()
         dX.Bind Item
         If dX("Id") Like IdPrefix & "*" Then
             curId = CLng(Val(VBA.Mid(dX("Id"), Len(IdPrefix) + 1)))
